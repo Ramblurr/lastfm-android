@@ -2,13 +2,12 @@ package fm.last.Android;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 
-public class ScrobblerActivity extends Activity
+public class ScrobblerTestActivity extends Activity
 {
 	private ServiceConnection m_connection = new ServiceConnection()
 	{
@@ -24,9 +23,14 @@ public class ScrobblerActivity extends Activity
 	{
 		super.onCreate( icicle );
 		
-		bindService( new Intent( this, 
-					 ScrobblerService.class ),
-					 m_connection, 
-					 Context.BIND_AUTO_CREATE );
+        Bundle args = new Bundle();
+        args.putString( "command", "start" );
+        args.putString( "artist", "Foo" );
+        args.putString( "title", "Bar" );
+        args.putInt( "duration", 300 );
+		
+        Intent intent = new Intent( ScrobblerTestActivity.this, ScrobblerService.class);
+        
+        startService( intent, args );
 	}
 }
