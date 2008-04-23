@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package fm.last.Android;
+package fm.last;
 
 public final class R {
     public static final class attr {

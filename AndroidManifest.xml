@@ -1,5 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fm.last.Android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fm.last">
 <application>
-<activity android:name="ScrobblerTestActivity">
-</activity><service android:name="ScrobblerService">
-</service></application></manifest>
+<activity android:name="ScrobblerTestActivity"></activity>
+<service android:name="ScrobblerService"></service>
+</application></manifest>

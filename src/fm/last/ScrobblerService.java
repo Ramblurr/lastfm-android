@@ -1,4 +1,4 @@
-package fm.last.Android;
+package fm.last;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -22,13 +22,23 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import fm.last.Android.Track.Rating;
+import fm.last.Track.Rating;
+
+
+class Utils
+{
+	static long now()
+	{
+		//TODO check this is UTC
+		return System.currentTimeMillis() / 1000;
+	}	
+}
 
 
 class Track
 {
 	enum Source { Player, LastFm }
-	enum Rating { Scrobbled, Skipped, Loved, Banned }
+	enum Rating { Unrated, Scrobbled, Skipped, Loved, Banned }
 	
 	// in order of submission parameters
 	String artist;
@@ -46,8 +56,32 @@ class Track
 	Track()
 	{
 		source = Source.Player;
-		rating = Rating.Scrobbled;
+		rating = Rating.Unrated;
 		mbid = "";
+	}
+
+	//TODO stupid function, bearing in mind Unrated possibility
+	public boolean requiresScrobble() 
+	{
+		return rating != Rating.Unrated;
+	}
+
+	public boolean isValid() 
+	{
+		return !(artist == null && title == null);
+	}
+
+	public void setPlaybackEnded() 
+	{
+		if (!isValid())
+			return;
+		
+		//TODO better system where skipped/scrobbled is determined by list of stop/start times
+		//TODO as this overwrites the love ban info
+		if (timestamp + duration / 2 <= Utils.now() )
+			rating = Rating.Scrobbled;
+		else if (source == Source.LastFm)
+			rating = Rating.Skipped;
 	}
 }
 
@@ -95,7 +129,7 @@ class SanitisedTrack extends Track
 		{
 			case Banned: return "B";
 			case Loved: return "L";
-			case Scrobbled: return "";
+			//case Scrobbled: return "";
 			case Skipped: return "S";
 		}
 		
@@ -135,13 +169,7 @@ public class ScrobblerService extends Service
     	n.tickerText = text;
     	((NotificationManager) getSystemService( NOTIFICATION_SERVICE )).notify( 0, n );
 	}
-	
-	private long now()
-	{
-		//TODO check this is UTC
-		return System.currentTimeMillis() / 1000;
-	}	
-	
+		
 	private String md5( String in ) throws NoSuchAlgorithmException
 	{
 		MessageDigest m = MessageDigest.getInstance( "MD5" );
@@ -164,12 +192,12 @@ public class ScrobblerService extends Service
 		
 		//TODO percent encode username
 		//TODO toLower the md5 of the password
-		String timestamp = new Long( now() ).toString();
+		String timestamp = new Long( Utils.now() ).toString();
 		String authToken = md5( password + timestamp );
 		String query = "?hs=true" +
 					   "&p=1.2" +
-					   "&c=foo" +
-					   "&v=1.0" +
+					   "&c=ass" +
+					   "&v=1.5" +
 					   "&u=" + URLEncoder.encode( username, "UTF-8" ) +
 					   "&t=" + timestamp +
 					   "&a=" + authToken;
@@ -203,6 +231,7 @@ public class ScrobblerService extends Service
 		}
 	}
 	
+	
 	@Override
     public void onCreate()
     {
@@ -225,6 +254,7 @@ public class ScrobblerService extends Service
     		Log.e( TAG, e.toString() );
     	}
     }
+	
     
     private Track m_track = new Track();
     
@@ -243,12 +273,25 @@ public class ScrobblerService extends Service
     	return Command.Invalid;
     }
     
+    
     @Override
     public void onStart( int startId, Bundle args )
     {
     	Log.i( TAG, args.toString());
-   	
-    	switch (commandFromString( args.getString( "command" ) ))
+
+    	Command command = commandFromString( args.getString( "command" ) );
+    	
+    	switch (command)
+    	{
+    		case Start:
+    		case Stop:
+				m_track.setPlaybackEnded();
+				
+				if (m_track.requiresScrobble())
+					scrobble( new SanitisedTrack( m_track ) );
+    	}
+    	
+    	switch (command)
     	{
     		case Start:
     		{
@@ -258,7 +301,7 @@ public class ScrobblerService extends Service
     			t.duration = args.getInt( "duration" );
     			t.auth = args.getString( "authorisation-code" );
     			t.mbid = args.getString( "mbid" );
-    			t.timestamp = now();
+    			t.timestamp = Utils.now();
     			t.trackNumber = args.getInt( "track-number" );
     			t.album = args.getString( "album" );
     			
@@ -280,6 +323,7 @@ public class ScrobblerService extends Service
     		case Resume:
     			
     		case Stop:
+    			m_track = new Track();
     			
     		default:
     			break;

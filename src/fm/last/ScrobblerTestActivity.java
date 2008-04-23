@@ -1,4 +1,4 @@
-package fm.last.Android;
+package fm.last;
 
 import android.app.Activity;
 import android.content.ComponentName;
