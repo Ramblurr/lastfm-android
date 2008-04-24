@@ -2,4 +2,19 @@
 <application>
 <activity android:name="ScrobblerTestActivity"></activity>
 <service android:name="ScrobblerService"></service>
-</application></manifest>
+
+<activity android:name=".RadioClient" android:label="@string/app_name">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER"/>
+    </intent-filter>
+</activity>
+<activity android:label="@string/app_name" android:name=".AccountSettings">
+	<intent-filter>
+		<action android:name="android.intent.action.ACCOUNTSETTINGS"/>
+		<category android:name="android.intent.category.DEFAULT"/>
+</intent-filter>
+</activity>
+
+</application>
+</manifest>
