@@ -11,39 +11,33 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import fm.last.Track.Rating;
+import fm.last.Utils;
 
-class Utils {
-	static long now() {
-		// TODO check this is UTC
-		return System.currentTimeMillis() / 1000;
-	}
-}
-
-class Track {
-	enum Source {
-		Player, LastFm
-	}
-
-	enum Rating {
-		Unrated, Scrobbled, Skipped, Loved, Banned
-	}
-
+class Track
+{
+	enum State { Stopped, Playing, Paused }
+	enum Source { Player, LastFm }
+	enum Rating { Unrated, Scrobbled, Skipped, Loved, Banned }
+	enum Transition { Started, Ended, Paused, Resumed }
+	
 	// in order of submission parameters
 	String artist;
 	String title;
-	long timestamp;
 	Source source;
 	Rating rating;
 	int duration;
@@ -51,11 +45,17 @@ class Track {
 	int trackNumber;
 	String mbid;
 
+	private State state;
+	
+	//FIXME is this a reference too?
+	State getState() { return state; }
+	
 	String auth; // Last.fm Radio tracks come with auth codes
 
 	Track() {
 		source = Source.Player;
 		rating = Rating.Unrated;
+		state = State.Stopped;
 		mbid = "";
 	}
 
@@ -68,17 +68,79 @@ class Track {
 		return !(artist == null && title == null);
 	}
 
-	public void setPlaybackEnded() {
-		if (!isValid())
-			return;
+	// used to calculate duration, adjacent timestamps are regions of playback
+	// ie 300 -> 400 is 100 seconds of playback, if another timestamp occurs, it 
+	// is assumed playback resumed, a final timestamp will be required for this
+	// region to be counted. It's up to you to ensure you don't timestamp incorrectly
+	// eg. adding to pause start timestamps will break the eventual playTime() 
+	// calculation
+	protected List timestamps = new ArrayList( 2 /*initial capacity*/ );
 
-		// TODO better system where skipped/scrobbled is determined by list of
-		// stop/start times
-		// TODO as this overwrites the love ban info
-		if (timestamp + duration / 2 <= Utils.now())
-			rating = Rating.Scrobbled;
-		else if (source == Source.LastFm)
-			rating = Rating.Skipped;
+	private void stamp()
+	{
+		timestamps.add( Utils.now() );
+	}
+
+	void handleTransition( Transition t )
+	{
+		switch (t)
+		{
+			case Started:
+				if (state == State.Stopped)
+					stamp();
+				state = State.Playing;
+				break;
+			
+			case Ended:
+				if (state == State.Playing)
+					stamp();
+				
+				switch (rating)
+				{
+					case Unrated:
+					case Skipped:   // in case we fucked up
+					case Scrobbled: // in case we fucked up
+						long l = playTime();
+						if (playTime() >= duration / 2)
+							rating = Rating.Scrobbled;
+						else if (source == Source.LastFm)
+							rating = Rating.Skipped;
+					
+					case Loved:
+					case Banned:
+						// these implicitly scrobble too
+						break;
+				}
+				
+				state = State.Stopped;
+				break;
+				
+			case Paused:
+				if (state == State.Playing)
+					stamp();
+				state = State.Paused;
+				break;
+				
+			case Resumed:
+				if (state == State.Paused)
+					stamp();
+				state = State.Playing;
+				break;
+		}
+	}
+
+	Long playTime()
+	{
+		Iterator i = timestamps.iterator();
+		
+		long playTime = 0;
+		while (i.hasNext())
+		{
+			long start = (Long) i.next();
+			if (i.hasNext())
+				playTime += ((Long) i.next()) - start;
+		}
+		return playTime;
 	}
 }
 
@@ -89,47 +151,42 @@ class SanitisedTrack extends Track {
 		t = tt;
 	}
 
-	private String formUrlEncoded(String in) {
-		try {
+	private String formUrlEncoded(String in) 
+	{
+		try
+		{
 			return URLEncoder.encode(in, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
 			return "";
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) 
+		{
 			return "";
 		}
 	}
-
-	String artist() {
-		return formUrlEncoded(t.artist);
-	}
-
-	String title() {
-		return formUrlEncoded(t.title);
-	}
-
-	String timestamp() {
-		return new Long(t.timestamp).toString();
-	}
-
-	String source() {
-		switch (t.source) {
-		case LastFm:
-			return "L" + t.auth;
-		default:
-			return "P";
+	
+	String artist() { return formUrlEncoded( t.artist ); }
+	String title() { return formUrlEncoded( t.title ); }
+	String timestamp() { return ((Long)t.timestamps.get( 0 )).toString(); } //FIXME throw if not enough elements in timestamps?
+	String source()
+	{
+		switch (t.source)
+		{
+			case LastFm: return "L" + t.auth;
+			default: return "P";
 		}
 	}
 
-	String rating() {
+	String rating()
+	{
 		// precedence order
-		switch (t.rating) {
-		case Banned:
-			return "B";
-		case Loved:
-			return "L";
-			// case Scrobbled: return "";
-		case Skipped:
-			return "S";
+		switch (t.rating) 
+		{
+			case Banned: return "B";
+			case Loved: return "L";
+			case Skipped: return "S";
 		}
 
 		// prevent compiler error -- lame
@@ -154,7 +211,8 @@ class SanitisedTrack extends Track {
 	}
 }
 
-public class ScrobblerService extends Service {
+public class ScrobblerService extends Service
+{
 	private static final String TAG = "Last.fm";
 
 	private String httpConnectionOutput(HttpURLConnection http)
@@ -177,43 +235,32 @@ public class ScrobblerService extends Service {
 				0, n);
 	}
 
-	private String md5(String in) throws NoSuchAlgorithmException {
-		MessageDigest m = MessageDigest.getInstance("MD5");
-		m.update(in.getBytes(), 0, in.length());
-		BigInteger bi = new BigInteger(1, m.digest());
-		return bi.toString(16);
-	}
-
 	private String m_session_id;
 	private String m_now_playing_url;
 	private String m_submission_url;
-
-	public String sessionId() {
-		return m_session_id;
-	}
-
-	public URL nowPlayingUrl() throws MalformedURLException {
-		return new URL(m_now_playing_url);
-	}
-
-	public URL submissionUrl() throws MalformedURLException {
-		return new URL(m_submission_url);
-	}
-
-	private void handshake(String username, String password)
-			throws IOException, NoSuchAlgorithmException {
-		notify("Handshaking");
-
-		// TODO percent encode username
-		// TODO toLower the md5 of the password
-		String timestamp = new Long(Utils.now()).toString();
-		String authToken = md5(password + timestamp);
-		String query = "?hs=true" + "&p=1.2" + "&c=ass" + "&v=1.5" + "&u="
-				+ URLEncoder.encode(username, "UTF-8") + "&t=" + timestamp
-				+ "&a=" + authToken;
-
-		URL url = new URL("http://post.audioscrobbler.com/" + query);
-
+	
+	public String sessionId() { return m_session_id; }
+	public URL nowPlayingUrl() throws MalformedURLException { return new URL( m_now_playing_url ); }
+	public URL submissionUrl() throws MalformedURLException { return new URL( m_submission_url ); }
+	
+	private void handshake( String username, String password ) throws IOException, NoSuchAlgorithmException
+	{
+		notify( "Handshaking" );
+		
+		//TODO percent encode username
+		//TODO toLower the md5 of the password
+		String timestamp = new Long( Utils.now() ).toString();
+		String authToken = Utils.md5( password + timestamp );
+		String query = "?hs=true" +
+					   "&p=1.2" +
+					   "&c=ass" +
+					   "&v=" + Utils.version() +
+					   "&u=" + URLEncoder.encode( username, "UTF-8" ) +
+					   "&t=" + timestamp +
+					   "&a=" + authToken;
+		
+		URL url = new URL( "http://post.audioscrobbler.com/" + query );
+		
 		HttpURLConnection http = (HttpURLConnection) url.openConnection();
 		http.setRequestMethod("GET");
 		String out = httpConnectionOutput(http);
@@ -239,95 +286,124 @@ public class ScrobblerService extends Service {
 	}
 
 	@Override
-	public void onCreate() {
-		Log.e(TAG, "Oh Hai!");
+    public void onCreate()
+    {
+		Log.e( TAG, "Oh Hai!" );
+    	
+    	notify( "Initialising AudioScrobbler" );
+    	
+		try
+    	{
+			SharedPreferences p = getSharedPreferences( "Last.fm", MODE_PRIVATE );
+			String user = p.getString( "username", "" );
+			String pass = p.getString( "md5Password", "" );
 
-		notify("Initialising AudioScrobbler");
+	    	handshake( user, pass );
+    	}
+    	catch (NoSuchAlgorithmException e)
+    	{
+    		//TODO error handling
+    		Log.e( TAG, e.toString() );
+    	}
+		catch (IOException e)
+    	{
+    		//TODO error handling
+    		Log.e( TAG, e.toString() );
+    	}
+    }
+	
+    
+    private Track m_track = new Track();
+    
+    enum Event { Unknown, TrackStarted, TrackLoved, TrackBanned, PlaybackPaused, PlaybackResumed, PlaybackEnded }
+    
+    private Event eventFromString( String s )
+    {
+    	s = s.toLowerCase();
+    	
+    	if (s.equals( "track-started" )) return Event.TrackStarted;
+    	if (s.equals( "track-loved" )) return Event.TrackLoved;
+    	if (s.equals( "track-banned" )) return Event.TrackBanned;
+    	if (s.equals( "playback-paused" )) return Event.PlaybackPaused;
+    	if (s.equals( "playback-resumed" )) return Event.PlaybackResumed;
+    	if (s.equals( "playback-ended" )) return Event.PlaybackEnded;
+    	
+    	return Event.Unknown;
+    }
+    
+    
+    @Override
+    public void onStart( int startId, Bundle args )
+    {
+    	Log.i( TAG, args.toString());
 
-		try {
-			handshake("2girls1cup", "77e3c764678e809f1e72727c1f26e3f3");
-		} catch (NoSuchAlgorithmException e) {
-			//TODO error handling
-			Log.e(TAG, e.toString());
-		} catch (IOException e) {
-			//TODO error handling
-			Log.e(TAG, e.toString());
+    	Event e = eventFromString( args.getString( "event" ) );
+
+    	switch (e)
+    	{
+	    	case TrackStarted:
+	    		if (m_track.getState() != Track.State.Playing)
+	    			break;
+	    		
+	    		// scrobble the previous track
+	    		
+	    	case PlaybackEnded:
+				m_track.handleTransition( Track.Transition.Ended );
+				if (m_track.requiresScrobble())
+					scrobble( new SanitisedTrack( m_track ) );
+				break;
 		}
-	}
-
-	private Track m_track = new Track();
-
-	enum Command {
-		Invalid, Start, Love, Pause, Resume, Stop
-	}
-
-	private Command commandFromString(String s) {
-		s = s.toLowerCase();
-
-		if (s.equals("start"))
-			return Command.Start;
-		if (s.equals("love"))
-			return Command.Love;
-		if (s.equals("pause"))
-			return Command.Pause;
-		if (s.equals("resume"))
-			return Command.Resume;
-		if (s.equals("stop"))
-			return Command.Stop;
-
-		return Command.Invalid;
-	}
-
-	@Override
-	public void onStart(int startId, Bundle args) {
-		Log.i(TAG, args.toString());
-
-		Command command = commandFromString(args.getString("command"));
-
-		switch (command) {
-		case Start:
-		case Stop:
-			m_track.setPlaybackEnded();
-
-			if (m_track.requiresScrobble())
-				scrobble(new SanitisedTrack(m_track));
-		}
-
-		switch (command) {
-		case Start: {
-			Track t = new Track();
-			t.artist = args.getString("artist");
-			t.title = args.getString("title");
-			t.duration = args.getInt("duration");
-			t.auth = args.getString("authorisation-code");
-			t.mbid = args.getString("mbid");
-			t.timestamp = Utils.now();
-			t.trackNumber = args.getInt("track-number");
-			t.album = args.getString("album");
-
-			t.source = args.getString("source") == "Last.fm" ? Track.Source.LastFm
-					: Track.Source.Player;
-
-			m_track = t;
-		}
-			break;
-
-		case Love:
-			//TODO verify we're loving the right track
-			m_track.rating = Rating.Loved;
-			break;
-
-		case Pause:
-
-		case Resume:
-
-		case Stop:
-			m_track = new Track();
-
-		default:
-			break;
-		}
-	}
+    	
+    	switch (e)
+    	{
+    		case TrackStarted:
+    		{
+    			Track t = new Track();
+    			t.artist = args.getString( "artist" );
+    			t.title = args.getString( "title" );
+    			t.duration = args.getInt( "duration" );
+    			t.auth = args.getString( "authorisation-code" );
+    			t.mbid = args.getString( "mbid" );
+    			t.trackNumber = args.getInt( "track-number" );
+    			t.album = args.getString( "album" );
+    			
+    			t.source = args.getString( "source" ) == "Last.fm"
+     					 ? Track.Source.LastFm
+    					 : Track.Source.Player;
+    			
+    			t.handleTransition( Track.Transition.Started );
+    			
+    			m_track = t;
+    			
+    			nowPlaying( new SanitisedTrack( m_track ) );
+    		}
+    		break;
+    		
+    		case TrackLoved:
+    			//TODO verify we're loving the right track
+    			m_track.rating = Track.Rating.Loved;
+    			break;
+    			
+    		case TrackBanned:
+    			m_track.rating = Track.Rating.Banned;
+    			break;
+    		
+    		case PlaybackPaused:
+    			m_track.handleTransition( Track.Transition.Paused );
+    			break;
+    			
+    		case PlaybackResumed:
+    			m_track.handleTransition( Track.Transition.Resumed );
+    			break;
+    			
+    		case PlaybackEnded:
+    			m_track.handleTransition( Track.Transition.Ended );
+    			m_track = new Track();
+    			
+    		default:
+    			break;
+    	}
+    }
 
 	@Override
 	protected void onDestroy() {

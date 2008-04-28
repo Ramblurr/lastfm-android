@@ -15,14 +15,16 @@ import android.view.*;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class RadioClient extends Activity {
+public class RadioClient extends Activity 
+{
 	private Radio m_radio = null;
 	private EditText artistField;
 	private MediaPlayer m_mediaPlayer;
 	private SharedPreferences m_preferences = null;
 
 	/** Called when the activity is first created. */
-	public void onCreate(Bundle icicle) {
+	public void onCreate(Bundle icicle)
+	{
 		super.onCreate(icicle);
 		setContentView(R.layout.main);
 
@@ -43,8 +45,10 @@ public class RadioClient extends Activity {
 		loginButton.setOnClickListener(onLoginPush);
 	}
 
-	private OnClickListener onLoginPush = new OnClickListener() {
-		public void onClick(View v) {
+	private OnClickListener onLoginPush = new OnClickListener()
+	{
+		public void onClick(View v)
+		{
 			String userName = m_preferences.getString("username", "");
 			String userPassword = m_preferences.getString("md5Password", "");
 			String artist = artistField.getText().toString();

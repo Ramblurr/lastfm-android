@@ -17,18 +17,18 @@ public class ScrobblerTestActivity extends Activity {
 	};
 
 	@Override
-	protected void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-
-		Bundle args = new Bundle();
-		args.putString("command", "start");
-		args.putString("artist", "Foo");
-		args.putString("title", "Bar");
-		args.putInt("duration", 300);
-
-		Intent intent = new Intent(ScrobblerTestActivity.this,
-				ScrobblerService.class);
-
-		startService(intent, args);
+	protected void onCreate( Bundle icicle )
+	{
+		super.onCreate( icicle );
+		
+        Bundle args = new Bundle();
+        args.putString( "event", "track-started" );
+        args.putString( "artist", "Foo" );
+        args.putString( "title", "Bar" );
+        args.putInt( "duration", 300 );
+		
+        Intent intent = new Intent( ScrobblerTestActivity.this, ScrobblerService.class);
+        
+        startService( intent, args );
 	}
 }

@@ -16,7 +16,11 @@ import android.os.Handler;
 
 import android.content.*;
 
-public class AccountSettings extends Activity {
+import fm.last.Utils; 
+
+
+public class AccountSettings extends Activity 
+{
 	private EditText userField, passwordField;
 	private final Handler m_handler = new Handler();
 	ProgressDialog m_progress = null;
@@ -50,7 +54,7 @@ public class AccountSettings extends Activity {
 		public void run() {
 
 			final String userName = userField.getText().toString();
-			final String userPassword = md5(passwordField.getText().toString());
+			final String userPassword = Utils.md5(passwordField.getText().toString());
 			m_loginTest = new RadioHandshake(userName, userPassword);
 
 			m_loginTest.connect();
@@ -81,15 +85,4 @@ public class AccountSettings extends Activity {
 					getResources().getString(R.string.badAuth), "OK", true);
 		}
 	};
-
-	private String md5(String in) {
-		try {
-			MessageDigest m = MessageDigest.getInstance("MD5");
-			m.update(in.getBytes(), 0, in.length());
-			return (new BigInteger(1, m.digest())).toString(16);
-		} catch (java.security.NoSuchAlgorithmException e) {
-			Log.e("Last.fm", e.toString());
-			return "";
-		}
-	}
 }
