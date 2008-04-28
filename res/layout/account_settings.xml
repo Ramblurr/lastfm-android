@@ -1,35 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="fill_parent"
-             android:layout_height="fill_parent"
-             android:stretchColumns="1">
-  <TableRow>
-    <TextView 
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/username"/>
-    <EditText
-        android:id="@+id/login_username"
-        android:layout_width="wrap_content"
-        android:layout_height="11pt"
-        android:hint="@string/username"/>
-  </TableRow>
-  <TableRow>
-    <TextView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/password"/>
-    <EditText
-        android:id="@+id/login_password"
-        android:layout_width="fill_parent"
-        android:layout_height="11pt"
-        android:hint="@string/password"
-        android:password="true"/>
-  </TableRow>
-  <Button
-    android:id="@+id/login_button"
-    android:text="login"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"/>
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:stretchColumns="1">
+	<TableRow>
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/username" />
+		<EditText android:id="@+id/login_username"
+			android:layout_width="wrap_content" android:layout_height="11pt"
+			android:hint="@string/username" />
+	</TableRow>
+	<TableRow>
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:text="@string/password" />
+		<EditText android:id="@+id/login_password"
+			android:layout_width="fill_parent" android:layout_height="11pt"
+			android:hint="@string/password" android:password="true" />
+	</TableRow>
+	<Button android:id="@+id/login_button" android:text="login"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
 </TableLayout>
 
