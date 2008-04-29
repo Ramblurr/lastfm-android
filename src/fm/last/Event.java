@@ -16,15 +16,15 @@ import android.util.Log;
 
 public class Event {
 	private String m_title, m_headliner;
-	private String[] m_artists;
+	private ArrayList<String> m_artists;
 
 	private long m_duration;
 
 	public Event() {
 	}
 
-	public static Event[] getByLocation(String location) {
-		ArrayList<Event> eventList;
+	public static EventList getByLocation(String location) {
+		EventList eventList = null;
 		try {
 			String eventRequestlocation = "http://ws.audioscrobbler.com/2.0/?method=geo.getEvents&location="
 					+ URLEncoder.encode(location, "UTF-8");
@@ -39,7 +39,10 @@ public class Event {
 			Element rootElement = doc.getDocumentElement();
 			NodeList events = rootElement.getElementsByTagName("event");
 			final int eventCount = events.getLength();
-			eventList = new ArrayList<Event>();
+			eventList = new EventList();
+			
+			//eventList.m_totalCount = rootElement.getAttribute(name)
+			eventList.m_totalCount = 100;
 			for (int i = 0; i < eventCount; i++) {
 				Event event = new Event();
 				event.read((Element) events.item(i));
@@ -47,25 +50,17 @@ public class Event {
 			}
 		} catch (java.net.MalformedURLException e) {
 			Log.e("Last.fm", "Malformed events lookup URL: " + e);
-			return new Event[] {};
-
 		} catch (java.io.IOException e) {
 			Log.e("Last.fm", "Could not read from http stream: " + e);
-			return new Event[] {};
 		} catch (FactoryConfigurationError e) {
 			Log.e("Last.fm", "DocumentBuilder Factory configuration error: "
 					+ e);
-			return new Event[] {};
 		} catch (ParserConfigurationException e) {
 			Log.e("Last.fm", "Parser Configuration error: " + e);
-			return new Event[] {};
 		} catch (org.xml.sax.SAXException e) {
 			Log.e("Last.fm", "Sax Error: " + e);
-			return new Event[] {};
 		}
-		Event[] eventListArray = new Event[eventList.size()];
-		eventList.toArray(eventListArray);
-		return eventListArray;
+		return eventList;
 	}
 
 	public void read(Element event) {
@@ -86,20 +81,34 @@ public class Event {
 	private void readArtists(Element artists) {
 		NodeList artistNodes = artists.getElementsByTagName("artist");
 		final int artistCount = artistNodes.getLength();
-		ArrayList<String> artistList = new ArrayList<String>();
+		m_artists = new ArrayList<String>();
 		for (int artistIndex = 0; artistIndex < artistCount; artistIndex++) {
 
 			Element artistElement = (Element) artistNodes.item(artistIndex);
 			final String artistName = ((Text) artistElement.getFirstChild())
 					.getData();
 
-			artistList.add(artistName);
+			m_artists.add(artistName);
 		}
-		m_artists = new String[artistList.size()];
-		artistList.toArray(m_artists);
 	}
 
 	public String title() {
 		return m_title;
+	}
+	
+	public String headliner() {
+		return m_headliner;
+	}
+	
+	public ArrayList<String> artists() {
+		return m_artists;
+	}
+
+	public static class EventList extends ArrayList<Event> {
+		private static final long serialVersionUID = -3362761671731676362L;
+		private int m_totalCount;
+		int totalCount() {
+			return m_totalCount;
+		}
 	}
 }

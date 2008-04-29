@@ -36,8 +36,6 @@ public class RadioClient extends Activity
 			startActivity(new Intent("ACCOUNTSETTINGS"));
 		}
 
-		// userField = (EditText)findViewById( R.id.login_username );
-		// passwordField = (EditText)findViewById( R.id.login_password );
 		artistField = (EditText) findViewById(R.id.radio_similarartist);
 
 		final Button loginButton = (Button) findViewById(R.id.login_button);
