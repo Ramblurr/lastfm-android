@@ -8,19 +8,17 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.InputSource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 
 import android.net.Uri;
 
 import fm.last.Log;
-
 
 
 public class Radio 
@@ -31,6 +29,8 @@ public class Radio
 	private String m_baseUrl = null;
 	private String m_basePath = null;
 
+	private Stack<TrackInfo> m_playlist = new Stack<TrackInfo>();
+	
 	Radio( String username, String md5password )
 	{
 		Log.i( "Starting last.fm radio" );
@@ -48,22 +48,17 @@ public class Radio
 	/** @returns station pretty name */
 	public String tuneToSimilarArtist( String artistName ) 
 	{
-		String urlString;
-		urlString = "http://";
-		urlString += m_baseUrl;
-		urlString += "/radio/adjust.php?";
-		urlString += "session=" + m_sessionId + "&";
-		urlString += "url=lastfm://artist/" + artistName + "/similarartists&";
-		urlString += "lang=en";
-		
 		try
 		{
-			URL radioAdjust = new URL( urlString );
+			URL radioAdjust = new URL( "http://" + m_baseUrl + "/radio/adjust.php" +
+					 				   "?session=" + m_sessionId +
+					 				   "&url=lastfm://artist/" + artistName + "/similarartists" +
+					 				   "&lang=en" );
 
-			//TODO use Utils function
-			Log.i( "ADJUST OUTPUT" );
 			String stationName = "", line;
 			BufferedReader reader = new BufferedReader( new InputStreamReader( radioAdjust.openStream(), "UTF-8" ) );
+			
+			Log.i( "ADJUST OUTPUT" );
 			while( (line = reader.readLine()) != null )
 			{
 				Log.i( line );
@@ -73,7 +68,9 @@ public class Radio
 					Log.d( "line startswith stationame" );
 					stationName = Uri.decode( line.substring( 12 ) );
 				}
-			}	
+			}
+			
+			fetch();
 			
 			return stationName;
 		}
@@ -89,48 +86,45 @@ public class Radio
 		return "";
 	}
 
-	public TrackInfo[] getPlaylist()
+	public Stack<TrackInfo> playlist()
 	{
-		String urlString;
-		urlString = "http://";
-		urlString += m_baseUrl;
-		urlString += "/radio/xspf.php?";
-		urlString += "sk=" + m_sessionId + "&";
-		urlString += "discovery=0&";
-		urlString += "&desktop=0.1";
+		return m_playlist;
+	}
 	
-		ArrayList<TrackInfo> tracks = new ArrayList<TrackInfo>();
+	/** fetches 5 new tracks for the playlist, valid while the session is valid */
+	public void fetch()
+	{
 		try 
 		{
-			URL xspfRequest = new URL(urlString);
-			try 
-			{
-				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-				Document doc = db.parse( new InputSource( xspfRequest.openStream() ) );
-				Element rootElement = doc.getDocumentElement();
-				Element trackListElement = (Element) rootElement.getElementsByTagName("trackList").item(0);
-				NodeList trackNodes = trackListElement.getElementsByTagName("track");
+			URL url = new URL( "http://" + m_baseUrl + "/radio/xspf.php" +
+					    	   "?sk=" + m_sessionId + 
+							   "&discovery=0" +
+							   "&desktop=0.1" );
+			
+			Node n = DocumentBuilderFactory.newInstance()
+					   					   .newDocumentBuilder()
+					   					   .parse( new InputSource( url.openStream() ) )
+					   					   .getDocumentElement()
+					   					   .getElementsByTagName( "trackList" )
+					   					   .item( 0 );
+			
+			NodeList tracks = ((Element) n).getElementsByTagName( "track" );
 
-				for (int i = 0; i < trackNodes.getLength(); i++) 
-				{
-					tracks.add( new TrackInfo( (Element) trackNodes.item( i ) ) );
-				}
+			for (int i = 0; i < tracks.getLength(); i++)
+			{
+				m_playlist.push( new TrackInfo( (Element) tracks.item( i ) ) );
 			}
-			catch (org.xml.sax.SAXException e) 
-			{}
-			catch (java.io.IOException e) 
-			{}
-			catch (ParserConfigurationException e) 
-			{}
 		}
+		catch (org.xml.sax.SAXException e) 
+		{}
 		catch (java.net.MalformedURLException e) 
 		{
 			Log.e( "Error: malformed URL: " + e.toString() );
-			return new TrackInfo[] {};
 		}
-		
-		TrackInfo[] array = new TrackInfo[ tracks.size() ];
-		tracks.toArray( array );
-		return array;
+		catch (java.io.IOException e) 
+		{}
+		catch (ParserConfigurationException e) 
+		{}
+
 	}
 }

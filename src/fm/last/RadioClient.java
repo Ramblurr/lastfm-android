@@ -5,7 +5,7 @@ import java.net.*;
 import java.util.*;
 
 import org.kxmlrpc.XmlRpcClient;
-
+	
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
 
@@ -30,27 +30,52 @@ import fm.last.Log;
 public class RadioClient extends Activity 
 {
 	private Radio m_radio = null;
-	private EditText artistField;
 	private MediaPlayer m_mediaPlayer;
-	private SharedPreferences m_preferences = null;
+	
+	private enum Requests { Login } 
 
 	/** Called when the activity is first created. */
 	public void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
-		setContentView( R.layout.main );
+		
+		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
+		String user = prefs.getString( "username", "" );
+		String pass = prefs.getString( "md5Password", "" );
+
+		if( user.length() == 0 || pass.length() == 0 ) 
+		{
+			// show username / password activity
+			startSubActivity( new Intent("ACCOUNTSETTINGS"), Requests.Login.ordinal() );
+			return;
+		}
+		else	
+			init();
+	}
+	
+	protected void onActivityResult( int requestCode, int resultCode, String data, Bundle extras )
+	{
+		if( requestCode == Requests.Login.ordinal() )
+			switch (resultCode)
+			{
+				case RESULT_OK:
+					init();
+				default:
+					finish();
+			}
+	}
+	
+	final private void init()
+	{
+		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
+		String user = prefs.getString( "username", "" );
+		String pass = prefs.getString( "md5Password", "" );
+		
+		m_radio = new Radio( user, pass );		
+
+		setContentView( R.layout.radio_client );
 		animate();
 		
-		m_preferences = getSharedPreferences("Last.fm", MODE_PRIVATE);
-
-		String user = m_preferences.getString("username", "");
-		String pass = m_preferences.getString("md5Password", "");
-		
-		if( user.length() == 0 || pass.length() == 0 ) {
-			// show username / password activity
-			startActivity(new Intent("ACCOUNTSETTINGS"));
-		}
-
         Button play = (Button) findViewById( R.id.stop );
         play.setOnClickListener( new OnClickListener() 
         {
@@ -75,7 +100,16 @@ public class RadioClient extends Activity
                         .setNegativeButton( "Cancel", null )
                         .show();
             }
-        });		
+        });
+        
+        Button skip = (Button) findViewById( R.id.skip );
+        skip.setOnClickListener( new OnClickListener() 
+        {
+        	public void onClick( View v )
+        	{
+        		RadioClient.this.skip();
+        	}
+        });
 	}
 
 	final private void animate()
@@ -106,37 +140,44 @@ public class RadioClient extends Activity
 	{
 		Log.i( "Tuning-in..." );
 		
-		String user = m_preferences.getString("username", "");
-		String pass = m_preferences.getString("md5Password", "");
-
-		m_radio = new Radio( user, pass );
 		String stationName = m_radio.tuneToSimilarArtist( artist );
-		TrackInfo[] tracks = m_radio.getPlaylist();
 		
 		TextView v = (TextView) findViewById( R.id.station_name );
 		v.setText( stationName );
 		
-		for (TrackInfo track : tracks)
-		{
-			Log.i( "Streaming track: " + track );
-
-			setupUi( track );
-			
-			// Uri myUrl = Uri.parse(track.location());
-			m_mediaPlayer = new MediaPlayer();
-			
-			try
-			{
-				m_mediaPlayer.setDataSource( track.location() );
-				m_mediaPlayer.setOnBufferingUpdateListener( onBufferUpdate );
-				// m_mediaPlayer.prepareAsync();
-			}
-			catch (java.io.IOException e) 
-			{}
-
-			break;
-		}
+		play();
 	};
+	
+	private void skip()
+	{
+		m_mediaPlayer.stop();
+		play();
+	}
+	
+	/** stupid api I've made here, but yeah, call tuneIn first or else */
+	private void play()
+	{
+		if( m_radio.playlist().size() == 0 )
+			m_radio.fetch();
+		
+		TrackInfo track = m_radio.playlist().pop();
+		
+		Log.i( "Streaming track: " + track );
+
+		setupUi( track );
+		
+		// Uri myUrl = Uri.parse(track.location());
+		m_mediaPlayer = new MediaPlayer();
+		
+		try
+		{
+			m_mediaPlayer.setDataSource( track.location() );
+			m_mediaPlayer.setOnBufferingUpdateListener( onBufferUpdate );
+			// m_mediaPlayer.prepareAsync();
+		}
+		catch (java.io.IOException e) 
+		{}
+	}
 	
 	private void setupUi( TrackInfo t )
 	{
@@ -191,7 +232,7 @@ public class RadioClient extends Activity
 
 	private OnBufferingUpdateListener onBufferUpdate = new OnBufferingUpdateListener()
 	{
-		public void onBufferingUpdate(MediaPlayer mp, int percent) 
+		public void onBufferingUpdate( MediaPlayer mp, int percent ) 
 		{
 			Log.i( "BufferUpdate: " + percent + "%" );
 		}
