@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/layout">
-	<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content">
+	<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_vertical">
 		<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/station" android:id="@+id/station_image"></ImageView>
-		<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginLeft="4sp">		
-			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/headliner" android:layout_toRight="@id/station_image" android:text="Headliner" android:textSize="17sp" android:textStyle="bold" android:layout_gravity="center_vertical"></TextView>
-			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/venue" android:layout_toRight="@id/station_image" android:text="Venue" android:layout_below="@id/headliner"></TextView>
+		<LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginLeft="4sp" android:layout_weight="1">		
+			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/headliner" android:text="Headliner" android:textSize="17sp" android:textStyle="bold"></TextView>
+			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/venue" android:text="Venue"></TextView>
 		</LinearLayout>
-	</LinearLayout>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" style="?android:attr/buttonStyleSmallRight" android:id="@+id/more_info" android:text="Info" android:textSize="10sp" android:layout_gravity="center_vertical"></Button></LinearLayout>
 	
 	
 	
