@@ -1,15 +1,22 @@
 package fm.last;
 
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+import org.kxmlrpc.XmlRpcClient;
+
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
 
 import android.net.*;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -30,8 +37,8 @@ public class RadioClient extends Activity
 	/** Called when the activity is first created. */
 	public void onCreate( Bundle icicle )
 	{
-		super.onCreate(icicle);
-		setContentView(R.layout.main);
+		super.onCreate( icicle );
+		setContentView( R.layout.main );
 		animate();
 		
 		m_preferences = getSharedPreferences("Last.fm", MODE_PRIVATE);
@@ -97,24 +104,28 @@ public class RadioClient extends Activity
 	
 	private void tuneIn( String artist )
 	{
-		Log.i( "Tune-in " + artist );
+		Log.i( "Tuning-in..." );
 		
 		String user = m_preferences.getString("username", "");
 		String pass = m_preferences.getString("md5Password", "");
 
 		m_radio = new Radio( user, pass );
-		Log.i( "Password hash = " + pass );
-		
-		m_radio.tuneToSimilarArtist( artist );
+		String stationName = m_radio.tuneToSimilarArtist( artist );
 		TrackInfo[] tracks = m_radio.getPlaylist();
+		
+		TextView v = (TextView) findViewById( R.id.station_name );
+		v.setText( stationName );
 		
 		for (TrackInfo track : tracks)
 		{
 			Log.i( "Streaming track: " + track );
+
+			setupUi( track );
+			
 			// Uri myUrl = Uri.parse(track.location());
 			m_mediaPlayer = new MediaPlayer();
 			
-			try 
+			try
 			{
 				m_mediaPlayer.setDataSource( track.location() );
 				m_mediaPlayer.setOnBufferingUpdateListener( onBufferUpdate );
@@ -126,8 +137,60 @@ public class RadioClient extends Activity
 			break;
 		}
 	};
+	
+	private void setupUi( TrackInfo t )
+	{
+        TextView tv;
+        tv = (TextView) findViewById( R.id.artist );
+        tv.setText( t.artist() );
+        tv = (TextView) findViewById( R.id.track_title );
+        tv.setText( t.title() );
+        
+		ImageView v = (ImageView) findViewById( R.id.album_art );
+		v.setImageBitmap( downloadAlbumArt( t ) );
+	}
+	
+	private Bitmap downloadAlbumArt( TrackInfo t )
+	{
+		try 
+		{ 
+            URL url = albumArtUrl( t ); 
+            URLConnection conn = url.openConnection(); 
+            conn.connect(); 
+            InputStream is = conn.getInputStream(); 
+            BufferedInputStream bis = new BufferedInputStream( is ); 
 
-	private OnBufferingUpdateListener onBufferUpdate = new OnBufferingUpdateListener() {
+            Bitmap bm = BitmapFactory.decodeStream(bis); 
+            bis.close(); 
+            is.close(); 
+             
+            return bm; 
+		}
+		catch (Exception e)
+		{
+            Log.e( e ); 
+		}
+		
+		return null;
+	}
+	
+	/** kXMLRPC throws Exception from execute :( */
+	private URL albumArtUrl( TrackInfo t ) throws Exception
+	{
+		XmlRpcClient client = new XmlRpcClient( "http://ws.audioscrobbler.com/1.0/rw/xmlrpc.php" );
+	
+		Vector<String> v = new Vector<String>( 4 );
+		v.add( t.artist() );
+		v.add( t.title() );
+		v.add( t.album() );
+		v.add( "en" );
+		
+		Map<String, String> m = (Map<String, String>) client.execute( "trackMetadata", v, this );
+		return new URL( m.get( "albumCover" ) );
+	}
+
+	private OnBufferingUpdateListener onBufferUpdate = new OnBufferingUpdateListener()
+	{
 		public void onBufferingUpdate(MediaPlayer mp, int percent) 
 		{
 			Log.i( "BufferUpdate: " + percent + "%" );

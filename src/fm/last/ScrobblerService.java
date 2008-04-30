@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.net.Uri;
 import android.widget.Toast;
 
 import fm.last.Utils;
@@ -147,28 +147,13 @@ class Track
 class SanitisedTrack extends Track {
 	private Track t;
 
-	SanitisedTrack(Track tt) {
+	SanitisedTrack(Track tt) 
+	{
 		t = tt;
 	}
-
-	private String formUrlEncoded(String in) 
-	{
-		try
-		{
-			return URLEncoder.encode(in, "UTF-8");
-		} 
-		catch (UnsupportedEncodingException e) 
-		{
-			return "";
-		}
-		catch (NullPointerException e) 
-		{
-			return "";
-		}
-	}
 	
-	String artist() { return formUrlEncoded( t.artist ); }
-	String title() { return formUrlEncoded( t.title ); }
+	String artist() { return Uri.encode( t.artist ); }
+	String title() { return Uri.encode( t.title ); }
 	String timestamp() { return ((Long)t.timestamps.get( 0 )).toString(); } //FIXME throw if not enough elements in timestamps?
 	String source()
 	{
@@ -198,7 +183,7 @@ class SanitisedTrack extends Track {
 	}
 
 	String album() {
-		return formUrlEncoded(t.album).toString();
+		return Uri.encode(t.album).toString();
 	}
 
 	String trackNumber() {
@@ -255,7 +240,7 @@ public class ScrobblerService extends Service
 					   "&p=1.2" +
 					   "&c=ass" +
 					   "&v=" + Utils.version() +
-					   "&u=" + URLEncoder.encode( username, "UTF-8" ) +
+					   "&u=" + Uri.encode( username ) +
 					   "&t=" + timestamp +
 					   "&a=" + authToken;
 		
