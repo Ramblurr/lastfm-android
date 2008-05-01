@@ -13,6 +13,6 @@ public class EventVenue {
 	private String m_name = null;
 
 	public void read(Element venue) {
-
+		
 	}
 }

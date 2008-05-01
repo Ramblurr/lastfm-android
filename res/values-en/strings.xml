@@ -7,4 +7,6 @@
 	<string name="badAuth">Unable to authenticated - please check your username and password</string>
 	<string name="authProgressTitle">Authenticating..</string>
 	<string name="authProgressMessage">Please Wait</string>
+    <string name="eventsProgressTitle">Finding Events..</string>
+    <string name="eventsProgressMessage">Please Wait</string>
 </resources>

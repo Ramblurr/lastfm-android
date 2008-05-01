@@ -14,8 +14,15 @@ import javax.xml.parsers.*;
 
 import android.util.Log;
 
+//TODO Read the following from the webservice:
+//		Venue information
+//		Start Date
+//		Description
+
 public class Event {
-	private String m_title, m_headliner;
+	private String m_title, m_headliner, m_description = null;
+	private String m_url, m_imageUrl = null;
+	private EventVenue m_venue;
 	private ArrayList<String> m_artists;
 
 	private long m_duration;
@@ -23,8 +30,9 @@ public class Event {
 	public Event() {
 	}
 
-	public static EventList getByLocation(String location) {
-		EventList eventList = null;
+	public static EventResult getPagesByLocation(String location, int pageOffset) {
+		EventResult eventResult = new EventResult();
+		eventResult.m_pageOffset = pageOffset;
 		try {
 			String eventRequestlocation = "http://ws.audioscrobbler.com/2.0/?method=geo.getEvents&location="
 					+ URLEncoder.encode(location, "UTF-8");
@@ -39,15 +47,17 @@ public class Event {
 			Element rootElement = doc.getDocumentElement();
 			NodeList events = rootElement.getElementsByTagName("event");
 			final int eventCount = events.getLength();
-			eventList = new EventList();
+			ArrayList<Event> eventList = new ArrayList<Event>();
 			
 			//eventList.m_totalCount = rootElement.getAttribute(name)
-			eventList.m_totalCount = 100;
+			eventResult.m_totalCount = 100;
 			for (int i = 0; i < eventCount; i++) {
 				Event event = new Event();
 				event.read((Element) events.item(i));
 				eventList.add(event);
 			}
+			eventResult.m_events = new Event[eventList.size()];
+			eventList.toArray(eventResult.m_events);
 		} catch (java.net.MalformedURLException e) {
 			Log.e("Last.fm", "Malformed events lookup URL: " + e);
 		} catch (java.io.IOException e) {
@@ -60,7 +70,7 @@ public class Event {
 		} catch (org.xml.sax.SAXException e) {
 			Log.e("Last.fm", "Sax Error: " + e);
 		}
-		return eventList;
+		return eventResult;
 	}
 
 	public void read(Element event) {
@@ -74,8 +84,19 @@ public class Event {
 
 		Element headlinerElement = (Element) artistsElement
 				.getElementsByTagName("headliner").item(0);
-
 		m_headliner = ((Text) headlinerElement.getFirstChild()).getData();
+		
+		Element urlElement = (Element) event.getElementsByTagName("url").item(0);
+			m_url = ((Text)urlElement.getFirstChild()).getData();
+		
+		Element imageUrlElement = (Element) event.getElementsByTagName("image").item(0);
+		if(imageUrlElement.hasChildNodes())
+			m_imageUrl = ((Text)imageUrlElement.getFirstChild()).getData();
+		
+		Element descriptionElement = (Element) event.getElementsByTagName("description").item(0);
+		if(descriptionElement.hasChildNodes())
+			m_description = ((Text)descriptionElement.getFirstChild()).getData();
+		
 	}
 
 	private void readArtists(Element artists) {
@@ -103,10 +124,35 @@ public class Event {
 	public ArrayList<String> artists() {
 		return m_artists;
 	}
+	
+	public String url() {
+		return m_url;
+	}
+	
+	public String imageUrl() {
+		return m_imageUrl;
+	}
+	
+	public String description() {
+		return m_description;
+	}
 
-	public static class EventList extends ArrayList<Event> {
-		private static final long serialVersionUID = -3362761671731676362L;
+	public static class EventResult {
+		
+		//Total number of events in result
 		private int m_totalCount;
+		
+		//Page offset (based on webservice pages - currently 10 events pp)
+		private int m_pageOffset;
+		
+		//Array of events in the result
+		private Event[] m_events;
+		
+		
+		Event[] events() {
+			return m_events;
+		}
+		
 		int totalCount() {
 			return m_totalCount;
 		}

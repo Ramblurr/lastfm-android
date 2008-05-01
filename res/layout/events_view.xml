@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-			 android:layout_height="fill_parent" 
-			 android:layout_width="fill_parent" 
-			 android:id="@+id/events_table">
-	
-</TableLayout>
+<LinearLayout android:layout_height="fill_parent"
+	android:layout_width="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical">
+	<TableLayout android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical" android:id="@+id/events_layout" />
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_alignParentBottom="true">
+		<Button android:layout_width="wrap_content"
+			android:layout_height="fill_parent" android:text="Previous"
+			android:layout_alignParentLeft="true" android:visibility="gone"
+			android:id="@+id/events_previous">
+		</Button>
+		<Button android:text="More" android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_alignParentRight="true" android:visibility="gone"
+			android:id="@+id/events_more">
+		</Button>
+	</RelativeLayout>
+</LinearLayout>
