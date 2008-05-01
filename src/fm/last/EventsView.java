@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.widget.*;
 import android.view.Gravity;
 import android.view.animation.TranslateAnimation;
@@ -92,6 +93,7 @@ public class EventsView extends Activity {
 			text.setText(event.title());
 	
 			Button button = (Button) row.getChildAt(0);
+			button.setId( count );
 			button.setOnClickListener(m_controller);
 	
 			// For some unknown reason you can't cast a TableView to a
@@ -118,6 +120,17 @@ public class EventsView extends Activity {
 			m_prevButton.setVisibility(View.VISIBLE);
 		else
 			m_prevButton.setVisibility(View.GONE);
+	}
+	
+	public void startRadio( int eventId )
+	{
+		Event event = m_eventList.get( eventId );
+		final String xmlString = event.getXml();
+				
+		Intent intent = new Intent("RADIOCLIENT");
+		intent.putExtra(  "eventXml", xmlString );
+		
+		startActivity( intent );
 	}
 
 	public void scrollPageNext() {

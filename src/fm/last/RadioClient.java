@@ -4,7 +4,15 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.kxmlrpc.XmlRpcClient;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 	
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
@@ -76,7 +84,7 @@ public class RadioClient extends Activity
 		setContentView( R.layout.radio_client );
 		animate();
 		
-        Button play = (Button) findViewById( R.id.stop );
+        ImageButton play = (ImageButton) findViewById( R.id.stop );
         play.setOnClickListener( new OnClickListener() 
         {
         	EditText edit = new EditText( RadioClient.this );
@@ -102,7 +110,8 @@ public class RadioClient extends Activity
             }
         });
         
-        Button skip = (Button) findViewById( R.id.skip );
+        // check intent for event to begin playback
+        ImageButton skip = (ImageButton) findViewById( R.id.skip );
         skip.setOnClickListener( new OnClickListener() 
         {
         	public void onClick( View v )
@@ -110,6 +119,38 @@ public class RadioClient extends Activity
         		RadioClient.this.skip();
         	}
         });
+        
+		try {
+			String xmlString = (String) getIntent().getExtra( "eventXml" );
+
+			DocumentBuilder b = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document xml = b.parse( new InputSource( new StringReader( xmlString ) ) );
+			
+			Event event = new Event( xml.getDocumentElement() );
+		
+			setupUi( event );
+			tuneIn( event.headliner() );
+		}
+		catch (ParserConfigurationException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (FactoryConfigurationError e) 
+		{
+			e.printStackTrace();
+		}
+		catch (SAXException e) 
+		{
+			e.printStackTrace();
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (NullPointerException e)
+		{
+			// no event passed in intent
+		}        
 	}
 
 	final private void animate()
@@ -177,6 +218,12 @@ public class RadioClient extends Activity
 		}
 		catch (java.io.IOException e) 
 		{}
+	}
+	
+	private void setupUi( Event e )
+	{
+		((TextView) findViewById( R.id.headliner )).setText( e.headliner() );
+		((TextView) findViewById( R.id.venue )).setText( e.title() );
 	}
 	
 	private void setupUi( TrackInfo t )

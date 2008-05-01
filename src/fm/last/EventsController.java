@@ -51,7 +51,8 @@ public class EventsController implements  Button.OnClickListener, Runnable {
 		case R.id.events_previous:
 			break;
 		default:
-			Log.e("Unknown onclick event caught in EventController: " + view.getId());
+			m_view.startRadio( view.getId() );
+			break;
 		}
 	}
 }

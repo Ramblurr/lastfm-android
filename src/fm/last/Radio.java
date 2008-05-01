@@ -46,17 +46,17 @@ public class Radio
 	}
 
 	/** @returns station pretty name */
-	public String tuneToSimilarArtist( String artistName ) 
+	public String tuneToSimilarArtist( String artist ) 
 	{
 		try
 		{
-			URL radioAdjust = new URL( "http://" + m_baseUrl + "/radio/adjust.php" +
-					 				   "?session=" + m_sessionId +
-					 				   "&url=lastfm://artist/" + artistName + "/similarartists" +
-					 				   "&lang=en" );
+			URL url = new URL( "http://" + m_baseUrl + "/radio/adjust.php" +
+					    	   "?session=" + m_sessionId +
+					 		   "&url=lastfm://artist/" + Uri.encode( artist ) + "/similarartists" +
+					 		   "&lang=en" );
 
 			String stationName = "", line;
-			BufferedReader reader = new BufferedReader( new InputStreamReader( radioAdjust.openStream(), "UTF-8" ) );
+			BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream(), "UTF-8" ) );
 			
 			Log.i( "ADJUST OUTPUT" );
 			while( (line = reader.readLine()) != null )
@@ -65,7 +65,6 @@ public class Radio
 				
 				if( line.startsWith( "stationname=" ) )
 				{
-					Log.d( "line startswith stationame" );
 					stationName = Uri.decode( line.substring( 12 ) );
 				}
 			}

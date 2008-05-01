@@ -8,11 +8,13 @@ import org.w3c.dom.NodeList;
 import android.location.Address;
 import android.util.Log;
 
-public class EventVenue {
+public class EventVenue
+{
 	private Address m_address = null;
 	private String m_name = null;
 
-	public void read(Element venue) {
+	public void read( Element venue ) 
+	{
 		
 	}
 }

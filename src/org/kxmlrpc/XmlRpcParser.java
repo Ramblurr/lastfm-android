@@ -36,8 +36,8 @@ import org.xmlpull.v1.XmlPullParserException;
  * This abstract base class provides basic XML-RPC parsing capabilities. The 
  * kxml parser is required by this class.
  */
-public class XmlRpcParser {
-
+public class XmlRpcParser
+{
 	KXmlParser   parser;
 	String       methodName;
 	Vector       params = new Vector();
