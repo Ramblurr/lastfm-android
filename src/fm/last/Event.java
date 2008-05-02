@@ -27,34 +27,54 @@ public class Event
 {
 	private String m_title, m_headliner, m_description = null;
 	private String m_url, m_imageUrl = null;
-	private EventVenue m_venue;
 	private ArrayList<String> m_artists = new ArrayList<String>();
 	private long m_duration;
-	private String m_xmlString;	
+	private String m_xmlString, m_venue;
+	private int m_latitude, m_longitude;
+	
+	private Element getFirstElementNamed( Element e, String s )
+	{
+		return (Element) e.getElementsByTagName( s ).item( 0 );
+	}
+	
+	private Element getFirstElementNamed( Element e, String ns, String s )
+	{
+		return (Element) e.getElementsByTagNameNS( ns, s ).item( 0 );
+	}	
+	
+	private int microDegrees( String degrees )
+	{
+		double tmp = Double.valueOf( degrees ) * 1E6;
+		return new Double( tmp ).intValue();
+	}
 	
 	Event( Element e )
 	{
 		m_xmlString = Utils.toString( e );
 		
-		Element titleElement = (Element) e.getElementsByTagName("title").item(0);
+		Element titleElement = (Element) e.getElementsByTagName("title").item( 0 );
 		m_title = ((Text) titleElement.getFirstChild()).getData();
 
-		Element artistsElement = (Element) e.getElementsByTagName("artists").item(0);
-		populateArtists(artistsElement);
-
-		Element headlinerElement = (Element) artistsElement.getElementsByTagName("headliner").item(0);
+		Element artistsElement = getFirstElementNamed( e, "artists" );
+		populateArtists( artistsElement );
+		
+		Element headlinerElement = (Element) artistsElement.getElementsByTagName("headliner").item( 0 );
 		m_headliner = ((Text) headlinerElement.getFirstChild()).getData();
 		
-		Element urlElement = (Element) e.getElementsByTagName("url").item(0);
+		Element urlElement = (Element) e.getElementsByTagName("url").item( 0 );
 		m_url = ((Text)urlElement.getFirstChild()).getData();
 		
-		Element imageUrlElement = (Element) e.getElementsByTagName("image").item(0);
+		Element imageUrlElement = (Element) e.getElementsByTagName("image").item( 0 );
 		if (imageUrlElement.hasChildNodes())
 			m_imageUrl = ((Text)imageUrlElement.getFirstChild()).getData();
 		
-		Element descriptionElement = (Element) e.getElementsByTagName("description").item(0);
+		Element descriptionElement = (Element) e.getElementsByTagName("description").item( 0 );
 		if (descriptionElement.hasChildNodes())
 			m_description = ((Text)descriptionElement.getFirstChild()).getData();
+		
+		//m_venue = getFirstElementNamed( e, "name" ).getFirstChild().getNodeValue();
+		//m_latitude = microDegrees( getFirstElementNamed( e, "geo", "lat" ).getFirstChild().getNodeValue() );
+		//m_longitude = microDegrees( getFirstElementNamed( e, "geo" , "long" ).getFirstChild().getNodeValue() );
 	}
 	
 	public static EventResult getPagesByLocation( String location, int pageOffset ) 
@@ -110,12 +130,7 @@ public class Event
 		return r;
 	}
 	
-	public String getXml()
-	{
-		return m_xmlString;
-	}
-	
-	private void populateArtists( Element artists ) 
+    private void populateArtists( Element artists ) 
 	{
 		NodeList nodes = artists.getElementsByTagName( "artist" );
 		for (int i = 0; i < nodes.getLength(); i++) 
@@ -130,6 +145,10 @@ public class Event
 	public String url() { return m_url;	}
 	public String imageUrl() { return m_imageUrl; }
 	public String description() { return m_description;	}
+	public String venue() { return m_venue; }
+	public int latitude() { return m_latitude; }
+	public int longitude() { return m_longitude; }
+	public String xml()	{ return m_xmlString; }
 
 	public static class EventResult 
 	{

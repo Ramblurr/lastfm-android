@@ -4,15 +4,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.*;
 
 import org.kxmlrpc.XmlRpcClient;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import org.xml.sax.*;
 	
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
@@ -23,8 +19,7 @@ import android.content.*;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.*;
 import android.os.Bundle;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -39,6 +34,7 @@ public class RadioClient extends Activity
 {
 	private Radio m_radio = null;
 	private MediaPlayer m_mediaPlayer;
+	private Event m_event;
 	
 	private enum Requests { Login } 
 
@@ -120,16 +116,29 @@ public class RadioClient extends Activity
         	}
         });
         
+        Button info = (Button) findViewById( R.id.info );
+        info.setOnClickListener( new OnClickListener()
+        {
+        	public void onClick( View v )
+        	{
+        		Intent i = new Intent( "MAP_ACTION" );
+        		i.putExtra( "latitude", RadioClient.this.m_event.latitude() );
+        		i.putExtra( "longitude", RadioClient.this.m_event.longitude() );
+        		
+        		startActivity( i );
+        	}
+        });
+        
 		try {
 			String xmlString = (String) getIntent().getExtra( "eventXml" );
 
 			DocumentBuilder b = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document xml = b.parse( new InputSource( new StringReader( xmlString ) ) );
 			
-			Event event = new Event( xml.getDocumentElement() );
+			m_event = new Event( xml.getDocumentElement() );
 		
-			setupUi( event );
-			tuneIn( event.headliner() );
+			setupUi( m_event );
+			tuneIn( m_event.headliner() );
 		}
 		catch (ParserConfigurationException e) 
 		{
@@ -223,7 +232,7 @@ public class RadioClient extends Activity
 	private void setupUi( Event e )
 	{
 		((TextView) findViewById( R.id.headliner )).setText( e.headliner() );
-		((TextView) findViewById( R.id.venue )).setText( e.title() );
+		((TextView) findViewById( R.id.venue )).setText( e.venue() );
 	}
 	
 	private void setupUi( TrackInfo t )

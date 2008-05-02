@@ -22,7 +22,8 @@ public class EventsView extends Activity {
 	private ProgressDialog m_progressDialog = null;
 	private Handler m_handler = null;
 
-	public void onCreate(Bundle icicle) {
+	public void onCreate(Bundle icicle)
+	{
 		super.onCreate(icicle);
 		setContentView(R.layout.events_view);
 		
@@ -124,12 +125,8 @@ public class EventsView extends Activity {
 	
 	public void startRadio( int eventId )
 	{
-		Event event = m_eventList.get( eventId );
-		final String xmlString = event.getXml();
-				
 		Intent intent = new Intent("RADIOCLIENT");
-		intent.putExtra(  "eventXml", xmlString );
-		
+		intent.putExtra( "eventXml", m_eventList.get( eventId ).xml() );
 		startActivity( intent );
 	}
 
