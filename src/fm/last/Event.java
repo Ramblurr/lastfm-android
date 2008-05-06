@@ -13,7 +13,13 @@ import java.net.URLEncoder;
 import java.io.InputStream;
 import javax.xml.parsers.*;
 
+import android.database.DataSetObserver;
 import android.net.Uri;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListAdapter;
+import android.widget.TextView;
 
 import fm.last.Log;
 
@@ -46,6 +52,11 @@ public class Event
 	{
 		double tmp = Double.valueOf( degrees ) * 1E6;
 		return new Double( tmp ).intValue();
+	}
+	
+	public String toString()
+	{
+		return m_title;
 	}
 	
 	Event( Element e )
@@ -127,6 +138,7 @@ public class Event
 			Log.e( "Sax Error: " + e );
 		}
 		
+		
 		return r;
 	}
 	
@@ -150,10 +162,10 @@ public class Event
 	public int longitude() { return m_longitude; }
 	public String xml()	{ return m_xmlString; }
 
-	public static class EventResult 
+	public static class EventResult
 	{
 		//Total number of events in result
-		private int m_totalCount;
+		private int m_totalCount = 0;
 		
 		//Page offset (based on webservice pages - currently 10 events pp)
 		private int m_pageOffset;

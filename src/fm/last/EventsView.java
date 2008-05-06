@@ -1,26 +1,22 @@
 package fm.last;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.widget.*;
-import android.view.Gravity;
-import android.view.animation.TranslateAnimation;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import java.util.ArrayList;
 
-public class EventsView extends Activity {
+public class EventsView extends ListActivity implements Button.OnClickListener {
 
 	private ArrayList<Event> m_eventList = new ArrayList<Event>();
-	private int m_curPageIndex = 0;
-	private LinearLayout m_eventsLayout;
+
+	//private ListView m_eventsLayout;
 	private Button m_prevButton, m_moreButton = null;
-	private EventsController m_controller;
 	private ProgressDialog m_progressDialog = null;
-	private Handler m_handler = null;
+	private EventsAdapter m_eventsAdapter;
 
 	public void onCreate(Bundle icicle)
 	{
@@ -29,39 +25,26 @@ public class EventsView extends Activity {
 		
 		m_prevButton = (Button) findViewById(R.id.events_previous);
 		m_moreButton = (Button) findViewById(R.id.events_more);
-		m_eventsLayout = (LinearLayout) findViewById(R.id.events_layout);
-		m_handler = new Handler();
+		
+		m_eventsAdapter = new EventsAdapter( this );
+		setListAdapter( m_eventsAdapter );
+		
 
-		showLoading();
-		m_controller = new EventsController( this );
-		
-		m_prevButton.setOnClickListener(m_controller);
-		m_moreButton.setOnClickListener(m_controller);
-	}
-	
-	public void addEvents( Event[] events )
-	{
-		for( Event event : events )
-		{
-			m_eventList.add( event );
-		}
-		
-		m_handler.post( new Runnable() {
-			public void run()
+		m_eventsAdapter.registerDataSetObserver( new DataSetObserver(){
+			public void onChanged()
 			{
-				if( m_eventList.size() > (m_curPageIndex + 5) )
-					setMoreEvents(true);
-				else
-					setMoreEvents(false);
-				
-				if( m_curPageIndex > 0 )
-					setPrevEvents(true);
-				else
-					setPrevEvents(false);
-				
+				loadingComplete();
+				Log.i( "Retrieved events" );
 			}
-		});
+		} );
+		
+		Log.i( "Downloading event information.." );
+
+		m_eventsAdapter.getPagesByLocation("E5 0ES");
+		showLoading();
+
 	}
+
 	
 	public void showLoading() {
 		m_progressDialog = 
@@ -71,43 +54,14 @@ public class EventsView extends Activity {
 	}
 	
 	public void loadingComplete() {
-		m_handler.post(new Runnable(){
+		runOnUIThread(new Runnable(){
 			public void run()
 			{
-				displayEvents();
-				m_progressDialog.dismiss();				
+				m_progressDialog.dismiss();
 			}
 		});
 	}
-
-	public void displayEvents() {
-
-		int count = 0;
-		for( Event event : m_eventList )
-		{
-			// Create a new table row based on the event_partial layout resource
-			TableRow row = (TableRow) getViewInflate().inflate(
-					R.layout.event_partial, null, null);
 	
-			// Populate the table row data
-			TextView text = (TextView) row.getChildAt(1);
-			text.setText(event.title());
-	
-			Button button = (Button) row.getChildAt(0);
-			button.setId( count );
-			button.setOnClickListener(m_controller);
-	
-			// For some unknown reason you can't cast a TableView to a
-			// ViewGroup - you get a ClassCastException thrown.
-			// Therefore it is necessary to add the row to the table manually.
-			row.setLayoutParams(new TableLayout.LayoutParams());
-			m_eventsLayout.addView(row);
-			
-			if( ++count % 5 == 0 ||
-				count == m_eventList.size())
-				break;
-		}
-	}
 
 	public void setMoreEvents(boolean more) {
 		if (more)
@@ -128,7 +82,7 @@ public class EventsView extends Activity {
 		Intent intent = new Intent("RADIOCLIENT");
 		intent.putExtra( "eventXml", m_eventList.get( eventId ).xml() );
 		startActivity( intent );
-	}
+	}	
 
 	public void scrollPageNext() {
 		Log.i( "Scrolling to next page." );
@@ -154,5 +108,21 @@ public class EventsView extends Activity {
 //		curPage.startAnimation(curAnimation);
 //		nextPage.startAnimation(nextAnimation);
 		
+	}
+	
+	
+	public void onClick(View view) {
+		Log.i( "Button Click id:" + view.getId() );
+		switch( view.getId() )
+		{
+		case R.id.events_more:
+			scrollPageNext();
+			break;
+		case R.id.events_previous:
+			break;
+		default:
+			startRadio( view.getId() );
+			break;
+		}
 	}
 }

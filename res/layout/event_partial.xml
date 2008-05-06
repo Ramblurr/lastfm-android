@@ -1,5 +1,12 @@
-<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content" android:gravity="center_vertical">
-	<Button android:layout_width="wrap_content" android:layout_height="fill_parent" android:text="Play" android:height="75px"></Button>
-	<TextView android:layout_width="fill_parent" android:layout_height="fill_parent" android:scrollHorizontally="false" singleLine="false" android:lines="2"></TextView></TableRow>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:gravity="center_vertical" android:orientation="horizontal" >
+	<Button android:layout_width="wrap_content"
+		android:layout_height="fill_parent" android:text="Play"
+		android:height="75px">
+	</Button>
+	<TextView android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:scrollHorizontally="false"
+		singleLine="false" android:lines="2">
+	</TextView>
+</LinearLayout>
