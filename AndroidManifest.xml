@@ -18,7 +18,7 @@
 		</intent-filter>
 	</activity>
 
-	<activity android:name=".EventsView" android:label="Gig Listing - Last.fm">
+	<activity android:name=".EventsView" android:label="Gigs Near Here - Last.fm">
 		<intent-filter>
 			<action android:name="EVENTSVIEW"/>
 			<category android:name="android.intent.category.DEFAULT"/>

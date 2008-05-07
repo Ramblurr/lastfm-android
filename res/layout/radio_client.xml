@@ -52,8 +52,7 @@
 			android:layout_height="wrap_content" android:padding="1sp"
 			android:background="#000" android:layout_weight="1">
 			<AbsoluteLayout android:layout_marginTop="6sp"
-				android:layout_marginBottom="3sp" android:layout_weight="1"
-				android:layout_width="fill_parent"
+				android:layout_weight="1" android:layout_width="fill_parent"
 				android:layout_height="wrap_content">
 				<ImageView android:id="@+id/album_art"
 					android:layout_width="fill_parent"
