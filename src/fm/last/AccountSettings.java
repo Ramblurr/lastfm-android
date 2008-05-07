@@ -25,11 +25,12 @@ public class AccountSettings extends Activity
 	private final Handler m_handler = new Handler();
 	ProgressDialog m_progress = null;
 
-	public void onCreate(Bundle icicle) {
-		super.onCreate(icicle);
-		setContentView(R.layout.account_settings);
+	public void onCreate(Bundle icicle)
+	{
+		super.onCreate( icicle );
+		setContentView( R.layout.account_settings );
 
-		final Button loginButton = (Button) findViewById(R.id.login_button);
+		final Button loginButton = (Button) findViewById( R.id.login_button );
 		userField = (EditText) findViewById(R.id.login_username);
 		passwordField = (EditText) findViewById(R.id.login_password);
 

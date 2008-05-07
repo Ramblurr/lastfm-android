@@ -42,7 +42,7 @@ public class RadioClient extends Activity
 	public void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
-		
+	 
 		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
 		String user = prefs.getString( "username", "" );
 		String pass = prefs.getString( "md5Password", "" );
