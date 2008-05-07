@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -82,13 +83,14 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	{
 		Event event = m_results.events()[position]; 
 		ViewInflate viewInflater = m_view.getWindow().getViewInflate();
-		
+		boolean newView = false;
 		if( convertView == null )
 		{
 			convertView = viewInflater.inflate( R.layout.event_partial, 
 											    parent,
 											    false, null );
 			Log.i("Creating new view");
+			newView = true;
 		}
 		else
 		{
@@ -98,7 +100,8 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		LinearLayout ll = (LinearLayout)convertView;
 		
 		ImageView iv = (ImageView)ll.getChildAt(0);
-		m_imageLoader.loadImage(iv, event);
+		if(newView)
+			m_imageLoader.loadImage(iv, event);
 		
 		LinearLayout detailLL = (LinearLayout)ll.getChildAt(1);
 		
@@ -157,10 +160,14 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	private class ImageLoader implements Runnable
 	{
 		Thread m_thread = null;
+		Object m_mapLock = new Object(); 
 		HashMap<ImageView, Event> m_imageMap = new HashMap<ImageView, Event>();
 		public void loadImage( ImageView view, Event event )
 		{
-			m_imageMap.put(view, event);
+			synchronized(m_mapLock)
+			{
+				m_imageMap.put(view, event);
+			}
 			if(m_thread == null || !m_thread.isAlive())
 			{
 				start();
@@ -170,25 +177,31 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		public void start()
 		{
 			m_thread = new Thread(this);
-			m_thread.start();
+			m_thread.start();				
 		}
 		
 		public void run()
 		{
+			Log.i("ImageLoader Thread running");
 			while( !m_imageMap.isEmpty() )
 			{
-				Iterator<Map.Entry<ImageView,Event>> it = m_imageMap.entrySet().iterator();
-				while( it.hasNext() )
-				{
-					final Map.Entry<ImageView, Event> pair = (Map.Entry<ImageView, Event>)it.next();
-					m_view.runOnUIThread(new Runnable() {
-						public void run()
-						{
-							pair.getKey().setImageBitmap(downloadEventImage(pair.getValue()));	
-						}
-					});
-					
-					m_imageMap.remove(pair.getKey());
+				Iterator<Map.Entry<ImageView,Event>> it;
+				it = m_imageMap.entrySet().iterator();
+				
+				Map.Entry<ImageView, Event> pair;
+				pair = (Map.Entry<ImageView, Event>)it.next();
+
+				final Bitmap bmp = downloadEventImage(pair.getValue());
+				final ImageView iv = pair.getKey();
+				m_view.runOnUIThread(new Runnable() {
+					public void run()
+					{
+						iv.setImageBitmap(bmp);
+					}
+				});
+
+				synchronized (m_mapLock) {
+					m_imageMap.remove(pair.getKey());						
 				}
 			}
 		}
