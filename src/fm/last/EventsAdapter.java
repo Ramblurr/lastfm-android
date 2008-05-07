@@ -90,7 +90,6 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 											    parent,
 											    false, null );
 			Log.i("Creating new view");
-			newView = true;
 		}
 		else
 		{
@@ -100,8 +99,7 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		LinearLayout ll = (LinearLayout)convertView;
 		
 		ImageView iv = (ImageView)ll.getChildAt(0);
-		if(newView)
-			m_imageLoader.loadImage(iv, event);
+		m_imageLoader.loadImage(iv, event);
 		
 		LinearLayout detailLL = (LinearLayout)ll.getChildAt(1);
 		
