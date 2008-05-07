@@ -1,25 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/layout">
-	<LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_gravity="center_vertical">
-		<ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/station" android:id="@+id/station_image" android:layout_marginTop="6sp" marginLeft="6sp" android:layout_marginLeft="6sp"></ImageView>
-		<LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_vertical" android:layout_marginLeft="4sp" android:layout_weight="1">		
-			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/headliner" android:text="Headliner" android:textSize="17sp" android:textStyle="bold"></TextView>
-			<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/venue" android:text="Venue"></TextView>
+<LinearLayout android:orientation="vertical"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout">
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_vertical">
+		<ImageView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/station"
+			android:id="@+id/station_image" android:layout_marginTop="6sp"
+			marginLeft="6sp" android:layout_marginLeft="6sp">
+		</ImageView>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_marginLeft="4sp" android:layout_weight="1">
+			<TextView android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/headliner"
+				android:text="Headliner" android:textSize="17sp"
+				android:textStyle="bold">
+			</TextView>
+			<TextView android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:id="@+id/venue"
+				android:text="Venue">
+			</TextView>
 		</LinearLayout>
-		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" style="?android:attr/buttonStyleSmallRight" android:id="@+id/info" android:text="Info" android:textSize="10sp" android:layout_gravity="center_vertical"></Button>
+		<Button android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonStyleSmallRight" android:id="@+id/info"
+			android:text="Info" android:textSize="10sp"
+			android:layout_gravity="center_vertical">
+		</Button>
 	</LinearLayout>
-	<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="#abababab" android:layout_marginLeft="6sp" android:padding="1px" android:layout_marginRight="6sp" android:layout_marginTop="4sp" android:layout_weight="1" android:layout_marginBottom="6sp">
-		<TextView android:text="Station Name" android:layout_width="fill_parent" android:layout_height="wrap_content" android:textAlign="center" android:textColor="#000" android:layout_marginTop="1sp" android:layout_marginBottom="1sp" android:textStyle="bold" android:id="@+id/station_name"></TextView>
-		<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:padding="1sp" android:background="#000" android:layout_weight="1">
-			
-			<TextView android:id="@+id/artist" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Artist" android:textAlign="center"></TextView>
-			<TextView android:id="@+id/track_title" android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="Title" android:textAlign="center" android:layout_marginBottom="2sp" android:textStyle="bold"></TextView>
-			<AbsoluteLayout android:layout_marginTop="6sp" android:layout_marginBottom="3sp" android:layout_weight="1" android:layout_width="fill_parent" android:layout_height="wrap_content"><ImageView android:id="@+id/album_art" android:layout_width="fill_parent" android:layout_height="fill_parent" android:paddingBottom="7px" android:paddingTop="3px" android:paddingLeft="20px"></ImageView><ImageView android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@drawable/empty_case"></ImageView></AbsoluteLayout></LinearLayout>
-		<LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:paddingTop="4sp">
-			<ImageButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/love"></ImageButton>
-			<ImageButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:src="@drawable/ban"></ImageButton>
-			<ImageButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/stop" android:src="@drawable/stop"></ImageButton>
-`			<ImageButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/skip" android:src="@drawable/skip"></ImageButton>
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:background="#abababab"
+		android:layout_marginLeft="6sp" android:padding="1px"
+		android:layout_marginRight="6sp" android:layout_marginTop="4sp"
+		android:layout_weight="1" android:layout_marginBottom="6sp">
+		<TextView android:text="Station Name"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:textAlign="center"
+			android:textColor="#000" android:layout_marginTop="1sp"
+			android:layout_marginBottom="1sp" android:textStyle="bold"
+			android:id="@+id/station_name">
+		</TextView>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:padding="1sp"
+			android:background="#000" android:layout_weight="1">
+			<AbsoluteLayout android:layout_marginTop="6sp"
+				android:layout_marginBottom="3sp" android:layout_weight="1"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<ImageView android:id="@+id/album_art"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" android:layout_gravity="right"
+					android:paddingTop="3px" android:paddingBottom="7px"
+					android:paddingLeft="20px">
+				</ImageView>
+				<ImageView android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:src="@drawable/empty_case">
+				</ImageView>
+			</AbsoluteLayout>
+			<TextView android:id="@+id/artist"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Artist"
+				android:textAlign="center">
+			</TextView>
+			<TextView android:id="@+id/track_title"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Title"
+				android:textAlign="center" android:layout_marginBottom="2sp"
+				android:textStyle="bold">
+			</TextView>
+		</LinearLayout>
+		<LinearLayout android:orientation="horizontal"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal"
+			android:paddingTop="4sp">
+			<ImageButton android:layout_height="wrap_content"
+				android:layout_width="wrap_content" android:src="@drawable/love">
+			</ImageButton>
+			<ImageButton android:layout_height="wrap_content"
+				android:layout_width="wrap_content" android:src="@drawable/ban">
+			</ImageButton>
+			<ImageButton android:layout_height="wrap_content"
+				android:layout_width="wrap_content" android:id="@+id/stop"
+				android:src="@drawable/stop">
+			</ImageButton>
+			<ImageButton android:layout_height="wrap_content"
+				android:layout_width="wrap_content" android:id="@+id/skip"
+				android:src="@drawable/skip">
+			</ImageButton>
 		</LinearLayout>
 	</LinearLayout>
 </LinearLayout>
