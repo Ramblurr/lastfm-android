@@ -25,7 +25,8 @@ import android.widget.ListAdapter;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-public class EventsAdapter extends BaseAdapter implements Runnable{
+public class EventsAdapter extends BaseAdapter implements Runnable
+{
 	private String m_postCode = "";
 	private EventsView m_view = null;
 	private int m_totalEvents = 0;
@@ -44,23 +45,23 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 	public void getPagesByLocation( String postcode )
 	{
 		m_postcode = postcode;
-		new Thread(this).start();
+		new Thread( this ).start();
 	}
 	
-	public void setPostCode( String postCode ) {
-		m_postCode = postCode;
-	}
+	public void setPostCode( String postCode ) { m_postCode = postCode; }
 
-
-	public boolean areAllItemsSelectable() {
+	public boolean areAllItemsSelectable() 
+	{
 		return true;
 	}
 
-	public boolean isSelectable(int arg0) {
+	public boolean isSelectable(int arg0) 
+	{
 		return true;
 	}
 
-	public int getCount() {
+	public int getCount() 
+	{
 		if( m_results != null &&
 			m_results.totalCount() > 0 )
 			return m_results.events().length;
@@ -68,18 +69,11 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 			return 0;
 	}
 
-	public Object getItem(int position) {
-		// TODO Auto-generated method stub
-		return m_results.events()[position];
-	}
+	public Object getItem(int position) { return m_results.events()[position]; }
+	public long getItemId(int position) { return position; }
 
-	public long getItemId(int position) {
-		// TODO Auto-generated method stub
-		return position;
-	}
-
-	public int getNewSelectionForKey(int currentSelection, int keyCode,
-			KeyEvent event) {
+	public int getNewSelectionForKey(int currentSelection, int keyCode, KeyEvent event) 
+	{
 		// TODO Auto-generated method stub
 		return NO_SELECTION;
 	}
@@ -122,8 +116,8 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 		return ll;
 	}
 	
-	   private Bitmap downloadEventImage(Event evt) 
-	   {
+	private Bitmap downloadEventImage( Event evt ) 
+	{
 		Bitmap bm = null;
 		try 
 		{
@@ -137,19 +131,22 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 			Log.i("Completed download of event image");
 
 			is.close();
-		} catch (Exception e) {
+		}
+		catch (Exception e) 
+		{
 			Log.e("Error downloading event art");
 		}
 
 		Matrix scaleMatrix = new Matrix();
-		scaleMatrix.setScale(0.5f, 0.5f);
-		Bitmap scaledBm = Bitmap.createBitmap(bm, 0, 0, bm.width(),	bm.height(), scaleMatrix, true);
-		return scaledBm;
+		scaleMatrix.setScale( 0.5f, 0.5f );
+		return Bitmap.createBitmap( bm, 0, 0, bm.width(), bm.height(), scaleMatrix, true );
 	}
 
-	public void run() {
+	public void run()
+	{
 		m_results = Event.getPagesByLocation(m_postcode, 5);
-		m_view.runOnUIThread( new Runnable(){
+		m_view.runOnUIThread( new Runnable()
+		{
 			public void run()
 			{
 				notifyDataSetChanged();
@@ -176,7 +173,8 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 			m_thread.start();
 		}
 		
-		public void run() {
+		public void run()
+		{
 			while( !m_imageMap.isEmpty() )
 			{
 				Iterator<Map.Entry<ImageView,Event>> it = m_imageMap.entrySet().iterator();

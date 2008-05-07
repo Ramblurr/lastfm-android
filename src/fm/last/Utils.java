@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import android.util.Log;
@@ -69,5 +70,55 @@ public class Utils
 		
 		return s;
 	}
+}	
+
+/** @author max@last.fm
+  * Makes better code
+  * Auto error handling
+  * Forces you to parse the xml document as you expect it rather than using recursive searches
+  */
+class EasyElement
+{
+	private Element e; 
+
+	EasyElement( Element e )
+	{
+		this.e = e;
+	}
+
+	EasyElement e( String name )
+	{
+		try 
+		{
+			return new EasyElement( (Element) e.getElementsByTagName( name ).item( 0 ) );
+		}
+		catch (Exception e)
+		{
+			return this;
+		}
+	}
+
+	int microDegrees()
+	{
+		String degrees = value();
+		double tmp = Double.valueOf( degrees ) * 1E6;
+		return new Double( tmp ).intValue();
+	}
 	
-}
+	Element e()
+	{
+		return e;
+	}
+	
+	String value()
+	{
+		try
+		{
+			return e.getFirstChild().getNodeValue();
+		}
+		catch ( Exception e )
+		{
+			return "";
+		}
+	}
+}	

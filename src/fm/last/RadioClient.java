@@ -135,8 +135,9 @@ public class RadioClient extends Activity
 		try {
 			String xmlString = (String) getIntent().getExtra( "eventXml" );
 
-			DocumentBuilder b = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document xml = b.parse( new InputSource( new StringReader( xmlString ) ) );
+			Document xml = DocumentBuilderFactory.newInstance()
+												 .newDocumentBuilder()
+												 .parse( new InputSource( new StringReader( xmlString ) ) );
 			
 			m_event = new Event( xml.getDocumentElement() );
 		
