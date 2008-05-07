@@ -43,6 +43,11 @@ public class Event
 		return (Element) e.getElementsByTagName( s ).item( 0 );
 	}
 	
+	private String getValueOfFirstElementNamed( Element e, String s )
+	{
+		return getFirstElementNamed( e, s ).getFirstChild().getNodeValue();
+	}
+	
 	private Element getFirstElementNamed( Element e, String ns, String s )
 	{
 		return (Element) e.getElementsByTagNameNS( ns, s ).item( 0 );
@@ -83,9 +88,10 @@ public class Event
 		if (descriptionElement.hasChildNodes())
 			m_description = ((Text)descriptionElement.getFirstChild()).getData();
 		
-		//m_venue = getFirstElementNamed( e, "name" ).getFirstChild().getNodeValue();
-		//m_latitude = microDegrees( getFirstElementNamed( e, "geo", "lat" ).getFirstChild().getNodeValue() );
-		//m_longitude = microDegrees( getFirstElementNamed( e, "geo" , "long" ).getFirstChild().getNodeValue() );
+		m_venue = getValueOfFirstElementNamed( e, "name" );
+		
+		m_latitude = microDegrees( getValueOfFirstElementNamed( e, "geo:lat" ) );
+		m_longitude = microDegrees( getValueOfFirstElementNamed( e, "geo:long" ) );
 	}
 	
 	public static EventResult getPagesByLocation( String location, int pageOffset ) 
