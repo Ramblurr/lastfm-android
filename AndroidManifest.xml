@@ -2,7 +2,7 @@
 <application>
 	<activity android:name="ScrobblerTestActivity"></activity>
 	<service android:name="ScrobblerService"></service>
-	<activity android:name=".RadioClient" android:label="@string/app_name">
+	<activity android:name=".RadioClient" android:label="Last.fm">
 	    <intent-filter>
 	        <action android:name="android.intent.action.MAIN" />
 	        <category android:name="android.intent.category.LAUNCHER"/>
@@ -18,13 +18,13 @@
 		</intent-filter>
 	</activity>
 
-	<activity android:name=".EventsView" android:label="Events Listing">
+	<activity android:name=".EventsView" android:label="Gig Listing - Last.fm">
 		<intent-filter>
 			<action android:name="EVENTSVIEW"/>
 			<category android:name="android.intent.category.DEFAULT"/>
 		</intent-filter>
 	</activity>
-<activity android:name="MapActivity">
+<activity android:name="MapActivity" android:label="Venue Location - Last.fm">
 <intent-filter>
 <action android:name="MAP_ACTION">
 </action><category android:name="android.intent.category.DEFAULT">

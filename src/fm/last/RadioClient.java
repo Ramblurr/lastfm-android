@@ -122,8 +122,11 @@ public class RadioClient extends Activity
         	public void onClick( View v )
         	{
         		Intent i = new Intent( "MAP_ACTION" );
-        		i.putExtra( "latitude", RadioClient.this.m_event.latitude() );
-        		i.putExtra( "longitude", RadioClient.this.m_event.longitude() );
+        		
+        		Event e = RadioClient.this.m_event;
+        		i.putExtra( "latitude", e.latitude() );
+        		i.putExtra( "longitude", e.longitude() );
+        		i.putExtra( "venue", e.venue() );
         		
         		startActivity( i );
         	}

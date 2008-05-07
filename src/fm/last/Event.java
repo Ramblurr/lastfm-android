@@ -89,7 +89,6 @@ public class Event
 			m_description = ((Text)descriptionElement.getFirstChild()).getData();
 		
 		m_venue = getValueOfFirstElementNamed( e, "name" );
-		
 		m_latitude = microDegrees( getValueOfFirstElementNamed( e, "geo:lat" ) );
 		m_longitude = microDegrees( getValueOfFirstElementNamed( e, "geo:long" ) );
 	}
