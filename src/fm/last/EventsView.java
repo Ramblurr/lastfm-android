@@ -11,9 +11,6 @@ import android.view.View;
 import java.util.ArrayList;
 
 public class EventsView extends ListActivity implements OnItemClickListener {
-
-	//private ListView m_eventsLayout;
-	private Button m_prevButton, m_moreButton = null;
 	private ProgressDialog m_progressDialog = null;
 	private EventsAdapter m_eventsAdapter;
 
@@ -21,9 +18,6 @@ public class EventsView extends ListActivity implements OnItemClickListener {
 	{
 		super.onCreate(icicle);
 		setContentView(R.layout.events_view);
-		
-		m_prevButton = (Button) findViewById(R.id.events_previous);
-		m_moreButton = (Button) findViewById(R.id.events_more);
 		
 		m_eventsAdapter = new EventsAdapter( this );
 		setListAdapter( m_eventsAdapter );

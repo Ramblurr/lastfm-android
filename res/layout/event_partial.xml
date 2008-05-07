@@ -1,15 +1,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="wrap_content"
-	android:gravity="center_vertical" android:orientation="horizontal" >
-	<ImageView android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:height="20px" android:maxHeight="20px" android:maxWidth="20px" android:width="20px" android:minWidth="20px">
+	android:layout_width="fill_parent" android:layout_height="80px"
+	android:gravity="top" android:orientation="horizontal"
+    >
+	<ImageView android:layout_width="80px"
+		android:layout_height="80px" android:height="20px"
+		android:maxHeight="20px" android:maxWidth="20px" android:width="20px"
+		android:minWidth="20px" android:adjustViewBounds="false" android:paddingTop="3sp" android:paddingBottom="3sp">
 	</ImageView>
-	<LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
-	<TextView android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:scrollHorizontally="false"
-		singleLine="false" android:lines="2">
-	</TextView>
-	<TextView android:layout_width="fill_parent" android:layout_height="wrap_content" singleLine="false" android:lines="2" android:scrollHorizontally="false"></TextView></LinearLayout>
-	
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="top"
+		>
+		<TextView android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:scrollHorizontally="false" singleLine="true"
+			android:lines="1" android:textStyle="bold"
+			android:paddingLeft="5sp"
+			android:gravity="top">
+		</TextView>
+		<TextView android:layout_width="fill_parent"
+			android:layout_height="wrap_content" singleLine="false"
+			android:textSize="13sp"
+			android:scrollHorizontally="false"
+			android:gravity="top"
+			android:paddingLeft="5sp"
+			android:paddingRight="3sp"
+			android:paddingBottom="3sp">
+		</TextView>
+	</LinearLayout>
+
 </LinearLayout>

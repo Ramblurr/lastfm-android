@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -31,7 +34,7 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 	private final int PERPAGE = 5;
 	Event.EventResult m_results = null;
 	private String m_postcode = null;
-
+	private ImageLoader m_imageLoader = new ImageLoader();
 	
 	public EventsAdapter( EventsView view )
 	{
@@ -101,16 +104,14 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 		LinearLayout ll = (LinearLayout)convertView;
 		
 		ImageView iv = (ImageView)ll.getChildAt(0);
-		iv.setImageBitmap(downloadEventImage(event));
+		m_imageLoader.loadImage(iv, event);
 		
 		LinearLayout detailLL = (LinearLayout)ll.getChildAt(1);
 		
 		TextView eventTitle = (TextView)detailLL.getChildAt(0);
-		eventTitle.setPadding(3, 3, 3, 3);
-		eventTitle.setText(event.toString());
+		eventTitle.setText(event.venue());
 		
 		TextView eventArtists = (TextView)detailLL.getChildAt(1);
-		eventArtists.setPadding(3, 10, 3, 10);
 		
 		String artistsString = event.artists().isEmpty() ? "" : event.artists().get(0);
 		for( int i = 1; i < event.artists().size(); i++)
@@ -154,5 +155,44 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 				notifyDataSetChanged();
 			}
 		});
+	}
+	
+	private class ImageLoader implements Runnable
+	{
+		Thread m_thread = null;
+		HashMap<ImageView, Event> m_imageMap = new HashMap<ImageView, Event>();
+		public void loadImage( ImageView view, Event event )
+		{
+			m_imageMap.put(view, event);
+			if(m_thread == null || !m_thread.isAlive())
+			{
+				start();
+			}
+		}
+		
+		public void start()
+		{
+			m_thread = new Thread(this);
+			m_thread.start();
+		}
+		
+		public void run() {
+			while( !m_imageMap.isEmpty() )
+			{
+				Iterator<Map.Entry<ImageView,Event>> it = m_imageMap.entrySet().iterator();
+				while( it.hasNext() )
+				{
+					final Map.Entry<ImageView, Event> pair = (Map.Entry<ImageView, Event>)it.next();
+					m_view.runOnUIThread(new Runnable() {
+						public void run()
+						{
+							pair.getKey().setImageBitmap(downloadEventImage(pair.getValue()));	
+						}
+					});
+					
+					m_imageMap.remove(pair.getKey());
+				}
+			}
+		}
 	}
 }
