@@ -1,8 +1,14 @@
 package fm.last;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
@@ -10,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.ViewInflate;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.TableRow;
@@ -76,6 +83,7 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
+		Event event = m_results.events()[position]; 
 		ViewInflate viewInflater = m_view.getWindow().getViewInflate();
 		
 		if( convertView == null )
@@ -91,10 +99,51 @@ public class EventsAdapter extends BaseAdapter implements Runnable{
 		}
 		
 		LinearLayout ll = (LinearLayout)convertView;
-		TextView tv = (TextView)ll.getChildAt(1);
-		tv.setPadding(20, 20, 20, 20);
-		tv.setText(m_results.events()[position].toString());
+		
+		ImageView iv = (ImageView)ll.getChildAt(0);
+		iv.setImageBitmap(downloadEventImage(event));
+		
+		LinearLayout detailLL = (LinearLayout)ll.getChildAt(1);
+		
+		TextView eventTitle = (TextView)detailLL.getChildAt(0);
+		eventTitle.setPadding(3, 3, 3, 3);
+		eventTitle.setText(event.toString());
+		
+		TextView eventArtists = (TextView)detailLL.getChildAt(1);
+		eventArtists.setPadding(3, 10, 3, 10);
+		
+		String artistsString = event.artists().isEmpty() ? "" : event.artists().get(0);
+		for( int i = 1; i < event.artists().size(); i++)
+			artistsString += ", " + event.artists().get(i);
+		
+		eventArtists.setText(artistsString);
+		
 		return ll;
+	}
+	
+	   private Bitmap downloadEventImage(Event evt) 
+	   {
+		Bitmap bm = null;
+		try 
+		{
+			URL url = new URL(evt.imageUrl());
+			URLConnection conn = url.openConnection();
+			conn.connect();
+			InputStream is = conn.getInputStream();
+
+			Log.i("Begining download of event image: " + evt.imageUrl());
+			bm = BitmapFactory.decodeStream(is);
+			Log.i("Completed download of event image");
+
+			is.close();
+		} catch (Exception e) {
+			Log.e("Error downloading event art");
+		}
+
+		Matrix scaleMatrix = new Matrix();
+		scaleMatrix.setScale(0.5f, 0.5f);
+		Bitmap scaledBm = Bitmap.createBitmap(bm, 0, 0, bm.width(),	bm.height(), scaleMatrix, true);
+		return scaledBm;
 	}
 
 	public void run() {
