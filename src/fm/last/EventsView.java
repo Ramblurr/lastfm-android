@@ -8,22 +8,30 @@ import android.database.DataSetObserver;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.TranslateAnimation;
+
 import java.util.ArrayList;
 
-public class EventsView extends ListActivity implements OnItemClickListener {
+import fm.last.R; 
+
+public class EventsView extends ListActivity implements OnItemClickListener
+{
 	private ProgressDialog m_progressDialog = null;
 	private EventsAdapter m_eventsAdapter;
 
 	public void onCreate(Bundle icicle)
 	{
 		super.onCreate(icicle);
-		setContentView(R.layout.events_view);
+		setContentView( R.layout.events_view );
 		
 		m_eventsAdapter = new EventsAdapter( this );
 		setListAdapter( m_eventsAdapter );
 		getListView().setOnItemClickListener(this);
 		
-
 		m_eventsAdapter.registerDataSetObserver( new DataSetObserver(){
 			public void onChanged()
 			{
@@ -37,6 +45,30 @@ public class EventsView extends ListActivity implements OnItemClickListener {
 		m_eventsAdapter.getPagesByLocation("E5 0ES");
 		showLoading();
 
+		setupAnimation();
+	}
+	
+	void setupAnimation()
+	{
+        AnimationSet set = new AnimationSet( true );
+
+        Animation animation = new AlphaAnimation( 0.0f, 1.0f );
+        animation.setDuration( 400 );
+        set.addAnimation( animation );
+
+        animation = new TranslateAnimation( Animation.RELATIVE_TO_SELF, 
+        									0.0f,
+        									Animation.RELATIVE_TO_SELF, 
+        									0.0f,
+        									Animation.RELATIVE_TO_SELF,
+        									-1.0f,
+        									Animation.RELATIVE_TO_SELF, 
+        									0.0f );
+        animation.setDuration( 100 );
+        set.addAnimation( animation );
+
+        LayoutAnimationController controller = new LayoutAnimationController( set, 0.5f );
+        getListView().setLayoutAnimation( controller );
 	}
 
 	
