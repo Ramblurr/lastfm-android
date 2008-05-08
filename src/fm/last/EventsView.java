@@ -39,7 +39,7 @@ public class EventsView extends ListActivity implements OnItemClickListener
 				Log.i( "Retrieved events" );
 			}
 		} );
-		
+			
 		Log.i( "Downloading event information.." );
 
 		m_eventsAdapter.getPagesByLocation("E5 0ES");

@@ -36,8 +36,8 @@
 	</LinearLayout>
 	<LinearLayout android:orientation="vertical"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:background="#abababab"
-		android:layout_marginLeft="6sp" android:padding="1px"
+		android:layout_height="wrap_content" android:background="@android:drawable/panel_spinner_background"
+		android:layout_marginLeft="6sp" android:padding="4px"
 		android:layout_marginRight="6sp" android:layout_marginTop="4sp"
 		android:layout_weight="1" android:layout_marginBottom="6sp">
 		<TextView android:text="Station Name"
