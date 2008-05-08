@@ -157,15 +157,23 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	
 	private class ImageLoader implements Runnable
 	{
+		HashMap<Event, Bitmap> m_bitmapCache = new HashMap<Event, Bitmap>();
 		Thread m_thread = null;
-		Object m_mapLock = new Object(); 
 		HashMap<ImageView, Event> m_imageMap = new HashMap<ImageView, Event>();
+		
 		public void loadImage( ImageView view, Event event )
 		{
-			synchronized(m_mapLock)
+			if(m_bitmapCache.containsKey(event))
+			{
+				view.setImageBitmap(m_bitmapCache.get(event));
+				return;
+			}
+			
+			synchronized(m_imageMap)
 			{
 				m_imageMap.put(view, event);
 			}
+			
 			if(m_thread == null || !m_thread.isAlive())
 			{
 				start();
@@ -189,7 +197,11 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 				Map.Entry<ImageView, Event> pair;
 				pair = (Map.Entry<ImageView, Event>)it.next();
 
-				final Bitmap bmp = downloadEventImage(pair.getValue());
+				Event event = pair.getValue();
+				final Bitmap bmp = downloadEventImage(event);
+
+				m_bitmapCache.put(event, bmp);					
+
 				final ImageView iv = pair.getKey();
 				m_view.runOnUIThread(new Runnable() {
 					public void run()
@@ -198,7 +210,7 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 					}
 				});
 
-				synchronized (m_mapLock) {
+				synchronized (m_imageMap) {
 					m_imageMap.remove(pair.getKey());						
 				}
 			}
