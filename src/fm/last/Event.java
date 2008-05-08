@@ -44,7 +44,7 @@ public class Event
 		
 		EasyElement e = new EasyElement( eventElement );
 		m_title       = e.e( "title" ).value();
-		m_headliner   = e.e( "poo" ).e( "headliner" ).value();
+		m_headliner   = e.e( "artists" ).e( "headliner" ).value();
 		m_url         = e.e( "url" ).value();
 		m_imageUrl    = e.e( "image" ).value();
 		m_description = e.e( "description" ).value(); 

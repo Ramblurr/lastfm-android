@@ -35,6 +35,7 @@ public class RadioClient extends Activity
 	private Radio m_radio = null;
 	private MediaPlayer m_mediaPlayer;
 	private Event m_event;
+	private ImageLoader m_imageLoader;
 	
 	private enum Requests { Login } 
 
@@ -47,6 +48,8 @@ public class RadioClient extends Activity
 		String user = prefs.getString( "username", "" );
 		String pass = prefs.getString( "md5Password", "" );
 
+		m_imageLoader = new ImageLoader(this);
+		
 		if( user.length() == 0 || pass.length() == 0 ) 
 		{
 			// show username / password activity
@@ -248,31 +251,13 @@ public class RadioClient extends Activity
         tv.setText( t.title() );
         
 		ImageView v = (ImageView) findViewById( R.id.album_art );
-		v.setImageBitmap( downloadAlbumArt( t ) );
-	}
-	
-	private Bitmap downloadAlbumArt( TrackInfo t )
-	{
-		try 
-		{ 
-            URL url = albumArtUrl( t ); 
-            URLConnection conn = url.openConnection(); 
-            conn.connect(); 
-            InputStream is = conn.getInputStream(); 
-            BufferedInputStream bis = new BufferedInputStream( is ); 
-
-            Bitmap bm = BitmapFactory.decodeStream(bis); 
-            bis.close(); 
-            is.close(); 
-             
-            return bm; 
+		v.setImageResource(android.R.drawable.empty);
+		try {
+			m_imageLoader.loadImage(v, albumArtUrl(t));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		catch (Exception e)
-		{
-            Log.e( e ); 
-		}
-		
-		return null;
 	}
 	
 	/** kXMLRPC throws Exception from execute :( */
