@@ -71,49 +71,50 @@ public class Event
 	public int longitude() { return m_longitude; }
 
 	
-	public static class EventResult
+	public static class EventResult extends ArrayList<Event>
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1327152640298137275L;
+
 		//Total number of events in result
 		private int m_totalCount = 0;
 		
 		//Page offset (based on webservice pages - currently 10 events pp)
-		private int m_pageOffset;
 		
-		//Array of events in this result
-		private Event[] m_events;
-		
-		Event[] events() { return m_events; }
 		int totalCount() { return m_totalCount; }
 	}
 	
 	public static EventResult getPagesByLocation( String location, int pageOffset ) 
 	{
 		EventResult r = new EventResult();
-		r.m_pageOffset = pageOffset;
+		
+		//imo page offsets /should/ start at 0 but the webservice starts with page 1
+		pageOffset += 1;
 		
 		try 
 		{
 			URL url = new URL( "http://ws.audioscrobbler.com/2.0/" +
 					    	   "?method=geo.getEvents" +
-					  		   "&location=" + Uri.encode( location ) );
+					    	   "&location=" + Uri.encode( location ) +
+					    	   "&page=" + pageOffset);
 
+			Log.i("Loading event information from: " + url.toString() );
 			NodeList nodes = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder()
 					.parse( new InputSource( url.openStream() ) )
 					.getDocumentElement()
 					.getElementsByTagName("event");
 					
-			ArrayList<Event> events = new ArrayList<Event>();
 			for (int i = 0; i < nodes.getLength(); i++) 
 			{
 				Element e = (Element) nodes.item( i );
-				events.add( new Event( e ) );
+				r.add( new Event( e ) );
 			}
 			
 			r.m_totalCount = 100; //FIXME
-			r.m_events = new Event[ events.size() ];
 			
-			events.toArray( r.m_events );
 		} 
 		catch (java.net.MalformedURLException e) 
 		{

@@ -14,8 +14,6 @@ import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
 
-import java.util.ArrayList;
-
 import fm.last.R; 
 
 public class EventsView extends ListActivity implements OnItemClickListener
@@ -83,7 +81,11 @@ public class EventsView extends ListActivity implements OnItemClickListener
 		runOnUIThread(new Runnable(){
 			public void run()
 			{
-				m_progressDialog.dismiss();
+				if(m_progressDialog != null)
+				{
+					m_progressDialog.dismiss();
+					m_progressDialog = null;
+				}
 			}
 		});
 	}

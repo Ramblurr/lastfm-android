@@ -40,6 +40,8 @@ public class ImageLoader implements Runnable
 			return;
 		}
 		
+		view.setImageResource(android.R.drawable.empty);
+		
 		synchronized(m_imageMap)
 		{
 			m_imageMap.put(view, url);

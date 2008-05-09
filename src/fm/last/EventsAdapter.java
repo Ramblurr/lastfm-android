@@ -17,7 +17,10 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	private EventsView m_view = null;
 	Event.EventResult m_results = null;
 	private String m_postcode = null;
-
+	private int m_eventPagesToLoad = 0;
+	private int m_eventPagesLoaded = 0;
+	private Thread m_thread = null;
+	
 	//Cached ImageLoader
 	private ImageLoader m_imageLoader;
 	
@@ -27,10 +30,29 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		m_imageLoader = new ImageLoader(view, true);
 	}
 	
+
+	public synchronized void getPagesByLocation()
+	{
+		m_eventPagesToLoad++;
+		
+		if(m_thread == null || !m_thread.isAlive())
+		{
+			//TODO: Check if it's necessary to create a new Thread instance
+			//		every time we want to restart the Thread. This seems 
+			//		unnecessary but I'm getting an error if I don't do it!
+			m_thread = new Thread( this );
+			m_thread.start();
+		}
+	}
+	
 	public void getPagesByLocation( String postcode )
 	{
-		m_postcode = postcode;
-		new Thread( this ).start();
+		if( postcode != m_postcode )
+		{
+			m_postcode = postcode;
+			m_results = null;
+		}
+		getPagesByLocation();
 	}
 	
 	public void setPostCode( String postCode ) { }
@@ -47,14 +69,13 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 
 	public int getCount() 
 	{
-		if( m_results != null &&
-			m_results.totalCount() > 0 )
-			return m_results.events().length;
+		if( m_results != null )
+			return m_results.size();
 		else
 			return 0;
 	}
 
-	public Object getItem(int position) { return m_results.events()[position]; }
+	public Object getItem(int position) { return m_results.get(position); }
 	public long getItemId(int position) { return position; }
 
 	public int getNewSelectionForKey(int currentSelection, int keyCode, KeyEvent event) 
@@ -65,9 +86,15 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
-		Event event = m_results.events()[position]; 
+		//Trigger the download of the next events list page
+		if( position > (3*m_eventPagesLoaded) )
+		{
+			getPagesByLocation();
+		}
+		
+		Event event = m_results.get(position); 
 		ViewInflate viewInflater = m_view.getWindow().getViewInflate();
-		boolean newView = false;
+
 		if( convertView == null )
 		{
 			convertView = viewInflater.inflate( R.layout.event_partial, 
@@ -108,13 +135,23 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	
 	public void run()
 	{
-		m_results = Event.getPagesByLocation(m_postcode, 5);
-		m_view.runOnUIThread( new Runnable()
+		do
 		{
-			public void run()
+			if( m_results == null )
 			{
-				notifyDataSetChanged();
+				m_results = Event.getPagesByLocation(m_postcode, m_eventPagesLoaded++);
 			}
-		});
+			else
+			{
+				m_results.addAll(m_results.size(), Event.getPagesByLocation(m_postcode, m_eventPagesLoaded++));
+			}
+			m_view.runOnUIThread( new Runnable()
+			{
+				public void run()
+				{
+					notifyDataSetChanged();
+				}
+			});
+		}while( ++m_eventPagesLoaded < m_eventPagesToLoad );
 	}
 }

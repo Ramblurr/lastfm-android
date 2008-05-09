@@ -251,7 +251,6 @@ public class RadioClient extends Activity
         tv.setText( t.title() );
         
 		ImageView v = (ImageView) findViewById( R.id.album_art );
-		v.setImageResource(android.R.drawable.empty);
 		try {
 			m_imageLoader.loadImage(v, albumArtUrl(t));
 		} catch (Exception e) {
