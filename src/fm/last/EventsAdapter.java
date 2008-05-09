@@ -87,8 +87,9 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
 		//Trigger the download of the next events list page
-		if( position > (3*m_eventPagesLoaded) )
+		if( position > (6*(m_eventPagesToLoad-1)))
 		{
+			Log.i("Triggering download of more events: "+position+" > " + (10*(m_eventPagesToLoad-1)));
 			getPagesByLocation();
 		}
 		
@@ -139,11 +140,11 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		{
 			if( m_results == null )
 			{
-				m_results = Event.getPagesByLocation(m_postcode, m_eventPagesLoaded++);
+				m_results = Event.getPagesByLocation(m_postcode, m_eventPagesLoaded);
 			}
 			else
 			{
-				m_results.addAll(m_results.size(), Event.getPagesByLocation(m_postcode, m_eventPagesLoaded++));
+				m_results.addAll( Event.getPagesByLocation(m_postcode, m_eventPagesLoaded));
 			}
 			m_view.runOnUIThread( new Runnable()
 			{
