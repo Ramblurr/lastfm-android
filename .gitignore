@@ -1,4 +1,5 @@
 .classpath
 .project
+.gitattributes
 bin/
 src/fm/last/R.java

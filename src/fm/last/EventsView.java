@@ -8,6 +8,7 @@ import android.database.DataSetObserver;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -24,6 +25,9 @@ public class EventsView extends ListActivity implements OnItemClickListener
 	public void onCreate(Bundle icicle)
 	{
 		super.onCreate(icicle);
+		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
+		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setContentView( R.layout.events_view );
 		
 		m_eventsAdapter = new EventsAdapter( this );

@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewInflate;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -90,6 +91,12 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		if( position > (6*(m_eventPagesToLoad-1)))
 		{
 			Log.i("Triggering download of more events: "+position+" > " + (10*(m_eventPagesToLoad-1)));
+			m_view.runOnUIThread(new Runnable(){
+				public void run()
+				{
+					m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
+				}
+			});
 			getPagesByLocation();
 		}
 		
@@ -154,5 +161,11 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 				}
 			});
 		}while( ++m_eventPagesLoaded < m_eventPagesToLoad );
+		m_view.runOnUIThread( new Runnable(){
+			public void run()
+			{
+				m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);				
+			}
+		});
 	}
 }
