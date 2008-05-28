@@ -26,7 +26,7 @@ public class EventsView extends ListActivity implements OnItemClickListener
 	{
 		super.onCreate(icicle);
 		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
-		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_OFF);
+		getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_INDETERMINATE_ON);
 		requestWindowFeature(Window.FEATURE_PROGRESS);
 		setContentView( R.layout.events_view );
 		
@@ -44,7 +44,7 @@ public class EventsView extends ListActivity implements OnItemClickListener
 			
 		Log.i( "Downloading event information.." );
 
-		m_eventsAdapter.getPagesByLocation("E5 0ES");
+		m_eventsAdapter.loadEventsByLocation("N1 6DL");
 		showLoading();
 
 		setupAnimation();

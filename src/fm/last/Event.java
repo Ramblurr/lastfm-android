@@ -1,28 +1,17 @@
 package fm.last;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import java.util.ArrayList;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.io.InputStream;
-import javax.xml.parsers.*;
 
-import android.database.DataSetObserver;
 import android.net.Uri;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.TextView;
 
-import fm.last.Log;
 import fm.last.Utils;
+import fm.last.ws.RequestManager;
+import fm.last.ws.RequestParameters;
+import fm.last.ws.Response;
 
 
 public class Event 
@@ -69,74 +58,42 @@ public class Event
 	public String xml()	{ return m_xmlString; }
 	public int latitude() { return m_latitude; }
 	public int longitude() { return m_longitude; }
-
 	
 	public static class EventResult extends ArrayList<Event>
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = -1327152640298137275L;
 
 		//Total number of events in result
-		private int m_totalCount = 0;
+		private int m_pageCount = 0;
 		
 		//Page offset (based on webservice pages - currently 10 events pp)
 		
-		int totalCount() { return m_totalCount; }
+		int pageCount() { return m_pageCount; }
 	}
 	
-	public static EventResult getPagesByLocation( String location, int pageOffset ) 
+	public static EventResult getEventsByLocation( String location, int pageOffset ) 
 	{
-		EventResult r = new EventResult();
-		
 		//imo page offsets /should/ start at 0 but the webservice starts with page 1
 		pageOffset += 1;
 		
-		try 
-		{
-			URL url = new URL( "http://ws.audioscrobbler.com/2.0/" +
-					    	   "?method=geo.getEvents" +
-					    	   "&location=" + Uri.encode( location ) +
-					    	   "&page=" + pageOffset);
+		RequestParameters params = new RequestParameters();
+		params.add( "location", Uri.encode( location ) )
+			  .add( "page", String.valueOf( pageOffset) );
 
-			Log.i("Loading event information from: " + url.toString() );
-			NodeList nodes = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder()
-					.parse( new InputSource( url.openStream() ) )
-					.getDocumentElement()
-					.getElementsByTagName("event");
-					
-			for (int i = 0; i < nodes.getLength(); i++) 
-			{
-				Element e = (Element) nodes.item( i );
-				r.add( new Event( e ) );
-			}
-			
-			r.m_totalCount = 100; //FIXME
-			
-		} 
-		catch (java.net.MalformedURLException e) 
-		{
-			Log.e( "Malformed events lookup URL: " + e );
-		} 
-		catch (java.io.IOException e) 
-		{
-			Log.e( "Could not read from http stream: " + e );
-		} 
-		catch (FactoryConfigurationError e) 
-		{
-			Log.e( "DocumentBuilder Factory configuration error: " + e );
-		} 
-		catch (ParserConfigurationException e) 
-		{
-			Log.e( "Parser Configuration error: " + e );
-		}
-		catch (org.xml.sax.SAXException e) 
-		{
-			Log.e( "Sax Error: " + e );
-		}
+		Response response = RequestManager.version2().callMethod( "geo.Events", params );
+
+		EventResult r = new EventResult();
 		
+		Document xmlDom = response.xmlDocument();
+		
+		Element events = (Element)xmlDom.getDocumentElement().getElementsByTagName("events").item(0);
+		r.m_pageCount = Integer.parseInt( events.getAttribute("totalpages") );
+		NodeList nodes = events.getElementsByTagName("event");
+
+		for (int i = 0; i < nodes.getLength(); i++) {
+			Element e = (Element) nodes.item(i);
+			r.add(new Event(e));
+		}
 		return r;
 	}
 }

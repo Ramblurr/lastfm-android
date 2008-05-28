@@ -3,15 +3,15 @@
  */
 package fm.last;
 
+import fm.last.ws.*;
+
 import java.net.URL;
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.Reader;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.InputSource;
 import org.w3c.dom.*;
@@ -48,17 +48,20 @@ public class Radio
 	/** @returns station pretty name */
 	public String tuneToSimilarArtist( String artist ) 
 	{
+		RequestParameters params = new RequestParameters();
+		params.add( "session", m_sessionId )
+			  .add( "url", "lastfm://artist/" + Uri.encode( artist ) + "/similarartists")
+			  .add( "lang", "en" );
+		
+		Response response = RequestManager.version1().callMethod( "radio/adjust.php", params );
+		
+		
+		String stationName = "", line;
+		BufferedReader reader = response.dataReader();
+		
+		Log.i( "ADJUST OUTPUT" );
 		try
 		{
-			URL url = new URL( "http://" + m_baseUrl + "/radio/adjust.php" +
-					    	   "?session=" + m_sessionId +
-					 		   "&url=lastfm://artist/" + Uri.encode( artist ) + "/similarartists" +
-					 		   "&lang=en" );
-
-			String stationName = "", line;
-			BufferedReader reader = new BufferedReader( new InputStreamReader( url.openStream(), "UTF-8" ) );
-			
-			Log.i( "ADJUST OUTPUT" );
 			while( (line = reader.readLine()) != null )
 			{
 				Log.i( line );
@@ -68,21 +71,17 @@ public class Radio
 					stationName = Uri.decode( line.substring( 12 ) );
 				}
 			}
-			
-			fetch();
-			
-			return stationName;
-		}
-		catch (java.net.MalformedURLException e) 
-		{
-			Log.e( "tuneToSimilarArtist(): " + e.toString() );
 		}
 		catch (java.io.IOException e) 
 		{
 			Log.e( "tuneToSimilarArtist(): " + e.toString() );
 		}
 		
-		return "";
+		
+		fetch();
+		
+		return stationName;
+
 	}
 
 	public Stack<TrackInfo> playlist()
@@ -93,37 +92,23 @@ public class Radio
 	/** fetches 5 new tracks for the playlist, valid while the session is valid */
 	public void fetch()
 	{
-		try 
-		{
-			URL url = new URL( "http://" + m_baseUrl + "/radio/xspf.php" +
-					    	   "?sk=" + m_sessionId + 
-							   "&discovery=0" +
-							   "&desktop=0.1" );
-			
-			Node n = DocumentBuilderFactory.newInstance()
-					   					   .newDocumentBuilder()
-					   					   .parse( new InputSource( url.openStream() ) )
-					   					   .getDocumentElement()
-					   					   .getElementsByTagName( "trackList" )
-					   					   .item( 0 );
-			
-			NodeList tracks = ((Element) n).getElementsByTagName( "track" );
+		RequestParameters params = new RequestParameters();
+		params.add( "sk", m_sessionId )
+			  .add( "discovery", "0" )
+			  .add( "desktop", "0.1" );
 
-			for (int i = 0; i < tracks.getLength(); i++)
-			{
-				m_playlist.push( new TrackInfo( (Element) tracks.item( i ) ) );
-			}
-		}
-		catch (org.xml.sax.SAXException e) 
-		{}
-		catch (java.net.MalformedURLException e) 
-		{
-			Log.e( "Error: malformed URL: " + e.toString() );
-		}
-		catch (java.io.IOException e) 
-		{}
-		catch (ParserConfigurationException e) 
-		{}
+		Response response = RequestManager.version1().callMethod( "radio/xspf.php", params );
+		
+		Element trackList =
+					  (Element)response.xmlDocument().getDocumentElement()
+				   			  		   .getElementsByTagName( "trackList" )
+				   			  		   .item( 0 );
+		
+		NodeList tracks = ((Element) trackList).getElementsByTagName( "track" );
 
+		for (int i = 0; i < tracks.getLength(); i++)
+		{
+			m_playlist.push( new TrackInfo( (Element) tracks.item( i ) ) );
+		}
 	}
 }
