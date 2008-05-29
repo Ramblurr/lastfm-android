@@ -28,6 +28,10 @@
 <intent-filter>
 <action android:name="MAP_ACTION">
 </action><category android:name="android.intent.category.DEFAULT">
+</category></intent-filter></activity><activity android:name=".FriendsView" android:label="Friends List - Last.fm">
+<intent-filter>
+<action android:name="FRIENDSVIEW">
+</action><category android:name="android.intent.category.DEFAULT">
 </category></intent-filter></activity></application>
 
 </manifest>

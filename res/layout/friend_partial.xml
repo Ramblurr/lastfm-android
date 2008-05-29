@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="80px"
+	android:gravity="top" android:orientation="horizontal"
+    >
+	<ImageView
+	    android:id="@+id/avatar" 
+	    android:layout_width="80px"
+		android:layout_height="80px" android:height="20px"
+		android:maxHeight="20px" android:maxWidth="20px" android:width="20px"
+		android:minWidth="20px" android:adjustViewBounds="false" android:paddingTop="3sp" android:paddingBottom="3sp">
+	</ImageView>
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="top"
+		>
+		<TextView
+		    android:id="@+id/name" 
+		    android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:scrollHorizontally="false" singleLine="true"
+			android:lines="1" android:textStyle="bold"
+			android:paddingLeft="5sp"
+			android:gravity="top">
+		</TextView>
+	</LinearLayout>
+
+</LinearLayout>

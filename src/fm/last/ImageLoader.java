@@ -66,6 +66,7 @@ public class ImageLoader implements Runnable
 		{
 			URLConnection conn = url.openConnection();
 			conn.connect();
+			Log.i("About to download " + url);
 			InputStream is = conn.getInputStream();
 
 			Log.i("Begining download of event image: " + url);
