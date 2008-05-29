@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import fm.last.ws.RequestEventHandler;
 import fm.last.ws.RequestManager;
 import fm.last.ws.RequestParameters;
 import fm.last.ws.Response;
@@ -42,21 +43,45 @@ public class FriendsAdapter extends BaseAdapter
 	
 	public void loadFriends( String username )
 	{
+		m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON );
 		RequestParameters params = new RequestParameters();
 		params.add( "user", username );
-		Response response = RequestManager.version2().callMethod( "user.getfriends", params );
-		
-		Document xmlDoc = response.xmlDocument();
+
+		RequestManager.version2().callMethod( "user.getfriends", params, m_requestEvent );
+	}
+	
+	RequestEventHandler m_requestEvent = new RequestEventHandler()
+	{
+
+		@Override
+		public void onError(int id, String error) {
+			// TODO Auto-generated method stub
 			
-		NodeList users = xmlDoc.getElementsByTagName("user");
-		for( int i = 0; i < users.getLength(); i++ )
-		{
-			m_friendsList.add(
-					User.newUserFromFriendXML((Element)users.item(i))
+		}
+
+		@Override
+		public void onMethodComplete(int id, Response response) {
+			Document xmlDoc = response.xmlDocument();
+			
+			NodeList users = xmlDoc.getElementsByTagName("user");
+			for( int i = 0; i < users.getLength(); i++ )
+			{
+				m_friendsList.add(
+						User.newUserFromFriendXML((Element)users.item(i))
+				);
+			}
+			m_view.runOnUIThread( new Runnable()
+				{
+					@Override
+					public void run() {
+						notifyDataSetChanged();
+						m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF );					
+					}
+				}
 			);
 		}
-		notifyDataSetChanged();
-	}
+		
+	};
 	
 	public boolean areAllItemsSelectable() 
 	{

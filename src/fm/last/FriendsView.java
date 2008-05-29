@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.DataSetObserver;
 import android.widget.*;
 import android.widget.AdapterView.OnItemClickListener;
@@ -33,7 +34,9 @@ public class FriendsView extends ListActivity implements OnItemClickListener
 		setListAdapter( m_eventsAdapter );
 		getListView().setOnItemClickListener(this);
 
-		m_eventsAdapter.loadFriends("jonocole");
+		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
+		String user = prefs.getString( "username", "" );
+		m_eventsAdapter.loadFriends( user );
 	}
 
 	@Override
