@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fm.last">
 <uses-permission android:name="android.permission.READ_CONTACTS"/>
-<application android:icon="@drawable/icon" android:label="Last.fm">
+<application android:icon="@drawable/icon" android:label="Last.fm" android:name="Application">
 	<activity android:name="ScrobblerTestActivity"></activity>
 	<service android:name="ScrobblerService"></service>
 	<activity android:name=".RadioClient" android:label="Last.fm">

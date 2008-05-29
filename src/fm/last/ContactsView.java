@@ -9,6 +9,8 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.SimpleCursorAdapter;
 
+//TODO handle zero contacts
+
 public class ContactsView extends ListActivity
 {
 	private ListAdapter adapter;

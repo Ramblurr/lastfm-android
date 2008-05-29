@@ -1,14 +1,18 @@
 package fm.last;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.w3c.dom.Element;
 
-public class User {
+public class User 
+{
+	/** Last.fm username */
 	private String m_username;
 	private URL m_imageUrl = null;
 	private URL m_url = null;
+	private int m_id = -1;
 	
 	private User( String username )
 	{
@@ -57,5 +61,22 @@ public class User {
 	public URL url() 
 	{
 		return m_url;
+	}
+
+	/** saves the username->android contact mapping to persistent storage 
+	 * @throws FileNotFoundException */
+	void setAndroidId( int id ) throws FileNotFoundException
+	{
+		m_id = id;
+		
+		Db db = new Db();
+		db.execSQL( "REPLACE INTO " + Db.CONTACT_MAP +
+				    "SET (lastfm_username, android_id) " +
+				    "VALUES (" + m_username + "," + m_id + ");" );
+	}
+	
+	public int androidId()
+	{
+		return m_id;
 	}
 }
