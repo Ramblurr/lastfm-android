@@ -63,16 +63,22 @@ public class User
 		return m_url;
 	}
 
-	/** saves the username->android contact mapping to persistent storage 
-	 * @throws FileNotFoundException */
+	/** saves the username->android contact mapping to persistent storage */
 	void setAndroidId( int id ) throws FileNotFoundException
 	{
 		m_id = id;
-		
 		Db db = new Db();
-		db.execSQL( "REPLACE INTO " + Db.CONTACT_MAP +
-				    "SET (lastfm_username, android_id) " +
-				    "VALUES (" + m_username + "," + m_id + ");" );
+		
+		try
+		{
+			db.execSQL( "REPLACE INTO " + Db.CONTACT_MAP +
+					    "SET (lastfm_username, android_id) " +
+				        "VALUES (" + m_username + "," + m_id + ");" );
+		}
+		finally
+		{
+			db.close();
+		}
 	}
 	
 	public int androidId()
