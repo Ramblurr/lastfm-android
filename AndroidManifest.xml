@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fm.last">
+<uses-permission android:name="android.permission.READ_CONTACTS"/>
 <application android:icon="@drawable/icon" android:label="Last.fm">
 	<activity android:name="ScrobblerTestActivity"></activity>
 	<service android:name="ScrobblerService"></service>
@@ -27,6 +28,10 @@
 <activity android:name="MapActivity" android:label="Venue Location - Last.fm">
 <intent-filter>
 <action android:name="MAP_ACTION">
+</action><category android:name="android.intent.category.DEFAULT">
+</category></intent-filter></activity><activity android:name="ContactsView">
+<intent-filter>
+<action android:name="CONTACTS_ACTION">
 </action><category android:name="android.intent.category.DEFAULT">
 </category></intent-filter></activity><activity android:name=".FriendsView" android:label="Friends List - Last.fm">
 <intent-filter>
