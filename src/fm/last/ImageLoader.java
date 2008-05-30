@@ -59,14 +59,13 @@ public class ImageLoader implements Runnable
 		m_thread.start();
 	}
 	
-	private Bitmap downloadEventImage( URL url ) 
+	private Bitmap downloadImage( URL url )
 	{
 		Bitmap bm = null;
 		try 
 		{
 			URLConnection conn = url.openConnection();
 			conn.connect();
-			Log.i("About to download " + url);
 			InputStream is = conn.getInputStream();
 
 			Log.i("Begining download of event image: " + url);
@@ -96,7 +95,7 @@ public class ImageLoader implements Runnable
 			pair = (Map.Entry<ImageView, URL>)it.next();
 
 			URL url = pair.getValue();
-			final Bitmap bmp = downloadEventImage(url);
+			final Bitmap bmp = downloadImage(url);
 
 			if(m_cachingEnabled)
 				m_bitmapCache.put(url, bmp);					

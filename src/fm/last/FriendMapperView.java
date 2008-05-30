@@ -14,11 +14,9 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.TranslateAnimation; 
 
-import fm.last.R; 
-
-public class FriendsView extends ListActivity implements OnItemClickListener
+public class FriendMapperView extends ListActivity implements OnItemClickListener
 {
 	private FriendsAdapter m_eventsAdapter;
 
@@ -39,9 +37,19 @@ public class FriendsView extends ListActivity implements OnItemClickListener
 		m_eventsAdapter.loadFriends( user );
 	}
 
-	@Override
-	public void onItemClick(AdapterView arg0, View arg1, int arg2, long arg3) {
-		// TODO Auto-generated method stub
-		
+	public void onItemClick(AdapterView parent, View v, int position, long id)
+	{
+		Intent i = new Intent( "CONTACTS_ACTION" );
+		startSubActivity( i, 0 );
 	}
+
+
+	protected void onActivityResult(int requestCode, int resultCode, String data, Bundle extras)
+	{
+		if( resultCode != RESULT_OK )
+			return;
+		
+		Toast.makeText(this, data, 10000 ).show();
+	}
+	
 }

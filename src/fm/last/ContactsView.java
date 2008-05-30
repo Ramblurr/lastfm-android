@@ -7,6 +7,7 @@ import android.provider.Contacts.People;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 //TODO handle zero contacts
@@ -28,4 +29,13 @@ public class ContactsView extends ListActivity
 		adapter = new SimpleCursorAdapter( this, android.R.layout.simple_list_item_1, c, columns, names );
 		setListAdapter( adapter );
 	}
+
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) 
+	{
+		Cursor c = (Cursor)adapter.getItem(position);
+		setResult(RESULT_OK,  c.getString( c.getColumnIndex(People._ID )));
+		finish();
+	}
+	
 }

@@ -1,7 +1,5 @@
 package fm.last;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import org.w3c.dom.Document;
@@ -13,6 +11,7 @@ import fm.last.ws.RequestManager;
 import fm.last.ws.RequestParameters;
 import fm.last.ws.Response;
 
+import android.app.Activity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +24,13 @@ import android.widget.TextView;
 
 public class FriendsAdapter extends BaseAdapter
 {
-	private FriendsView m_view = null;
+	private Activity m_view = null;
 	ArrayList< User > m_friendsList = new ArrayList< User >();
-	private String m_postcode = null;
-	private int m_eventPagesToLoad = 0;
-	private int m_eventPagesLoaded = 0;
-	private Thread m_thread = null;
 	
 	//Cached ImageLoader
 	private ImageLoader m_imageLoader;
 	
-	public FriendsAdapter( FriendsView view )
+	public FriendsAdapter( Activity view )
 	{
 		m_view = view;
 		m_imageLoader = new ImageLoader(view, true);
@@ -52,14 +47,11 @@ public class FriendsAdapter extends BaseAdapter
 	
 	RequestEventHandler m_requestEvent = new RequestEventHandler()
 	{
-
-		@Override
 		public void onError(int id, String error) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
 		public void onMethodComplete(int id, Response response) {
 			Document xmlDoc = response.xmlDocument();
 			
@@ -72,7 +64,6 @@ public class FriendsAdapter extends BaseAdapter
 			}
 			m_view.runOnUIThread( new Runnable()
 				{
-					@Override
 					public void run() {
 						notifyDataSetChanged();
 						m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF );					
