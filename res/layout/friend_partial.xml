@@ -5,9 +5,7 @@
 	<ImageView
 	    android:id="@+id/avatar" 
 	    android:layout_width="40px"
-		android:layout_height="10px" android:height="10px"
-		android:maxHeight="10px" android:maxWidth="40px" android:width="40px"
-		android:minWidth="40px" android:adjustViewBounds="false" android:paddingTop="3sp" android:paddingBottom="3sp">
+		android:layout_height="fill_parent" android:adjustViewBounds="false" android:paddingTop="3sp" android:paddingBottom="3sp">
 	</ImageView>
 	<LinearLayout android:orientation="vertical"
 		android:layout_width="fill_parent"

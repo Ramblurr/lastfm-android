@@ -49,7 +49,7 @@ public class FriendsAdapter extends BaseAdapter
 	{
 		public void onError(int id, String error) {
 			// TODO Auto-generated method stub
-			
+			Log.e( "Error occured in Friend list request: " + error );
 		}
 
 		public void onMethodComplete(int id, Response response) {
