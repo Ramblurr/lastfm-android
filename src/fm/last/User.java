@@ -6,6 +6,10 @@ import java.net.URL;
 
 import org.w3c.dom.Element;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 public class User 
 {
 	/** Last.fm username */
@@ -45,6 +49,30 @@ public class User
 		user.m_imageUrl = imageUrl;
 		user.m_url = url;
 		
+		SQLiteDatabase db = null;
+		try
+		{
+			db = Application.instance().getDb();
+		} catch ( FileNotFoundException e1 )
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return user;
+		}
+		
+		Cursor result = db.query( "FriendsMap", 					//table
+								  new String[]{ "contactId" }, 		//columns
+								  "username = ?", 					//WHERE clause
+								  new String[]{ user.username() },	//WHERE arguments
+								  null,								//groupBy
+								  null,								//having
+								  null );							//orderBy
+		
+		if( result.first() )
+		{
+			user.m_id = result.getInt( result.getColumnIndex( "contactId" ) );
+		}
+		
 		return user;
 	}
 
@@ -67,17 +95,19 @@ public class User
 	void setAndroidId( int id ) throws FileNotFoundException
 	{
 		m_id = id;
-		Db db = new Db();
 		
 		try
 		{
-			db.execSQL( "REPLACE INTO " + Db.CONTACT_MAP +
-					    "SET (lastfm_username, android_id) " +
-				        "VALUES (" + m_username + "," + m_id + ");" );
-		}
-		finally
+			SQLiteDatabase db = Application.instance().getDb();
+			String nullColumn = null;
+			ContentValues values = new ContentValues();
+			values.put( "contactId", id );
+			values.put( "username", username() );
+			db.replace( "FriendsMap", nullColumn, values );
+		} catch ( FileNotFoundException e )
 		{
-			db.close();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

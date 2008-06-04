@@ -1,6 +1,9 @@
 package fm.last;
 
+import java.io.FileNotFoundException;
+
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 
 public class Application extends android.app.Application
 {
@@ -9,6 +12,7 @@ public class Application extends android.app.Application
 	private String m_pass;
 	private String m_sessionKey;
 	private SharedPreferences m_preferences;
+	private SQLiteDatabase m_db = null;
 	
 	public void onCreate()
 	{
@@ -19,10 +23,34 @@ public class Application extends android.app.Application
 		
 		instance = this;
 	}
-	
+
 	public static Application instance()
 	{
 		return instance;
+	}
+
+	public SQLiteDatabase getDb() throws FileNotFoundException
+	{
+		if( m_db != null )
+		{
+			return m_db;
+		}
+		
+		try
+		{
+			m_db = openDatabase( "lastFm", null );
+		}catch( FileNotFoundException e )
+		{
+			m_db = createDatabase( "lastFm", 1, MODE_PRIVATE, null );
+			createTables();
+			return m_db;
+		}
+		return m_db;
+	}
+	
+	private void createTables()
+	{
+		m_db.execSQL( "CREATE TABLE FriendsMap (contactId integer PRIMARY_KEY, username VARCHAR);" );
 	}
 	
 	public String userName()

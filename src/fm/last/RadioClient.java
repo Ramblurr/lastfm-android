@@ -44,9 +44,8 @@ public class RadioClient extends Activity
 	{
 		super.onCreate( icicle );
 	 
-		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
-		String user = prefs.getString( "username", "" );
-		String pass = prefs.getString( "md5Password", "" );
+		String user = Application.instance().userName();
+		String pass = Application.instance().password();
 
 		m_imageLoader = new ImageLoader(this);
 		
@@ -74,9 +73,8 @@ public class RadioClient extends Activity
 	
 	final private void init()
 	{
-		SharedPreferences prefs = getSharedPreferences( "Last.fm", MODE_PRIVATE );
-		String user = prefs.getString( "username", "" );
-		String pass = prefs.getString( "md5Password", "" );
+		String user = Application.instance().userName();
+		String pass = Application.instance().password();
 		
 		m_radio = new Radio( user, pass );		
 
