@@ -12,9 +12,12 @@ import org.xml.sax.InputSource;
 
 import fm.last.Log;
 
-public class Response {
+public class Response 
+{
 	private int m_id;
-	private BufferedReader m_responseData;
+	private BufferedReader m_responseData = null;
+	Document m_xmlDom = null;
+	String m_error;
 	
 	public Response( Request request, BufferedReader responseData )
 	{
@@ -34,12 +37,14 @@ public class Response {
 	
 	public Document xmlDocument()
 	{
-		Document xmlDom = null;
+		if( m_xmlDom != null )
+			return m_xmlDom;
+		
 		try
 		{
-			xmlDom = DocumentBuilderFactory.newInstance()
-										   .newDocumentBuilder()
-										   .parse( new InputSource( m_responseData ) );
+			m_xmlDom = DocumentBuilderFactory.newInstance()
+										   	 .newDocumentBuilder()
+										   	 .parse( new InputSource( m_responseData ) );
 		}
 		catch (IOException e) 
 		{
@@ -57,6 +62,22 @@ public class Response {
 		{
 			Log.e( "Sax Error: " + e );
 		}
-		return xmlDom;
+		
+		return m_xmlDom;
+	}
+	
+	void setError( String error )
+	{
+		m_error = error;
+	}
+	
+	public boolean hasError()
+	{
+		return m_error != null;
+	}
+	
+	public String error()
+	{
+		return m_error;
 	}
 }

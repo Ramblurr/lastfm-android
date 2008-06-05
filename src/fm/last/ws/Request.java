@@ -7,29 +7,35 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 
+import org.w3c.dom.Element;
+
+import fm.last.EasyElement;
+
 public class Request 
 {
 	private static int m_idCount = 0;
 	private URL m_url;
 	private int m_id;
+	private int m_wsVersion;
 	
-	private RequestEventHandler m_requestEventHandler = null;
+	private EventHandler m_requestEventHandler = null;
 	
-	public Request( URL url, RequestEventHandler handler )
+	Request( URL url, int wsVersion, EventHandler handler )
 	{
-		this( url );
+		this( url, wsVersion );
 		m_requestEventHandler = handler;
 	}
 	
-	public Request( URL url )
+	Request( URL url, int wsVersion )
 	{
+		m_wsVersion = wsVersion;
 		m_url = url;
 		synchronized (Request.class) {
 			m_id = m_idCount++;
 		}
 	}
 	
-	public Response execute() 
+	Response execute() 
 	{
 		Response response = null;
 		try
@@ -37,33 +43,74 @@ public class Request
 			InputStreamReader charStream = new InputStreamReader( m_url.openStream(), "UTF-8" ); 
 			response = new Response(this, new BufferedReader( charStream ));
 		} catch (UnsupportedEncodingException e) {
-			onError( "Could not decode response from UTF-8" );
+			response = new Response( this, null );
+			response.setError( "Could not decode response from UTF-8" );
 		} catch (IOException e) {
-			onError( "IOException error: " + e );
+			response = new Response( this, null );
+			response.setError( "IOException error: " + e );
 		}
 		
-		//If this is a synchronous / fire and forget request
-		//OR there was an error.
-		if( m_requestEventHandler == null ||
-			response == null )
-			return response;
+		String error = errorCheck( response );
+		if( error != null )
+		{
+			response.setError( error );
+		}
 
-		onMethodComplete( response );
+
+
+		
+		//If this is an asynchronous request call the event handler
+		if( m_requestEventHandler != null )
+		{
+			if( response.hasError() )
+			{
+				onError( response.error() );
+			}
+			else
+			{
+				onMethodComplete( response );
+			}
+		}
+		
 		return response;
 	}
 	
-	private void onMethodComplete( Response response )
+	String errorCheck( Response response )
+	{
+		switch( m_wsVersion )
+		{
+			case 2:
+			{
+				EasyElement e = new EasyElement(
+										response.xmlDocument().getDocumentElement());
+				String lfmStatus = e.e("lfm").e().getAttribute( "status" );
+				if( lfmStatus.compareTo( "ok" ) != 0 )
+				{
+					return lfmStatus;
+				}
+				break;
+			}
+		}
+		return null;
+	}
+	
+	void onMethodComplete( Response response )
 	{
 		m_requestEventHandler.onMethodComplete( m_id, response);
 	}
 	
-	private void onError( String error )
+	void onError( String error )
 	{
 		m_requestEventHandler.onError( m_id, error );
 	}
 	
-	public int id()
+	int id()
 	{
 		return m_id;
+	}
+	
+	int wsVersion()
+	{
+		return m_wsVersion;
 	}
 }

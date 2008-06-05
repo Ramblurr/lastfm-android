@@ -1,4 +1,4 @@
-package fm.last;
+package fm.last.events;
 
 import android.os.Bundle;
 import android.app.ListActivity;
@@ -15,7 +15,10 @@ import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
 
+import fm.last.Log;
 import fm.last.R; 
+import fm.last.R.layout;
+import fm.last.R.string;
 
 public class EventsView extends ListActivity implements OnItemClickListener
 {

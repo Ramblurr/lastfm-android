@@ -28,6 +28,7 @@ import android.view.*;
 import android.widget.*;
 
 import fm.last.Log;
+import fm.last.events.Event;
 
 
 public class RadioClient extends Activity 

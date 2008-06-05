@@ -28,7 +28,7 @@ public class EasyElement
 		}
 	}
 
-	int microDegrees()
+	public int microDegrees()
 	{
 		String degrees = value();
 		double tmp = Double.valueOf( degrees ) * 1E6;

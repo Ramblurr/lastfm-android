@@ -1,4 +1,4 @@
-package fm.last;
+package fm.last.events;
 
 import org.w3c.dom.Text;
 import org.w3c.dom.Document;

@@ -1,4 +1,4 @@
-package fm.last;
+package fm.last.events;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import android.net.Uri;
 
+import fm.last.EasyElement;
 import fm.last.Utils;
 import fm.last.ws.RequestManager;
 import fm.last.ws.RequestParameters;
@@ -27,7 +28,7 @@ public class Event
 		return m_title;
 	}	
 	
-	Event( Element eventElement )
+	public Event( Element eventElement )
 	{
 		m_xmlString = Utils.toString( eventElement );
 		
@@ -71,7 +72,18 @@ public class Event
 		int pageCount() { return m_pageCount; }
 	}
 	
-	public static EventResult getEventsByLocation( String location, int pageOffset ) 
+	public static EventResult getEventsByLocation( String location, int pageOffset )
+	{
+		int id = getEventsByLocation( location, pageOffset, null );
+		Response response = RequestManager.version2().waitForRequestResponse( id );
+		
+		if( response.hasError() )
+			return new EventResult();
+		
+		return resultFromResponse( response );
+	}
+	
+	public static int getEventsByLocation( String location, int pageOffset, final EventHandler handler ) 
 	{
 		//imo page offsets /should/ start at 0 but the webservice starts with page 1
 		pageOffset += 1;
@@ -80,8 +92,39 @@ public class Event
 		params.add( "location", Uri.encode( location ) )
 			  .add( "page", String.valueOf( pageOffset) );
 
-		Response response = RequestManager.version2().callMethod( "geo.Events", params );
-
+		int requestId = 
+			RequestManager.version2().callMethod( "geo.Events", params, new fm.last.ws.EventHandler()
+			{
+	
+				@Override
+				public void onError( int id, String error )
+				{
+					// TODO Auto-generated method stub
+					
+				}
+	
+				@Override
+				public void onMethodComplete( int id, Response response )
+				{
+	
+					if( response.hasError() )
+					{
+						if( handler != null )
+							handler.onError( response.error() );
+						return;
+					}
+					
+					EventResult r = resultFromResponse( response );
+					if( handler != null )
+						handler.onSuccess( r );
+				}
+				
+			} );
+		return requestId;
+	}
+	
+	private static EventResult resultFromResponse( Response response )
+	{
 		EventResult r = new EventResult();
 		
 		Document xmlDom = response.xmlDocument();

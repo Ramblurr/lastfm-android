@@ -89,14 +89,14 @@ public class RequestManager {
 		return waitForRequestResponse( requestId );
 	}
 	
-	public int callMethod( String methodName, RequestParameters methodParams, RequestEventHandler eventHandler ) 
+	public int callMethod( String methodName, RequestParameters methodParams, EventHandler eventHandler ) 
 	{
 		String urlString = m_baseHost + 
 						   m_apiRoot + 
 						   methodName;
 		urlString = urlString.trim();
 		
-		if(!urlString.contains("?"))
+		if( !urlString.contains( "?" ) )
 			urlString += "?";
 		else
 			urlString += "&";
@@ -105,25 +105,28 @@ public class RequestManager {
 		
 		for( String name : parameterMap.keySet() )
 		{
-			final String value = parameterMap.get( name );
+			final String value = parameterMap.get( name ); 
 			urlString += ( name + "=" + value + "&" ); 
 		}
 		
 		if( m_version == 2 )
 		{
-			urlString += "api_key=" + API_KEY + "&"
+			urlString += "api_key=" + API_KEY + "&" 
 					  +  "api_sig=" + methodSignature( methodName ) + "&" 
 					  +	 "sk=" + m_sessionKey;
 		}
 		
 		URL url = null;
-		try {
+		try 
+		{
 			url = new URL( urlString );
-		} catch (MalformedURLException e) {
+		} 
+		catch (MalformedURLException e) 
+		{
 			return -1;
 		}
-
-		Request request = new Request( url, eventHandler );
+		
+		Request request = new Request( url, m_version, eventHandler );
 		m_requestQueue.sendRequest( request );
 		
 		return request.id();
@@ -132,7 +135,7 @@ public class RequestManager {
 	private String methodSignature( String methodName )
 	{
 		return Utils.md5( "api_key" + API_KEY + 
-						  "authToken" + m_authToken +
+						  "authToken" + m_authToken + 
 						  "method" + methodName );
 	}
 	

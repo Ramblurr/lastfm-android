@@ -1,7 +1,13 @@
-package fm.last;
+package fm.last.events;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import fm.last.ImageLoader;
+import fm.last.Log;
+import fm.last.R;
+import fm.last.R.layout;
+import fm.last.events.Event.EventResult;
 
 import android.view.KeyEvent;
 import android.view.View;
@@ -13,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class EventsAdapter extends BaseAdapter implements Runnable
+public class EventsAdapter extends BaseAdapter
 {
 	private EventsView m_view = null;
 	Event.EventResult m_results = null;
@@ -34,17 +40,43 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 
 	public synchronized void loadEventsByLocation()
 	{
-		m_eventPagesToLoad++;
-		
-		if(m_thread == null || !m_thread.isAlive())
-		{
-			//TODO: Check if it's necessary to create a new Thread instance
-			//		every time we want to restart the Thread. This seems 
-			//		unnecessary but I'm getting an error if I don't do it!
-			m_thread = new Thread( this );
-			m_thread.start();
-		}
+		Event.getEventsByLocation( m_postcode, m_eventPagesToLoad++, m_handler );
 	}
+	
+	EventHandler m_handler = new EventHandler()
+	{
+
+		@Override
+		public void onError( String error )
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onSuccess( EventResult result )
+		{
+			m_eventPagesLoaded++;
+			if( m_results == null )
+			{
+				m_results = result;
+			}
+			else
+			{
+				m_results.addAll( result );
+			}
+			
+			m_view.runOnUIThread( new Runnable(){
+				public void run()
+				{
+					notifyDataSetChanged();
+					m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+					m_view.loadingComplete();
+				}
+			});
+		}
+		
+	};
 	
 	public void loadEventsByLocation( String postcode )
 	{
@@ -140,33 +172,5 @@ public class EventsAdapter extends BaseAdapter implements Runnable
 		eventArtists.setText(artistsString);
 		
 		return ll;
-	}
-	
-	public void run()
-	{
-		do
-		{
-			if( m_results == null )
-			{
-				m_results = Event.getEventsByLocation(m_postcode, m_eventPagesLoaded);
-			}
-			else
-			{
-				m_results.addAll( Event.getEventsByLocation(m_postcode, m_eventPagesLoaded));
-			}
-			m_view.runOnUIThread( new Runnable()
-			{
-				public void run()
-				{
-					notifyDataSetChanged();
-				}
-			});
-		}while( ++m_eventPagesLoaded < m_eventPagesToLoad );
-		m_view.runOnUIThread( new Runnable(){
-			public void run()
-			{
-				m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);				
-			}
-		});
 	}
 }

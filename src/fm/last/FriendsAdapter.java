@@ -6,7 +6,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import fm.last.ws.RequestEventHandler;
 import fm.last.ws.RequestManager;
 import fm.last.ws.RequestParameters;
 import fm.last.ws.Response;
@@ -45,7 +44,7 @@ public class FriendsAdapter extends BaseAdapter
 		RequestManager.version2().callMethod( "user.getfriends", params, m_requestEvent );
 	}
 	
-	RequestEventHandler m_requestEvent = new RequestEventHandler()
+	fm.last.ws.EventHandler m_requestEvent = new fm.last.ws.EventHandler()
 	{
 		public void onError(int id, String error) {
 			// TODO Auto-generated method stub
