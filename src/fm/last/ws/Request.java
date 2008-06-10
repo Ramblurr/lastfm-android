@@ -3,61 +3,92 @@ package fm.last.ws;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
-
-import org.w3c.dom.Element;
 
 import fm.last.EasyElement;
 
 public class Request 
 {
-	private static int m_idCount = 0;
+	private static int s_idCount = 0;
 	private URL m_url;
 	private int m_id;
 	private int m_wsVersion;
-	
 	private EventHandler m_requestEventHandler = null;
+	private RequestType m_requestType = RequestType.GET_REQUEST;
+	
+	public enum RequestType {
+		GET_REQUEST,
+		POST_REQUEST
+	};
+	
 	
 	Request( URL url, int wsVersion, EventHandler handler )
-	{
-		this( url, wsVersion );
-		m_requestEventHandler = handler;
-	}
-	
-	Request( URL url, int wsVersion )
 	{
 		m_wsVersion = wsVersion;
 		m_url = url;
 		synchronized (Request.class) {
-			m_id = m_idCount++;
+			m_id = s_idCount++;
 		}
+		m_requestEventHandler = handler;
 	}
+	
+	Request( URL url, int wsVersion, EventHandler handler, RequestType rType )
+	{
+		this( url, wsVersion, handler );
+		m_requestType = rType;
+	}
+	
+	Response getRequest() throws UnsupportedEncodingException, IOException
+	{
+		InputStreamReader charStream = new InputStreamReader( m_url.openStream(), "UTF-8" ); 
+		return new Response(this, new BufferedReader( charStream ));
+	}
+	
+	Response postRequest() throws UnsupportedEncodingException, IOException
+	{
+		URL url = new URL( m_url.getProtocol() + "://" + m_url.getHost() + m_url.getPath() );
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setDoOutput( true );
+		con.setRequestMethod( "POST" );
+		con.getOutputStream().write( m_url.getQuery().getBytes() );
+		con.connect();
+		InputStreamReader charStream = new InputStreamReader( con.getInputStream(), "UTF-8" );
+		return new Response(this, new BufferedReader( charStream ));
+	}	
 	
 	Response execute() 
 	{
 		Response response = null;
 		try
 		{
-			InputStreamReader charStream = new InputStreamReader( m_url.openStream(), "UTF-8" ); 
-			response = new Response(this, new BufferedReader( charStream ));
-		} catch (UnsupportedEncodingException e) {
+			if( m_requestType == RequestType.GET_REQUEST )
+			{
+				response = getRequest();
+			}
+			else if( m_requestType == RequestType.POST_REQUEST )
+			{
+				response = postRequest();
+			}
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
 			response = new Response( this, null );
 			response.setError( "Could not decode response from UTF-8" );
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
 			response = new Response( this, null );
 			response.setError( "IOException error: " + e );
 		}
-		
-		String error = errorCheck( response );
-		if( error != null )
+
+		String error = null;
+		if( !response.hasError() && 
+				(error = errorCheck( response )) != null )
 		{
 			response.setError( error );
 		}
-
-
-
 		
 		//If this is an asynchronous request call the event handler
 		if( m_requestEventHandler != null )

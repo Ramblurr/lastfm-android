@@ -1,13 +1,10 @@
 package fm.last;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
-import android.util.Log;
 
 public class Utils 
 {
@@ -16,7 +13,7 @@ public class Utils
 	    try
 	    {
 	    	MessageDigest m = MessageDigest.getInstance( "MD5" );
-			m.update( in.getBytes(), 0, in.length() );
+			m.update( in.getBytes( "UTF-8" ), 0, in.length() );
 			BigInteger bi = new BigInteger( 1, m.digest() );
 			return bi.toString(16);
 		}
@@ -24,9 +21,14 @@ public class Utils
 	    {
 	    	//TODO we should prolly throw this, as otherwise the user will get a BADAUTH error
 	    	// which isn't accurate
-	        Log.e( "Last.fm", e.toString() );
+	        Log.e( e.toString() );
 	        return "";
-	    }
+	    } catch ( UnsupportedEncodingException e )
+		{
+			// TODO Auto-generated catch block
+			Log.e( e.toString() );
+			return "";
+		}
 	}
 	
 	public static long now()

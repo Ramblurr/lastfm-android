@@ -1,4 +1,4 @@
-package fm.last;
+package fm.last.radio;
 
 import java.io.*;
 import java.net.*;
@@ -27,7 +27,13 @@ import android.view.animation.*;
 import android.view.*;
 import android.widget.*;
 
+import fm.last.Application;
+import fm.last.ImageLoader;
 import fm.last.Log;
+import fm.last.R;
+import fm.last.TrackInfo;
+import fm.last.R.id;
+import fm.last.R.layout;
 import fm.last.events.Event;
 
 
@@ -215,6 +221,12 @@ public class RadioClient extends Activity
 	{
 		if( m_radio.playlist().size() == 0 )
 			m_radio.fetch();
+		
+		if( m_radio.playlist().size() == 0 )
+		{
+			//TODO: handle not enough content error correctly
+			return;
+		}
 		
 		TrackInfo track = m_radio.playlist().pop();
 		

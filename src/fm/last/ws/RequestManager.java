@@ -3,13 +3,17 @@ package fm.last.ws;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+
+import android.net.Uri;
 
 import com.google.common.util.Assert;
 
 import fm.last.Application;
 import fm.last.EasyElement;
 import fm.last.Utils;
+import fm.last.ws.Request.RequestType;
 
 public class RequestManager {
 
@@ -19,6 +23,7 @@ public class RequestManager {
 	private RequestQueue m_requestQueue = new RequestQueue();
 	
 	private static final String API_KEY = "";
+	private static final String API_SECRET = "";
 	
 	private String m_authToken;
 	private String m_sessionKey;
@@ -55,20 +60,20 @@ public class RequestManager {
 		m_version = version;
 		if( m_version == 2 )
 		{
-			m_apiRoot = "2.0/?method=";
+			m_apiRoot = "2.0/?";
+
 			m_sessionKey = Application.instance().sessionKey();
-			if ( m_sessionKey.length() > 0)
+			m_authToken = Utils.md5( Application.instance().userName() + 
+						  Application.instance().password() );
+			
+			if ( m_sessionKey.length() == 0)
 			{
 				RequestParameters params = new RequestParameters();
-				
-				m_authToken = Utils.md5( Application.instance().userName() + 
-										 Application.instance().password() );
-				
 				
 				params.add( "username", Application.instance().userName() )
 					  .add( "authToken", m_authToken )
 					  .add( "api_key", API_KEY )
-					  .add( "api_sig", methodSignature( "auth.getMobileSession" ) );
+					  .add( "api_sig", methodSignature( new RequestParameters() ) );
 				
 				Response response = callMethod( "auth.getMobileSession", params );
 				EasyElement document = new EasyElement( response.xmlDocument().getDocumentElement() );
@@ -85,21 +90,36 @@ public class RequestManager {
 	
 	public Response callMethod( String methodName, RequestParameters methodParams )
 	{
-		int requestId = callMethod( methodName, methodParams, null );
+		return callMethod( methodName, methodParams, RequestType.GET_REQUEST );
+	}
+	
+	public Response callMethod( String methodName, RequestParameters methodParams, RequestType rType )
+	{
+		int requestId = callMethod( methodName, methodParams, null, rType );
 		return waitForRequestResponse( requestId );
 	}
 	
 	public int callMethod( String methodName, RequestParameters methodParams, EventHandler eventHandler ) 
 	{
+		return callMethod( methodName, methodParams, eventHandler, RequestType.GET_REQUEST);
+	}
+	
+	public int callMethod( String methodName, RequestParameters methodParams, EventHandler eventHandler, RequestType requestType ) 
+	{
 		String urlString = m_baseHost + 
-						   m_apiRoot + 
-						   methodName;
-		urlString = urlString.trim();
+						   m_apiRoot;
 		
-		if( !urlString.contains( "?" ) )
-			urlString += "?";
-		else
-			urlString += "&";
+		if( m_version == 1 )
+		{
+			urlString += methodName + "?";
+		}
+		else if( m_version == 2 )
+		{
+			methodParams.add( "method", methodName )
+						.add( "api_key", API_KEY )
+						.add( "sk", m_sessionKey );
+			methodParams.add( "api_sig", methodSignature( methodParams ) );
+		}
 		
 		Map<String, String> parameterMap = methodParams.getMap();
 		
@@ -107,13 +127,6 @@ public class RequestManager {
 		{
 			final String value = parameterMap.get( name ); 
 			urlString += ( name + "=" + value + "&" ); 
-		}
-		
-		if( m_version == 2 )
-		{
-			urlString += "api_key=" + API_KEY + "&" 
-					  +  "api_sig=" + methodSignature( methodName ) + "&" 
-					  +	 "sk=" + m_sessionKey;
 		}
 		
 		URL url = null;
@@ -126,17 +139,25 @@ public class RequestManager {
 			return -1;
 		}
 		
-		Request request = new Request( url, m_version, eventHandler );
+		Request request = new Request( url, m_version, eventHandler, requestType );
 		m_requestQueue.sendRequest( request );
 		
 		return request.id();
 	}
 	
-	private String methodSignature( String methodName )
+	private String methodSignature( RequestParameters params )
 	{
-		return Utils.md5( "api_key" + API_KEY + 
-						  "authToken" + m_authToken + 
-						  "method" + methodName );
+		Map< String, String > paramMap = params.getMap();
+		Set< Map.Entry<String, String> > set = paramMap.entrySet();
+		
+		String paramString = "";
+		for( Map.Entry<String, String> entry: set )
+		{
+			paramString += entry.getKey() + Uri.decode( entry.getValue() );
+		}
+		
+		paramString += API_SECRET;
+		return Utils.md5( paramString );
 	}
 	
 	public Response waitForRequestResponse( int id )

@@ -99,8 +99,7 @@ public class Event
 				@Override
 				public void onError( int id, String error )
 				{
-					// TODO Auto-generated method stub
-					
+					handler.onError( error );
 				}
 	
 				@Override

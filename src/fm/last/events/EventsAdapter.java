@@ -9,6 +9,8 @@ import fm.last.R;
 import fm.last.R.layout;
 import fm.last.events.Event.EventResult;
 
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,14 +45,31 @@ public class EventsAdapter extends BaseAdapter
 		Event.getEventsByLocation( m_postcode, m_eventPagesToLoad++, m_handler );
 	}
 	
-	EventHandler m_handler = new EventHandler()
+	private EventHandler m_handler = new EventHandler()
 	{
 
 		@Override
-		public void onError( String error )
+		public void onError( final String error )
 		{
-			// TODO Auto-generated method stub
-			
+			m_view.runOnUIThread( new Runnable(){
+				public void run()
+				{
+					m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
+					m_view.loadingComplete();
+					m_view.showAlert( "Error ", R.drawable.icon, error, "OK", new OnClickListener(){
+
+						@Override
+						public void onClick( DialogInterface dialog, int which )
+						{
+							if( m_results == null )
+							{
+								//If the first page of events won't even load then just 
+								//close the view - no point showing an empty list
+								m_view.finish();
+							}
+						}}, false, null );
+				}
+			});
 		}
 
 		@Override
