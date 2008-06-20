@@ -3,8 +3,16 @@ package fm.last.events;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 
 import android.net.Uri;
 
@@ -47,6 +55,42 @@ public class Event
 		{
 			m_artists.add( nodes.item( i ).getFirstChild().getNodeValue() );
 		}		
+	}
+	
+	public static Event EventFromXmlString( String xml )
+	{
+		Event event = null;
+        try {
+
+			Document xmlDoc = DocumentBuilderFactory.newInstance()
+												 .newDocumentBuilder()
+												 .parse( new InputSource( new StringReader( xml ) ) );
+			
+			event = new Event( xmlDoc.getDocumentElement() );
+
+		}
+		catch (ParserConfigurationException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (FactoryConfigurationError e) 
+		{
+			e.printStackTrace();
+		}
+		catch (SAXException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (NullPointerException e)
+		{
+			// no event passed in intent
+		}
+		
+		return event;
 	}
 	
 	public String title() { return m_title;	}

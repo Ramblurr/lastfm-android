@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+    <LinearLayout android:layout_width="fill_parent"
+            android:layout_height="40px" 
+            android:visibility="gone" 
+            android:id="@+id/top_placeholder" 
+            android:orientation="horizontal" 
+            android:background="#55888888" 
+            android:padding="3px"
+             >
+            <Button android:id="@+id/back_button"
+                    android:layout_width="40px"
+                    android:layout_height="fill_parent"
+                    android:text="&lt;"
+                    android:background="#888888"
+                    android:padding="5px"
+                    android:layout_marginLeft="2px"
+                    android:layout_marginRight="5px"
+            />
+            <TextView
+                android:id="@+id/current_tag" 
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" 
+                android:text="This is a placeholder for the title" 
+                android:gravity="center_vertical"
+                android:padding="5px" 
+                android:background="#dddddd"
+                android:layout_weight="0.8"
+                android:layout_marginLeft="5px"
+                android:layout_marginRight="5px"/>
+            <Button android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:text="More..."
+                    android:background="#888888"
+                    android:padding="5px"
+            />
+    </LinearLayout>
+    <ListView android:id="@android:id/list"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent" 
+        android:layout_weight="1.0" />
+        <LinearLayout android:id="@+id/bottom_placeholder" 
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="4sp"
+            android:visibility="gone" >
+
+            <ImageButton android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:src="@drawable/love">
+            </ImageButton>
+            <ImageButton android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:src="@drawable/ban">
+            </ImageButton>
+            <ImageButton android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:id="@+id/stop"
+                android:src="@drawable/stop">
+            </ImageButton>
+            <ImageButton android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:id="@+id/skip"
+                android:src="@drawable/skip">
+            </ImageButton>
+    </LinearLayout>
+</LinearLayout>

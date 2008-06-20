@@ -37,6 +37,10 @@
 <intent-filter>
 <action android:name="FRIENDSVIEW">
 </action><category android:name="android.intent.category.DEFAULT">
+</category></intent-filter></activity><activity android:name=".tag.TagBrowser">
+<intent-filter>
+<action android:name="TAGBROWSER">
+</action><category android:name="android.intent.category.DEFAULT">
 </category></intent-filter></activity></application>
 
 </manifest>

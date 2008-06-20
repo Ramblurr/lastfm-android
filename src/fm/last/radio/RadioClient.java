@@ -40,7 +40,6 @@ import fm.last.events.Event;
 public class RadioClient extends Activity 
 {
 	private Radio m_radio = null;
-	private MediaPlayer m_mediaPlayer;
 	private Event m_event;
 	private ImageLoader m_imageLoader;
 	
@@ -78,14 +77,42 @@ public class RadioClient extends Activity
 			}
 	}
 	
+	RadioEventHandler m_radioEventHandler = new RadioEventHandler()
+	{
+
+		@Override
+		public void onTrackEnded( TrackInfo track )
+		{
+
+		}
+
+		@Override
+		public void onTrackStarted( TrackInfo track )
+		{
+			setupUi( track );
+		}
+		
+	};
+	
 	final private void init()
 	{
 		String user = Application.instance().userName();
 		String pass = Application.instance().password();
 		
-		m_radio = new Radio( user, pass );		
+		m_radio = new Radio( user, pass );	
+		m_radio.addRadioHandler( m_radioEventHandler );
 
 		setContentView( R.layout.radio_client );
+		
+		ViewInflate inflater = getViewInflate();
+		View radioPartial = inflater.inflate( R.layout.event_radio_partial, null, null );
+		LinearLayout radioLayout = (LinearLayout)findViewById( R.id.layout );
+		radioPartial.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 
+																	 LinearLayout.LayoutParams.WRAP_CONTENT) );
+		radioLayout.addView( radioPartial, 0 );
+		radioPartial.setVisibility( View.VISIBLE );
+		radioPartial.setAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_top ) );
+		
 		animate();
 		
         ImageButton play = (ImageButton) findViewById( R.id.stop );
@@ -106,7 +133,7 @@ public class RadioClient extends Activity
                         {
                             public void onClick( DialogInterface dialog, int whichButton ) 
                             {
-                                RadioClient.this.tuneIn( edit.getText().toString() );
+                                RadioClient.this.tuneInSimilarArtists( edit.getText().toString() );
                             }
                         })
                         .setNegativeButton( "Cancel", null )
@@ -120,7 +147,7 @@ public class RadioClient extends Activity
         {
         	public void onClick( View v )
         	{
-        		RadioClient.this.skip();
+        		m_radio.skip();
         	}
         });
         
@@ -140,38 +167,32 @@ public class RadioClient extends Activity
         	}
         });
         
-		try {
-			String xmlString = (String) getIntent().getExtra( "eventXml" );
-
-			Document xml = DocumentBuilderFactory.newInstance()
-												 .newDocumentBuilder()
-												 .parse( new InputSource( new StringReader( xmlString ) ) );
-			
-			m_event = new Event( xml.getDocumentElement() );
-		
-			setupUi( m_event );
-			tuneIn( m_event.headliner() );
+        readExtras();
+	}
+	
+	private void readExtras()
+	{
+		final Bundle extras = getIntent().getExtras();
+		if( extras.containsKey( "eventXml" ))
+		{
+			readEvent( extras.getString( "eventXml" ) );
 		}
-		catch (ParserConfigurationException e) 
+		else if( extras.containsKey( "tag" ) )
 		{
-			e.printStackTrace();
+			readTag( extras.getString( "tag" ) );
 		}
-		catch (FactoryConfigurationError e) 
-		{
-			e.printStackTrace();
-		}
-		catch (SAXException e) 
-		{
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-		catch (NullPointerException e)
-		{
-			// no event passed in intent
-		}        
+	}
+	
+	private void readTag( String tag )
+	{
+		tuneInTag( tag );
+	}
+	
+	private void readEvent( String eventXml )
+	{
+		m_event = Event.EventFromXmlString( eventXml );
+		setupUi( m_event );
+		tuneInSimilarArtists( m_event.headliner() );
 	}
 
 	final private void animate()
@@ -198,7 +219,7 @@ public class RadioClient extends Activity
         l.setLayoutAnimation( controller );
 	}
 	
-	private void tuneIn( String artist )
+	private void tuneInSimilarArtists( String artist )
 	{
 		Log.i( "Tuning-in..." );
 		
@@ -207,45 +228,20 @@ public class RadioClient extends Activity
 		TextView v = (TextView) findViewById( R.id.station_name );
 		v.setText( stationName );
 		
-		play();
+		m_radio.play();
 	};
-	
-	private void skip()
-	{
-		m_mediaPlayer.stop();
-		play();
-	}
-	
-	/** stupid api I've made here, but yeah, call tuneIn first or else */
-	private void play()
-	{
-		if( m_radio.playlist().size() == 0 )
-			m_radio.fetch();
-		
-		if( m_radio.playlist().size() == 0 )
-		{
-			//TODO: handle not enough content error correctly
-			return;
-		}
-		
-		TrackInfo track = m_radio.playlist().pop();
-		
-		Log.i( "Streaming track: " + track );
 
-		setupUi( track );
+	private void tuneInTag( String tag )
+	{
+		Log.i( "Tuning-in..." );
 		
-		// Uri myUrl = Uri.parse(track.location());
-		m_mediaPlayer = new MediaPlayer();
+		String stationName = m_radio.tuneToTag( tag );
 		
-		try
-		{
-			m_mediaPlayer.setDataSource( track.location() );
-			m_mediaPlayer.setOnBufferingUpdateListener( onBufferUpdate );
-			// m_mediaPlayer.prepareAsync();
-		}
-		catch (java.io.IOException e) 
-		{}
-	}
+		TextView v = (TextView) findViewById( R.id.station_name );
+		v.setText( stationName );
+		
+		m_radio.play();
+	};
 	
 	private void setupUi( Event e )
 	{
