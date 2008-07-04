@@ -28,40 +28,25 @@ public class Menu extends ListActivity
 	
 	private void populateList()
 	{
-		{
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put( "title", "Events" );
-			map.put( "intent", "EVENTVIEW" );
-			m_list.add( map );
-		}
-		
-		{
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put( "title", "Tags" );
-			map.put( "intent", "TAGBROWSER" );
-			m_list.add( map );
-		}
-		
-		{
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put( "title", "Friend Mapper" );
-			map.put( "intent", "FRIENDSVIEW" );
-			m_list.add( map );
-		}
-		
-		{
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put( "title", "Similar Artist" );
-			map.put( "intent", "SIMILARARTIST" );
-			m_list.add( map );
-		}
+		addMenuItem( "Events", "EVENTVIEW" );
+		addMenuItem( "Tags", "TAGBROWSER" );
+		addMenuItem( "Friend Mapper", "FRIENDSVIEW" );
+		addMenuItem( "Similar Artist", "SIMILARARTIST" );
+	}
+	
+	private void addMenuItem( String title, String action )
+	{
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put( "title", title );
+		map.put( "action", action );
+		m_list.add( map );
 	}
 	
 	private OnItemClickListener m_listClickListener = new OnItemClickListener()
 	{
 		public void onItemClick(AdapterView parent, View v, int position, long id)
 		{
-			String intentName = m_list.get( (int)id ).get( "intent" );
+			String intentName = m_list.get( (int)id ).get( "action" );
 			Intent i = new Intent( intentName );
 			startActivity( i );
 		}
