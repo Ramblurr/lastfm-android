@@ -156,8 +156,17 @@ public class RequestManager {
 			paramString += entry.getKey() + Uri.decode( entry.getValue() );
 		}
 		
+		
 		paramString += API_SECRET;
-		return Utils.md5( paramString );
+		String apiSig = Utils.md5( paramString );
+		
+		//Probably a better way to pad the md5sum
+		//without calculating length and looping
+		//but this will do for now!
+		while( 32 - apiSig.length() > 0 )
+			apiSig = "0" + apiSig;
+		
+		return apiSig;
 	}
 	
 	public Response waitForRequestResponse( int id )

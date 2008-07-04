@@ -28,7 +28,7 @@ public class Menu extends ListActivity
 	
 	private void populateList()
 	{
-		addMenuItem( "Events", "EVENTVIEW" );
+		addMenuItem( "Events", "EVENTSVIEW" );
 		addMenuItem( "Tags", "TAGBROWSER" );
 		addMenuItem( "Friend Mapper", "FRIENDSVIEW" );
 		addMenuItem( "Similar Artist", "SIMILARARTIST" );

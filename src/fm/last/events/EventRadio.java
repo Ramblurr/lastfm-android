@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import fm.last.Log;
 import fm.last.R;
 import fm.last.radio.RadioView;
 
@@ -43,9 +44,20 @@ public class EventRadio extends RadioView {
 	private void readEvent( String eventXml )
 	{
 		m_event = Event.EventFromXmlString( eventXml );
-		((TextView) findViewById( R.id.headliner )).setText( m_event.headliner() );
-		((TextView) findViewById( R.id.venue )).setText( m_event.venue() );
-		tuneInSimilarArtists( m_event.headliner() );
+		if( m_event == null )
+		{
+			Log.e("cannot get event from XML:\n" + eventXml );
+			return;
+		}
+		
+		if( m_event.headliner() != null )
+			((TextView) findViewById( R.id.headliner )).setText( m_event.headliner() );
+		
+		if( m_event.artists() != null )
+		{
+			((TextView) findViewById( R.id.venue )).setText( m_event.venue() );
+			tuneInSimilarArtists( m_event.headliner() );
+		}
 	}
 
 }
