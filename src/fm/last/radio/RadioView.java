@@ -1,25 +1,17 @@
 package fm.last.radio;
 
-import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import javax.xml.parsers.*;
-
 import org.kxmlrpc.XmlRpcClient;
-import org.w3c.dom.Document;
-import org.xml.sax.*;
 	
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
 
-import android.net.*;
 import android.content.*;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.SharedPreferences;
-import android.graphics.*;
 import android.os.Bundle;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -32,15 +24,11 @@ import fm.last.ImageLoader;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
-import fm.last.R.id;
-import fm.last.R.layout;
-import fm.last.events.Event;
 
 
-public class RadioClient extends Activity 
+public class RadioView extends Activity 
 {
 	private Radio m_radio = null;
-	private Event m_event;
 	private ImageLoader m_imageLoader;
 	
 	private enum Requests { Login } 
@@ -79,14 +67,11 @@ public class RadioClient extends Activity
 	
 	RadioEventHandler m_radioEventHandler = new RadioEventHandler()
 	{
-
-		@Override
 		public void onTrackEnded( TrackInfo track )
 		{
-
+			
 		}
 
-		@Override
 		public void onTrackStarted( TrackInfo track )
 		{
 			setupUi( track );
@@ -104,21 +89,12 @@ public class RadioClient extends Activity
 
 		setContentView( R.layout.radio_client );
 		
-		ViewInflate inflater = getViewInflate();
-		View radioPartial = inflater.inflate( R.layout.event_radio_partial, null, null );
-		LinearLayout radioLayout = (LinearLayout)findViewById( R.id.layout );
-		radioPartial.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 
-																	 LinearLayout.LayoutParams.WRAP_CONTENT) );
-		radioLayout.addView( radioPartial, 0 );
-		radioPartial.setVisibility( View.VISIBLE );
-		radioPartial.setAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_top ) );
-		
 		animate();
 		
         ImageButton play = (ImageButton) findViewById( R.id.stop );
         play.setOnClickListener( new OnClickListener() 
         {
-        	EditText edit = new EditText( RadioClient.this );
+        	EditText edit = new EditText( RadioView.this );
         	
             public void onClick( View v )
             {
@@ -126,14 +102,14 @@ public class RadioClient extends Activity
             	edit.setHint( "eg. Nirvana" );
             	edit.setSingleLine( true );
             	
-                new AlertDialog.Builder( RadioClient.this )
+                new AlertDialog.Builder( RadioView.this )
                         .setTitle( "Similar Artist Radio" )
                         .setView( edit )
                         .setPositiveButton( "Tune-in", new DialogInterface.OnClickListener() 
                         {
                             public void onClick( DialogInterface dialog, int whichButton ) 
                             {
-                                RadioClient.this.tuneInSimilarArtists( edit.getText().toString() );
+                                RadioView.this.tuneInSimilarArtists( edit.getText().toString() );
                             }
                         })
                         .setNegativeButton( "Cancel", null )
@@ -150,49 +126,6 @@ public class RadioClient extends Activity
         		m_radio.skip();
         	}
         });
-        
-        Button info = (Button) findViewById( R.id.info );
-        info.setOnClickListener( new OnClickListener()
-        {
-        	public void onClick( View v )
-        	{
-        		Intent i = new Intent( "MAP_ACTION" );
-        		
-        		Event e = RadioClient.this.m_event;
-        		i.putExtra( "latitude", e.latitude() );
-        		i.putExtra( "longitude", e.longitude() );
-        		i.putExtra( "venue", e.venue() );
-        		
-        		startActivity( i );
-        	}
-        });
-        
-        readExtras();
-	}
-	
-	private void readExtras()
-	{
-		final Bundle extras = getIntent().getExtras();
-		if( extras.containsKey( "eventXml" ))
-		{
-			readEvent( extras.getString( "eventXml" ) );
-		}
-		else if( extras.containsKey( "tag" ) )
-		{
-			readTag( extras.getString( "tag" ) );
-		}
-	}
-	
-	private void readTag( String tag )
-	{
-		tuneInTag( tag );
-	}
-	
-	private void readEvent( String eventXml )
-	{
-		m_event = Event.EventFromXmlString( eventXml );
-		setupUi( m_event );
-		tuneInSimilarArtists( m_event.headliner() );
 	}
 
 	final private void animate()
@@ -219,7 +152,7 @@ public class RadioClient extends Activity
         l.setLayoutAnimation( controller );
 	}
 	
-	private void tuneInSimilarArtists( String artist )
+	protected void tuneInSimilarArtists( String artist )
 	{
 		Log.i( "Tuning-in..." );
 		
@@ -231,7 +164,7 @@ public class RadioClient extends Activity
 		m_radio.play();
 	};
 
-	private void tuneInTag( String tag )
+	protected void tuneInTag( String tag )
 	{
 		Log.i( "Tuning-in..." );
 		
@@ -242,12 +175,6 @@ public class RadioClient extends Activity
 		
 		m_radio.play();
 	};
-	
-	private void setupUi( Event e )
-	{
-		((TextView) findViewById( R.id.headliner )).setText( e.headliner() );
-		((TextView) findViewById( R.id.venue )).setText( e.venue() );
-	}
 	
 	private void setupUi( TrackInfo t )
 	{
@@ -288,6 +215,16 @@ public class RadioClient extends Activity
 			Log.i( "BufferUpdate: " + percent + "%" );
 		}
 	};
+	
+	protected void setHeaderRes( int resId )
+	{
+		ViewInflate inflater = getViewInflate();
+		View radioPartial = inflater.inflate( resId, null, null );
+		LinearLayout radioLayout = (LinearLayout)findViewById( R.id.layout );
+		radioPartial.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 
+																	 LinearLayout.LayoutParams.WRAP_CONTENT) );
+		radioLayout.addView( radioPartial, 0 );
+	}
 
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{

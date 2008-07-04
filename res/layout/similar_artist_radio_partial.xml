@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        >
+        <ImageView android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:src="@drawable/station"
+            android:id="@+id/station_image" android:layout_marginTop="6sp"
+            marginLeft="6sp" android:layout_marginLeft="6sp">
+        </ImageView>
+        <EditText android:id="@+id/artist_input"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:hint="@string/artist" android:layout_weight="10" />
+        <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/buttonStyleSmallRight" android:id="@+id/tune"
+            android:text="Tune" android:textSize="10sp"
+            android:layout_gravity="center_vertical">
+        </Button>
+    </LinearLayout>

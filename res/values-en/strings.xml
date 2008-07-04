@@ -9,4 +9,5 @@
 	<string name="authProgressMessage">Please Wait</string>
     <string name="eventsProgressTitle">Finding Events..</string>
     <string name="eventsProgressMessage">Please Wait</string>
+    <string name="artist">Artist</string>
 </resources>

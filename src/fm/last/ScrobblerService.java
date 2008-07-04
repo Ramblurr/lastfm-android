@@ -74,7 +74,7 @@ class Track
 	// region to be counted. It's up to you to ensure you don't timestamp incorrectly
 	// eg. adding to pause start timestamps will break the eventual playTime() 
 	// calculation
-	protected List timestamps = new ArrayList( 2 /*initial capacity*/ );
+	protected List<Long> timestamps = new ArrayList<Long>( 2 /*initial capacity*/ );
 
 	private void stamp()
 	{

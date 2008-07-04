@@ -1,13 +1,7 @@
 package fm.last;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.w3c.dom.Text;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
-import android.util.Log;
 
 public class TrackInfo 
 {
@@ -17,19 +11,24 @@ public class TrackInfo
 	public TrackInfo( Element track )
 	{
 		Element creatorElement = (Element) track.getElementsByTagName("creator").item(0);
-		m_artist = ((Text) creatorElement.getFirstChild()).getData();
+		if( creatorElement.getFirstChild() != null )
+			m_artist = ((Text) creatorElement.getFirstChild()).getData();
 
 		Element titleElement = (Element) track.getElementsByTagName("title").item(0);
-		m_title = ((Text) titleElement.getFirstChild()).getData();
+		if( titleElement.getFirstChild() != null )
+			m_title = ((Text) titleElement.getFirstChild()).getData();
 
 		Element albumElement = (Element) track.getElementsByTagName("album").item(0);
-		m_album = ((Text) albumElement.getFirstChild()).getData();
+		if( albumElement.getFirstChild() != null )
+			m_album = ((Text) albumElement.getFirstChild()).getData();
 
 		Element durationElement = (Element) track.getElementsByTagName("duration").item(0);
-		m_duration = Long.valueOf(((Text) durationElement.getFirstChild()).getData());
+		if( durationElement.getFirstChild() != null )
+			m_duration = Long.valueOf(((Text) durationElement.getFirstChild()).getData());
 		
 		Element locationElement = (Element) track.getElementsByTagName("location").item(0);
-		m_location = ((Text) locationElement.getFirstChild()).getData();
+		if( locationElement.getFirstChild() != null )
+			m_location = ((Text) locationElement.getFirstChild()).getData();
 	}
 
 	public String toString() 

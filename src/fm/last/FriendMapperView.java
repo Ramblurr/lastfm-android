@@ -33,7 +33,6 @@ public class FriendMapperView extends ListActivity implements OnItemClickListene
 		m_eventsAdapter.loadFriends( user );
 	}
 
-	@Override
 	public void onItemClick(AdapterView parent, View v, int position, long id)
 	{
 		m_selectedUser = (User)m_eventsAdapter.getItem( position );

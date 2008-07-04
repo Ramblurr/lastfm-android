@@ -139,14 +139,11 @@ public class Event
 		int requestId = 
 			RequestManager.version2().callMethod( "geo.Events", params, new fm.last.ws.EventHandler()
 			{
-	
-				@Override
 				public void onError( int id, String error )
 				{
 					handler.onError( error );
 				}
 	
-				@Override
 				public void onMethodComplete( int id, Response response )
 				{
 	

@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.TextView.BufferType;
 
 public class TagAdapter extends BaseAdapter
 {
@@ -31,7 +30,14 @@ public class TagAdapter extends BaseAdapter
 	
 	public void getTopTags()
 	{
-		RequestManager.version2().callMethod( "tag.getTopTags", new RequestParameters(), m_toptagEventHandler );
+		RequestManager.version2().callMethod( "tag.getTopTags", new RequestParameters(), m_topTagsEventHandler );
+	}
+	
+	public void getSimilarTags( String tag )
+	{
+		RequestParameters params = new RequestParameters();
+		params.add( "tag", tag);
+		RequestManager.version2().callMethod( "tag.getSimilar", params, m_similarTagsEventHandler );
 	}
 	
 	public void removeItem( int position )
@@ -40,26 +46,22 @@ public class TagAdapter extends BaseAdapter
 		notifyDataSetChanged();
 	}
 	
-	@Override
 	public int getCount()
 	{
 		return m_tagNames.size();
 	}
 
-	@Override
 	public Object getItem( int position )
 	{
 		return m_tagNames.get( position );
 	}
 
-	@Override
 	public long getItemId( int position )
 	{
 		// TODO Auto-generated method stub
 		return position;
 	}
 
-	@Override
 	public View getView( int position, View convertView, ViewGroup parent )
 	{
 		if( convertView == null )
@@ -71,6 +73,7 @@ public class TagAdapter extends BaseAdapter
 			tv.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 40 ) );
 			((LinearLayout)convertView).addView( tv );
 		}
+		
 		LinearLayout ll = (LinearLayout)convertView;
 		TextView v = (TextView)ll.getChildAt( 0 );
 		v.setVisibility( View.VISIBLE );
@@ -78,18 +81,16 @@ public class TagAdapter extends BaseAdapter
 		return ll;
 	}
 
-	private fm.last.ws.EventHandler m_toptagEventHandler = 
+	private fm.last.ws.EventHandler m_topTagsEventHandler = 
 		new fm.last.ws.EventHandler()
 	{
 
-		@Override
 		public void onError( int id, String error )
 		{
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
 		public void onMethodComplete( int id, Response response )
 		{
 			Element topTags = (Element)response.xmlDocument().getElementsByTagName( "toptags" ).item(0);
@@ -101,7 +102,6 @@ public class TagAdapter extends BaseAdapter
 			}
 			m_activity.runOnUIThread( new Runnable() 
 			{
-				@Override
 				public void run()
 				{
 					notifyDataSetChanged();
@@ -112,4 +112,34 @@ public class TagAdapter extends BaseAdapter
 		
 	};
 	
+	private fm.last.ws.EventHandler m_similarTagsEventHandler = 
+		new fm.last.ws.EventHandler()
+	{
+
+		public void onError( int id, String error )
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void onMethodComplete( int id, Response response )
+		{
+			Element topTags = (Element)response.xmlDocument().getElementsByTagName( "similartags" ).item(0);
+			NodeList tags = topTags.getElementsByTagName( "tag" );
+			for( int i = 0; i < tags.getLength(); i++ )
+			{
+				EasyElement tag = new EasyElement( (Element)tags.item( i ) );
+				m_tagNames.add( tag.e("name").value() );
+			}
+			m_activity.runOnUIThread( new Runnable() 
+			{
+				public void run()
+				{
+					notifyDataSetChanged();
+				}
+				
+			});
+		}
+		
+	};
 }

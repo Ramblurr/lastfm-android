@@ -28,7 +28,6 @@ public class EventsAdapter extends BaseAdapter
 	private String m_postcode = null;
 	private int m_eventPagesToLoad = 0;
 	private int m_eventPagesLoaded = 0;
-	private Thread m_thread = null;
 	
 	//Cached ImageLoader
 	private ImageLoader m_imageLoader;
@@ -48,7 +47,6 @@ public class EventsAdapter extends BaseAdapter
 	private EventHandler m_handler = new EventHandler()
 	{
 
-		@Override
 		public void onError( final String error )
 		{
 			m_view.runOnUIThread( new Runnable(){
@@ -58,7 +56,6 @@ public class EventsAdapter extends BaseAdapter
 					m_view.loadingComplete();
 					m_view.showAlert( "Error ", R.drawable.icon, error, "OK", new OnClickListener(){
 
-						@Override
 						public void onClick( DialogInterface dialog, int which )
 						{
 							if( m_results == null )
@@ -72,7 +69,6 @@ public class EventsAdapter extends BaseAdapter
 			});
 		}
 
-		@Override
 		public void onSuccess( EventResult result )
 		{
 			m_eventPagesLoaded++;

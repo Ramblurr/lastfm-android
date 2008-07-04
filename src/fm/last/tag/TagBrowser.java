@@ -6,6 +6,7 @@ import fm.last.R;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
@@ -21,16 +22,19 @@ import android.widget.TextView;
 
 public class TagBrowser extends ListActivity
 {
-	TagAdapter m_adapter;
-	Button m_backButton;
-	LinearLayout m_topPlaceholder;
-	LinearLayout m_bottomPlaceholder;
+	private TagAdapter m_adapter;
+	private Button m_backButton;
+	private LinearLayout m_topPlaceholder;
+	private LinearLayout m_bottomPlaceholder;
+	private TextView m_currentTag;
 	
-	TextView m_currentTag;
+	private String m_targetTag = null;
+
 	public void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
 		setContentView( R.layout.tag_browser );
+		
 		m_topPlaceholder = (LinearLayout)findViewById( R.id.top_placeholder );
 		m_bottomPlaceholder = (LinearLayout)findViewById( R.id.bottom_placeholder );
 		m_currentTag = (TextView)findViewById( R.id.current_tag );
@@ -39,7 +43,6 @@ public class TagBrowser extends ListActivity
 		m_backButton.setOnClickListener( new Button.OnClickListener()
 		{
 
-			@Override
 			public void onClick( View view )
 			{
 				m_topPlaceholder.startAnimation( AnimationUtils.loadAnimation( TagBrowser.this, android.R.anim.slide_out_top ) );
@@ -51,9 +54,30 @@ public class TagBrowser extends ListActivity
 		});
 		
 		m_adapter = new TagAdapter( this );
+		
+		//the listView header /must/ be set before the listAdapter is set
+		if( getIntent().hasExtra( "tag" ) )
+		{
+			m_targetTag = getIntent().getStringExtra( "tag" );
+			TextView tv = new TextView( this );
+			tv.setGravity( Gravity.CENTER_VERTICAL );
+			tv.setPadding( 4, 0, 4, 0 );
+			tv.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 40 ) );
+			tv.setText( m_targetTag + " Similar Tags" );
+			getListView().addHeaderView( tv );
+		}
 		setListAdapter( m_adapter );
-		m_adapter.getTopTags();
+
+		if( m_targetTag != null )
+		{
+			m_adapter.getSimilarTags( m_targetTag );
+		}
+		else
+		{
+			m_adapter.getTopTags();
+		}
 		getListView().setAlwaysDrawnWithCacheEnabled( false );
+
 	}
 	
 	public void onStart()
@@ -107,22 +131,19 @@ public class TagBrowser extends ListActivity
         anim.setInterpolator(new AccelerateInterpolator());
         anim.setAnimationListener( new AnimationListener(){
 
-			@Override
 			public void onAnimationEnd()
 			{
-				Intent intent = new Intent( "RADIOCLIENT" );
+				Intent intent = new Intent( "TAGRADIO" );
 				intent.putExtra( "tag", selectedTag );
 				startActivity( intent );
 			}
 
-			@Override
 			public void onAnimationRepeat()
 			{
 				// TODO Auto-generated method stub
 				
 			}
 
-			@Override
 			public void onAnimationStart()
 			{
 				// TODO Auto-generated method stub

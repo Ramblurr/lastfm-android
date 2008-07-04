@@ -1,7 +1,5 @@
 package fm.last;
 
-import javax.xml.parsers.DocumentBuilder;
-
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayController;
 import com.google.android.maps.Point;
@@ -58,10 +56,10 @@ public class MapActivity extends com.google.android.maps.MapActivity
 	{
 		super.onStart();
 		
-		int latitude = (Integer) getIntent().getExtra( "latitude" );
-		int longitude = (Integer) getIntent().getExtra( "longitude" );
+		int latitude = getIntent().getIntExtra( "latitude", 0 );
+		int longitude = getIntent().getIntExtra( "longitude", 0 );
 				
-		venue = (String) getIntent().getExtra( "venue" );
+		venue = getIntent().getStringExtra( "venue" );
 		point = new Point( latitude, longitude );
 		
 		map.getController().centerMapTo( point, true /*ignored*/ );
