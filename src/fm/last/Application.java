@@ -2,6 +2,7 @@ package fm.last;
 
 import java.io.FileNotFoundException;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -21,6 +22,13 @@ public class Application extends android.app.Application
 		m_pass = m_preferences.getString( "md5Password", "" );
 		m_sessionKey = m_preferences.getString( "sessionKey", "" );
 		
+		if( m_user.trim().length() == 0 )
+		{
+			Intent i = new Intent( "ACCOUNTSETTINGS" );
+			i.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+			startActivity( i );
+		}
+		
 		instance = this;
 	}
 
@@ -36,16 +44,10 @@ public class Application extends android.app.Application
 			return m_db;
 		}
 		
-		try
-		{
-			m_db = openDatabase( "lastFm", null );
-		}catch( FileNotFoundException e )
-		{
-			m_db = createDatabase( "lastFm", 1, MODE_PRIVATE, null );
-			createTables();
-			return m_db;
-		}
+		m_db = openOrCreateDatabase( "lastFm", MODE_PRIVATE, null );
+		createTables();
 		return m_db;
+
 	}
 	
 	private void createTables()

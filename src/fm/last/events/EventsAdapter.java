@@ -6,15 +6,13 @@ import java.net.URL;
 import fm.last.ImageLoader;
 import fm.last.Log;
 import fm.last.R;
-import fm.last.R.layout;
 import fm.last.events.Event.EventResult;
 
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
+import android.app.AlertDialog;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewInflate;
 import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -49,24 +47,26 @@ public class EventsAdapter extends BaseAdapter
 
 		public void onError( final String error )
 		{
-			m_view.runOnUIThread( new Runnable(){
+			m_view.runOnUiThread( new Runnable(){
 				public void run()
 				{
 					m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_OFF);
 					m_view.loadingComplete();
-					m_view.showAlert( "Error ", R.drawable.icon, error, "OK", new OnClickListener(){
+					
+					AlertDialog.Builder alertBuilder = new AlertDialog.Builder( m_view );
+					alertBuilder.setTitle( "Error" )
+								.setMessage( error )
+								.setIcon( R.drawable.icon )
+								.show();
 
-						public void onClick( DialogInterface dialog, int which )
-						{
-							if( m_results == null )
-							{
-								//If the first page of events won't even load then just 
-								//close the view - no point showing an empty list
-								m_view.finish();
-							}
-						}}, false, null );
-				}
-			});
+					if( m_results == null )
+					{
+						//If the first page of events won't even load then just 
+						//close the view - no point showing an empty list
+						m_view.finish();
+					}
+			}} );
+
 		}
 
 		public void onSuccess( EventResult result )
@@ -81,7 +81,7 @@ public class EventsAdapter extends BaseAdapter
 				m_results.addAll( result );
 			}
 			
-			m_view.runOnUIThread( new Runnable(){
+			m_view.runOnUiThread( new Runnable(){
 				public void run()
 				{
 					notifyDataSetChanged();
@@ -139,7 +139,7 @@ public class EventsAdapter extends BaseAdapter
 			m_eventPagesToLoad < m_results.pageCount() &&
 		    position > (6*(m_eventPagesToLoad-1)))
 		{
-			m_view.runOnUIThread(new Runnable(){
+			m_view.runOnUiThread(new Runnable(){
 				public void run()
 				{
 					m_view.getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
@@ -149,13 +149,13 @@ public class EventsAdapter extends BaseAdapter
 		}
 		
 		Event event = m_results.get(position); 
-		ViewInflate viewInflater = m_view.getWindow().getViewInflate();
+		LayoutInflater viewInflater = m_view.getWindow().getLayoutInflater();
 
 		if( convertView == null )
 		{
 			convertView = viewInflater.inflate( R.layout.event_partial, 
 											    parent,
-											    false, null );
+											    false );
 			Log.i("Creating new view");
 		}
 		else

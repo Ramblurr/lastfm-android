@@ -1,7 +1,6 @@
 package fm.last.tag;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -100,7 +99,7 @@ public class TagAdapter extends BaseAdapter
 				EasyElement tag = new EasyElement( (Element)tags.item( i ) );
 				m_tagNames.add( tag.e("name").value() );
 			}
-			m_activity.runOnUIThread( new Runnable() 
+			m_activity.runOnUiThread( new Runnable() 
 			{
 				public void run()
 				{
@@ -131,7 +130,7 @@ public class TagAdapter extends BaseAdapter
 				EasyElement tag = new EasyElement( (Element)tags.item( i ) );
 				m_tagNames.add( tag.e("name").value() );
 			}
-			m_activity.runOnUIThread( new Runnable() 
+			m_activity.runOnUiThread( new Runnable() 
 			{
 				public void run()
 				{

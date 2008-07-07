@@ -43,7 +43,7 @@ public class EventsView extends ListActivity implements OnItemClickListener
 			}
 		} );
 			
-		Log.i( "Downloading event information.." );
+		Log.i( "Downloading event list.." );
 
 		m_eventsAdapter.loadEventsByLocation("N1 6DL");
 		showLoading();
@@ -83,7 +83,7 @@ public class EventsView extends ListActivity implements OnItemClickListener
 	}
 	
 	public void loadingComplete() {
-		runOnUIThread(new Runnable(){
+		runOnUiThread(new Runnable(){
 			public void run()
 			{
 				if(m_progressDialog != null)

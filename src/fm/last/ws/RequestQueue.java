@@ -1,6 +1,5 @@
 package fm.last.ws;
 
-import java.io.Reader;
 import java.util.LinkedList;
 
 public class RequestQueue implements Runnable{

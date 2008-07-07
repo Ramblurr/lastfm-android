@@ -70,7 +70,8 @@ public class User
 		
 		if( result.first() )
 		{
-			user.m_id = result.getInt( result.getColumnIndex( "contactId" ) );
+			final int contactIdIndex = result.getColumnIndexOrThrow( "contactId" );
+			user.m_id = result.getInt( contactIdIndex );
 		}
 		
 		return user;

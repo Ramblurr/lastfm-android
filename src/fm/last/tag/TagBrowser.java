@@ -1,7 +1,6 @@
 package fm.last.tag;
 
 import fm.last.Animation3d;
-import fm.last.Log;
 import fm.last.R;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -45,9 +43,9 @@ public class TagBrowser extends ListActivity
 
 			public void onClick( View view )
 			{
-				m_topPlaceholder.startAnimation( AnimationUtils.loadAnimation( TagBrowser.this, android.R.anim.slide_out_top ) );
+				m_topPlaceholder.startAnimation( AnimationUtils.loadAnimation( TagBrowser.this, android.R.anim.slide_in_left ) );
 				m_topPlaceholder.setVisibility( View.GONE );
-				m_bottomPlaceholder.startAnimation( AnimationUtils.loadAnimation( TagBrowser.this, android.R.anim.slide_out_bottom ) );
+				m_bottomPlaceholder.startAnimation( AnimationUtils.loadAnimation( TagBrowser.this, android.R.anim.slide_out_right ) );
 				m_bottomPlaceholder.setVisibility( View.GONE );
 			}
 			
@@ -97,26 +95,6 @@ public class TagBrowser extends ListActivity
 		getListView().startAnimation( animSet );
 	}
 	
-	private void showRadioToolbars()
-	{
-		if( m_topPlaceholder.getVisibility() == View.VISIBLE )
-			return;
-		
-		m_topPlaceholder.startAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_top ) );
-		m_topPlaceholder.setVisibility( View.VISIBLE );
-		m_bottomPlaceholder.startAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_bottom ) );
-		m_bottomPlaceholder.setVisibility( View.VISIBLE );
-	}
-	
-	private void hideRadioToolbars()
-	{
-		if( m_topPlaceholder.getVisibility() == View.GONE )
-			return;
-		m_topPlaceholder.startAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_top ) );
-		m_topPlaceholder.setVisibility( View.VISIBLE );
-		m_bottomPlaceholder.startAnimation( AnimationUtils.loadAnimation( this, android.R.anim.slide_in_bottom ) );
-		m_bottomPlaceholder.setVisibility( View.VISIBLE );
-	}
 	
 	protected void onListItemClick( ListView l, View v, int position, long id )
 	{
@@ -129,22 +107,22 @@ public class TagBrowser extends ListActivity
 	    anim.setDuration(1000);
         anim.setFillAfter(true);
         anim.setInterpolator(new AccelerateInterpolator());
-        anim.setAnimationListener( new AnimationListener(){
+        anim.setAnimationListener( new AnimationListener() {
 
-			public void onAnimationEnd()
+			public void onAnimationEnd( Animation a )
 			{
 				Intent intent = new Intent( "TAGRADIO" );
 				intent.putExtra( "tag", selectedTag );
 				startActivity( intent );
 			}
 
-			public void onAnimationRepeat()
+			public void onAnimationRepeat( Animation a )
 			{
 				// TODO Auto-generated method stub
 				
 			}
 
-			public void onAnimationStart()
+			public void onAnimationStart( Animation a )
 			{
 				// TODO Auto-generated method stub
 				

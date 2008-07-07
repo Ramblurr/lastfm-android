@@ -3,12 +3,7 @@
 <application android:icon="@drawable/icon" android:label="Last.fm" android:name="Application">
 	<activity android:name="ScrobblerTestActivity"></activity>
 	<service android:name="ScrobblerService"></service>
-	<activity android:label="Last.fm" android:name=".radio.RadioClient" android:multiprocess="false">
-	    
-	<intent-filter>
-<action android:name="RADIOCLIENT">
-</action><category android:name="android.intent.category.DEFAULT">
-</category></intent-filter></activity>
+	
 	<activity android:label="@string/app_name" android:name=".AccountSettings">
 		<intent-filter>
 			<action android:name="ACCOUNTSETTINGS"/>

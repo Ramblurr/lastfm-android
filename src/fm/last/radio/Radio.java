@@ -11,7 +11,6 @@ import java.util.Stack;
 
 import org.w3c.dom.*;
 
-import android.media.MediaPlayer;
 import android.net.Uri;
 
 import fm.last.EasyElement;

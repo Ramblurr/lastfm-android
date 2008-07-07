@@ -31,7 +31,8 @@ public class RadioView extends Activity
 	private Radio m_radio = null;
 	private ImageLoader m_imageLoader;
 	
-	private enum Requests { Login } 
+	private enum Requests { Login }
+	private enum MenuItems{ Account, Events }
 
 	/** Called when the activity is first created. */
 	public void onCreate( Bundle icicle )
@@ -92,6 +93,8 @@ public class RadioView extends Activity
 		animate();
 		
         ImageButton play = (ImageButton) findViewById( R.id.stop );
+        
+       
         play.setOnClickListener( new OnClickListener() 
         {
         	EditText edit = new EditText( RadioView.this );
@@ -186,7 +189,7 @@ public class RadioView extends Activity
         
 		ImageView v = (ImageView) findViewById( R.id.album_art );
 		try {
-			m_imageLoader.loadImage(v, albumArtUrl(t));
+			m_imageLoader.loadImage(v, t.imageUrl());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -218,8 +221,9 @@ public class RadioView extends Activity
 	
 	protected void setHeaderRes( int resId )
 	{
-		ViewInflate inflater = getViewInflate();
-		View radioPartial = inflater.inflate( resId, null, null );
+		LayoutInflater inflater = LayoutInflater.from( this );
+		
+		View radioPartial = inflater.inflate( resId, null );
 		LinearLayout radioLayout = (LinearLayout)findViewById( R.id.layout );
 		radioPartial.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 
 																	 LinearLayout.LayoutParams.WRAP_CONTENT) );
@@ -229,18 +233,28 @@ public class RadioView extends Activity
 	public boolean onCreateOptionsMenu(Menu menu) 
 	{
 		super.onCreateOptionsMenu(menu);
-		menu.add(0, 0, "Account", new Runnable() {
-			public void run() {
-				startActivity( new Intent( "ACCOUNTSETTINGS" ) );
-			}
-		});
+		menu.add( 0, MenuItems.Account.ordinal(), 0, "Account" );
 
-		menu.add(0, 1, "Events", new Runnable() {
-			public void run() {
-				startActivity( new Intent( "EVENTSVIEW" ) );
-			}
-		});
+		menu.add(0, MenuItems.Events.ordinal(), 1, "Events");
 		
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(Menu.Item item)
+	{
+		int id = item.getItemId();
+		if( id == MenuItems.Account.ordinal() )
+		{
+			startActivity( new Intent( "ACCOUNTSETTINGS" ) );			
+		}
+		else if( id == MenuItems.Events.ordinal() )
+		{
+			startActivity( new Intent( "EVENTSVIEW" ) );
+		}
+		else
+		{
+			return false;
+		}
 		return true;
 	}
 }

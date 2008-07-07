@@ -102,7 +102,7 @@ public class ImageLoader implements Runnable
 
 			final ImageView iv = pair.getKey();
 			
-			m_activity.runOnUIThread(new Runnable() {
+			m_activity.runOnUiThread(new Runnable() {
 				public void run()
 				{
 					iv.setImageBitmap(bmp);

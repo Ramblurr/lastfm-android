@@ -3,12 +3,9 @@ package fm.last;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -131,7 +128,7 @@ class Track
 
 	Long playTime()
 	{
-		Iterator i = timestamps.iterator();
+		Iterator<Long> i = timestamps.iterator();
 		
 		long playTime = 0;
 		while (i.hasNext())
@@ -318,8 +315,9 @@ public class ScrobblerService extends Service
     
     
     @Override
-    public void onStart( int startId, Bundle args )
+    public void onStart( Intent intent, int startId )
     {
+    	Bundle args = intent.getExtras();
     	Log.i( TAG, args.toString());
 
     	Event e = eventFromString( args.getString( "event" ) );
@@ -391,7 +389,7 @@ public class ScrobblerService extends Service
     }
 
 	@Override
-	protected void onDestroy() {
+	public void onDestroy() {
 		Toast.makeText(this, "Scrobbler stopped", Toast.LENGTH_SHORT).show();
 	}
 

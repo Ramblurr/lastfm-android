@@ -6,13 +6,13 @@
 
 	<LinearLayout android:orientation="vertical"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" android:background="@android:drawable/panel_spinner_background"
+		android:layout_height="wrap_content" android:background="@android:drawable/spinner_background"
 		android:layout_marginLeft="6sp" android:padding="4px"
 		android:layout_marginRight="6sp" android:layout_marginTop="4sp"
 		android:layout_weight="1" android:layout_marginBottom="6sp">
 		<TextView android:text="Station Name"
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:textAlign="center"
+			android:layout_height="wrap_content" android:gravity="center_horizontal"
 			android:textColor="#000" android:layout_marginTop="1sp"
 			android:layout_marginBottom="1sp" android:textStyle="bold"
 			android:id="@+id/station_name">
@@ -38,12 +38,12 @@
 			<TextView android:id="@+id/artist"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:text="Artist"
-				android:textAlign="center">
+				android:gravity="center_horizontal">
 			</TextView>
 			<TextView android:id="@+id/track_title"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:text="Title"
-				android:textAlign="center" android:layout_marginBottom="2sp"
+				android:gravity="center_horizontal" android:layout_marginBottom="2sp"
 				android:textStyle="bold">
 			</TextView>
 		</LinearLayout>

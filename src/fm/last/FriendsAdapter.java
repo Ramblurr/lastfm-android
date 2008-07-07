@@ -11,11 +11,7 @@ import fm.last.ws.RequestParameters;
 import fm.last.ws.Response;
 
 import android.app.Activity;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewInflate;
-import android.view.Window;
+import android.view.*;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -61,7 +57,7 @@ public class FriendsAdapter extends BaseAdapter
 						User.newUserFromFriendXML((Element)users.item(i))
 				);
 			}
-			m_view.runOnUIThread( new Runnable()
+			m_view.runOnUiThread( new Runnable()
 				{
 					public void run() {
 						notifyDataSetChanged();
@@ -100,13 +96,13 @@ public class FriendsAdapter extends BaseAdapter
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
 		User friend = m_friendsList.get(position); 
-		ViewInflate viewInflater = m_view.getWindow().getViewInflate();
+		LayoutInflater viewInflater = m_view.getWindow().getLayoutInflater();
 
 		if( convertView == null )
 		{
 			convertView = viewInflater.inflate( R.layout.friend_partial, 
 											    parent,
-											    false, null );
+											    false );
 			Log.i("Creating new view");
 		}
 		else

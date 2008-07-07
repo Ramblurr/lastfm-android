@@ -22,13 +22,10 @@
 
 package org.kxmlrpc;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.nio.CharBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -50,6 +47,7 @@ import android.net.http.EventHandler;
 import android.net.http.Headers;
 import android.net.http.RequestQueue;
 import android.net.http.SslCertificate;
+import android.net.http.SslError;
 import android.util.Log; 
 
 /**
@@ -286,6 +284,16 @@ public class XmlRpcClient {
 		
 		public byte[] getBytes() {
 			return m_byteArray.toByteArray();
+		}
+
+		public void certificate(SslCertificate arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void handleSslErrorRequest(SslError arg0) {
+			// TODO Auto-generated method stub
+			
 		}
 	}    
     

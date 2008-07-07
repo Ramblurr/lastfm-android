@@ -1,8 +1,7 @@
 package fm.last;
 
-import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayController;
-import com.google.android.maps.Point;
+import com.google.android.maps.*;
+import android.graphics.*;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -14,18 +13,18 @@ import android.os.Bundle;
 public class MapActivity extends com.google.android.maps.MapActivity 
 {
 	MapView map;
-	Point point;
+	GeoPoint point;
 	String venue;
 	
 	/** currently no support for traditional overlay controllers */
 	class Overlay extends com.google.android.maps.Overlay
 	{
 		@Override
-		public void draw( Canvas canvas, PixelCalculator calculator, boolean shadow )
+		public void draw( Canvas canvas, PixelConverter converter, boolean shadow )
 		{
-			int[] c = new int[2]; //crap API
-			calculator.getPointXY( point, c ); //crap API
-			int x = c[0], y = c[1]; //crap API
+			Point p = new Point();
+			converter.toPixels( point, p );
+			int x = p.x, y = p.y;
 			
 			Paint paint = new Paint();
 			paint.setAntiAlias( true );
@@ -46,9 +45,6 @@ public class MapActivity extends com.google.android.maps.MapActivity
 	{
 		super.onCreate( icicle );
 		setContentView( map = new MapView( this ) );
-		
-		OverlayController c = map.createOverlayController();
-		c.add( new Overlay(), true );
 	}
 	
 	@Override
@@ -60,9 +56,15 @@ public class MapActivity extends com.google.android.maps.MapActivity
 		int longitude = getIntent().getIntExtra( "longitude", 0 );
 				
 		venue = getIntent().getStringExtra( "venue" );
-		point = new Point( latitude, longitude );
+		point = new GeoPoint( latitude, longitude );
 		
 		map.getController().centerMapTo( point, true /*ignored*/ );
 		map.getController().zoomTo( 18 );
+	}
+
+	@Override
+	protected boolean isRouteDisplayed() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

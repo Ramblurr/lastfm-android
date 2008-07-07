@@ -80,9 +80,11 @@ public class AccountSettings extends Activity
 
 	Runnable showAlert = new Runnable() {
 		public void run() {
-			showAlert(getResources().getString(R.string.badAuthTitle),
-					R.drawable.icon,
-					getResources().getString(R.string.badAuth), "OK", true);
+			new AlertDialog.Builder( AccountSettings.this )
+					       .setTitle( R.string.badAuthTitle )
+					       .setIcon( R.drawable.icon )
+						   .setMessage( R.string.badAuth )
+						   .show();
 		}
 	};
 }

@@ -20,15 +20,15 @@ public class ScrobblerTestActivity extends Activity {
 	protected void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
-		
-        Bundle args = new Bundle();
-        args.putString( "event", "track-started" );
-        args.putString( "artist", "Foo" );
-        args.putString( "title", "Bar" );
-        args.putInt( "duration", 300 );
-		
-        Intent intent = new Intent( ScrobblerTestActivity.this, ScrobblerService.class);
         
-        startService( intent, args );
+		Intent intent = new Intent( ScrobblerTestActivity.this, ScrobblerService.class);
+
+        intent.putExtra( "event", "track-started" );
+        intent.putExtra( "artist", "Foo" );
+        intent.putExtra( "title", "Bar" );
+        intent.putExtra( "duration", 300 );
+		
+
+        startService( intent );
 	}
 }

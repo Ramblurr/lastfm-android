@@ -1,6 +1,7 @@
 package fm.last;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.Contacts.People;
@@ -33,8 +34,10 @@ public class ContactsView extends ListActivity
 	protected void onListItemClick(ListView l, View v, int position, long id) 
 	{
 		Cursor c = (Cursor)adapter.getItem(position);
-		setResult(RESULT_OK,  c.getString( c.getColumnIndex(People._ID )));
+		Intent i = new Intent();
+		final int idIndex = c.getColumnIndexOrThrow( People._ID );
+		i.putExtra( "id", c.getString( idIndex));
+		setResult(RESULT_OK, i );
 		finish();
 	}
-	
 }
