@@ -36,7 +36,7 @@ public class TrackInfo
 			m_location = ((Text) locationElement.getFirstChild()).getData();
 		
 		Element imageElement = (Element) track.getElementsByTagName( "image" ).item( 0 );
-		if( locationElement.getFirstChild() != null )
+		if( imageElement.getFirstChild() != null )
 			try {
 				m_imageUrl = new URL( ((Text) imageElement.getFirstChild()).getData() );
 			} catch (MalformedURLException e) {

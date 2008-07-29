@@ -6,27 +6,49 @@ package fm.last.radio;
 import fm.last.ws.*;
 import fm.last.ws.Request.RequestType;
 
+import android.net.Uri;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Stack;
 
 import org.w3c.dom.*;
 
-import android.net.Uri;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.RedirectHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.client.RedirectHandler;
 
 import fm.last.EasyElement;
 import fm.last.Log;
 import fm.last.TrackInfo;
+
+import android.content.Context;
+import android.media.MediaPlayer;
 
 
 public class Radio 
 {
 
 	private ArrayList<RadioEventHandler> m_handlers = new ArrayList<RadioEventHandler>();
-	private Stack<TrackInfo> m_playlist = new Stack<TrackInfo>();
+	private LinkedList<TrackInfo> m_playlist = new LinkedList<TrackInfo>();
 	private TrackInfo m_nowPlaying;
+	private MediaPlayer m_mediaPlayer = null;
+	private Context m_context;
+	private RadioStream m_radioStream = new RadioStream();
 	
-	Radio( String username, String md5password )
+	Radio( Context context )
 	{
+		m_context = context;
 		Log.i( "Starting last.fm radio" );
 	}
 	
@@ -70,7 +92,7 @@ public class Radio
 			return response.error();
 	}
 
-	public Stack<TrackInfo> playlist()
+	public LinkedList<TrackInfo> playlist()
 	{
 		return m_playlist;
 	}
@@ -91,7 +113,7 @@ public class Radio
 
 		for (int i = 0; i < tracks.getLength(); i++)
 		{
-			m_playlist.push( new TrackInfo( (Element) tracks.item( i ) ) );
+			m_playlist.add( new TrackInfo( (Element) tracks.item( i ) ) );
 		}
 	}
 	
@@ -106,14 +128,16 @@ public class Radio
 			return;
 		}
 		
-		TrackInfo track = playlist().pop();
+		TrackInfo track = playlist().remove();
 		
-		Log.i( "Streaming track: " + track );
+		m_radioStream.play( track.location() );
+		
 		onTrackStarted( track );		
 	}
 	
 	public void stop()
 	{
+		m_radioStream.stop();
 		onTrackEnded( m_nowPlaying );	
 	}
 	
@@ -139,4 +163,13 @@ public class Radio
 			handler.onTrackEnded( track );
 		}
 	}
+	
+	private Runnable radioThread = new Runnable()
+	{
+
+		public void run() {
+			//m_mediaPlayer
+		}
+		
+	};
 }
