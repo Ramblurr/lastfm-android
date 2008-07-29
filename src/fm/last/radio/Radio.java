@@ -8,33 +8,14 @@ import fm.last.ws.Request.RequestType;
 
 import android.net.Uri;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Stack;
 
 import org.w3c.dom.*;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.RedirectHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.client.RedirectHandler;
 
 import fm.last.EasyElement;
 import fm.last.Log;
 import fm.last.TrackInfo;
-
-import android.content.Context;
-import android.media.MediaPlayer;
-
 
 public class Radio 
 {
@@ -42,13 +23,10 @@ public class Radio
 	private ArrayList<RadioEventHandler> m_handlers = new ArrayList<RadioEventHandler>();
 	private LinkedList<TrackInfo> m_playlist = new LinkedList<TrackInfo>();
 	private TrackInfo m_nowPlaying;
-	private MediaPlayer m_mediaPlayer = null;
-	private Context m_context;
 	private RadioStream m_radioStream = new RadioStream();
 	
-	Radio( Context context )
+	Radio()
 	{
-		m_context = context;
 		Log.i( "Starting last.fm radio" );
 	}
 	
@@ -163,13 +141,4 @@ public class Radio
 			handler.onTrackEnded( track );
 		}
 	}
-	
-	private Runnable radioThread = new Runnable()
-	{
-
-		public void run() {
-			//m_mediaPlayer
-		}
-		
-	};
 }
