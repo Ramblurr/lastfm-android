@@ -9,6 +9,10 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.*;
 
 import android.content.*;
+import android.graphics.Color;
+import android.graphics.Canvas.VertexMode;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.GradientDrawable.Orientation;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,7 +45,7 @@ public class RadioView extends Activity
 	 
 		String user = Application.instance().userName();
 		String pass = Application.instance().password();
-
+		
 		m_imageLoader = new ImageLoader(this);
 		
 		if( user.length() == 0 || pass.length() == 0 ) 
@@ -88,6 +92,14 @@ public class RadioView extends Activity
 
 		setContentView( R.layout.radio_client );
 		
+		LinearLayout l = (LinearLayout)findViewById( R.id.layout );
+		LinearLayout bl = (LinearLayout)findViewById( R.id.buttonLayout );
+		
+		//l.setBackgroundDrawable( new GradientDrawable( Orientation.TOP_BOTTOM, new int[]{ Color.BLACK, Color.rgb( 20, 20, 20)} ) );
+		GradientDrawable gradient = new GradientDrawable( Orientation.TOP_BOTTOM, new int[]{ Color.argb( 150, 150, 150, 150 ), 
+																							 Color.argb( 0, 150, 150, 150 ),
+																							 Color.argb( 0, 0, 0, 0 )} );
+		bl.setBackgroundDrawable( gradient );
 		animate();
 		
         ImageButton play = (ImageButton) findViewById( R.id.stop );

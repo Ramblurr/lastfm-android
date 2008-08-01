@@ -20,9 +20,7 @@ public class Menu extends ListActivity
 		m_list = new ArrayList<HashMap<String, String>>();
 		populateList();
 		
-        setListAdapter(new SimpleAdapter(this, m_list,
-                android.R.layout.simple_list_item_1, new String[] { "title" },
-                new int[] { android.R.id.text1 }));
+        setListAdapter( new MenuAdapter( this ) );
         getListView().setOnItemClickListener( m_listClickListener );
 	}
 	
