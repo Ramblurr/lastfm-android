@@ -6,15 +6,13 @@
 		<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:text="@string/username" />
 		<EditText android:id="@+id/login_username"
-			android:layout_width="wrap_content" android:layout_height="11pt"
-			android:hint="@string/username" />
+			android:layout_width="wrap_content" android:hint="@string/username" />
 	</TableRow>
 	<TableRow>
 		<TextView android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:text="@string/password" />
 		<EditText android:id="@+id/login_password"
-			android:layout_width="fill_parent" android:layout_height="11pt"
-			android:hint="@string/password" android:password="true" />
+			android:layout_width="fill_parent" android:hint="@string/password" android:password="true" />
 	</TableRow>
 	<Button android:id="@+id/login_button" android:text="login"
 		android:layout_width="fill_parent"

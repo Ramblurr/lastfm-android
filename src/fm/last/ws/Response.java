@@ -2,6 +2,7 @@ package fm.last.ws;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -15,7 +16,7 @@ import fm.last.Log;
 public class Response 
 {
 	private int m_id;
-	private BufferedReader m_responseData = null;
+	private Reader m_responseData = null;
 	Document m_xmlDom = null;
 	String m_error;
 	
@@ -30,7 +31,7 @@ public class Response
 		return m_id;
 	}
 	
-	public BufferedReader dataReader()
+	public Reader dataReader()
 	{
 		return m_responseData;
 	}

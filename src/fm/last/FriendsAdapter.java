@@ -116,10 +116,10 @@ public class FriendsAdapter extends BaseAdapter
 		if( friend.imageUrl() != null )
 			m_imageLoader.loadImage(avatar, friend.imageUrl());
 		else
-			avatar.setImageResource(android.R.drawable.empty);
+			avatar.setImageResource( android.R.drawable.screen_background_dark );
 		
 		TextView name = (TextView)ll.findViewById(R.id.name);
-		name.setText(friend.username());
+		name.setText( friend.username() );
 		
 		return ll;
 	}

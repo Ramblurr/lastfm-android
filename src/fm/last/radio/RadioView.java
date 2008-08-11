@@ -51,7 +51,7 @@ public class RadioView extends Activity
 		if( user.length() == 0 || pass.length() == 0 ) 
 		{
 			// show username / password activity
-			startSubActivity( new Intent("ACCOUNTSETTINGS"), Requests.Login.ordinal() );
+			startActivityForResult( new Intent("ACCOUNTSETTINGS"), Requests.Login.ordinal() );
 			return;
 		}
 		else	
@@ -250,7 +250,7 @@ public class RadioView extends Activity
 		return true;
 	}
 	
-	public boolean onOptionsItemSelected(Menu.Item item)
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		int id = item.getItemId();
 		if( id == MenuItems.Account.ordinal() )

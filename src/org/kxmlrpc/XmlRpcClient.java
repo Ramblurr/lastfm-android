@@ -45,6 +45,7 @@ import org.kxml2.io.KXmlSerializer;
 import android.content.Context;
 import android.net.http.EventHandler;
 import android.net.http.Headers;
+import android.net.http.RequestHandle;
 import android.net.http.RequestQueue;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
@@ -225,8 +226,8 @@ public class XmlRpcClient {
 
 			// Create the connection and post the arguments
 			con = new RequestQueue(context);
-			con.queueRequest(url, "POST", headers, eventHandler, bis, request.length, false);
-			con.waitUntilComplete(); 
+			RequestHandle handle = con.queueRequest(url, "POST", headers, eventHandler, bis, request.length, false);
+			handle.waitUntilComplete();
 			
 			ByteArrayInputStream in = new ByteArrayInputStream(eventHandler.getBytes());
 			

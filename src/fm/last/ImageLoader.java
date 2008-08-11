@@ -40,7 +40,7 @@ public class ImageLoader implements Runnable
 			return;
 		}
 		
-		view.setImageResource(android.R.drawable.empty);
+		view.setImageResource( android.R.drawable.screen_background_dark );
 		
 		synchronized(m_imageMap)
 		{

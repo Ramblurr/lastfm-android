@@ -68,7 +68,7 @@ public class User
 								  null,								//having
 								  null );							//orderBy
 		
-		if( result.first() )
+		if( result.moveToFirst() )
 		{
 			final int contactIdIndex = result.getColumnIndexOrThrow( "contactId" );
 			user.m_id = result.getInt( contactIdIndex );

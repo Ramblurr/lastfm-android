@@ -37,7 +37,7 @@ public class FriendMapperView extends ListActivity implements OnItemClickListene
 	{
 		m_selectedUser = (User)m_eventsAdapter.getItem( position );
 		Intent i = new Intent( "CONTACTS_ACTION" );
-		startSubActivity( i, 0 );
+		startActivityForResult( i, 0 );
 	}
 
 

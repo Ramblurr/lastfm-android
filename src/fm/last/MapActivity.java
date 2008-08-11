@@ -20,10 +20,12 @@ public class MapActivity extends com.google.android.maps.MapActivity
 	class Overlay extends com.google.android.maps.Overlay
 	{
 		@Override
-		public void draw( Canvas canvas, PixelConverter converter, boolean shadow )
+		public void draw( Canvas canvas, MapView map, boolean shadow )
 		{
 			Point p = new Point();
-			converter.toPixels( point, p );
+			Projection projection = map.getProjection();
+			projection.toPixels( point, p );
+			
 			int x = p.x, y = p.y;
 			
 			Paint paint = new Paint();
@@ -58,8 +60,8 @@ public class MapActivity extends com.google.android.maps.MapActivity
 		venue = getIntent().getStringExtra( "venue" );
 		point = new GeoPoint( latitude, longitude );
 		
-		map.getController().centerMapTo( point, true /*ignored*/ );
-		map.getController().zoomTo( 18 );
+		map.getController().setCenter( point );
+		//TODO: zoom in
 	}
 
 	@Override
