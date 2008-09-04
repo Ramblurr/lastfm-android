@@ -51,4 +51,6 @@
 </action><category android:name="android.intent.category.DEFAULT">
 </category></intent-filter></activity></application>
 
+<uses-permission xmlns:android="http://schemas.android.com/apk/res/android" android:name="android.permission.INTERNET"></uses-permission>
+
 </manifest>

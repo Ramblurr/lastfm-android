@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import fm.last.EasyElement;
+import fm.last.Log;
 
 public class Request 
 {
@@ -81,6 +82,7 @@ public class Request
 		} 
 		catch (IOException e) 
 		{
+			Log.e( e );
 			response = new Response( this, null );
 			response.setError( "IOException error: " + e );
 		}
