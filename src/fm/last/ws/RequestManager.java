@@ -1,5 +1,7 @@
 package fm.last.ws;
 
+import junit.framework.Assert;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -8,7 +10,7 @@ import java.util.TreeMap;
 
 import android.net.Uri;
 
-import com.google.common.util.Assert;
+//import com.google.common.util.Assert;
 
 import fm.last.Application;
 import fm.last.EasyElement;
@@ -43,8 +45,9 @@ public class RequestManager {
 	
 	private static RequestManager getInstance( int version )
 	{
-		Assert.assertTrue( "Unknown webservices version number: " + version, 
-						   ( version > 0 && version < 3 ));
+	  if (version != 1 && version != 2) {
+	    throw new RuntimeException("Unknown webservices version number: " + version);
+	  }
 		
 		if( !m_webServiceInstances.containsKey(version) )
 		{
