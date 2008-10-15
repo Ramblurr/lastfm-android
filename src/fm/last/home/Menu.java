@@ -10,43 +10,28 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
+import androidx.list.ListModel;
 
 public class Menu extends ListActivity
 {
-	private ArrayList<HashMap<String, String>> m_list = null; 
+	private ListModel<MenuData> menuListModel;
+	
 	public void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
-		m_list = new ArrayList<HashMap<String, String>>();
-		populateList();
-		
-        setListAdapter( new MenuAdapter( this ) );
+		menuListModel = new MenuListModel();
+        setListAdapter( new MenuAdapter( this, menuListModel, new ConvertViewFactory()) );
         getListView().setOnItemClickListener( m_listClickListener );
 	}
 	
-	private void populateList()
-	{
-		addMenuItem( "Events", "EVENTSVIEW" );
-		addMenuItem( "Tags", "TAGBROWSER" );
-		addMenuItem( "Friend Mapper", "FRIENDSVIEW" );
-		addMenuItem( "Similar Artist", "SIMILARARTIST" );
-	}
-	
-	private void addMenuItem( String title, String action )
-	{
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put( "title", title );
-		map.put( "action", action );
-		m_list.add( map );
-	}
 	
 	private OnItemClickListener m_listClickListener = new OnItemClickListener()
 	{
 		public void onItemClick(AdapterView parent, View v, int position, long id)
 		{
-			String intentName = m_list.get( (int)id ).get( "action" );
-			Intent i = new Intent( intentName );
-			startActivity( i );
+		  MenuData menuData = menuListModel.getItem((int)id);
+		  Intent i = new Intent( menuData.getIntentName() );
+		  startActivity( i );
 		}
 	};
 }
