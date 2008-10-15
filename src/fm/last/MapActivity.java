@@ -46,7 +46,8 @@ public class MapActivity extends com.google.android.maps.MapActivity
 	protected void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
-		setContentView( map = new MapView( this ) );
+		map = new MapView( this, "myapikey" );
+		setContentView(map);
 	}
 	
 	@Override

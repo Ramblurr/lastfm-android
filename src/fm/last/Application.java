@@ -37,6 +37,7 @@ public class Application extends android.app.Application
 		return instance;
 	}
 
+	
 	public SQLiteDatabase getDb() throws FileNotFoundException
 	{
 		if( m_db != null )

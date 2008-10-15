@@ -3,14 +3,12 @@ package fm.last.radio;
 import java.net.*;
 import java.util.*;
 
-import org.kxmlrpc.XmlRpcClient;
 	
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.*;
+import android.media.MediaPlayer;
 
 import android.content.*;
 import android.graphics.Color;
-import android.graphics.Canvas.VertexMode;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 
@@ -28,6 +26,8 @@ import fm.last.ImageLoader;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
+import fm.last.rpc.RpcCall;
+import fm.last.rpc.RpcCallFactory;
 
 
 public class RadioView extends Activity 
@@ -209,19 +209,19 @@ public class RadioView extends Activity
 	/** kXMLRPC throws Exception from execute :( */
 	private URL albumArtUrl( TrackInfo t ) throws Exception
 	{
-		XmlRpcClient client = new XmlRpcClient( "http://ws.audioscrobbler.com/1.0/rw/xmlrpc.php" );
+		RpcCall client = RpcCallFactory.getRpcCall("http://ws.audioscrobbler.com/1.0/rw/xmlrpc.php" );
 	
-		Vector<String> v = new Vector<String>( 4 );
+		List<String> v = new ArrayList<String>( 4 );
 		v.add( t.artist() );
 		v.add( t.title() );
 		v.add( t.album() );
 		v.add( "en" );
 		
-		Map<String, String> m = (Map<String, String>) client.execute( "trackMetadata", v, this );
+		Map<String, String> m = client.execute( "trackMetadata", v, this );
 		return new URL( m.get( "albumCover" ) );
 	}
 
-	private OnBufferingUpdateListener onBufferUpdate = new OnBufferingUpdateListener()
+	private MediaPlayer.OnBufferingUpdateListener onBufferUpdate = new MediaPlayer.OnBufferingUpdateListener()
 	{
 		public void onBufferingUpdate( MediaPlayer mp, int percent ) 
 		{

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import org.kobjects.base64.Base64;
@@ -53,7 +54,7 @@ public class XmlRpcWriter {
 	 * @param name the method's name
 	 * @param params the parameters to be passed to the server
 	 */
-	public void writeCall( String name, Vector params ) throws IOException {
+	public void writeCall( String name, List<String> params ) throws IOException {
 		writer.startTag( null, "methodCall" );
 		writer.startTag( null, "methodName" );
 		writer.text( name );
@@ -66,7 +67,7 @@ public class XmlRpcWriter {
 				writer.startTag( null, "param" );
 				// The writeValue() method is called for each parameter that is
 				//  encoded in the call
-				writeValue( params.elementAt(i) );
+				writeValue( params.get(i) );
 				writer.endTag(null, "param");
 			}//end for( int i = 0; i < params.size (); i++ )
 

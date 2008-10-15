@@ -22,11 +22,14 @@
 
 package org.kxmlrpc;
 
+import fm.last.rpc.RpcCall;
+
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.Iterator;
@@ -55,7 +58,7 @@ import android.net.http.RequestQueue;
 /**
  * A single-threaded, reusable XML-RPC client object.
  */
-public class XmlRpcClient {
+public class XmlRpcClient implements RpcCall {
 	private final String DEBUG_TAG = "XmlRpcClient";
 
     /**
@@ -197,7 +200,7 @@ public class XmlRpcClient {
     /**
      * An Android specific implementation of the "execute" method
      */
-    public Object execute(String method, Vector params, Context context) throws Exception {
+    public Map<String, String> execute(String method, List<String> params, Context context) throws Exception {
 		KXmlSerializer			xw = null;
 		XmlRpcWriter			writer = null;
 		XmlRpcParser			parser = null;
@@ -245,7 +248,7 @@ public class XmlRpcClient {
 		if (result instanceof Exception)
 			throw (Exception) result;
 
-		return result;
+		return (Map<String, String>) result;
 	}//end execute( String, Vector )
 
     
