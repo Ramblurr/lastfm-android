@@ -60,50 +60,8 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
       
       GUITaskQueue.getInstance().addTask(
       new AuthenticationTask(username, md5Password, m_progress, this));
-//new Thread(runAuthentication).start();
-	  
 	}
 	
-	
-	Runnable runAuthentication = new Runnable() {
-		private RadioHandshake m_loginTest;
-
-		public void run() {
-
-			final String userName = userField.getText().toString();
-			final String userPassword = Utils.md5(passwordField.getText().toString());
-			m_loginTest = new RadioHandshake(userName, userPassword);
-
-			m_loginTest.connect();
-
-			m_progress.dismiss();
-			if (!m_loginTest.isValid()) {
-				m_handler.post(showAlert);
-			} else {
-				SharedPreferences prefs = AccountSettings.this
-						.getSharedPreferences("Last.fm", Context.MODE_PRIVATE);
-
-				SharedPreferences.Editor prefEdit = prefs.edit();
-
-				prefEdit.putString("username", userName);
-				prefEdit.putString("md5Password", userPassword);
-
-				prefEdit.commit();
-
-				AccountSettings.this.finish();
-			}
-		}
-	};
-
-	Runnable showAlert = new Runnable() {
-		public void run() {
-			new AlertDialog.Builder( AccountSettings.this )
-					       .setTitle( R.string.badAuthTitle )
-					       .setIcon( R.drawable.icon )
-						   .setMessage( R.string.badAuth )
-						   .show();
-		}
-	};
 
   public void handle_exception(Throwable t) {
     new AlertDialog.Builder( AccountSettings.this )
@@ -117,6 +75,7 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
     if (!m_loginTest.isValid()) {
       handle_exception(null);
     } else {
+/*      
       SharedPreferences prefs = AccountSettings.this
               .getSharedPreferences("Last.fm", Context.MODE_PRIVATE);
 
@@ -126,7 +85,7 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
       prefEdit.putString("md5Password", md5Password);
 
       prefEdit.commit();
-
+*/
       AccountSettings.this.finish();
     }
   }
