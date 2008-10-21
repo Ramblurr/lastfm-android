@@ -15,15 +15,28 @@ public class GUITaskQueue {
   public static GUITaskQueue getInstance() {
     if (singleton == null) {
       singleton = new GUITaskQueue();
+      singleton.start();
     }
     return singleton;
   }
-
+  
   private GUITaskQueue() {
     taskQ = new TaskQueue();
     handler = new MyHandler();
   }
 
+  public void start() {
+    taskQ.start();
+  }
+  
+  public void stop() {
+    taskQ.stop();
+  }
+  
+  public void addTask(GUITask task) {
+    taskQ.addTask(new GUITaskAdapter(task));
+  }
+    
   private static class GUITaskWithSomething<T> {
     GUITask guiTask;
     T something;
