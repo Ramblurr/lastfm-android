@@ -24,6 +24,7 @@ public class TaskQueue {
     if (!running) {
       thread = new Thread(internalRunnable);
       thread.setDaemon(true);
+      running = true;
       thread.start();
     }
   }

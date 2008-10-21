@@ -30,10 +30,12 @@ public class AuthenticationTask implements GUITask {
 
   public void handle_exception(Throwable t) {
     m_progress.dismiss();
+    resultReceiver.handle_exception(t);
   }
 
   public void after_execute() {
     m_progress.dismiss();
+    resultReceiver.resultObtained(m_loginTest);
   }
 
  
