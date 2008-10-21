@@ -228,6 +228,7 @@ public class RadioView extends Activity
 	
 	protected void setHeaderRes( int resId )
 	{
+	    Log.d("Radioview.setHeaderRes(" + resId + ")");
 		LayoutInflater inflater = LayoutInflater.from( this );
 		
 		View radioPartial = inflater.inflate( resId, null );

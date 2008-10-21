@@ -46,7 +46,7 @@ public class MenuAdapter extends BaseAdapter {
 		TextView tv = (TextView)convertView.findViewById( R.id.name );
 		ImageView iv = (ImageView)convertView.findViewById( android.R.id.icon );
 		
-		tv.setText( "foo:" + listModel.getItem(position).getMenuText() );
+		tv.setText( listModel.getItem(position).getMenuText() );
 		return convertView;
 	}
 
