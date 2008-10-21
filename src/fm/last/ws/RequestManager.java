@@ -12,8 +12,8 @@ import android.net.Uri;
 
 //import com.google.common.util.Assert;
 
-import fm.last.Application;
 import fm.last.EasyElement;
+import fm.last.LastFmApplication;
 import fm.last.Utils;
 import fm.last.ws.Request.RequestType;
 
@@ -65,15 +65,15 @@ public class RequestManager {
 		{
 			m_apiRoot = "2.0/?";
 
-			m_sessionKey = Application.instance().sessionKey();
-			m_authToken = Utils.md5( Application.instance().userName() + 
-						  Application.instance().password() );
+			m_sessionKey = LastFmApplication.instance().sessionKey();
+			m_authToken = Utils.md5( LastFmApplication.instance().userName() + 
+			    LastFmApplication.instance().password() );
 			
 			if ( m_sessionKey.length() == 0)
 			{
 				RequestParameters params = new RequestParameters();
 				
-				params.add( "username", Application.instance().userName() )
+				params.add( "username", LastFmApplication.instance().userName() )
 					  .add( "authToken", m_authToken )
 					  .add( "api_key", API_KEY )
 					  .add( "api_sig", methodSignature( new RequestParameters() ) );
@@ -81,7 +81,7 @@ public class RequestManager {
 				Response response = callMethod( "auth.getMobileSession", params );
 				EasyElement document = new EasyElement( response.xmlDocument().getDocumentElement() );
 				m_sessionKey = document.e("key").value();
-				Application.instance().setSessionKey( m_sessionKey );
+				LastFmApplication.instance().setSessionKey( m_sessionKey );
 			}
 		}
 	}

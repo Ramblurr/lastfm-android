@@ -52,7 +52,7 @@ public class User
 		SQLiteDatabase db = null;
 		try
 		{
-			db = Application.instance().getDb();
+			db = LastFmApplication.instance().getDb();
 		} catch ( FileNotFoundException e1 )
 		{
 			// TODO Auto-generated catch block
@@ -99,7 +99,7 @@ public class User
 		
 		try
 		{
-			SQLiteDatabase db = Application.instance().getDb();
+			SQLiteDatabase db = LastFmApplication.instance().getDb();
 			String nullColumn = null;
 			ContentValues values = new ContentValues();
 			values.put( "contactId", id );

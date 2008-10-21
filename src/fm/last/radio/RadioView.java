@@ -21,8 +21,8 @@ import android.view.animation.*;
 import android.view.*;
 import android.widget.*;
 
-import fm.last.Application;
 import fm.last.ImageLoader;
+import fm.last.LastFmApplication;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
@@ -46,8 +46,8 @@ public class RadioView extends Activity
 	{
 		super.onCreate( icicle );
 	 
-		String user = Application.instance().userName();
-		String pass = Application.instance().password();
+		String user = LastFmApplication.instance().userName();
+		String pass = LastFmApplication.instance().password();
 		
 		m_imageLoader = new ImageLoader(this);
 		
