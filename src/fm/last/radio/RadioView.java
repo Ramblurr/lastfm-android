@@ -26,6 +26,9 @@ import fm.last.ImageLoader;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.api.LastFmServer;
+import fm.last.api.Track;
 import fm.last.rpc.RpcCall;
 import fm.last.rpc.RpcCallFactory;
 
@@ -175,7 +178,7 @@ public class RadioView extends Activity
 		v.setText( stationName );
 		
 		m_radio.play();
-	};
+	}
 
 	protected void tuneInTag( String tag )
 	{
@@ -187,7 +190,7 @@ public class RadioView extends Activity
 		v.setText( stationName );
 		
 		m_radio.play();
-	};
+	}
 	
 	private void setupUi( TrackInfo t )
 	{
@@ -209,16 +212,10 @@ public class RadioView extends Activity
 	/** kXMLRPC throws Exception from execute :( */
 	private URL albumArtUrl( TrackInfo t ) throws Exception
 	{
-		RpcCall client = RpcCallFactory.getRpcCall("http://ws.audioscrobbler.com/1.0/rw/xmlrpc.php" );
-	
-		List<String> v = new ArrayList<String>( 4 );
-		v.add( t.artist() );
-		v.add( t.title() );
-		v.add( t.album() );
-		v.add( "en" );
-		
-		Map<String, String> m = client.execute( "trackMetadata", v, this );
-		return new URL( m.get( "albumCover" ) );
+	    LastFmServer server = AndroidLastFmServerFactory.getServer();
+	    
+	    Track track = server.getTrackInfo(t.artist(), t.title(), null);
+	    return new URL(track.getAlbum().getImages()[0].getUrl());
 	}
 
 	private MediaPlayer.OnBufferingUpdateListener onBufferUpdate = new MediaPlayer.OnBufferingUpdateListener()
@@ -237,6 +234,7 @@ public class RadioView extends Activity
 		LinearLayout radioLayout = (LinearLayout)findViewById( R.id.layout );
 		radioPartial.setLayoutParams( new LinearLayout.LayoutParams( LinearLayout.LayoutParams.FILL_PARENT, 
 																	 LinearLayout.LayoutParams.WRAP_CONTENT) );
+		
 		radioLayout.addView( radioPartial, 0 );
 	}
 
