@@ -3,16 +3,18 @@ package fm.last;
 import java.lang.Runnable;
 import java.lang.Thread;
 
-import android.app.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.util.Log;
-import android.view.*;
-import android.view.View.*;
+import android.view.View;
 import android.os.Handler;
 
-import android.content.*;
 
 import fm.last.Utils; 
 import fm.last.radio.RadioHandshake;
@@ -37,7 +39,7 @@ public class AccountSettings extends Activity
 		loginButton.setOnClickListener(onLoginClick);
 	}
 
-	private OnClickListener onLoginClick = new OnClickListener() {
+	private View.OnClickListener onLoginClick = new View.OnClickListener() {
 		public void onClick(View v) {
 			m_progress = ProgressDialog.show(AccountSettings.this,
 					getResources().getString(R.string.authProgressTitle),
