@@ -14,7 +14,7 @@ public class AndroidLastFmServerFactory {
   
   public static LastFmServer getServer() {
     if (server == null) {
-      server = LastFmServerFactory.getServer(XMLRPC_ROOT_URL, API_KEY);
+      server = LastFmServerFactory.getServer(XMLRPC_ROOT_URL, API_KEY, API_SECRET);
     }
     return server;
   }
