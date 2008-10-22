@@ -18,7 +18,8 @@ import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
 
-import fm.last.Utils; 
+import fm.last.Utils;
+import fm.last.api.MD5;
 import fm.last.radio.RadioHandshake;
 import fm.last.tasks.AuthenticationTask;
 
@@ -56,8 +57,7 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
           getResources().getString(R.string.authProgressMessage),
           true);
       username = userField.getText().toString();
-      md5Password = Utils.md5(passwordField.getText().toString());
-      
+      md5Password = MD5.getInstance().hash(passwordField.getText().toString());
       GUITaskQueue.getInstance().addTask(
       new AuthenticationTask(username, md5Password, m_progress, this));
 	}
