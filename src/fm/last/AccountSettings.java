@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.util.Log;
 import android.view.View;
 import android.os.Handler;
 import androidx.util.GUITaskQueue;
@@ -20,11 +19,12 @@ import androidx.util.ResultReceiver;
 
 import fm.last.Utils;
 import fm.last.api.MD5;
+import fm.last.api.Session;
 import fm.last.radio.RadioHandshake;
 import fm.last.tasks.AuthenticationTask;
 
 
-public class AccountSettings extends Activity implements ResultReceiver<RadioHandshake>
+public class AccountSettings extends Activity implements ResultReceiver<Session>
 {
 	private EditText userField, passwordField;
 	private final Handler m_handler = new Handler();
@@ -41,7 +41,7 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
 		userField = (EditText) findViewById(R.id.login_username);
 		passwordField = (EditText) findViewById(R.id.login_password);
 
-		Log.i("Last.fm", "Handler object: " + m_handler.toString());
+		Log.i("Handler object: " + m_handler.toString());
 		loginButton.setOnClickListener(onLoginClick);
 	}
 
@@ -71,10 +71,9 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
     .show();
   }
 
-  public void resultObtained(RadioHandshake m_loginTest) {
-    if (!m_loginTest.isValid()) {
-      handle_exception(null);
-    } else {
+  public void resultObtained(Session session) {
+  	Log.i("We've got a session! session=" + session);
+  	
 /*      
       SharedPreferences prefs = AccountSettings.this
               .getSharedPreferences("Last.fm", Context.MODE_PRIVATE);
@@ -85,8 +84,7 @@ public class AccountSettings extends Activity implements ResultReceiver<RadioHan
       prefEdit.putString("md5Password", md5Password);
 
       prefEdit.commit();
-*/
       AccountSettings.this.finish();
-    }
+*/
   }
 }
