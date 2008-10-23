@@ -3,31 +3,38 @@
  */
 package fm.last.radio;
 
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.api.LastFmServer;
+import fm.last.api.Session;
+import fm.last.api.Station;
 import fm.last.ws.*;
 import fm.last.ws.Request.RequestType;
 
 import android.net.Uri;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.w3c.dom.*;
 
 import fm.last.EasyElement;
+import fm.last.LastFmApplication;
 import fm.last.Log;
 import fm.last.TrackInfo;
 
 public class Radio 
 {
-
 	private ArrayList<RadioEventHandler> m_handlers = new ArrayList<RadioEventHandler>();
 	private LinkedList<TrackInfo> m_playlist = new LinkedList<TrackInfo>();
 	private TrackInfo m_nowPlaying;
 	private RadioStream m_radioStream = new RadioStream();
+	private LastFmServer server;
 	
 	public Radio()
 	{
 		Log.i( "Starting last.fm radio" );
+		server = AndroidLastFmServerFactory.getServer();
 	}
 	
 	public void addRadioHandler( RadioEventHandler handler )
@@ -38,6 +45,20 @@ public class Radio
 	/** @returns station pretty name */
 	public String tuneToSimilarArtist( String artist ) 
 	{
+		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
+		Session session = LastFmApplication.instance().getSession();
+		String sk = session.getKey();
+		try {
+			Station radioStation = server.tuneToSimilarArtist(station, sk);
+			if (radioStation != null) {
+				return radioStation.getName();
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		RequestParameters params = new RequestParameters();
 		params.add( "station", "lastfm://artist/" + Uri.encode( Uri.encode( artist ) ) + "/similarartists" );
 		Response response = RequestManager.version2().callMethod( "radio.tune", params, RequestType.POST_REQUEST);
