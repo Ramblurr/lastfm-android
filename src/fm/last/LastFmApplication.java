@@ -22,14 +22,24 @@ public class LastFmApplication extends android.app.Application {
 		m_pass = m_preferences.getString("md5Password", "");
 		m_sessionKey = m_preferences.getString("sessionKey", "");
 
-		if (m_user.trim().length() == 0) {
-			Intent i = new Intent("ACCOUNTSETTINGS");
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(i);
+		if (noUsernameSaved()) {
+			startLoginActivity();
 		}
 	}
 
-	public SharedPreferences getPrivatePreferences() {
+	private void startLoginActivity() {
+		Intent i = new Intent("ACCOUNTSETTINGS");
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(i);
+	}
+	
+	public boolean noUsernameSaved() {
+		m_preferences = getPrivatePreferences();
+		m_user = m_preferences.getString("username", "").trim();
+		return (m_user.equals(""));
+	}
+	
+	private SharedPreferences getPrivatePreferences() {
 		return getSharedPreferences("Last.fm", Context.MODE_PRIVATE);
 	}
 

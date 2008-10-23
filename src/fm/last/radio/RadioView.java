@@ -89,7 +89,6 @@ public class RadioView extends Activity
 	
 	final private void init()
 	{
-
 		m_radio = new Radio();	
 		m_radio.addRadioHandler( m_radioEventHandler );
 

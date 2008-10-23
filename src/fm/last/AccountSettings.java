@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import androidx.util.DismissLaterTask;
+import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
@@ -54,6 +56,10 @@ public class AccountSettings extends Activity implements
 				R.string.badAuthTitle).setIcon(R.drawable.icon)
 				.setMessage(R.string.badAuth)).create();
 		alert.show();
+		// dismiss the alert dialog after 2 seconds
+		GUITaskQueue.getInstance().addTask(new DismissLaterTask(alert, 2000));
+		// call finish on this activity after the alert dialog is dismissed
+		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
 
 	public void resultObtained(Session session) {
@@ -61,6 +67,7 @@ public class AccountSettings extends Activity implements
 		Log.i("We've got a session! session.key=" + session.getKey());
 		// Save our credentials to our SharedPreferences
 		LastFmApplication.instance().saveCredentials(username, md5Password);
-		this.finish();
+		setResult(RESULT_OK);
+		finish();
 	}
 }
