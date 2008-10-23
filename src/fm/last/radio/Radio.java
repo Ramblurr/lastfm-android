@@ -25,7 +25,7 @@ public class Radio
 	private TrackInfo m_nowPlaying;
 	private RadioStream m_radioStream = new RadioStream();
 	
-	Radio()
+	public Radio()
 	{
 		Log.i( "Starting last.fm radio" );
 	}

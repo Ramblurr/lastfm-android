@@ -11,6 +11,7 @@ import fm.last.radio.RadioView;
 public class ArtistRadio extends RadioView {
 	Button m_tuneButton = null;
 	EditText m_artistInput = null;
+	
 	public void onCreate( Bundle icicle )
 	{
 		super.onCreate( icicle );
@@ -19,7 +20,6 @@ public class ArtistRadio extends RadioView {
 		m_tuneButton = (Button)findViewById( R.id.tune );
 		m_tuneButton.setOnClickListener( new OnClickListener()
 		{
-
 			public void onClick(View v) {
 				tuneInSimilarArtists(m_artistInput.getText().toString() );
 			}

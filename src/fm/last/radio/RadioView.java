@@ -242,9 +242,7 @@ public class RadioView extends Activity
 	{
 		super.onCreateOptionsMenu(menu);
 		menu.add( 0, MenuItems.Account.ordinal(), 0, "Account" );
-
 		menu.add(0, MenuItems.Events.ordinal(), 1, "Events");
-		
 		return true;
 	}
 	
