@@ -51,11 +51,15 @@ public class Request
 	
 	Response postRequest() throws UnsupportedEncodingException, IOException
 	{
-		URL url = new URL( m_url.getProtocol() + "://" + m_url.getHost() + m_url.getPath() );
+		String baseUrl = m_url.getProtocol() + "://" + m_url.getHost() + m_url.getPath();
+		Log.d("baseUrl=" + baseUrl);
+		URL url = new URL( baseUrl );
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setDoOutput( true );
 		con.setRequestMethod( "POST" );
-		con.getOutputStream().write( m_url.getQuery().getBytes() );
+		String query = m_url.getQuery();
+		Log.d("query=" + query);
+		con.getOutputStream().write( query.getBytes() );
 		con.connect();
 		InputStreamReader charStream = new InputStreamReader( con.getInputStream(), "UTF-8" );
 		return new Response(this, new BufferedReader( charStream ));

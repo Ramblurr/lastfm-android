@@ -195,7 +195,7 @@ public class SimilarArtistActivity extends Activity {
 	private void tuneInSimilarArtists(String artist) {
 		Log.i("Tuning-in to '" + artist + "'");
 
-		// String stationName = m_radio.tuneToSimilarArtist( artist );
+		String stationName = m_radio.tuneToSimilarArtist( artist );
 
 		TextView v = (TextView) findViewById(R.id.station_name);
 v.setText(artist + ".similar");		

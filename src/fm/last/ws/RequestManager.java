@@ -14,6 +14,7 @@ import android.net.Uri;
 
 import fm.last.EasyElement;
 import fm.last.LastFmApplication;
+import fm.last.Log;
 import fm.last.Utils;
 import fm.last.ws.Request.RequestType;
 
@@ -132,6 +133,8 @@ public class RequestManager {
 			urlString += ( name + "=" + value + "&" ); 
 		}
 		
+		Log.d("urlString=" + urlString);
+		
 		URL url = null;
 		try 
 		{
@@ -159,7 +162,7 @@ public class RequestManager {
 			paramString += entry.getKey() + Uri.decode( entry.getValue() );
 		}
 		
-		
+		Log.d(paramString);
 		paramString += API_SECRET;
 		String apiSig = Utils.md5( paramString );
 		
