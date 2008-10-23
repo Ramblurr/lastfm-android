@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+<LinearLayout android:orientation="vertical"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/layout" android:fadingEdge="vertical" android:fadingEdgeLength="100px">
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	        android:orientation="horizontal"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical"
+	        >
+		<ImageView android:layout_width="wrap_content"
+		    android:layout_height="wrap_content" android:src="@drawable/station"
+		    android:id="@+id/station_image" android:layout_marginTop="6sp"
+		    marginLeft="6sp" android:layout_marginLeft="6sp"/>
+		    
+	    <EditText android:id="@+id/artist_input"
+	        android:layout_width="wrap_content" android:layout_height="wrap_content"
+	        android:hint="@string/artist" android:layout_weight="10" />
+	        
+	    <Button android:layout_width="wrap_content"
+	        android:layout_height="wrap_content" android:id="@+id/tune"
+	        android:text="Tune" android:textSize="10sp"
+	        android:layout_gravity="center_vertical"/>
+	</LinearLayout>
+	
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_weight="1" android:layout_margin="0px">
+		<TextView android:text="Station Name"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:gravity="center_horizontal"
+			android:layout_marginTop="1sp"
+			android:layout_marginBottom="1sp" android:textStyle="bold"
+			android:id="@+id/station_name" android:textColor="#fff">
+		</TextView>
+		<LinearLayout android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:padding="1sp"
+			android:layout_weight="1">
+			<AbsoluteLayout android:layout_marginTop="6sp"
+				android:layout_weight="1" android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<ImageView android:id="@+id/album_art"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" android:layout_gravity="right"
+					android:paddingTop="3px" android:paddingBottom="7px"
+					android:paddingLeft="20px">
+				</ImageView>
+				<ImageView android:layout_width="fill_parent"
+					android:layout_height="fill_parent"
+					android:src="@drawable/empty_case">
+				</ImageView>
+			</AbsoluteLayout>
+			<TextView android:id="@+id/artist"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Artist"
+				android:gravity="center_horizontal">
+			</TextView>
+			<TextView android:id="@+id/track_title"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:text="Title"
+				android:gravity="center_horizontal" android:layout_marginBottom="2sp"
+				android:textStyle="bold">
+			</TextView>
+		</LinearLayout>
+		<LinearLayout android:orientation="horizontal"
+			android:layout_height="wrap_content"
+			android:paddingTop="4sp" android:id="@+id/buttonLayout" android:layout_width="fill_parent" android:layout_gravity="center_vertical">
+			<ImageButton android:src="@drawable/love" android:layout_height="40px" android:layout_width="wrap_content" android:layout_weight="10" android:background="#0000">
+			</ImageButton>
+			<ImageButton android:src="@drawable/ban" android:layout_height="40px" android:background="#0000" android:layout_width="wrap_content" android:layout_weight="10">
+			</ImageButton>
+			<ImageButton android:id="@+id/stop"
+				android:src="@drawable/stop" android:layout_height="40px" android:background="#0000" android:layout_width="wrap_content" android:layout_weight="10">
+			</ImageButton>
+			<ImageButton android:id="@+id/skip"
+				android:src="@drawable/skip" android:layout_height="40px" android:background="#0000" android:layout_width="wrap_content" android:layout_weight="10">
+			</ImageButton>
+		</LinearLayout>
+	</LinearLayout>
+</LinearLayout>
