@@ -16,6 +16,7 @@ import fm.last.EasyElement;
 import fm.last.LastFmApplication;
 import fm.last.Log;
 import fm.last.Utils;
+import fm.last.api.Session;
 import fm.last.ws.Request.RequestType;
 
 public class RequestManager {
@@ -66,7 +67,8 @@ public class RequestManager {
 		{
 			m_apiRoot = "2.0/?";
 
-			m_sessionKey = LastFmApplication.instance().sessionKey();
+			Session session = LastFmApplication.instance().getSession();
+			m_sessionKey = session.getKey();
 			m_authToken = Utils.md5( LastFmApplication.instance().userName() + 
 			    LastFmApplication.instance().password() );
 			
@@ -82,7 +84,7 @@ public class RequestManager {
 				Response response = callMethod( "auth.getMobileSession", params );
 				EasyElement document = new EasyElement( response.xmlDocument().getDocumentElement() );
 				m_sessionKey = document.e("key").value();
-				LastFmApplication.instance().setSessionKey( m_sessionKey );
+//				LastFmApplication.instance().setSessionKey( m_sessionKey );
 			}
 		}
 	}

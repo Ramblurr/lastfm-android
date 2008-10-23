@@ -82,6 +82,14 @@
 		</activity>
 		<activity android:name=".artist.ArtistRadio">
 			<intent-filter>
+				<action android:name="SIMILARARTIST.OLD">
+				</action>
+				<category android:name="android.intent.category.DEFAULT">
+				</category>
+			</intent-filter>
+		</activity>
+		<activity android:name=".activities.SimilarArtistActivity">
+			<intent-filter>
 				<action android:name="SIMILARARTIST">
 				</action>
 				<category android:name="android.intent.category.DEFAULT">

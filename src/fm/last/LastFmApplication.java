@@ -2,28 +2,36 @@ package fm.last;
 
 import java.io.FileNotFoundException;
 
+import fm.last.api.Session;
+import fm.last.tasks.AuthenticationTask;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import androidx.util.GUITaskQueue;
+import androidx.util.ResultReceiver;
 
-public class LastFmApplication extends android.app.Application {
+public class LastFmApplication extends android.app.Application implements ResultReceiver<Session> {
 	static private LastFmApplication instance;
 	private String m_user;
 	private String m_pass;
-	private String m_sessionKey;
 	private SharedPreferences m_preferences;
 	private SQLiteDatabase m_db = null;
+	private Session session;
 
 	public void onCreate() {
 		instance = this;
 		m_preferences = getPrivatePreferences();
 		m_user = m_preferences.getString("username", "");
 		m_pass = m_preferences.getString("md5Password", "");
-		m_sessionKey = m_preferences.getString("sessionKey", "");
 
 		if (noUsernameSaved()) {
 			startLoginActivity();
+		} else {
+			// start grabbing a session key in the background
+			GUITaskQueue.getInstance().addTask(
+					new AuthenticationTask(m_user, m_pass, this));
 		}
 	}
 
@@ -75,16 +83,20 @@ public class LastFmApplication extends android.app.Application {
 	public String userName() {
 		return m_user;
 	}
-
-	public String sessionKey() {
-		return m_sessionKey;
+	
+	public void resultObtained(Session session) {
+		this.session = session;
+	}	
+	
+	// called if there was a problem authenticating
+	public void handle_exception(Throwable t) {
+		Log.e(t);
 	}
 
-	public boolean setSessionKey(String sessionKey) {
-		m_sessionKey = sessionKey;
-		return m_preferences.edit().putString("sessionKey", sessionKey).commit();
+	public Session getSession() {
+		return session;
 	}
-
+	
 	public String password() {
 		return m_pass;
 	}

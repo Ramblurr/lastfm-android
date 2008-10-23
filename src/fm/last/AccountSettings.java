@@ -65,8 +65,11 @@ public class AccountSettings extends Activity implements
 	public void resultObtained(Session session) {
 		m_progress.dismiss();
 		Log.i("We've got a session! session.key=" + session.getKey());
+		
 		// Save our credentials to our SharedPreferences
 		LastFmApplication.instance().saveCredentials(username, md5Password);
+		// set our session
+		LastFmApplication.instance().resultObtained(session);
 		setResult(RESULT_OK);
 		finish();
 	}
