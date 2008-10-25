@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import androidx.util.DialogUtil;
 import androidx.util.DismissLaterTask;
 import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
@@ -52,12 +53,15 @@ public class AccountSettings extends Activity implements
 
 	public void handle_exception(Throwable t) {
 		m_progress.dismiss();
+/*		
 		Dialog alert = (new AlertDialog.Builder(this).setTitle(
 				R.string.badAuthTitle).setIcon(R.drawable.icon)
 				.setMessage(R.string.badAuth)).create();
 		alert.show();
 		// dismiss the alert dialog after 2 seconds
 		GUITaskQueue.getInstance().addTask(new DismissLaterTask(alert, 2000));
+*/		
+		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
