@@ -13,6 +13,7 @@ import fm.last.tasks.TuneRadioTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -36,6 +37,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.util.DialogUtil;
+import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
@@ -46,6 +49,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	private ImageLoader m_imageLoader;
 	private EditText similarArtistEditText;
 	private Dialog tunerDialog;
+	private ProgressDialog progressDialog;
 
 	private enum Requests {
 		Login
@@ -199,9 +203,12 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 
 	private void tuneInSimilarArtists(String artist) {
 		Log.i("Tuning-in to '" + artist + "'");
-		
-		//new TuneRadioTask()
+
+		String title = getResources().getString(R.string.authProgressTitle);
+		String message = getResources().getString(R.string.authProgressMessage);
+		progressDialog = ProgressDialog.show(this, title, message, true);
 		GUITaskQueue.getInstance().addTask(new TuneRadioTask(artist, this));
+		
 /*
 		String stationName = m_radio.tuneToSimilarArtist( artist );
 
@@ -214,6 +221,20 @@ v.setText(artist + ".similar");
 		 */
 	}
 
+	public void handle_exception(Throwable t) {
+		progressDialog.dismiss();
+		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
+		// call finish on this activity after the alert dialog is dismissed
+		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
+	}
+
+	public void resultObtained(Station result) {
+		progressDialog.dismiss();
+		TextView v = (TextView) findViewById(R.id.station_name);
+		v.setText(result.getName());		
+	}
+	
+	
 	protected void setHeaderResource(int resId) {
 		Log.d("Radioview.setHeaderRes(" + resId + ")");
 		LayoutInflater inflater = LayoutInflater.from(this);
@@ -249,13 +270,5 @@ v.setText(artist + ".similar");
 		return true;
 	}
 
-	public void handle_exception(Throwable t) {
-		
-	}
-
-	public void resultObtained(Station result) {
-		TextView v = (TextView) findViewById(R.id.station_name);
-		v.setText(result.getName());		
-	}
 
 }
