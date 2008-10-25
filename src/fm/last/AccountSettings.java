@@ -52,7 +52,7 @@ public class AccountSettings extends Activity implements
 
 	public void handle_exception(Throwable t) {
 		m_progress.dismiss();
-		Dialog alert = (new AlertDialog.Builder(AccountSettings.this).setTitle(
+		Dialog alert = (new AlertDialog.Builder(this).setTitle(
 				R.string.badAuthTitle).setIcon(R.drawable.icon)
 				.setMessage(R.string.badAuth)).create();
 		alert.show();

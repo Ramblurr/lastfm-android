@@ -5,8 +5,11 @@ import fm.last.LastFmApplication;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
+import fm.last.api.Artist;
+import fm.last.api.Station;
 import fm.last.radio.Radio;
 import fm.last.radio.RadioEventHandler;
+import fm.last.tasks.TuneRadioTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,8 +36,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.util.GUITaskQueue;
+import androidx.util.ResultReceiver;
 
-public class SimilarArtistActivity extends Activity {
+public class SimilarArtistActivity extends Activity implements ResultReceiver<Station> {
 	private Button m_tuneButton = null;
 	private EditText m_artistInput = null;
 	private Radio m_radio = null;
@@ -194,7 +199,10 @@ public class SimilarArtistActivity extends Activity {
 
 	private void tuneInSimilarArtists(String artist) {
 		Log.i("Tuning-in to '" + artist + "'");
-
+		
+		//new TuneRadioTask()
+		GUITaskQueue.getInstance().addTask(new TuneRadioTask(artist, this));
+/*
 		String stationName = m_radio.tuneToSimilarArtist( artist );
 
 		TextView v = (TextView) findViewById(R.id.station_name);
@@ -202,6 +210,8 @@ v.setText(artist + ".similar");
 		// v.setText( stationName );
 
 		// m_radio.play();
+		 * 
+		 */
 	}
 
 	protected void setHeaderResource(int resId) {
@@ -237,6 +247,15 @@ v.setText(artist + ".similar");
 			return false;
 		}
 		return true;
+	}
+
+	public void handle_exception(Throwable t) {
+		
+	}
+
+	public void resultObtained(Station result) {
+		TextView v = (TextView) findViewById(R.id.station_name);
+		v.setText(result.getName());		
 	}
 
 }
