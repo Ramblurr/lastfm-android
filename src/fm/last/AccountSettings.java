@@ -44,7 +44,7 @@ public class AccountSettings extends Activity implements
 	private void doLogin() {
 		String title = getResources().getString(R.string.authProgressTitle);
 		String message = getResources().getString(R.string.authProgressMessage);
-		m_progress = ProgressDialog.show(AccountSettings.this, title, message, true);
+		m_progress = ProgressDialog.show(this, title, message, true);
 		username = userField.getText().toString();
 		md5Password = MD5.getInstance().hash(passwordField.getText().toString());
 		GUITaskQueue.getInstance().addTask(
@@ -53,14 +53,6 @@ public class AccountSettings extends Activity implements
 
 	public void handle_exception(Throwable t) {
 		m_progress.dismiss();
-/*		
-		Dialog alert = (new AlertDialog.Builder(this).setTitle(
-				R.string.badAuthTitle).setIcon(R.drawable.icon)
-				.setMessage(R.string.badAuth)).create();
-		alert.show();
-		// dismiss the alert dialog after 2 seconds
-		GUITaskQueue.getInstance().addTask(new DismissLaterTask(alert, 2000));
-*/		
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
