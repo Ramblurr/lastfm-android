@@ -80,7 +80,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		tuneButton = (Button) findViewById(R.id.tune);
 		tuneButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				doTune();
+				tuneToSimilarArtist();
 			}
 		});
 
@@ -99,10 +99,6 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		}
 	}
 
-	private void doTune() {
-		tuneInSimilarArtists(artistInputEdit.getText().toString());
-	}
-	
 	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {
 		public void onTrackEnded(TrackInfo track) {
 		}
@@ -186,11 +182,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	private void stopButtonPressed() {
 		tunerDialog.show();
 	}
-	
-	private void tuneToSimilarArtist() {
-		tuneInSimilarArtists(similarArtistEditText.getText().toString());
-	}
-	
+
 	final private void animate() {
 		AnimationSet set = new AnimationSet(true);
 
@@ -210,6 +202,10 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		l.setLayoutAnimation(controller);
 	}
 
+	private void tuneToSimilarArtist() {
+		tuneInSimilarArtists(similarArtistEditText.getText().toString());
+	}
+		
 	private void tuneInSimilarArtists(String artist) {
 		Log.i("Tuning-in to '" + artist + "'");
 
