@@ -2,6 +2,7 @@ package fm.last;
 
 import androidx.util.ResultReceiver;
 import fm.last.api.Session;
+import fm.last.api.Station;
 
 public class LastfmRadio implements ResultReceiver<Session> {
 	private static LastfmRadio instance;
@@ -14,6 +15,15 @@ public class LastfmRadio implements ResultReceiver<Session> {
 	}
 
 	private Session session;
+	
+	
+	private ResultReceiver<Station> stationResult = new ResultReceiver<Station>() {
+		public void resultObtained(Station station) {
+		}
+		
+		public void handle_exception(Throwable t) {
+		}
+	};
 	
 	private LastfmRadio() {
 	}

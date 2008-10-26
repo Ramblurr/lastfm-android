@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -212,7 +213,8 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		String title = getResources().getString(R.string.authProgressTitle);
 		String message = getResources().getString(R.string.authProgressMessage);
 		progressDialog = ProgressDialog.show(this, title, message, true);
-		GUITaskQueue.getInstance().addTask(new TuneRadioTask(artist, this));
+		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
+		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, this));
 		
 /*
 		String stationName = m_radio.tuneToSimilarArtist( artist );
