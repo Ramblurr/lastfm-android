@@ -48,6 +48,9 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	private Radio m_radio = null;
 	private ImageLoader m_imageLoader;
 	private EditText similarArtistEditText;
+	private TextView artistText;
+	private TextView trackTitleText;
+	private ImageView albumArtImage;
 	private Dialog tunerDialog;
 	private ProgressDialog progressDialog;
 
@@ -62,6 +65,12 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 
+		// now get the controls that we will use to display information
+		// about the current track
+		artistText = (TextView) findViewById(R.id.artist);
+		trackTitleText = (TextView) findViewById(R.id.track_title);
+		albumArtImage = (ImageView) findViewById(R.id.album_art);
+		
 		setContentView(R.layout.similar_artist);
 
 		tunerDialog = createTunerDialog();
