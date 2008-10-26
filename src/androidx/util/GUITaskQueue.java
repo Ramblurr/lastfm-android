@@ -47,7 +47,11 @@ public class GUITaskQueue {
    * @param task
    */
   public void addTask(ProgressIndicator progressIndicator, GUITask task) {
-  	addTask(new GUITaskWithProgress(task, progressIndicator));
+  	if (progressIndicator == null) {
+  		addTask(task);
+  	} else {
+  		addTask(new GUITaskWithProgress(task, progressIndicator));
+  	}
   }
   
   private static class GUITaskWithProgress implements GUITask {

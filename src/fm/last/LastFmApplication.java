@@ -33,8 +33,7 @@ public class LastFmApplication extends Application {
 		} else {
 			// start grabbing a session key in the background
 			// let the radio be notified of the session
-			GUITaskQueue.getInstance().addTask(
-					new AuthenticationTask(m_user, m_pass, radio));
+			radio.obtainSession(null, m_user, m_pass, null);
 		}
 	}
 

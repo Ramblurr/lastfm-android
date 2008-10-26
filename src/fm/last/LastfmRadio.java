@@ -1,13 +1,16 @@
 package fm.last;
 
 import android.net.Uri;
+import androidx.util.ExceptionHandler;
 import androidx.util.GUITaskQueue;
+import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 import fm.last.api.Session;
 import fm.last.api.Station;
+import fm.last.tasks.AuthenticationTask;
 import fm.last.tasks.TuneRadioTask;
 
-public class LastfmRadio implements ResultReceiver<Session> {
+public class LastfmRadio {
 	private static LastfmRadio instance;
 	
 	public static LastfmRadio getInstance() {
@@ -19,12 +22,18 @@ public class LastfmRadio implements ResultReceiver<Session> {
 
 	private Session session;
 	private Station currentStation;
+	private ExceptionHandler sessionExceptionHandler;
 	
 	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
 		public void handle_exception(Throwable t) {
+			if (sessionExceptionHandler != null) {
+				sessionExceptionHandler.handle_exception(t);
+			}
 		}
 
 		public void resultObtained(Session result) {
+			setSession(result);
+			sessionExceptionHandler = null;
 		}
 	};
 	
@@ -38,6 +47,14 @@ public class LastfmRadio implements ResultReceiver<Session> {
 	};
 	
 	private LastfmRadio() {
+	}
+	
+	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, ExceptionHandler handler) {
+		sessionExceptionHandler = handler;
+		// start grabbing a session key in the background
+		// let the radio be notified of the session
+		GUITaskQueue.getInstance().addTask(progressIndicator,
+				new AuthenticationTask(username, md5password, sessionResult));
 	}
 	
 	private void setCurrentStation(Station station) {
@@ -60,15 +77,5 @@ public class LastfmRadio implements ResultReceiver<Session> {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
 		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, stationResult));
 	}
-
 	
-	public void resultObtained(Session session) {
-		this.session = session;
-	}	
-	
-	// called if there was a problem authenticating
-	public void handle_exception(Throwable t) {
-		Log.e(t);
-	}
-
 }
