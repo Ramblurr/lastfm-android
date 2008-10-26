@@ -36,6 +36,44 @@ public class GUITaskQueue {
   public void addTask(GUITask task) {
     taskQ.addTask(new GUITaskAdapter(task));
   }
+  
+  /**
+   * Adds a task with an associated progress indicator.
+   * The indicator's showProgressIndicator() gets called immediately
+   * then the hideProgressIndicator() gets called before the GUITask's
+   * handle_exception() or after_execute() method gets called.
+   * 
+   * @param progressIndicator
+   * @param task
+   */
+  public void addTask(ProgressIndicator progressIndicator, GUITask task) {
+  	addTask(new GUITaskWithProgress(task, progressIndicator));
+  }
+  
+  private static class GUITaskWithProgress implements GUITask {
+  	private GUITask delegate;
+  	private ProgressIndicator progressIndicator;
+  	
+  	GUITaskWithProgress(GUITask _delegate, ProgressIndicator _progressIndicator) {
+  		delegate = _delegate;
+  		progressIndicator = _progressIndicator;
+  		progressIndicator.showProgressIndicator();
+  	}
+  	
+		public void executeNonGuiTask() throws Exception {
+			delegate.executeNonGuiTask();
+		}
+
+		public void handle_exception(Throwable t) {
+			progressIndicator.hideProgressIndicator();
+			delegate.handle_exception(t);
+		}
+
+		public void after_execute() {
+			progressIndicator.hideProgressIndicator();
+			delegate.after_execute();
+		}
+  };
     
   private static class GUITaskWithSomething<T> {
     GUITask guiTask;
