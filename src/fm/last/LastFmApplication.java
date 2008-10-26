@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import fm.last.api.Session;
 import fm.last.tasks.AuthenticationTask;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,16 +13,18 @@ import android.database.sqlite.SQLiteDatabase;
 import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
-public class LastFmApplication extends android.app.Application implements ResultReceiver<Session> {
+public class LastFmApplication extends Application implements ResultReceiver<Session> {
 	static private LastFmApplication instance;
 	private String m_user;
 	private String m_pass;
 	private SharedPreferences m_preferences;
 	private SQLiteDatabase m_db = null;
+	private LastfmRadio radio;
 	private Session session;
 
 	public void onCreate() {
 		instance = this;
+		radio = LastfmRadio.getInstance();
 		m_preferences = getPrivatePreferences();
 		m_user = m_preferences.getString("username", "");
 		m_pass = m_preferences.getString("md5Password", "");
