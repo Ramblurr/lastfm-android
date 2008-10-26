@@ -20,6 +20,13 @@ public class LastfmRadio implements ResultReceiver<Session> {
 	private Session session;
 	private Station currentStation;
 	
+	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
+		public void handle_exception(Throwable t) {
+		}
+
+		public void resultObtained(Session result) {
+		}
+	};
 	
 	private ResultReceiver<Station> stationResult = new ResultReceiver<Station>() {
 		public void resultObtained(Station station) {
