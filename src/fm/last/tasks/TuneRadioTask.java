@@ -1,6 +1,7 @@
 package fm.last.tasks;
 
 import fm.last.LastFmApplication;
+import fm.last.LastfmRadio;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
@@ -28,7 +29,7 @@ public class TuneRadioTask implements GUITask {
 	
 	public void executeNonGuiTask() throws Exception {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		Session session = LastFmApplication.instance().getSession();
+		Session session = LastfmRadio.getInstance().getSession();
 		String sk = session.getKey();
 		radioStation = server.tuneToSimilarArtist(station, sk);
 	}

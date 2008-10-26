@@ -13,14 +13,13 @@ import android.database.sqlite.SQLiteDatabase;
 import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
-public class LastFmApplication extends Application implements ResultReceiver<Session> {
+public class LastFmApplication extends Application {
 	static private LastFmApplication instance;
 	private String m_user;
 	private String m_pass;
 	private SharedPreferences m_preferences;
 	private SQLiteDatabase m_db = null;
 	private LastfmRadio radio;
-	private Session session;
 
 	public void onCreate() {
 		instance = this;
@@ -33,8 +32,9 @@ public class LastFmApplication extends Application implements ResultReceiver<Ses
 			startLoginActivity();
 		} else {
 			// start grabbing a session key in the background
+			// let the radio be notified of the session
 			GUITaskQueue.getInstance().addTask(
-					new AuthenticationTask(m_user, m_pass, this));
+					new AuthenticationTask(m_user, m_pass, radio));
 		}
 	}
 
@@ -86,20 +86,7 @@ public class LastFmApplication extends Application implements ResultReceiver<Ses
 	public String userName() {
 		return m_user;
 	}
-	
-	public void resultObtained(Session session) {
-		this.session = session;
-	}	
-	
-	// called if there was a problem authenticating
-	public void handle_exception(Throwable t) {
-		Log.e(t);
-	}
-
-	public Session getSession() {
-		return session;
-	}
-	
+		
 	public String password() {
 		return m_pass;
 	}

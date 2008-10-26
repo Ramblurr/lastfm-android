@@ -14,6 +14,7 @@ import android.net.Uri;
 
 import fm.last.EasyElement;
 import fm.last.LastFmApplication;
+import fm.last.LastfmRadio;
 import fm.last.Log;
 import fm.last.Utils;
 import fm.last.api.Session;
@@ -67,7 +68,8 @@ public class RequestManager {
 		{
 			m_apiRoot = "2.0/?";
 
-			Session session = LastFmApplication.instance().getSession();
+			Session session = LastfmRadio.getInstance().getSession();
+			
 			m_sessionKey = session.getKey();
 			m_authToken = Utils.md5( LastFmApplication.instance().userName() + 
 			    LastFmApplication.instance().password() );

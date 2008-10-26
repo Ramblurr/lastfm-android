@@ -65,7 +65,7 @@ public class AccountSettings extends Activity implements
 		// Save our credentials to our SharedPreferences
 		LastFmApplication.instance().saveCredentials(username, md5Password);
 		// set our session
-		LastFmApplication.instance().resultObtained(session);
+		LastfmRadio.getInstance().resultObtained(session);
 		setResult(RESULT_OK);
 		finish();
 	}

@@ -20,6 +20,7 @@ import org.w3c.dom.*;
 
 import fm.last.EasyElement;
 import fm.last.LastFmApplication;
+import fm.last.LastfmRadio;
 import fm.last.Log;
 import fm.last.TrackInfo;
 
@@ -46,7 +47,7 @@ public class Radio
 	public String tuneToSimilarArtist( String artist ) 
 	{
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		Session session = LastFmApplication.instance().getSession();
+		Session session = LastfmRadio.getInstance().getSession();
 		String sk = session.getKey();
 		try {
 			Station radioStation = server.tuneToSimilarArtist(station, sk);
