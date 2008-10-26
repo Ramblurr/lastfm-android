@@ -43,10 +43,10 @@ import androidx.util.GUITaskQueue;
 import androidx.util.ResultReceiver;
 
 public class SimilarArtistActivity extends Activity implements ResultReceiver<Station> {
-	private Button m_tuneButton = null;
-	private EditText m_artistInput = null;
-	private Radio m_radio = null;
-	private ImageLoader m_imageLoader;
+	private Button tuneButton = null;
+	private EditText artistInputEdit = null;
+	private Radio radio = null;
+	private ImageLoader imageLoader;
 	private EditText similarArtistEditText;
 	private TextView artistText;
 	private TextView trackTitleText;
@@ -76,9 +76,9 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		tunerDialog = createTunerDialog();
 		
 //		setHeaderResource(R.layout.similar_artist_radio_partial);
-		m_artistInput = (EditText) findViewById(R.id.artist_input);
-		m_tuneButton = (Button) findViewById(R.id.tune);
-		m_tuneButton.setOnClickListener(new OnClickListener() {
+		artistInputEdit = (EditText) findViewById(R.id.artist_input);
+		tuneButton = (Button) findViewById(R.id.tune);
+		tuneButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				doTune();
 			}
@@ -87,7 +87,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		String user = LastFmApplication.instance().userName();
 		String pass = LastFmApplication.instance().password();
 
-		m_imageLoader = new ImageLoader(this);
+		imageLoader = new ImageLoader(this);
 
 		if (user.length() == 0 || pass.length() == 0) {
 			// show username / password activity
@@ -100,7 +100,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	}
 
 	private void doTune() {
-		tuneInSimilarArtists(m_artistInput.getText().toString());
+		tuneInSimilarArtists(artistInputEdit.getText().toString());
 	}
 	
 	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {
@@ -121,7 +121,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 
 		ImageView v = (ImageView) findViewById(R.id.album_art);
 		try {
-			m_imageLoader.loadImage(v, t.imageUrl());
+			imageLoader.loadImage(v, t.imageUrl());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -129,8 +129,8 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 	}
 
 	final private void init() {
-		m_radio = new Radio();
-		m_radio.addRadioHandler(m_radioEventHandler);
+		radio = new Radio();
+		radio.addRadioHandler(m_radioEventHandler);
 
 		setContentView(R.layout.radio_client);
 
@@ -156,7 +156,7 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		ImageButton skip = (ImageButton) findViewById(R.id.skip);
 		skip.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				m_radio.skip();
+				radio.skip();
 			}
 		});
 	}
