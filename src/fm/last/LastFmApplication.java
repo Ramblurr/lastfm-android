@@ -15,25 +15,32 @@ import androidx.util.ResultReceiver;
 
 public class LastFmApplication extends Application {
 	static private LastFmApplication instance;
-	private String m_user;
-	private String m_pass;
-	private SharedPreferences m_preferences;
+	private String username;
+	private String md5Password;
+	private SharedPreferences applicationPreferences;
 	private SQLiteDatabase m_db = null;
 	private LastfmRadio radio;
 
 	public void onCreate() {
 		instance = this;
 		radio = LastfmRadio.getInstance();
-		m_preferences = getPrivatePreferences();
-		m_user = m_preferences.getString("username", "");
-		m_pass = m_preferences.getString("md5Password", "");
+		applicationPreferences = getPrivatePreferences();
+		username = applicationPreferences.getString("username", "");
+		md5Password = applicationPreferences.getString("md5Password", "");
 
 		if (noUsernameSaved()) {
 			startLoginActivity();
 		} else {
 			// start grabbing a session key in the background
 			// let the radio be notified of the session
-			radio.obtainSession(null, m_user, m_pass, null);
+			radio.obtainSession(null, username, md5Password, new ResultReceiver<Session>() {
+				public void handle_exception(Throwable t) {
+				}
+				// if we get a valid session, we should save the credentials
+				public void resultObtained(Session result) {
+					saveCredentials(username, md5Password);
+				}
+			});
 		}
 	}
 
@@ -44,9 +51,9 @@ public class LastFmApplication extends Application {
 	}
 	
 	public boolean noUsernameSaved() {
-		m_preferences = getPrivatePreferences();
-		m_user = m_preferences.getString("username", "").trim();
-		return (m_user.equals(""));
+		applicationPreferences = getPrivatePreferences();
+		username = applicationPreferences.getString("username", "").trim();
+		return (username.equals(""));
 	}
 	
 	private SharedPreferences getPrivatePreferences() {
@@ -74,7 +81,6 @@ public class LastFmApplication extends Application {
 		m_db = openOrCreateDatabase("lastFm", MODE_PRIVATE, null);
 		createTables();
 		return m_db;
-
 	}
 
 	private void createTables() {
@@ -83,10 +89,10 @@ public class LastFmApplication extends Application {
 	}
 
 	public String userName() {
-		return m_user;
+		return username;
 	}
 		
 	public String password() {
-		return m_pass;
+		return md5Password;
 	}
 }

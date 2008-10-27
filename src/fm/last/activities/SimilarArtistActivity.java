@@ -2,6 +2,7 @@ package fm.last.activities;
 
 import fm.last.ImageLoader;
 import fm.last.LastFmApplication;
+import fm.last.LastfmRadio;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
@@ -213,8 +214,9 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		String title = getResources().getString(R.string.authProgressTitle);
 		String message = getResources().getString(R.string.authProgressMessage);
 		progressDialog = ProgressDialog.show(this, title, message, true);
-		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, this));
+		LastfmRadio.getInstance().tuneToSimilarArtist(null, artist, this);
+//		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
+//		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, this));
 		
 /*
 		String stationName = m_radio.tuneToSimilarArtist( artist );

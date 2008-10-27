@@ -50,7 +50,7 @@ public class Radio
 		Session session = LastfmRadio.getInstance().getSession();
 		String sk = session.getKey();
 		try {
-			Station radioStation = server.tuneToSimilarArtist(station, sk);
+			Station radioStation = server.tuneToStation(station, sk);
 			if (radioStation != null) {
 				return radioStation.getName();
 			}

@@ -5,6 +5,7 @@ import androidx.util.ExceptionHandler;
 import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
+import androidx.util.ResultReceiverPair;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.tasks.AuthenticationTask;
@@ -22,18 +23,13 @@ public class LastfmRadio {
 
 	private Session session;
 	private Station currentStation;
-	private ExceptionHandler sessionExceptionHandler;
 	
 	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
 		public void handle_exception(Throwable t) {
-			if (sessionExceptionHandler != null) {
-				sessionExceptionHandler.handle_exception(t);
-			}
 		}
 
 		public void resultObtained(Session result) {
 			setSession(result);
-			sessionExceptionHandler = null;
 		}
 	};
 	
@@ -49,12 +45,11 @@ public class LastfmRadio {
 	private LastfmRadio() {
 	}
 	
-	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, ExceptionHandler handler) {
-		sessionExceptionHandler = handler;
+	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, ResultReceiver<Session> resultReceiver) {
 		// start grabbing a session key in the background
 		// let the radio be notified of the session
 		GUITaskQueue.getInstance().addTask(progressIndicator,
-				new AuthenticationTask(username, md5password, sessionResult));
+				new AuthenticationTask(username, md5password, new ResultReceiverPair<Session>(sessionResult, resultReceiver)));
 	}
 	
 	private void setCurrentStation(Station station) {
@@ -73,9 +68,9 @@ public class LastfmRadio {
 		return session;
 	}
 	
-	public void tuneToSimilarArtist(String artist) {
+	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist, ResultReceiver<Station> resultReceiver) {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, stationResult));
+		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, new ResultReceiverPair<Station>(stationResult, resultReceiver)));
 	}
 	
 }
