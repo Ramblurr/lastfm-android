@@ -70,7 +70,7 @@ public class LastfmRadio {
 	
 	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist, ResultReceiver<Station> resultReceiver) {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, new ResultReceiverPair<Station>(stationResult, resultReceiver)));
+		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, new ResultReceiverPair<Station>(stationResult, resultReceiver)));
 	}
 	
 }

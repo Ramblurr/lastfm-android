@@ -42,12 +42,16 @@ import android.widget.TextView;
 import androidx.util.DialogUtil;
 import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
+import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 
-public class SimilarArtistActivity extends Activity implements ResultReceiver<Station> {
+public class SimilarArtistActivity extends Activity 
+implements ResultReceiver<Station>, ProgressIndicator
+{
 	private Button tuneButton = null;
 	private EditText artistInputEdit = null;
-	private Radio radio = null;
+	private Radio old_radio = null;
+	private LastfmRadio radio;
 	private ImageLoader imageLoader;
 	private EditText similarArtistEditText;
 	private TextView artistText;
@@ -66,6 +70,8 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		// get our one-and-only radio instance
+		radio = LastfmRadio.getInstance();
 
 		// now get the controls that we will use to display information
 		// about the current track
@@ -87,37 +93,8 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		});
 
 		imageLoader = new ImageLoader(this);
-		init();
-	}
-
-	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {
-		public void onTrackEnded(TrackInfo track) {
-		}
-
-		public void onTrackStarted(TrackInfo track) {
-			setupUi(track);
-		}
-	};
-
-	private void setupUi(TrackInfo t) {
-		TextView tv;
-		tv = (TextView) findViewById(R.id.artist);
-		tv.setText(t.artist());
-		tv = (TextView) findViewById(R.id.track_title);
-		tv.setText(t.title());
-
-		ImageView v = (ImageView) findViewById(R.id.album_art);
-		try {
-			imageLoader.loadImage(v, t.imageUrl());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	final private void init() {
-		radio = new Radio();
-		radio.addRadioHandler(m_radioEventHandler);
+		old_radio = new Radio();
+		old_radio.addRadioHandler(m_radioEventHandler);
 
 		setContentView(R.layout.radio_client);
 
@@ -143,12 +120,42 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		ImageButton skip = (ImageButton) findViewById(R.id.skip);
 		skip.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				radio.skip();
+				old_radio.skip();
 			}
 		});
+		
+		Station station = radio.getCurrentStation();
+		if (station != null) {
+			resultObtained(station);
+		}
 	}
 
-	
+	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {
+		public void onTrackEnded(TrackInfo track) {
+		}
+
+		public void onTrackStarted(TrackInfo track) {
+			setupUi(track);
+		}
+		
+	};
+
+	private void setupUi(TrackInfo t) {
+		TextView tv;
+		tv = (TextView) findViewById(R.id.artist);
+		tv.setText(t.artist());
+		tv = (TextView) findViewById(R.id.track_title);
+		tv.setText(t.title());
+
+		ImageView v = (ImageView) findViewById(R.id.album_art);
+		try {
+			imageLoader.loadImage(v, t.imageUrl());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private Dialog createTunerDialog() {
 		// create the text field we will show in the dialog
 		similarArtistEditText = new EditText(this);
@@ -199,39 +206,29 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 		
 	private void tuneInSimilarArtists(String artist) {
 		Log.i("Tuning-in to '" + artist + "'");
-
-		String title = getResources().getString(R.string.authProgressTitle);
-		String message = getResources().getString(R.string.authProgressMessage);
-		progressDialog = ProgressDialog.show(this, title, message, true);
-		LastfmRadio.getInstance().tuneToSimilarArtist(null, artist, this);
-//		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-//		GUITaskQueue.getInstance().addTask(new TuneRadioTask(station, this));
-		
-/*
-		String stationName = m_radio.tuneToSimilarArtist( artist );
-
-		TextView v = (TextView) findViewById(R.id.station_name);
-v.setText(artist + ".similar");		
-		// v.setText( stationName );
-
-		// m_radio.play();
-		 * 
-		 */
+		LastfmRadio.getInstance().tuneToSimilarArtist(this, artist, this);
 	}
 
 	public void handle_exception(Throwable t) {
-		progressDialog.dismiss();
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
 
 	public void resultObtained(Station result) {
-		progressDialog.dismiss();
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());		
 	}
 	
+	public void hideProgressIndicator() {
+		progressDialog.dismiss();
+	}
+
+	public void showProgressIndicator() {
+		String title = getResources().getString(R.string.authProgressTitle);
+		String message = getResources().getString(R.string.authProgressMessage);
+		progressDialog = ProgressDialog.show(this, title, message, true);
+	}
 	
 	protected void setHeaderResource(int resId) {
 		Log.d("Radioview.setHeaderRes(" + resId + ")");
@@ -267,6 +264,7 @@ v.setText(artist + ".similar");
 		}
 		return true;
 	}
+
 
 
 }
