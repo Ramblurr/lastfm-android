@@ -1,4 +1,4 @@
-package fm.last;
+package fm.last.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -12,11 +12,15 @@ import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 
+import fm.last.R;
+import fm.last.Log;
+import fm.last.LastFmApplication;
+import fm.last.LastfmRadio;
 import fm.last.api.MD5;
 import fm.last.api.Session;
 import fm.last.tasks.AuthenticationTask;
 
-public class AccountSettings extends Activity implements
+public class LoginActivity extends Activity implements
 		ResultReceiver<Session>, ProgressIndicator {
 	private EditText userField, passwordField;
 	// private final Handler m_handler = new Handler();
