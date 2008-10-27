@@ -215,6 +215,11 @@ implements ResultReceiver<Station>, ProgressIndicator
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
 
+	/**
+	 * This method gets called when the radio has tuned into a new station, or
+	 * this activity is created and the radio is already tuned to a station.
+	 * 
+	 */
 	public void resultObtained(Station result) {
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());		
