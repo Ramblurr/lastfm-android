@@ -7,6 +7,7 @@ import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
 import fm.last.api.Artist;
+import fm.last.api.RadioTrack;
 import fm.last.api.Station;
 import fm.last.radio.Radio;
 import fm.last.radio.RadioEventHandler;
@@ -73,30 +74,29 @@ implements ResultReceiver<Station>, ProgressIndicator
 		// get our one-and-only radio instance
 		radio = LastfmRadio.getInstance();
 
+		setContentView(R.layout.similar_artist);
+		
 		// now get the controls that we will use to display information
 		// about the current track
 		artistText = (TextView) findViewById(R.id.artist);
 		trackTitleText = (TextView) findViewById(R.id.track_title);
 		albumArtImage = (ImageView) findViewById(R.id.album_art);
 		
-		setContentView(R.layout.similar_artist);
-
-		tunerDialog = createTunerDialog();
+		artistInputEdit = (EditText) findViewById(R.id.artist_input);
+		similarArtistEditText = new EditText(this);
+		tunerDialog = createTunerDialog(similarArtistEditText);
 		
 //		setHeaderResource(R.layout.similar_artist_radio_partial);
-		artistInputEdit = (EditText) findViewById(R.id.artist_input);
 		tuneButton = (Button) findViewById(R.id.tune);
 		tuneButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				tuneToSimilarArtist();
+				tuneToSimilarArtist(artistInputEdit);
 			}
 		});
 
 		imageLoader = new ImageLoader(this);
 		old_radio = new Radio();
 		old_radio.addRadioHandler(m_radioEventHandler);
-
-		setContentView(R.layout.radio_client);
 
 		LinearLayout l = (LinearLayout) findViewById(R.id.layout);
 		LinearLayout bl = (LinearLayout) findViewById(R.id.buttonLayout);
@@ -156,9 +156,8 @@ implements ResultReceiver<Station>, ProgressIndicator
 		}
 	}
 
-	private Dialog createTunerDialog() {
+	private Dialog createTunerDialog(final EditText similarArtistEditText) {
 		// create the text field we will show in the dialog
-		similarArtistEditText = new EditText(this);
 		similarArtistEditText.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 				LayoutParams.FILL_PARENT));
 		similarArtistEditText.setHint("eg. Nirvana");
@@ -170,12 +169,17 @@ implements ResultReceiver<Station>, ProgressIndicator
 		.setPositiveButton("Tune-in",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						tuneToSimilarArtist();
+						tuneInSimilarArtists(similarArtistEditText.getText().toString());
 					}
 				})
 		.setNegativeButton("Cancel", null)
 		).create();		
 	}
+	
+	private void tuneToSimilarArtist(EditText similarArtistEditText) {
+		tuneInSimilarArtists(similarArtistEditText.getText().toString());
+	}
+	
 	
 	private void stopButtonPressed() {
 		tunerDialog.show();
@@ -200,11 +204,12 @@ implements ResultReceiver<Station>, ProgressIndicator
 		l.setLayoutAnimation(controller);
 	}
 
-	private void tuneToSimilarArtist() {
-		tuneInSimilarArtists(similarArtistEditText.getText().toString());
-	}
 		
 	private void tuneInSimilarArtists(String artist) {
+		if (artist.equals("")) {
+			Log.e("Can't tune to empty artist!");
+			return;
+		}
 		Log.i("Tuning-in to '" + artist + "'");
 		LastfmRadio.getInstance().tuneToSimilarArtist(this, artist, this);
 	}
@@ -218,11 +223,27 @@ implements ResultReceiver<Station>, ProgressIndicator
 	/**
 	 * This method gets called when the radio has tuned into a new station, or
 	 * this activity is created and the radio is already tuned to a station.
-	 * 
 	 */
 	public void resultObtained(Station result) {
 		TextView v = (TextView) findViewById(R.id.station_name);
-		v.setText(result.getName());		
+		v.setText(result.getName());	
+		radio.play(null, new ResultReceiver<RadioTrack>() {
+			public void handle_exception(Throwable t) {
+				handle_play_exception(t);
+			}
+			public void resultObtained(RadioTrack result) {
+				onTrackPlaying(result);
+			}
+		});
+	}
+	
+	private void onTrackPlaying(RadioTrack track) {
+		Log.i("Gonna play track '" + track.getTitle() + "'");
+		trackTitleText.setText(track.getTitle());
+	}
+
+	private void handle_play_exception(Throwable t) {
+		
 	}
 	
 	public void hideProgressIndicator() {

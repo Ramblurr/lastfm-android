@@ -5,9 +5,12 @@ import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 import androidx.util.ResultReceiverPair;
+import fm.last.api.RadioPlayList;
+import fm.last.api.RadioTrack;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.tasks.AuthenticationTask;
+import fm.last.tasks.GetRadioPlaylistTask;
 import fm.last.tasks.TuneRadioTask;
 
 public class LastfmRadio {
@@ -22,6 +25,7 @@ public class LastfmRadio {
 
 	private Session session;
 	private Station currentStation;
+	private RadioPlayList currentPlaylist;
 	
 	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
 		public void handle_exception(Throwable t) {
@@ -41,6 +45,15 @@ public class LastfmRadio {
 		}
 	};
 	
+	private ResultReceiver<RadioPlayList> playlistResult = new ResultReceiver<RadioPlayList>() {
+		public void resultObtained(RadioPlayList result) {
+			setCurrentPlaylist(result);
+		}
+
+		public void handle_exception(Throwable t) {
+		}
+	};
+	
 	private LastfmRadio() {
 	}
 	
@@ -55,12 +68,77 @@ public class LastfmRadio {
 		currentStation = station;
 	}
 	
+	private void setCurrentPlaylist(RadioPlayList playlist) {
+		currentPlaylist = playlist;
+	}
+
+	public RadioTrack getCurrentTrack() {
+		if (currentPlaylist == null) {
+			return null;
+		}
+		RadioTrack[] tracks = currentPlaylist.getTracks();
+		if (tracks.length == 0) {
+			Log.d("LastfmRadio.getCurrentTrack(): 0 tracks returned");
+			return null;
+		}
+		return currentPlaylist.getTracks()[0];
+	}
+	
+	private void moveToNextTrack() {
+		// no-op for now
+	}
+	
 	public Station getCurrentStation() {
 		return currentStation;
 	}
 	
 	public void setSession(Session session) {
 		this.session = session;
+	}
+	
+	public boolean isPlaying() {
+		return (getCurrentTrack() != null);
+	}
+	
+	public void play(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+		RadioTrack track = getCurrentTrack();
+		if (track == null) {
+			playNext(progressIndicator, trackReceiver);
+		} else {
+			trackReceiver.resultObtained(track);
+		}
+	}
+
+	/**
+	 * Play the next track of the current playlist.
+	 * 
+	 * @param progressIndicator
+	 * @param trackReceiver
+	 */
+	private void playNext(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+		if (currentPlaylist == null) {
+			fetchPlaylist(progressIndicator, trackReceiver);
+		} else {
+			streamNext(progressIndicator, trackReceiver);
+		}
+	}	
+	
+	private void fetchPlaylist(final ProgressIndicator progressIndicator, final ResultReceiver<RadioTrack> trackReceiver) {
+		getPlaylist(null, new ResultReceiver<RadioPlayList>() {
+			public void handle_exception(Throwable t) {
+				trackReceiver.handle_exception(t);
+			}
+			public void resultObtained(RadioPlayList result) {
+				currentPlaylist = result;
+				play(progressIndicator, trackReceiver);
+			}
+		});
+	}
+	
+	private void streamNext(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+		moveToNextTrack();
+		RadioTrack track = getCurrentTrack();
+		trackReceiver.resultObtained(track);
 	}
 	
 	public Session getSession() {
@@ -72,4 +150,9 @@ public class LastfmRadio {
 		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, new ResultReceiverPair<Station>(stationResult, resultReceiver)));
 	}
 	
+	public void getPlaylist(ProgressIndicator progressIndicator, ResultReceiver<RadioPlayList> resultReceiver) {
+		GUITaskQueue.getInstance().addTask(progressIndicator
+				, new GetRadioPlaylistTask(new ResultReceiverPair<RadioPlayList>(playlistResult, resultReceiver)));
+		
+	}
 }

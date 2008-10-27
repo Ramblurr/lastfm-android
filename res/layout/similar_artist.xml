@@ -62,17 +62,25 @@
 				android:layout_height="wrap_content" android:text="Artist"
 				android:gravity="center_horizontal">
 			</TextView>
-			<TextView android:id="@+id/track_title"
+			<TextView android:id="@+id/track_title" android:text="The Track Title"
 				android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Title"
+				android:layout_height="wrap_content" 
 				android:gravity="center_horizontal" android:layout_marginBottom="2sp"
 				android:textStyle="bold">
 			</TextView>
 		</LinearLayout>
 		<LinearLayout android:orientation="horizontal"
 			android:layout_height="wrap_content"
-			android:paddingTop="4sp" android:id="@+id/buttonLayout" android:layout_width="fill_parent" android:layout_gravity="center_vertical">
-			<ImageButton android:src="@drawable/love" android:layout_height="40px" android:layout_width="wrap_content" android:layout_weight="10" android:background="#0000">
+			android:paddingTop="4sp" 
+			android:id="@+id/buttonLayout" 
+			android:layout_width="fill_parent" 
+			android:layout_gravity="center_vertical">
+			<ImageButton 
+				android:src="@drawable/love" 
+				android:layout_height="40px" 
+				android:layout_width="wrap_content" 
+				android:layout_weight="10" 
+				android:background="#0000">
 			</ImageButton>
 			<ImageButton android:src="@drawable/ban" android:layout_height="40px" android:background="#0000" android:layout_width="wrap_content" android:layout_weight="10">
 			</ImageButton>
