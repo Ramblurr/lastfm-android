@@ -86,19 +86,8 @@ public class SimilarArtistActivity extends Activity implements ResultReceiver<St
 			}
 		});
 
-		String user = LastFmApplication.instance().userName();
-		String pass = LastFmApplication.instance().password();
-
 		imageLoader = new ImageLoader(this);
-
-		if (user.length() == 0 || pass.length() == 0) {
-			// show username / password activity
-			startActivityForResult(new Intent("ACCOUNTSETTINGS"), Requests.Login
-					.ordinal());
-			return;
-		} else {
-				init();
-		}
+		init();
 	}
 
 	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {

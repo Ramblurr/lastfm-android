@@ -18,13 +18,11 @@ import fm.last.LastFmApplication;
 import fm.last.LastfmRadio;
 import fm.last.api.MD5;
 import fm.last.api.Session;
-import fm.last.tasks.AuthenticationTask;
 
 public class LoginActivity extends Activity implements
 		ResultReceiver<Session>, ProgressIndicator {
 	private EditText userField, passwordField;
-	// private final Handler m_handler = new Handler();
-	ProgressDialog m_progress = null;
+	ProgressDialog progressDialog = null;
 	private String md5Password;
 	private String username;
 
@@ -46,36 +44,33 @@ public class LoginActivity extends Activity implements
 	public void showProgressIndicator() {
 		String title = getResources().getString(R.string.authProgressTitle);
 		String message = getResources().getString(R.string.authProgressMessage);
-		m_progress = ProgressDialog.show(this, title, message, true);
+		progressDialog = ProgressDialog.show(this, title, message, true);
 	}
 	
 	public void hideProgressIndicator() {
-		m_progress.dismiss();
+		progressDialog.dismiss();
 	}
 	
 	private void doLogin() {
 		username = userField.getText().toString();
 		md5Password = MD5.getInstance().hash(passwordField.getText().toString());
-		GUITaskQueue.getInstance().addTask(this,
-				new AuthenticationTask(username, md5Password, this));
+		LastfmRadio.getInstance().obtainSession(this, username, md5Password, this);
 	}
 
 	public void handle_exception(Throwable t) {
+		// show an alert dialog for 2 seconds
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
 
 	public void resultObtained(Session session) {
-		Log.i("We've got a session! session.key=" + session.getKey());
+		Log.i("LoginActivity: We've got a session! session.key=" + session.getKey());
 		
 		// Save our credentials to our SharedPreferences
 		LastFmApplication.instance().saveCredentials(username, md5Password);
-		// set our session
-		LastfmRadio.getInstance().setSession(session);
 		setResult(RESULT_OK);
 		finish();
 	}
-
 
 }
