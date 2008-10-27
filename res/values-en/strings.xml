@@ -10,4 +10,6 @@
     <string name="eventsProgressTitle">Finding Events..</string>
     <string name="eventsProgressMessage">Please Wait</string>
     <string name="artist">Artist</string>
+	<string name="tuneToSimilarArtistTitle">Tuning..</string>
+	<string name="tuneToSimilarArtistMessage">Please Wait</string>
 </resources>

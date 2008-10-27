@@ -47,7 +47,7 @@ import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 
 public class SimilarArtistActivity extends Activity 
-implements ResultReceiver<Station>, ProgressIndicator
+implements ResultReceiver<Station>
 {
 	private Button tuneButton = null;
 	private EditText artistInputEdit = null;
@@ -59,7 +59,7 @@ implements ResultReceiver<Station>, ProgressIndicator
 	private TextView trackTitleText;
 	private ImageView albumArtImage;
 	private Dialog tunerDialog;
-	private ProgressDialog progressDialog;
+	private ProgressDialog tuningProgressDialog;
 
 	private enum Requests {
 		Login
@@ -211,7 +211,27 @@ implements ResultReceiver<Station>, ProgressIndicator
 			return;
 		}
 		Log.i("Tuning-in to '" + artist + "'");
-		LastfmRadio.getInstance().tuneToSimilarArtist(this, artist, this);
+		LastfmRadio.getInstance().tuneToSimilarArtist(tuneToSimilarArtistProgress, artist, this);
+	}
+	
+	private ProgressIndicator tuneToSimilarArtistProgress = new ProgressIndicator() {
+		public void hideProgressIndicator() {
+			hideTuneToSimilarArtistProgress();
+		}
+
+		public void showProgressIndicator() {
+			showTuneToSimilarArtistProgress();
+		}
+	};
+	
+	private void showTuneToSimilarArtistProgress() {
+		String title = getResources().getString(R.string.tuneToSimilarArtistTitle);
+		String message = getResources().getString(R.string.tuneToSimilarArtistMessage);
+		tuningProgressDialog = ProgressDialog.show(this, title, message, true);
+	}
+	
+	private void hideTuneToSimilarArtistProgress() {
+		tuningProgressDialog.dismiss();
 	}
 
 	public void handle_exception(Throwable t) {
@@ -240,20 +260,11 @@ implements ResultReceiver<Station>, ProgressIndicator
 	private void onTrackPlaying(RadioTrack track) {
 		Log.i("Gonna play track '" + track.getTitle() + "'");
 		trackTitleText.setText(track.getTitle());
+		artistText.setText(track.getCreator());
 	}
 
 	private void handle_play_exception(Throwable t) {
 		
-	}
-	
-	public void hideProgressIndicator() {
-		progressDialog.dismiss();
-	}
-
-	public void showProgressIndicator() {
-		String title = getResources().getString(R.string.authProgressTitle);
-		String message = getResources().getString(R.string.authProgressMessage);
-		progressDialog = ProgressDialog.show(this, title, message, true);
 	}
 	
 	protected void setHeaderResource(int resId) {
