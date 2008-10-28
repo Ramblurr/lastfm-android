@@ -231,14 +231,7 @@ implements AsyncCallback<Station>
 	public void onSuccess(Station result) {
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());	
-		radio.play(null, new AsyncCallback<RadioTrack>() {
-			public void onFailure(Throwable t) {
-				handle_play_exception(t);
-			}
-			public void onSuccess(RadioTrack result) {
-				onTrackPlaying(result);
-			}
-		});
+		radio.playNext();
 	}
 	
 	private void onTrackPlaying(RadioTrack track) {

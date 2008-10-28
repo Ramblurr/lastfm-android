@@ -24,13 +24,14 @@ class TrackProvider {
 	};
 	
 	private void setCurrentPlaylist(RadioPlayList playlist) {
+		Log.i("setCurrentPlaylist");
 		currentPlaylist = playlist;
 		currentTrackIndex = -1;
 	}
 
 	private RadioTrack getNextTrack() {
 		++currentTrackIndex;
-		if (currentTrackIndex >= currentPlaylist.getTracks().length) {
+		if (currentPlaylist != null && currentTrackIndex >= currentPlaylist.getTracks().length) {
 			currentPlaylist = null;
 		}
 		if (currentPlaylist == null) {
@@ -66,8 +67,10 @@ class TrackProvider {
 	};
 
 	private void getNextTrackAsync(AsyncCallback<RadioTrack> trackReceiver) {
+		Log.i("getNextTrackAsync");
 		AsyncCallback<RadioPlayList> resultReceiver = new TrackReceiverAdapter(trackReceiver);
 		resultReceiver = new AsyncCallbackPair<RadioPlayList>(playlistResult, resultReceiver);
+		getPlaylist(null, resultReceiver);
 	}
 	
 	
