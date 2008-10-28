@@ -33,7 +33,7 @@ public class GetRadioPlaylistTask implements GUITask {
 	}
 
 	public void after_execute() {
-		resultReceiver.resultObtained(playlist);
+		resultReceiver.onSuccess(playlist);
 	}
 }
 

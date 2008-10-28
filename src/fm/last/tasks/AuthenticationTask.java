@@ -32,6 +32,6 @@ public class AuthenticationTask implements GUITask {
   }
 
   public void after_execute() {
-    resultReceiver.resultObtained(session);
+    resultReceiver.onSuccess(session);
   }
 }

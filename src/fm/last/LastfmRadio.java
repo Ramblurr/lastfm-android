@@ -31,13 +31,13 @@ public class LastfmRadio {
 		public void handle_exception(Throwable t) {
 		}
 
-		public void resultObtained(Session result) {
+		public void onSuccess(Session result) {
 			setSession(result);
 		}
 	};
 	
 	private ResultReceiver<Station> stationResult = new ResultReceiver<Station>() {
-		public void resultObtained(Station station) {
+		public void onSuccess(Station station) {
 			setCurrentStation(station);
 		}
 		
@@ -46,7 +46,7 @@ public class LastfmRadio {
 	};
 	
 	private ResultReceiver<RadioPlayList> playlistResult = new ResultReceiver<RadioPlayList>() {
-		public void resultObtained(RadioPlayList result) {
+		public void onSuccess(RadioPlayList result) {
 			setCurrentPlaylist(result);
 		}
 
@@ -105,7 +105,7 @@ public class LastfmRadio {
 		if (track == null) {
 			playNext(progressIndicator, trackReceiver);
 		} else {
-			trackReceiver.resultObtained(track);
+			trackReceiver.onSuccess(track);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class LastfmRadio {
 			public void handle_exception(Throwable t) {
 				trackReceiver.handle_exception(t);
 			}
-			public void resultObtained(RadioPlayList result) {
+			public void onSuccess(RadioPlayList result) {
 				currentPlaylist = result;
 				play(progressIndicator, trackReceiver);
 			}
@@ -138,7 +138,7 @@ public class LastfmRadio {
 	private void streamNext(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
 		moveToNextTrack();
 		RadioTrack track = getCurrentTrack();
-		trackReceiver.resultObtained(track);
+		trackReceiver.onSuccess(track);
 	}
 	
 	public Session getSession() {

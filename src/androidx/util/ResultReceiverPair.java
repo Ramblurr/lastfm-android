@@ -14,8 +14,8 @@ public final class ResultReceiverPair<T> implements ResultReceiver<T> {
 		secondResultReceiver.handle_exception(t);
 	}
 
-	public void resultObtained(T result) {
-		firstResultReceiver.resultObtained(result);
-		secondResultReceiver.resultObtained(result);
+	public void onSuccess(T result) {
+		firstResultReceiver.onSuccess(result);
+		secondResultReceiver.onSuccess(result);
 	}
 }

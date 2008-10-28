@@ -35,6 +35,6 @@ public class TuneRadioTask implements GUITask {
 	}
 
 	public void after_execute() {
-		resultReceiver.resultObtained(radioStation);
+		resultReceiver.onSuccess(radioStation);
 	}
 }

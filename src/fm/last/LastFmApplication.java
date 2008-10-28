@@ -37,7 +37,7 @@ public class LastFmApplication extends Application {
 				public void handle_exception(Throwable t) {
 				}
 				// if we get a valid session, we should save the credentials
-				public void resultObtained(Session result) {
+				public void onSuccess(Session result) {
 					saveCredentials(username, md5Password);
 				}
 			});

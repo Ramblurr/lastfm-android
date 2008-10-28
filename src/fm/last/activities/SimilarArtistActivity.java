@@ -126,7 +126,7 @@ implements ResultReceiver<Station>
 		
 		Station station = radio.getCurrentStation();
 		if (station != null) {
-			resultObtained(station);
+			onSuccess(station);
 		}
 	}
 
@@ -244,14 +244,14 @@ implements ResultReceiver<Station>
 	 * This method gets called when the radio has tuned into a new station, or
 	 * this activity is created and the radio is already tuned to a station.
 	 */
-	public void resultObtained(Station result) {
+	public void onSuccess(Station result) {
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());	
 		radio.play(null, new ResultReceiver<RadioTrack>() {
 			public void handle_exception(Throwable t) {
 				handle_play_exception(t);
 			}
-			public void resultObtained(RadioTrack result) {
+			public void onSuccess(RadioTrack result) {
 				onTrackPlaying(result);
 			}
 		});

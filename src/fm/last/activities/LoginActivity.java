@@ -64,7 +64,7 @@ public class LoginActivity extends Activity implements
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
 	}
 
-	public void resultObtained(Session session) {
+	public void onSuccess(Session session) {
 		Log.i("LoginActivity: We've got a session! session.key=" + session.getKey());
 		
 		// Save our credentials to our SharedPreferences

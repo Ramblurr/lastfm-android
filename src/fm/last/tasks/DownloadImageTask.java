@@ -8,15 +8,16 @@ import fm.last.util.UrlUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import androidx.util.GUITask;
-import androidx.util.ResultReceiver;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class DownloadImageTask implements GUITask {
 	private static final int MAX_IMAGE_BYTES = 2000000;
 	private URL url;
-	private ResultReceiver<Bitmap> resultReceiver;
+	private AsyncCallback<Bitmap> resultReceiver;
 	private Bitmap bitmap;
 	
-	public DownloadImageTask(URL url, ResultReceiver<Bitmap> resultReceiver) {
+	public DownloadImageTask(URL url, AsyncCallback<Bitmap> resultReceiver) {
 		this.url = url;
 		this.resultReceiver = resultReceiver;
 	}
@@ -30,10 +31,10 @@ public class DownloadImageTask implements GUITask {
 	}
 
 	public void handle_exception(Throwable t) {
-		resultReceiver.handle_exception(t);
+		resultReceiver.onFailure(t);
 	}
 
 	public void after_execute() {
-		resultReceiver.resultObtained(bitmap);
+		resultReceiver.onSuccess(bitmap);
 	}
 }
