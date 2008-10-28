@@ -1,10 +1,16 @@
 package fm.last;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import android.media.MediaPlayer;
 import android.net.Uri;
 import androidx.util.AsyncCallbackPair;
 import androidx.util.GUITaskQueue;
+import androidx.util.MediaPlayerX;
 import androidx.util.ProgressIndicator;
 import fm.last.api.RadioPlayList;
 import fm.last.api.RadioTrack;
@@ -13,6 +19,7 @@ import fm.last.api.Station;
 import fm.last.tasks.AuthenticationTask;
 import fm.last.tasks.GetRadioPlaylistTask;
 import fm.last.tasks.TuneRadioTask;
+import fm.last.util.UrlUtil;
 
 public class LastfmRadio {
 	private static LastfmRadio instance;
@@ -27,6 +34,24 @@ public class LastfmRadio {
 	private Session session;
 	private Station currentStation;
 	private RadioPlayList currentPlaylist;
+	private MediaPlayerX mediaPlayer;
+	private int currentTrackIndex = -1;
+	
+	private MediaPlayerX.Listener playableListener =
+		new MediaPlayerX.Listener() {
+			public void onPaused(MediaPlayerX mp, String url, int where) {
+				trackReady(url, where);
+			}
+
+			public void onPlay(MediaPlayerX mp, String url) {
+			}
+
+	};
+	
+	private LastfmRadio() {
+		mediaPlayer = new MediaPlayerX(new MediaPlayer(), playableListener);
+	}
+	
 	
 	private AsyncCallback<Session> sessionResult = new AsyncCallback<Session>() {
 		public void onFailure(Throwable t) {
@@ -55,9 +80,6 @@ public class LastfmRadio {
 		}
 	};
 	
-	private LastfmRadio() {
-	}
-	
 	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, AsyncCallback<Session> resultReceiver) {
 		// start grabbing a session key in the background
 		// let the radio be notified of the session
@@ -71,22 +93,19 @@ public class LastfmRadio {
 	
 	private void setCurrentPlaylist(RadioPlayList playlist) {
 		currentPlaylist = playlist;
+		currentTrackIndex = -1;
 	}
 
 	public RadioTrack getCurrentTrack() {
-		if (currentPlaylist == null) {
+		if (currentPlaylist == null || currentTrackIndex == -1 || currentTrackIndex >= currentPlaylist.getTracks().length) {
 			return null;
 		}
-		RadioTrack[] tracks = currentPlaylist.getTracks();
-		if (tracks.length == 0) {
-			Log.d("LastfmRadio.getCurrentTrack(): 0 tracks returned");
-			return null;
-		}
-		return currentPlaylist.getTracks()[0];
+		return currentPlaylist.getTracks()[currentTrackIndex];
 	}
 	
+	
 	private void moveToNextTrack() {
-		// no-op for now
+		++currentTrackIndex; 
 	}
 	
 	public Station getCurrentStation() {
@@ -99,6 +118,24 @@ public class LastfmRadio {
 	
 	public boolean isPlaying() {
 		return (getCurrentTrack() != null);
+	}
+
+	private void trackReady(final String url, int where) {
+		if (where == MediaPlayerX.TRACK_LOCATION_BEGINNING) {
+			mediaPlayer.play();
+		} else if (where == MediaPlayerX.TRACK_LOCATION_END) {
+			Log.i("we are at the end of " + url);
+			moveToNextTrack();
+			play(null, new AsyncCallback<RadioTrack>() {
+				public void onFailure(Throwable t) {
+					Log.e(t);
+				}
+
+				public void onSuccess(RadioTrack result) {
+					Log.i("playing next track '" + result.getTitle() + "' by '" + result.getCreator()+"'");
+				}
+			});
+		}
 	}
 	
 	public void play(ProgressIndicator progressIndicator, AsyncCallback<RadioTrack> trackReceiver) {
@@ -139,7 +176,20 @@ public class LastfmRadio {
 	private void streamNext(ProgressIndicator progressIndicator, AsyncCallback<RadioTrack> trackReceiver) {
 		moveToNextTrack();
 		RadioTrack track = getCurrentTrack();
-		trackReceiver.onSuccess(track);
+		if (track == null) {
+			throw new NullPointerException("no track!");
+		}
+		if (track.getLocationUrl() == null) {
+			throw new NullPointerException("No track url!");
+		}
+		URL url;
+		try {
+			url = UrlUtil.getRedirectedUrl(new URL(track.getLocationUrl()));
+			mediaPlayer.setDataSource(url.toExternalForm());
+			trackReceiver.onSuccess(track);
+		} catch (Exception e) {
+			Log.e(e);
+		}
 	}
 	
 	public Session getSession() {

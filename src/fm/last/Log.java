@@ -21,6 +21,6 @@ public class Log
 	
 	public static void e( Throwable e )
 	{
-		android.util.Log.e( TAG, e.toString() );
+		android.util.Log.e( TAG, "", e);
 	}
 }
