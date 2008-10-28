@@ -30,7 +30,7 @@ public class DownloadImageTask implements GUITask {
 		}
 	}
 
-	public void handle_exception(Throwable t) {
+	public void onFailure(Throwable t) {
 		resultReceiver.onFailure(t);
 	}
 

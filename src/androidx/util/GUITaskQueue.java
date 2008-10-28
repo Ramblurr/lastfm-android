@@ -68,9 +68,9 @@ public class GUITaskQueue {
 			delegate.executeNonGuiTask();
 		}
 
-		public void handle_exception(Throwable t) {
+		public void onFailure(Throwable t) {
 			progressIndicator.hideProgressIndicator();
-			delegate.handle_exception(t);
+			delegate.onFailure(t);
 		}
 
 		public void after_execute() {
@@ -106,7 +106,7 @@ public class GUITaskQueue {
       switch(msg.what) {
         case HANDLE_EXCEPTION:
           GUITaskWithSomething<Throwable> thingie = (GUITaskWithSomething<Throwable>) msg.obj;
-          thingie.guiTask.handle_exception(thingie.something);
+          thingie.guiTask.onFailure(thingie.something);
           break;
           
         case HANDLE_AFTER_EXECUTE:

@@ -28,8 +28,8 @@ public class GetRadioPlaylistTask implements GUITask {
 		playlist = server.getRadioPlayList(sk);
 	}
 
-	public void handle_exception(Throwable t) {
-		resultReceiver.handle_exception(t);
+	public void onFailure(Throwable t) {
+		resultReceiver.onFailure(t);
 	}
 
 	public void after_execute() {

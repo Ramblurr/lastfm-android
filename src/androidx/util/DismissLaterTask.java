@@ -20,7 +20,7 @@ public class DismissLaterTask implements GUITask {
 		dialog.dismiss();
 	}
 
-	public void handle_exception(Throwable t) {
+	public void onFailure(Throwable t) {
 		Log.e("androidx", "Exception!", t);
 	}
 }

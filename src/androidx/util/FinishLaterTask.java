@@ -38,7 +38,7 @@ public class FinishLaterTask implements GUITask {
 		}
 	}
 
-	public void handle_exception(Throwable t) {
+	public void onFailure(Throwable t) {
 		// TODO Auto-generated method stub
 		activity.setResult(Activity.RESULT_CANCELED);
 	}

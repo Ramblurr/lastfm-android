@@ -34,7 +34,7 @@ public class LastFmApplication extends Application {
 			// start grabbing a session key in the background
 			// let the radio be notified of the session
 			radio.obtainSession(null, username, md5Password, new ResultReceiver<Session>() {
-				public void handle_exception(Throwable t) {
+				public void onFailure(Throwable t) {
 				}
 				// if we get a valid session, we should save the credentials
 				public void onSuccess(Session result) {

@@ -27,8 +27,8 @@ public class AuthenticationTask implements GUITask {
     session = server.getMobileSession(username, authToken);
   }
 
-  public void handle_exception(Throwable t) {
-    resultReceiver.handle_exception(t);
+  public void onFailure(Throwable t) {
+    resultReceiver.onFailure(t);
   }
 
   public void after_execute() {

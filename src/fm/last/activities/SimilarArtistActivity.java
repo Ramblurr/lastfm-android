@@ -234,7 +234,7 @@ implements ResultReceiver<Station>
 		tuningProgressDialog.dismiss();
 	}
 
-	public void handle_exception(Throwable t) {
+	public void onFailure(Throwable t) {
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
@@ -248,7 +248,7 @@ implements ResultReceiver<Station>
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());	
 		radio.play(null, new ResultReceiver<RadioTrack>() {
-			public void handle_exception(Throwable t) {
+			public void onFailure(Throwable t) {
 				handle_play_exception(t);
 			}
 			public void onSuccess(RadioTrack result) {

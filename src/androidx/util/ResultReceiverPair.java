@@ -9,9 +9,9 @@ public final class ResultReceiverPair<T> implements ResultReceiver<T> {
 		this.secondResultReceiver = secondResultReceiver;
 	}
 	
-	public void handle_exception(Throwable t) {
-		firstResultReceiver.handle_exception(t);
-		secondResultReceiver.handle_exception(t);
+	public void onFailure(Throwable t) {
+		firstResultReceiver.onFailure(t);
+		secondResultReceiver.onFailure(t);
 	}
 
 	public void onSuccess(T result) {

@@ -57,7 +57,7 @@ public class LoginActivity extends Activity implements
 		LastfmRadio.getInstance().obtainSession(this, username, md5Password, this);
 	}
 
-	public void handle_exception(Throwable t) {
+	public void onFailure(Throwable t) {
 		// show an alert dialog for 2 seconds
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed

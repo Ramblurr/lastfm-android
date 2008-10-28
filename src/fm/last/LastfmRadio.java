@@ -28,7 +28,7 @@ public class LastfmRadio {
 	private RadioPlayList currentPlaylist;
 	
 	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
-		public void handle_exception(Throwable t) {
+		public void onFailure(Throwable t) {
 		}
 
 		public void onSuccess(Session result) {
@@ -41,7 +41,7 @@ public class LastfmRadio {
 			setCurrentStation(station);
 		}
 		
-		public void handle_exception(Throwable t) {
+		public void onFailure(Throwable t) {
 		}
 	};
 	
@@ -50,7 +50,7 @@ public class LastfmRadio {
 			setCurrentPlaylist(result);
 		}
 
-		public void handle_exception(Throwable t) {
+		public void onFailure(Throwable t) {
 		}
 	};
 	
@@ -125,8 +125,8 @@ public class LastfmRadio {
 	
 	private void fetchPlaylist(final ProgressIndicator progressIndicator, final ResultReceiver<RadioTrack> trackReceiver) {
 		getPlaylist(null, new ResultReceiver<RadioPlayList>() {
-			public void handle_exception(Throwable t) {
-				trackReceiver.handle_exception(t);
+			public void onFailure(Throwable t) {
+				trackReceiver.onFailure(t);
 			}
 			public void onSuccess(RadioPlayList result) {
 				currentPlaylist = result;
