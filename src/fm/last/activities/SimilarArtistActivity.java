@@ -2,7 +2,6 @@ package fm.last.activities;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-import fm.last.ImageLoader;
 import fm.last.LastFmApplication;
 import fm.last.LastfmRadio;
 import fm.last.Log;
@@ -45,6 +44,7 @@ import android.widget.TextView;
 import androidx.util.DialogUtil;
 import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
+import androidx.util.ImageLoader;
 import androidx.util.ProgressIndicator;
 
 public class SimilarArtistActivity extends Activity 
@@ -95,7 +95,7 @@ implements AsyncCallback<Station>
 			}
 		});
 
-		imageLoader = new ImageLoader(this);
+		imageLoader = ImageLoader.getInstance();
 		old_radio = new Radio();
 		old_radio.addRadioHandler(m_radioEventHandler);
 
@@ -136,26 +136,9 @@ implements AsyncCallback<Station>
 		}
 
 		public void onTrackStarted(TrackInfo track) {
-			setupUi(track);
 		}
 		
 	};
-
-	private void setupUi(TrackInfo t) {
-		TextView tv;
-		tv = (TextView) findViewById(R.id.artist);
-		tv.setText(t.artist());
-		tv = (TextView) findViewById(R.id.track_title);
-		tv.setText(t.title());
-
-		ImageView v = (ImageView) findViewById(R.id.album_art);
-		try {
-			imageLoader.loadImage(v, t.imageUrl());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	private Dialog createTunerDialog(final EditText similarArtistEditText) {
 		// create the text field we will show in the dialog
@@ -262,6 +245,7 @@ implements AsyncCallback<Station>
 		Log.i("Gonna play track '" + track.getTitle() + "'");
 		trackTitleText.setText(track.getTitle());
 		artistText.setText(track.getCreator());
+		imageLoader.loadImage(track.getImageUrl(), albumArtImage);
 	}
 
 	private void handle_play_exception(Throwable t) {

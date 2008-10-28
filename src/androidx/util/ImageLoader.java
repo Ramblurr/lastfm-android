@@ -1,9 +1,13 @@
 package androidx.util;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.WeakHashMap;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+import android.widget.ImageView;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -22,8 +26,48 @@ public class ImageLoader {
 	private ImageLoader() {
 		urlToBitmap = new WeakHashMap<String, Bitmap>();
 	}
+	
+	private static class ImageViewCallback implements AsyncCallback<Bitmap> {
+		private ImageView imageView;
+		private int errorImageResource;
+		
+		ImageViewCallback(ImageView _imageView, int _errorImageResource) {
+			imageView = _imageView;
+			errorImageResource = _errorImageResource;
+		}
+		
+		public void onSuccess(Bitmap result) {
+			imageView.setImageBitmap(result);
+		}
+
+		public void onFailure(Throwable t) {
+			imageView.setImageResource(errorImageResource);
+		}
+
+	};
+	
+	public void loadImage(String urlAsString, ImageView view ) {
+		loadImage(urlAsString, view, android.R.drawable.screen_background_dark);
+	}
+
+	public void loadImage(String urlAsString, ImageView view, int errorImageResource ) {
+		URL url = null;
+		if (urlAsString != null) {
+			try {
+				url = new URL(urlAsString);
+			} catch (MalformedURLException e) {
+				Log.e("androidx", "", e);
+			}
+		}
+		downloadImage(url, new ImageViewCallback(view, errorImageResource));
+	}
+	
 
 	public void downloadImage(URL url, AsyncCallback<Bitmap> callback) {
+		if (url == null) {
+			callback.onFailure(new IOException("Bad URL"));
+			return;
+		}
 		String urlAsString = url.toExternalForm();
 		Bitmap cachedBitmap = urlToBitmap.get(urlAsString);
 		if (cachedBitmap != null) {
