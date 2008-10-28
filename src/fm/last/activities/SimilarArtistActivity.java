@@ -1,5 +1,7 @@
 package fm.last.activities;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import fm.last.ImageLoader;
 import fm.last.LastFmApplication;
 import fm.last.LastfmRadio;
@@ -47,7 +49,7 @@ import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
 
 public class SimilarArtistActivity extends Activity 
-implements ResultReceiver<Station>
+implements AsyncCallback<Station>
 {
 	private Button tuneButton = null;
 	private EditText artistInputEdit = null;
@@ -247,7 +249,7 @@ implements ResultReceiver<Station>
 	public void onSuccess(Station result) {
 		TextView v = (TextView) findViewById(R.id.station_name);
 		v.setText(result.getName());	
-		radio.play(null, new ResultReceiver<RadioTrack>() {
+		radio.play(null, new AsyncCallback<RadioTrack>() {
 			public void onFailure(Throwable t) {
 				handle_play_exception(t);
 			}

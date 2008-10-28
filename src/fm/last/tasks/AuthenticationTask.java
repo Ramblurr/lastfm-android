@@ -1,5 +1,7 @@
 package fm.last.tasks;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
@@ -12,10 +14,10 @@ public class AuthenticationTask implements GUITask {
   private String username;
   private String md5Password;
 //  private RadioHandshake m_loginTest;
-  private ResultReceiver<Session> resultReceiver;
+  private AsyncCallback<Session> resultReceiver;
   private Session session;
 
-  public AuthenticationTask(String username, String md5Password, ResultReceiver<Session> resultReceiver) {
+  public AuthenticationTask(String username, String md5Password, AsyncCallback<Session> resultReceiver) {
     this.username = username;
     this.md5Password = md5Password;
     this.resultReceiver = resultReceiver;

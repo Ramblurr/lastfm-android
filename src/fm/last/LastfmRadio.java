@@ -1,6 +1,9 @@
 package fm.last;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import android.net.Uri;
+import androidx.util.AsyncCallbackPair;
 import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
 import androidx.util.ResultReceiver;
@@ -27,7 +30,7 @@ public class LastfmRadio {
 	private Station currentStation;
 	private RadioPlayList currentPlaylist;
 	
-	private ResultReceiver<Session> sessionResult = new ResultReceiver<Session>() {
+	private AsyncCallback<Session> sessionResult = new AsyncCallback<Session>() {
 		public void onFailure(Throwable t) {
 		}
 
@@ -36,7 +39,7 @@ public class LastfmRadio {
 		}
 	};
 	
-	private ResultReceiver<Station> stationResult = new ResultReceiver<Station>() {
+	private AsyncCallback<Station> stationResult = new AsyncCallback<Station>() {
 		public void onSuccess(Station station) {
 			setCurrentStation(station);
 		}
@@ -45,7 +48,7 @@ public class LastfmRadio {
 		}
 	};
 	
-	private ResultReceiver<RadioPlayList> playlistResult = new ResultReceiver<RadioPlayList>() {
+	private AsyncCallback<RadioPlayList> playlistResult = new AsyncCallback<RadioPlayList>() {
 		public void onSuccess(RadioPlayList result) {
 			setCurrentPlaylist(result);
 		}
@@ -57,11 +60,11 @@ public class LastfmRadio {
 	private LastfmRadio() {
 	}
 	
-	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, ResultReceiver<Session> resultReceiver) {
+	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, AsyncCallback<Session> resultReceiver) {
 		// start grabbing a session key in the background
 		// let the radio be notified of the session
 		GUITaskQueue.getInstance().addTask(progressIndicator,
-				new AuthenticationTask(username, md5password, new ResultReceiverPair<Session>(sessionResult, resultReceiver)));
+				new AuthenticationTask(username, md5password, new AsyncCallbackPair<Session>(sessionResult, resultReceiver)));
 	}
 	
 	private void setCurrentStation(Station station) {
@@ -100,7 +103,7 @@ public class LastfmRadio {
 		return (getCurrentTrack() != null);
 	}
 	
-	public void play(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+	public void play(ProgressIndicator progressIndicator, AsyncCallback<RadioTrack> trackReceiver) {
 		RadioTrack track = getCurrentTrack();
 		if (track == null) {
 			playNext(progressIndicator, trackReceiver);
@@ -115,7 +118,7 @@ public class LastfmRadio {
 	 * @param progressIndicator
 	 * @param trackReceiver
 	 */
-	private void playNext(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+	private void playNext(ProgressIndicator progressIndicator, AsyncCallback<RadioTrack> trackReceiver) {
 		if (currentPlaylist == null) {
 			fetchPlaylist(progressIndicator, trackReceiver);
 		} else {
@@ -123,8 +126,8 @@ public class LastfmRadio {
 		}
 	}	
 	
-	private void fetchPlaylist(final ProgressIndicator progressIndicator, final ResultReceiver<RadioTrack> trackReceiver) {
-		getPlaylist(null, new ResultReceiver<RadioPlayList>() {
+	private void fetchPlaylist(final ProgressIndicator progressIndicator, final AsyncCallback<RadioTrack> trackReceiver) {
+		getPlaylist(null, new AsyncCallback<RadioPlayList>() {
 			public void onFailure(Throwable t) {
 				trackReceiver.onFailure(t);
 			}
@@ -135,7 +138,7 @@ public class LastfmRadio {
 		});
 	}
 	
-	private void streamNext(ProgressIndicator progressIndicator, ResultReceiver<RadioTrack> trackReceiver) {
+	private void streamNext(ProgressIndicator progressIndicator, AsyncCallback<RadioTrack> trackReceiver) {
 		moveToNextTrack();
 		RadioTrack track = getCurrentTrack();
 		trackReceiver.onSuccess(track);
@@ -145,14 +148,14 @@ public class LastfmRadio {
 		return session;
 	}
 	
-	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist, ResultReceiver<Station> resultReceiver) {
+	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist, AsyncCallback<Station> resultReceiver) {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, new ResultReceiverPair<Station>(stationResult, resultReceiver)));
+		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, new AsyncCallbackPair<Station>(stationResult, resultReceiver)));
 	}
 	
-	public void getPlaylist(ProgressIndicator progressIndicator, ResultReceiver<RadioPlayList> resultReceiver) {
+	public void getPlaylist(ProgressIndicator progressIndicator, AsyncCallback<RadioPlayList> resultReceiver) {
 		GUITaskQueue.getInstance().addTask(progressIndicator
-				, new GetRadioPlaylistTask(new ResultReceiverPair<RadioPlayList>(playlistResult, resultReceiver)));
+				, new GetRadioPlaylistTask(new AsyncCallbackPair<RadioPlayList>(playlistResult, resultReceiver)));
 		
 	}
 }

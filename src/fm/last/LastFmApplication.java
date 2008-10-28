@@ -2,6 +2,8 @@ package fm.last;
 
 import java.io.FileNotFoundException;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import fm.last.api.Session;
 import fm.last.tasks.AuthenticationTask;
 
@@ -33,7 +35,7 @@ public class LastFmApplication extends Application {
 		} else {
 			// start grabbing a session key in the background
 			// let the radio be notified of the session
-			radio.obtainSession(null, username, md5Password, new ResultReceiver<Session>() {
+			radio.obtainSession(null, username, md5Password, new AsyncCallback<Session>() {
 				public void onFailure(Throwable t) {
 				}
 				// if we get a valid session, we should save the credentials

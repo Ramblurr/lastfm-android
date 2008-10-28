@@ -1,5 +1,7 @@
 package fm.last.activities;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -20,7 +22,7 @@ import fm.last.api.MD5;
 import fm.last.api.Session;
 
 public class LoginActivity extends Activity implements
-		ResultReceiver<Session>, ProgressIndicator {
+ AsyncCallback<Session>, ProgressIndicator {
 	private EditText userField, passwordField;
 	ProgressDialog progressDialog = null;
 	private String md5Password;

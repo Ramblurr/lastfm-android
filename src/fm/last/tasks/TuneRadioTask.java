@@ -1,5 +1,7 @@
 package fm.last.tasks;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import fm.last.LastfmRadio;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.api.LastFmServer;
@@ -12,13 +14,13 @@ public class TuneRadioTask implements GUITask {
 	private String station;
 	private Station radioStation;
 	private LastFmServer server;
-	private ResultReceiver<Station> resultReceiver;
+	private AsyncCallback<Station> resultReceiver;
 	
 	private TuneRadioTask() {
 		server = AndroidLastFmServerFactory.getServer();
 	}
 	
-	public TuneRadioTask(String station, ResultReceiver<Station> resultReceiver) {
+	public TuneRadioTask(String station, AsyncCallback<Station> resultReceiver) {
 		this();
 		this.station = station;
 		this.resultReceiver = resultReceiver;
