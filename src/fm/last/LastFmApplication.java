@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import androidx.util.GUITaskQueue;
-import androidx.util.ResultReceiver;
 
 public class LastFmApplication extends Application {
 	static private LastFmApplication instance;

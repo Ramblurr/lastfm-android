@@ -46,7 +46,6 @@ import androidx.util.DialogUtil;
 import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
-import androidx.util.ResultReceiver;
 
 public class SimilarArtistActivity extends Activity 
 implements AsyncCallback<Station>

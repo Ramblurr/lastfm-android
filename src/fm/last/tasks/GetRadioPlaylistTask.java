@@ -8,7 +8,6 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.RadioPlayList;
 import androidx.util.GUITask;
-import androidx.util.ResultReceiver;
 
 public class GetRadioPlaylistTask implements GUITask {
 	private LastFmServer server;

@@ -12,7 +12,6 @@ import androidx.util.DialogUtil;
 import androidx.util.FinishLaterTask;
 import androidx.util.GUITaskQueue;
 import androidx.util.ProgressIndicator;
-import androidx.util.ResultReceiver;
 
 import fm.last.R;
 import fm.last.Log;

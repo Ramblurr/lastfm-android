@@ -8,7 +8,6 @@ import fm.last.api.MD5;
 import fm.last.api.Session;
 //import fm.last.radio.RadioHandshake;
 import androidx.util.GUITask;
-import androidx.util.ResultReceiver;
 
 public class AuthenticationTask implements GUITask {
   private String username;
