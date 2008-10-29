@@ -3,6 +3,8 @@ package fm.last;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -31,11 +33,75 @@ public class LastfmRadio {
 		return instance;
 	}
 
+	public static interface Listener {
+			void onRadioStarted();
+			void onRadioStopped();
+			void onStationChanged(Station station);
+			void onFetchingTrack(RadioTrack track);
+			void onTrackStarted(RadioTrack track);
+			void onTrackFinished(RadioTrack track);
+	};
+	
+	private static class ListenerList implements Listener {
+		private List<Listener> listeners;
+		
+		ListenerList() {
+			listeners = new ArrayList<Listener>();
+		}
+		
+		void addListener(Listener listener) {
+			if (!listeners.contains(listener)) {
+				listeners.add(listener);
+			}
+		}
+		
+		void removeListener(Listener listener) {
+			listeners.remove(listener);
+		}
+		
+		public void onRadioStarted() {
+			for (Listener l : listeners) {
+				l.onRadioStarted();
+			}
+		}
+
+		public void onRadioStopped() {
+			for (Listener l : listeners) {
+				l.onRadioStopped();
+			}
+		}
+
+		public void onStationChanged(Station station) {
+			for (Listener l : listeners) {
+				l.onStationChanged(station);
+			}
+		}
+
+		public void onTrackFinished(RadioTrack track) {
+			for (Listener l : listeners) {
+				l.onTrackFinished(track);
+			}
+		}
+
+		public void onTrackStarted(RadioTrack track) {
+			for (Listener l : listeners) {
+				l.onTrackStarted(track);
+			}
+		}
+
+		public void onFetchingTrack(RadioTrack track) {
+			for (Listener l : listeners) {
+				l.onFetchingTrack(track);
+			}
+		}
+	};
+	
 	private Session session;
 	private Station currentStation;
 	private MediaPlayerX mediaPlayer;
 	private TrackProvider trackProvider;
 	private RadioTrack currentTrack;
+	private ListenerList listeners;
 	
 	private MediaPlayerX.Listener playableListener =
 		new MediaPlayerX.Listener() {
@@ -81,6 +147,15 @@ public class LastfmRadio {
 	private LastfmRadio() {
 		mediaPlayer = new MediaPlayerX(new MediaPlayer(), playableListener);
 		trackProvider = new TrackProvider();
+		listeners = new ListenerList();
+	}
+	
+	public void addListener(Listener listener) {
+		listeners.addListener(listener);
+	}
+	
+	public void removeListener(Listener listener) {
+		listeners.removeListener(listener);
 	}
 	
 	public void obtainSession(ProgressIndicator progressIndicator, String username, String md5password, AsyncCallback<Session> resultReceiver) {
@@ -90,8 +165,13 @@ public class LastfmRadio {
 				new AuthenticationTask(username, md5password, new AsyncCallbackPair<Session>(sessionResult, resultReceiver)));
 	}
 	
+	/**
+	 * This is called when a new station is tuned into
+	 * @param station
+	 */
 	private void setCurrentStation(Station station) {
 		currentStation = station;
+		listeners.onStationChanged(station);
 	}
 		
 	public RadioTrack getCurrentTrack() {
@@ -114,8 +194,10 @@ public class LastfmRadio {
 		if (where == MediaPlayerX.TRACK_LOCATION_BEGINNING) {
 			Log.i("trackReady() - beginning");
 			mediaPlayer.play();
+			listeners.onTrackStarted(currentTrack);
 		} else if (where == MediaPlayerX.TRACK_LOCATION_END) {
 			Log.i("we are at the end of " + url);
+			listeners.onTrackFinished(currentTrack);
 			playNext();
 		}
 	}
@@ -130,6 +212,7 @@ public class LastfmRadio {
 		try {
 			url = UrlUtil.getRedirectedUrl(new URL(currentTrack.getLocationUrl()));
 			mediaPlayer.setDataSource(url.toExternalForm());
+			listeners.onFetchingTrack(currentTrack);
 		} catch (Exception e) {
 			Log.e(e);
 		}
@@ -150,9 +233,15 @@ public class LastfmRadio {
 		return session;
 	}
 	
-	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist, AsyncCallback<Station> resultReceiver) {
+	/**
+	 * Tune to a station which plays music similar to the given artist.
+	 * 
+	 * @param progressIndicator
+	 * @param artist
+	 */
+	public void tuneToSimilarArtist(ProgressIndicator progressIndicator, String artist) {
 		String station = "lastfm://artist/" + Uri.encode( artist ) + "/similarartists";
-		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, new AsyncCallbackPair<Station>(stationResult, resultReceiver)));
+		GUITaskQueue.getInstance().addTask(progressIndicator, new TuneRadioTask(station, stationResult));
 	}
 	
 }

@@ -1,18 +1,13 @@
 package fm.last.activities;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import fm.last.LastFmApplication;
 import fm.last.LastfmRadio;
 import fm.last.Log;
 import fm.last.R;
 import fm.last.TrackInfo;
-import fm.last.api.Artist;
 import fm.last.api.RadioTrack;
 import fm.last.api.Station;
 import fm.last.radio.Radio;
 import fm.last.radio.RadioEventHandler;
-import fm.last.tasks.TuneRadioTask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -22,7 +17,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,7 +42,7 @@ import androidx.util.ImageLoader;
 import androidx.util.ProgressIndicator;
 
 public class SimilarArtistActivity extends Activity 
-implements AsyncCallback<Station>
+implements LastfmRadio.Listener
 {
 	private Button tuneButton = null;
 	private EditText artistInputEdit = null;
@@ -74,6 +68,8 @@ implements AsyncCallback<Station>
 		super.onCreate(icicle);
 		// get our one-and-only radio instance
 		radio = LastfmRadio.getInstance();
+		// we listen to radio events
+		radio.addListener(this);
 
 		setContentView(R.layout.similar_artist);
 		
@@ -87,7 +83,6 @@ implements AsyncCallback<Station>
 		similarArtistEditText = new EditText(this);
 		tunerDialog = createTunerDialog(similarArtistEditText);
 		
-//		setHeaderResource(R.layout.similar_artist_radio_partial);
 		tuneButton = (Button) findViewById(R.id.tune);
 		tuneButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -127,7 +122,7 @@ implements AsyncCallback<Station>
 		
 		Station station = radio.getCurrentStation();
 		if (station != null) {
-			onSuccess(station);
+			onStationChanged(station);
 		}
 	}
 
@@ -195,7 +190,7 @@ implements AsyncCallback<Station>
 			return;
 		}
 		Log.i("Tuning-in to '" + artist + "'");
-		LastfmRadio.getInstance().tuneToSimilarArtist(tuneToSimilarArtistProgress, artist, this);
+		LastfmRadio.getInstance().tuneToSimilarArtist(tuneToSimilarArtistProgress, artist);
 	}
 	
 	private ProgressIndicator tuneToSimilarArtistProgress = new ProgressIndicator() {
@@ -222,27 +217,6 @@ implements AsyncCallback<Station>
 		DialogUtil.showAlertDialog(this, R.string.badAuthTitle, R.string.badAuth, R.drawable.icon, 2000);
 		// call finish on this activity after the alert dialog is dismissed
 		GUITaskQueue.getInstance().addTask(new FinishLaterTask(this, RESULT_CANCELED, 0));
-	}
-
-	/**
-	 * This method gets called when the radio has tuned into a new station, or
-	 * this activity is created and the radio is already tuned to a station.
-	 */
-	public void onSuccess(Station result) {
-		TextView v = (TextView) findViewById(R.id.station_name);
-		v.setText(result.getName());	
-		radio.playNext();
-	}
-	
-	private void onTrackPlaying(RadioTrack track) {
-		Log.i("Gonna play track '" + track.getTitle() + "'");
-		trackTitleText.setText(track.getTitle());
-		artistText.setText(track.getCreator());
-		imageLoader.loadImage(track.getImageUrl(), albumArtImage);
-	}
-
-	private void handle_play_exception(Throwable t) {
-		
 	}
 	
 	protected void setHeaderResource(int resId) {
@@ -280,6 +254,41 @@ implements AsyncCallback<Station>
 		return true;
 	}
 
+	public void onRadioStarted() {
+		// TODO Auto-generated method stub
+		
+	}
 
+	public void onRadioStopped() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * This method gets called when the radio has tuned into a new station, or
+	 * this activity is created and the radio is already tuned to a station.
+	 */
+	public void onStationChanged(Station station) {
+		TextView v = (TextView) findViewById(R.id.station_name);
+		v.setText(station.getName());	
+		radio.playNext();
+	}
+
+	public void onTrackFinished(RadioTrack track) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onTrackStarted(RadioTrack track) {
+		Log.i("Gonna play track '" + track.getTitle() + "'");
+		trackTitleText.setText(track.getTitle());
+	}
+
+	public void onFetchingTrack(RadioTrack track) {
+		Log.i("Fetching '" + track.getTitle() + "'");
+		trackTitleText.setText("Fetching '" + track.getTitle() + "'");
+		artistText.setText(track.getCreator());
+		imageLoader.loadImage(track.getImageUrl(), albumArtImage);
+	}
 
 }
