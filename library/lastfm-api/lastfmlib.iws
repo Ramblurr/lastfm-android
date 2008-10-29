@@ -16,9 +16,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="" />
-    <list name="Ignore" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lastfmlib.iws" afterPath="$PROJECT_DIR$/lastfmlib.iws" />
-    </list>
+    <list name="Ignore" comment="" />
     <ignored path="lastfmlib.iws" />
     <ignored path=".idea/workspace.xml" />
   </component>
@@ -97,62 +95,7 @@
     <favorites_list name="lastfmlib" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="RadioFunctions.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/RadioFunctions.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="39" selection-start="1045" selection-end="1045" vertical-scroll-proportion="0.027842227">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LastFmServerImpl.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/LastFmServerImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="119" column="74" selection-start="3394" selection-end="3394" vertical-scroll-proportion="0.63228697">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UrlUtil.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/fm/last/util/UrlUtil.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="140" column="55" selection-start="4255" selection-end="4255" vertical-scroll-proportion="0.47309417">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HttpURLConnection.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/src.jar!/src/java/net/HttpURLConnection.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="53" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.02690583">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TestMain.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/fm/last/TestMain.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="77" column="17" selection-start="2285" selection-end="2285" vertical-scroll-proportion="0.8206278">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LastFmServer.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/fm/last/api/LastFmServer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="47" column="30" selection-start="1155" selection-end="1155" vertical-scroll-proportion="1.1704036">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -203,7 +146,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -217,33 +160,15 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="lastfmlib" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="lastfmlib" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api/src/fm/last" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -257,49 +182,19 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api/src" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api/src/fm/last" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last/api" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="lastfmlib" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="lastfmlib" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last/api" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/jennings/mjlastfm/src/fm/last/api/impl" />
+          <option name="myItemId" value="PsiDirectory:/Users/jennings/android-lastfm-branches/trunk/library/lastfm-api/src/fm/last/api" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -317,8 +212,8 @@
       <hideEmptyPackages />
       <abbreviatePackageNames />
       <showStructure ProjectPane="false" />
-      <autoscrollToSource />
-      <autoscrollFromSource />
+      <autoscrollToSource ProjectPane="true" />
+      <autoscrollFromSource ProjectPane="true" />
       <sortByType />
     </navigator>
   </component>
@@ -344,28 +239,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.TestMain">
-    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
-      <module name="" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="ADDITIONAL_CLASS_PATH" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="wholeProject" />
-      </option>
-      <envs />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -411,12 +284,27 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
+    <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="ADDITIONAL_CLASS_PATH" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="wholeProject" />
+      </option>
+      <envs />
+      <method>
+        <option name="Make" value="true" />
+      </method>
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
       <module name="" />
@@ -429,6 +317,13 @@
       <option name="VM_PARAMETERS" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
     </configuration>
     <configuration default="false" name="TestMain" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="fm.last.TestMain" />
@@ -508,7 +403,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="9" y="27" width="1440" height="803" extended-state="0" />
+    <frame x="3" y="22" width="1440" height="803" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
@@ -548,7 +443,7 @@
     <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
     <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed unused AsyncLastFmServer and AsyncCallback interface" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
@@ -559,7 +454,6 @@
     <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="deleted unused directory" />
     <MESSAGE value="Added ant script for building library" />
     <MESSAGE value="added getters to Session object" />
     <MESSAGE value="first stab at &quot;radio&quot; functions" />
@@ -584,6 +478,7 @@
     <MESSAGE value="added method UrlUtil.doGetAndReturnBytes" />
     <MESSAGE value="Checked in project file" />
     <MESSAGE value="Ignore" />
+    <MESSAGE value="Removed unused AsyncLastFmServer and AsyncCallback interface" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -624,20 +519,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/SessionBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="13" selection-start="817" selection-end="817" vertical-scroll-proportion="0.2690583">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/RadioTrackBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="30" selection-start="797" selection-end="814" vertical-scroll-proportion="0.24215247">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/fm/last/api/RadioTrack.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="68" column="59" selection-start="2486" selection-end="2486" vertical-scroll-proportion="0.19257541">
@@ -696,42 +577,49 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/RadioFunctions.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="39" selection-start="1045" selection-end="1045" vertical-scroll-proportion="0.027842227">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/src.jar!/src/java/net/HttpURLConnection.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="53" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.02690583">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/fm/last/TestMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="77" column="17" selection-start="2285" selection-end="2285" vertical-scroll-proportion="0.8206278">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/fm/last/api/LastFmServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="47" column="30" selection-start="1155" selection-end="1155" vertical-scroll-proportion="1.1704036">
+        <state line="35" column="39" selection-start="1045" selection-end="1045" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/fm/last/api/impl/LastFmServerImpl.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="74" selection-start="3394" selection-end="3394" vertical-scroll-proportion="0.63228697">
+        <state line="119" column="74" selection-start="3394" selection-end="3394" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/src.jar!/src/java/net/HttpURLConnection.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="53" selection-start="1139" selection-end="1139" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fm/last/TestMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="17" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/fm/last/api/LastFmServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="47" column="30" selection-start="1155" selection-end="1155" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/fm/last/util/UrlUtil.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="140" column="55" selection-start="4255" selection-end="4255" vertical-scroll-proportion="0.47309417">
+        <state line="140" column="55" selection-start="4255" selection-end="4255" vertical-scroll-proportion="0.02690583">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/gwt/user/client/rpc/AsyncCallback.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="17" selection-start="672" selection-end="672" vertical-scroll-proportion="0.24060151">
           <folding />
         </state>
       </provider>
