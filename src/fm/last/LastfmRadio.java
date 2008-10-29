@@ -1,7 +1,6 @@
 package fm.last;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +10,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import androidx.util.AsyncCallbackPair;
+import androidx.util.DoLater;
 import androidx.util.GUITaskQueue;
 import androidx.util.MediaPlayerX;
 import androidx.util.ProgressIndicator;
-import fm.last.api.RadioPlayList;
 import fm.last.api.RadioTrack;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.tasks.AuthenticationTask;
-import fm.last.tasks.GetRadioPlaylistTask;
 import fm.last.tasks.TuneRadioTask;
 import fm.last.util.UrlUtil;
 
@@ -36,11 +34,22 @@ public class LastfmRadio {
 	public static interface Listener {
 			void onRadioStarted();
 			void onRadioStopped();
+			void onRadioTechnicalProblem();
 			void onStationChanged(Station station);
 			void onFetchingTrack(RadioTrack track);
-			void onTrackStarted(RadioTrack track);
+			void onTrackFetched(RadioTrack track, boolean started);
 			void onTrackFinished(RadioTrack track);
 	};
+	
+	
+	private static void remove(List list, Object o) {
+		for (int i = 0; i < list.size(); ++i) {
+			if (list.get(i) == o) {
+				list.remove(i);
+				return;
+			}
+		}
+	}
 	
 	private static class ListenerList implements Listener {
 		private List<Listener> listeners;
@@ -50,13 +59,12 @@ public class LastfmRadio {
 		}
 		
 		void addListener(Listener listener) {
-			if (!listeners.contains(listener)) {
-				listeners.add(listener);
-			}
+			removeListener(listener);
+			listeners.add(listener);
 		}
 		
 		void removeListener(Listener listener) {
-			listeners.remove(listener);
+			remove(listeners, listener);
 		}
 		
 		public void onRadioStarted() {
@@ -83,15 +91,21 @@ public class LastfmRadio {
 			}
 		}
 
-		public void onTrackStarted(RadioTrack track) {
+		public void onTrackFetched(RadioTrack track, boolean started) {
 			for (Listener l : listeners) {
-				l.onTrackStarted(track);
+				l.onTrackFetched(track, started);
 			}
 		}
 
 		public void onFetchingTrack(RadioTrack track) {
 			for (Listener l : listeners) {
 				l.onFetchingTrack(track);
+			}
+		}
+
+		public void onRadioTechnicalProblem() {
+			for (Listener l : listeners) {
+				l.onRadioTechnicalProblem();
 			}
 		}
 	};
@@ -102,6 +116,7 @@ public class LastfmRadio {
 	private TrackProvider trackProvider;
 	private RadioTrack currentTrack;
 	private ListenerList listeners;
+	private boolean playing;
 	
 	private MediaPlayerX.Listener playableListener =
 		new MediaPlayerX.Listener() {
@@ -170,12 +185,17 @@ public class LastfmRadio {
 	 * @param station
 	 */
 	private void setCurrentStation(Station station) {
+		Log.i("radio: got a new station - '" + station.getName() + "'");
 		currentStation = station;
 		listeners.onStationChanged(station);
 	}
 		
 	public RadioTrack getCurrentTrack() {
-		return currentTrack;
+		if (playing) {
+			return currentTrack;
+		} else {
+			return null;
+		}
 	}
 		
 	public Station getCurrentStation() {
@@ -187,18 +207,31 @@ public class LastfmRadio {
 	}
 	
 	public boolean isPlaying() {
-		return (getCurrentTrack() != null);
+		return playing;
 	}
-
+	
+	public void stopPlaying() {
+		if (playing) {
+			playing = false;
+			listeners.onRadioStopped();
+		}
+	}
+	
 	private void trackReady(final String url, int where) {
 		if (where == MediaPlayerX.TRACK_LOCATION_BEGINNING) {
 			Log.i("trackReady() - beginning");
-			mediaPlayer.play();
-			listeners.onTrackStarted(currentTrack);
+			if (playing) {
+				mediaPlayer.play();
+				listeners.onTrackFetched(currentTrack, true);
+			} else {
+				listeners.onTrackFetched(currentTrack, false);
+			}
 		} else if (where == MediaPlayerX.TRACK_LOCATION_END) {
 			Log.i("we are at the end of " + url);
 			listeners.onTrackFinished(currentTrack);
-			playNext();
+			if (playing) {
+				playNext();
+			}
 		}
 	}
 	
@@ -208,29 +241,98 @@ public class LastfmRadio {
 		if (currentTrack.getLocationUrl() == null) {
 			throw new NullPointerException("No track url!");
 		}
-		URL url;
+		String url = getLocationUrl(currentTrack);
 		try {
-			url = UrlUtil.getRedirectedUrl(new URL(currentTrack.getLocationUrl()));
-			mediaPlayer.setDataSource(url.toExternalForm());
+			mediaPlayer.setDataSource(url);
 			listeners.onFetchingTrack(currentTrack);
-		} catch (Exception e) {
-			Log.e(e);
+		} catch (IOException e) {
+			Log.e("trouble getting track", e);
 		}
 	}
 	
-	private void trackFailed(Throwable t) {
-		currentTrack = null;
-		Log.e(t);
+	private static String getLocationUrl(RadioTrack track) {
+		URL url = null;
+		try {
+			url = new URL(track.getLocationUrl());
+			if( url.getHost().equals( "play.last.fm" )) {
+				//This url is actually the ticketing url that redirects to a streamer. 
+				//Because the MediaPlayer object does not currently support 302 redirects,
+				//this has to be done manually.
+				//WARNING: if this system or host name changes in the future, this may break!
+				url = UrlUtil.getRedirectedUrl(url);
+			}
+		} catch (Exception e) {
+			Log.e(e);
+		}
+		return (url == null) ? null : url.toExternalForm();
 	}
 	
+	private class TryTrackAgain extends DoLater {
+		TryTrackAgain() {
+			// 5 seconds
+			super(5000);
+		}
+
+		@Override
+		public void execute() {
+			// the next line will cause trackReceived to be called (eventually)
+			trackProvider.getNextTrack(trackReceiver);			
+		}
+	};
+	
+	private TryTrackAgain tryTrackAgain = new TryTrackAgain();
+	
+	private void trackFailed(Throwable t) {
+		currentTrack = null;
+		Log.e("trackFailed", t);
+		// notify listeners of the technical glitch
+		listeners.onRadioTechnicalProblem();
+		if (playing) {
+			// if this radio is still on, try again to get the next track
+			// in a few seconds
+			GUITaskQueue.getInstance().addTask(tryTrackAgain);
+		}
+	}
 	
 	public void playNext() {
 		Log.i("playNext");
+		if (!playing) {
+			if (currentStation == null) {
+				throw new IllegalStateException("Not tuned to any stations");
+			}
+			playing = true;
+			listeners.onRadioStarted();
+		}
+		// the next line will cause trackReceived to be called (eventually)
 		trackProvider.getNextTrack(trackReceiver);
 	}
 	
 	public Session getSession() {
 		return session;
+	}
+	
+	/**
+	 * send appropriate events to all registered listeners so that they can
+	 * synchronize their GUIs
+	 */
+	public void sendEventsForListenerCreation() {
+		if (this.isPlaying()) {
+			listeners.onRadioStarted();
+		} else {
+			listeners.onRadioStopped();
+		}
+		Station station = getCurrentStation();
+		if (station != null) {
+			listeners.onStationChanged(station);
+		} else {
+			Log.i("No station apparently");
+		}
+		RadioTrack track = getCurrentTrack();
+		if (track != null) {
+			Log.i("Faking the fetching of tracks");
+			listeners.onFetchingTrack(track);
+			listeners.onTrackFetched(track, this.isPlaying());
+		}
 	}
 	
 	/**

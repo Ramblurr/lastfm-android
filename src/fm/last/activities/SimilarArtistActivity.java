@@ -3,11 +3,8 @@ package fm.last.activities;
 import fm.last.LastfmRadio;
 import fm.last.Log;
 import fm.last.R;
-import fm.last.TrackInfo;
 import fm.last.api.RadioTrack;
 import fm.last.api.Station;
-import fm.last.radio.Radio;
-import fm.last.radio.RadioEventHandler;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -46,7 +43,6 @@ implements LastfmRadio.Listener
 {
 	private Button tuneButton = null;
 	private EditText artistInputEdit = null;
-	private Radio old_radio = null;
 	private LastfmRadio radio;
 	private ImageLoader imageLoader;
 	private EditText similarArtistEditText;
@@ -91,8 +87,6 @@ implements LastfmRadio.Listener
 		});
 
 		imageLoader = ImageLoader.getInstance();
-		old_radio = new Radio();
-		old_radio.addRadioHandler(m_radioEventHandler);
 
 		LinearLayout l = (LinearLayout) findViewById(R.id.layout);
 		LinearLayout bl = (LinearLayout) findViewById(R.id.buttonLayout);
@@ -116,24 +110,12 @@ implements LastfmRadio.Listener
 		ImageButton skip = (ImageButton) findViewById(R.id.skip);
 		skip.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				old_radio.skip();
+				radio.playNext();
 			}
 		});
 		
-		Station station = radio.getCurrentStation();
-		if (station != null) {
-			onStationChanged(station);
-		}
+		radio.sendEventsForListenerCreation();
 	}
-
-	RadioEventHandler m_radioEventHandler = new RadioEventHandler() {
-		public void onTrackEnded(TrackInfo track) {
-		}
-
-		public void onTrackStarted(TrackInfo track) {
-		}
-		
-	};
 
 	private Dialog createTunerDialog(final EditText similarArtistEditText) {
 		// create the text field we will show in the dialog
@@ -232,6 +214,44 @@ implements LastfmRadio.Listener
 		radioLayout.addView(radioPartial, 0);
 	}
 
+
+	public void onRadioStarted() {
+		Log.i("onRadioStarted()");
+	}
+
+	public void onRadioStopped() {
+		Log.i("onRadioStopped()");
+	}
+
+	/**
+	 * This method gets called when the radio has tuned into a new station, or
+	 * this activity is created and the radio is already tuned to a station.
+	 */
+	public void onStationChanged(Station station) {
+		Log.i("onStationChanged - " + station.getName());
+		TextView v = (TextView) findViewById(R.id.station_name);
+		v.setText(station.getName());	
+		if (!radio.isPlaying()) {
+			radio.playNext();
+		}
+	}
+
+	public void onTrackFinished(RadioTrack track) {
+		Log.i("Finished track '" + track.getTitle() + "'");
+	}
+
+	public void onTrackFetched(RadioTrack track, boolean started) {
+		Log.i("fetched track '" + track.getTitle() + "' started=" + started);
+		trackTitleText.setText(track.getTitle());
+	}
+
+	public void onFetchingTrack(RadioTrack track) {
+		Log.i("Fetching '" + track.getTitle() + "'");
+		trackTitleText.setText("Fetching '" + track.getTitle() + "'");
+		artistText.setText(track.getCreator());
+		imageLoader.loadImage(track.getImageUrl(), albumArtImage);
+	}
+
 	/**
 	 * System menu stuff
 	 */
@@ -254,41 +274,8 @@ implements LastfmRadio.Listener
 		return true;
 	}
 
-	public void onRadioStarted() {
-		// TODO Auto-generated method stub
-		
+	public void onRadioTechnicalProblem() {
+		Log.i("onRadioTechnicalProblem()");
 	}
-
-	public void onRadioStopped() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
-	 * This method gets called when the radio has tuned into a new station, or
-	 * this activity is created and the radio is already tuned to a station.
-	 */
-	public void onStationChanged(Station station) {
-		TextView v = (TextView) findViewById(R.id.station_name);
-		v.setText(station.getName());	
-		radio.playNext();
-	}
-
-	public void onTrackFinished(RadioTrack track) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onTrackStarted(RadioTrack track) {
-		Log.i("Gonna play track '" + track.getTitle() + "'");
-		trackTitleText.setText(track.getTitle());
-	}
-
-	public void onFetchingTrack(RadioTrack track) {
-		Log.i("Fetching '" + track.getTitle() + "'");
-		trackTitleText.setText("Fetching '" + track.getTitle() + "'");
-		artistText.setText(track.getCreator());
-		imageLoader.loadImage(track.getImageUrl(), albumArtImage);
-	}
-
+	
 }

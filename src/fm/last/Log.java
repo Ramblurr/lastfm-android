@@ -23,4 +23,9 @@ public class Log
 	{
 		android.util.Log.e( TAG, "", e);
 	}
+	
+	public static void e(String msg, Throwable e )
+	{
+		android.util.Log.e( TAG, msg, e);
+	}
 }
