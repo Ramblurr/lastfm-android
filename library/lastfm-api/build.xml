@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="mjlastfm" default="build">
+
+  <!-- Define some directories -->
+  <property name="out.dir" value="${basedir}/out"/>
+  <property name="classes.dir" value="${out.dir}/classes"/>
+  <property name="java.dir" value="${basedir}/src"/>
+
+
+  <!-- define our output jars -->
+  <property name="jar.file" value="${basedir}/lastfmlib.jar"/>
+  <property name="src-zip.file" value="${basedir}/lastfmlib-src.zip"/>
+
+  <patternset id="compiler.resources">
+    <include name="**/?*.properties" />
+    <include name="**/?*.txt" />
+    <include name="**/?*.xml" />
+    <include name="**/?*.gif" />
+    <include name="**/?*.png" />
+    <include name="**/?*.jpeg" />
+    <include name="**/?*.jpg" />
+    <include name="**/?*.html" />
+    <include name="**/?*.dtd" />
+    <include name="**/?*.tld" />
+    <include name="**/?*.ser" />
+  </patternset>
+  
+
+  <target name="build" depends="create-classes-dir">
+
+    <echo>
+      Compiling source files into ${classes.dir}      
+    </echo>
+    <javac srcdir="${java.dir}" destdir="${classes.dir}">
+    </javac>
+    <copy todir="${classes.dir}">
+      <fileset dir="${java.dir}">
+        <patternset refid="compiler.resources" />
+        <type type="file" />
+      </fileset>
+    </copy>
+
+    <!-- Create the source zip file -->
+    <echo>
+      Putting source files in ${java.dir} into ${src-zip.file}
+    </echo>
+    <delete file="${src-zip.file}"/>
+    <zip file="${src-zip.file}" basedir="${java.dir}"/>    
+
+    <echo>
+      Putting class files in ${classes.dir} into ${jar.file}
+    </echo>
+    <delete file="${jar.file}"/>
+    <jar destfile="${jar.file}" duplicate="preserve">
+      <fileset dir="${classes.dir}" />
+    </jar>
+
+  </target>
+
+
+  <target name="create-classes-dir">
+    <delete dir="${classes.dir}"/>
+    <mkdir  dir="${classes.dir}"/>
+  </target>
+
+
+</project>
