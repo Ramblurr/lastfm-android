@@ -49,6 +49,7 @@ implements LastfmRadio.Listener
 	private TextView artistText;
 	private TextView trackTitleText;
 	private ImageView albumArtImage;
+	private ImageButton stopButton;
 	private Dialog tunerDialog;
 	private ProgressDialog tuningProgressDialog;
 
@@ -85,6 +86,8 @@ implements LastfmRadio.Listener
 				tuneToSimilarArtist(artistInputEdit);
 			}
 		});
+		
+		stopButton = (ImageButton) findViewById(R.id.stop);
 
 		imageLoader = ImageLoader.getInstance();
 
@@ -98,8 +101,6 @@ implements LastfmRadio.Listener
 						Color.argb(0, 150, 150, 150), Color.argb(0, 0, 0, 0) });
 		bl.setBackgroundDrawable(gradient);
 		animate();
-
-		ImageButton stopButton = (ImageButton) findViewById(R.id.stop);
 
 		stopButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -143,7 +144,12 @@ implements LastfmRadio.Listener
 	
 	
 	private void stopButtonPressed() {
-		tunerDialog.show();
+		//tunerDialog.show();
+		if (radio.isPlaying()) {
+			radio.stopPlaying();
+		} else {
+			radio.playNext();
+		}
 	}
 
 	final private void animate() {
@@ -216,11 +222,13 @@ implements LastfmRadio.Listener
 
 
 	public void onRadioStarted() {
+		stopButton.setImageResource(R.drawable.stop);
 		Log.i("onRadioStarted()");
 	}
 
 	public void onRadioStopped() {
 		Log.i("onRadioStopped()");
+		stopButton.setImageResource(R.drawable.play);
 	}
 
 	/**
