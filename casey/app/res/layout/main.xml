@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+android:id="@+id/widget45"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:background="@drawable/frame"
+>
+<Button
+android:id="@+id/buttonSetup"
+android:layout_height="wrap_content"
+android:padding="10px"
+android:text="@string/main_setup"
+android:layout_x="110px"
+android:layout_y="282px"
+android:layout_width="100px"
+style="@+style/LastFMButton.NewStation">
+</Button>
+<ImageView
+android:id="@+id/main_logo"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_x="100px"
+android:layout_y="136px"
+>
+</ImageView>
+</AbsoluteLayout>

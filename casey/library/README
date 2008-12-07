@@ -1,0 +1,5 @@
+This lib is a huge mess. I've been refactoring the xml parsing from DOM to XMLPullParser. 
+I've only refactored the bits as I needed them in my lastfm app. This guy could use a _lot_ 
+of optimization or just a rewrite in general.
+
+Casey
