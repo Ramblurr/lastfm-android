@@ -1,6 +1,0 @@
-* The profile picture should display the "unknown" image until the actual one is fetched (if it exists)
-* When in landscape mode on the home activity the list shadow is visible a couple inches off the bottom of the screen
-* Switching from landscape mode -> portrait mode on home screen
-* From the Home activity: play a station > Hit back to go to the Home activity again > the station isn't listed in the "Recent Stations", but if you restart the app it is.
-* The app is unbearable with anything less than 3G speeds
- 
