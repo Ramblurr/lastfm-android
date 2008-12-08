@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/home"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/frame">
+
+	<LinearLayout android:id="@+id/home_top"
+		android:layout_width="fill_parent" android:layout_height="64dip"
+		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+		android:paddingBottom="8dip" android:background="@+drawable/full_dark_bg"
+		xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
+		<fm.last.android.RemoteImageView android:id="@+id/home_profileimage"
+            android:layout_width="64dip"
+            android:layout_height="64dip"
+            android:paddingLeft="5dip"
+            android:paddingTop="5dip"
+            lfm:unknownImage="@drawable/profile_unknown" />
+		<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			android:orientation="vertical" android:id="@+id/loginLayout"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:stretchColumns="1" android:paddingTop="5dip">
+			<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+				android:layout_height="wrap_content" android:layout_width="fill_parent">
+				<TextView android:id="@+id/home_usersname"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:text="" android:layout_weight="1" style="@+style/Home.UserName"
+					android:layout_gravity="center" android:gravity="center" />
+			</TableRow>
+			<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+				android:layout_height="wrap_content" android:layout_width="fill_parent">
+				<TextView android:id="@+id/home_songsplayed"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:text="" android:layout_weight="1"
+					style="@+style/Home.NumberPlayed" android:layout_gravity="center"
+					android:gravity="center" />
+			</TableRow>
+		</TableLayout>
+	</LinearLayout>
+	<LinearLayout android:id="@+id/home_newstation"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="vertical" android:layout_below="@+id/home_top"
+		android:layout_alignParentLeft="true" android:paddingBottom="8dip">
+		<Button android:id="@+id/home_startnewstation"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="@string/home_newstation" style="@+style/LastFMButton.NewStation" />
+	</LinearLayout>
+	<ListView android:id="@+id/home_main_list"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@+id/home_newstation"
+		android:layout_alignParentLeft="true" android:paddingBottom="8dip" />
+</RelativeLayout>

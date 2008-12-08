@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:orientation="horizontal" android:id="@+id/station_list_row" >
+	<TextView android:id="@+id/label" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Black Eyed Peas"
+			android:layout_weight="1" android:paddingLeft="5dip" android:paddingTop="5dip" android:paddingBottom="5dip"  
+			android:layout_gravity="center" android:gravity="left" android:textSize="16dip" android:textStyle="bold">
+		</TextView>
+	<ImageView android:id="@+id/icon" android:paddingLeft="5dip" android:paddingRight="20dip"
+		android:src="@drawable/radio_icon" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:paddingTop="3dip"/>
+</LinearLayout>
