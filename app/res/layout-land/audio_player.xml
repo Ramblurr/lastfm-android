@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<!--Copyright (C) 2008 Casey Link <unnamedrambler@gmail.com> 
+	Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -17,118 +18,46 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical">
+    android:orientation="vertical" android:background="#000">
+
+    <LinearLayout style="TopBar" android:background="#9d9fa2" android:layout_height="48dip" android:layout_width="fill_parent"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&lt;" android:id="@+id/player_backBtn"></Button>
+<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight="1" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:id="@+id/station_name" android:text="Station Name" android:layout_gravity="center"></TextView>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="i" android:id="@+id/player_infoBtn"></Button>
+</LinearLayout>
+    
+
+    
+
+    
+
+    
+
+    
 
 
-    <!-- This is the LinearLayout that contains the album art, function buttons and album/artist/track info -->
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        android:orientation="horizontal"
- 		xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
+        
 
-        <fm.last.android.RemoveImageView android:id="@+id/album"
-            android:layout_width="200px"
-            android:layout_height="204px"
-            android:paddingLeft="20px"
-            android:paddingRight="15px"
-            android:paddingTop="20px"
-            lfm:unknownImage="@+drawable/albumart_mp_unknown" />
 
-        <!-- This is the LinearLayout that contains function buttons and album/artist/track info -->
-        <LinearLayout
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
+<fm.last.android.RemoteImageView android:id="@+id/album" lfm:unknownImage="@+drawable/albumart_mp_unknown" android:background="@drawable/albumart_mp_unknown" android:layout_width="220dip" android:layout_height="220dip"/>
+<TableLayout android:layout_width="fill_parent" android:id="@+id/track_metadata" android:layout_toRightOf="@+id/album" android:layout_height="wrap_content" android:layout_centerVertical="true">
+<TableRow android:id="@+id/TableRow01" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center">
+<TextView android:layout_height="wrap_content" android:id="@+id/track_artist" android:layout_gravity="center" android:gravity="center"></TextView>
+</TableRow><TableRow android:layout_height="wrap_content" android:id="@+id/TableRow02" android:gravity="center"><TextView android:layout_height="wrap_content" android:id="@+id/track_title" android:layout_gravity="center" android:gravity="center"></TextView>
+</TableRow>
+<TableRow android:id="@+id/TableRow03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dip" android:gravity="center"><LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/currenttime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:layout_gravity="bottom" android:paddingLeft="5dip" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="right" android:maxWidth="48dip" android:width="48dip" /><ProgressBar android:id="@android:id/progress" android:background="#80000000" android:layout_height="18px" android:paddingLeft="5px" android:paddingRight="5px" android:paddingBottom="4px" android:indeterminateDuration="3500" android:indeterminateBehavior="repeat" android:indeterminateOnly="false" android:progressDrawable="@+drawable/progress_horizontal" android:indeterminateDrawable="@+drawable/progress_indeterminate_horizontal" android:layout_width="200dip" android:layout_marginLeft="8dip" android:layout_marginRight="8dip" /><TextView android:id="@+id/totaltime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:paddingRight="5px" android:layout_gravity="bottom" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="left" android:maxWidth="48dip" android:width="48dip" /></LinearLayout>
+</TableRow>
+</TableLayout><LinearLayout android:orientation="horizontal" android:layout_marginTop="1px" android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center" android:layout_toRightOf="@+id/album" android:layout_alignParentBottom="true">
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingTop="20px" >
+            <ImageButton android:id="@+id/love" android:background="@drawable/love" android:layout_margin="8dip" android:layout_height="wrap_content" android:layout_width="wrap_content" />
+            
 
-            </LinearLayout>
+            <ImageButton android:id="@+id/ban" android:background="@drawable/ban" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="8dip" /><ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog_button" android:id="@+id/playback_menu" android:layout_margin="8dip"></ImageButton><ImageButton android:id="@+id/stop" android:background="@drawable/stop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dip" />
 
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:paddingTop="8dip"
-                android:paddingBottom="2dip">
+            <ImageButton android:background="@drawable/skip" android:id="@+id/skip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="8dip" />
+            
+            
 
-                <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dip"
-            style="@+style/LastFMButton.Artist"
-            />>
-
-                <TextView android:id="@+id/artistname"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:paddingTop="8dip"
-                android:paddingBottom="2dip">
-
-                <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dip"
-            style="@+style/LastFMButton.Album"
-            />
-
-                <TextView android:id="@+id/albumname"
-                    android:textSize="14sp"
-                    android:maxLines="1"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:paddingTop="4dip"
-                android:paddingBottom="2dip">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="4dip"
-                    android:src="@drawable/radio_icon" />
-
-                <TextView android:id="@+id/trackname"
-                    android:textSize="14sp"
-                    android:maxLines="1"
-                    android:textStyle="bold"
-                    android:layout_gravity="center_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <include layout="@layout/audio_player_common" />
-
+        
+</LinearLayout></RelativeLayout>
 </LinearLayout>
