@@ -1,4 +1,4 @@
-package fm.last.android;
+package fm.last.android.activity;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -25,12 +25,23 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
+import fm.last.android.R;
+import fm.last.android.RemoteImageHandler;
+import fm.last.android.RemoteImageView;
+import fm.last.android.SeparatedListAdapter;
+import fm.last.android.Worker;
+import fm.last.android.R.id;
+import fm.last.android.R.layout;
+import fm.last.android.R.string;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
-public class LastFMHome extends Activity
+public class Home extends Activity
 {
 
     private SeparatedListAdapter mMainAdapter;
@@ -191,7 +202,7 @@ public class LastFMHome extends Activity
 
             final Session session = ( Session ) LastFMApplication.getInstance().map
                     .get( "lastfm_session" );
-            Intent intent = new Intent( LastFMHome.this, LastFMPlayer.class );
+            Intent intent = new Intent( Home.this, Player.class );
             intent.putExtra( "radiostation", mMainAdapter.getStation( position ) );
             startActivity( intent );
         }
@@ -213,7 +224,7 @@ public class LastFMHome extends Activity
         public void onClick( View v )
         {
 
-            Intent intent = new Intent( LastFMHome.this, LastFMNewStation.class );
+            Intent intent = new Intent( Home.this, NewStation.class );
             startActivity( intent );
         }
     };
@@ -264,7 +275,7 @@ public class LastFMHome extends Activity
         editor.remove( "lastfm_user" );
         editor.remove( "lastfm_pass" );
         editor.commit();
-        Intent intent = new Intent( LastFMHome.this, LastFm.class );
+        Intent intent = new Intent( Home.this, LastFm.class );
         startActivity( intent );
         finish();
     }

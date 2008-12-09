@@ -17,20 +17,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-class ViewWrapper
+public class ViewWrapper
 {
 
     View base;
     TextView label = null;
     ImageView icon = null;
 
-    ViewWrapper( View base )
+    public ViewWrapper( View base )
     {
 
         this.base = base;
     }
 
-    TextView getLabel()
+    public TextView getLabel()
     {
 
         if ( label == null )
@@ -41,7 +41,7 @@ class ViewWrapper
         return ( label );
     }
 
-    ImageView getIcon()
+    public ImageView getIcon()
     {
 
         if ( icon == null )

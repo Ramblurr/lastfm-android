@@ -3,7 +3,7 @@
  *	Port "Player"
  *	Integrate Player with service
  */
-package fm.last.android;
+package fm.last.android.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -30,11 +30,16 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import java.io.IOException;
 import java.util.Collection;
 
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.R.id;
+import fm.last.android.R.layout;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Artist;
 
-public class LastFMNewStation extends Activity
+public class NewStation extends Activity
 {
 
     private enum SearchType
@@ -134,7 +139,7 @@ public class LastFMNewStation extends Activity
                             uiThreadCallback.post( runInUIThread );
                         }
                     }.start();
-                    Toast.makeText( LastFMNewStation.this, "Searching...",
+                    Toast.makeText( NewStation.this, "Searching...",
                             Toast.LENGTH_LONG ).show();
                 }
                 else if ( searching == SearchType.Tag )
@@ -151,7 +156,7 @@ public class LastFMNewStation extends Activity
                             uiThreadCallback.post( runInUIThread );
                         }
                     }.start();
-                    Toast.makeText( LastFMNewStation.this, "Searching...",
+                    Toast.makeText( NewStation.this, "Searching...",
                             Toast.LENGTH_LONG ).show();
                 }
                 else if ( searching == SearchType.User )
@@ -160,7 +165,7 @@ public class LastFMNewStation extends Activity
                     if ( !exists )
                     {
                         AlertDialog.Builder error = new AlertDialog.Builder(
-                                LastFMNewStation.this );
+                                NewStation.this );
                         error.setTitle( "Error" ).setMessage(
                                 "No such user '" + txt + "'." )
                                 .setPositiveButton( "OK", null ).show();
@@ -229,7 +234,7 @@ public class LastFMNewStation extends Activity
 
             final Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
-		    Intent intent = new Intent( LastFMNewStation.this, LastFMPlayer.class );
+		    Intent intent = new Intent( NewStation.this, Player.class );
 		    intent.putExtra( "radiostation", mAdapter.getStation( position ) );
 		    startActivity( intent );
         }

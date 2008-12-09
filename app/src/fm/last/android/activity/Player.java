@@ -1,4 +1,4 @@
-package fm.last.android;
+package fm.last.android.activity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,16 @@ import java.net.URL;
 import java.util.Formatter;
 import java.util.Locale;
 
+import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
+import fm.last.android.R;
+import fm.last.android.RemoteImageHandler;
+import fm.last.android.RemoteImageView;
+import fm.last.android.Worker;
+import fm.last.android.R.drawable;
+import fm.last.android.R.id;
+import fm.last.android.R.layout;
+import fm.last.android.R.string;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
 
@@ -36,7 +46,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class LastFMPlayer extends Activity
+public class Player extends Activity
 {
 
     private fm.last.android.player.IRadioPlayer mService = null;
@@ -271,7 +281,7 @@ public class LastFMPlayer extends Activity
             {
                 try
                 {
-                    LastFMPlayer.this.setTitle( "LastFM: "
+                    Player.this.setTitle( "LastFM: "
                             + mService.getStationName() );
                 }
                 catch ( RemoteException e )

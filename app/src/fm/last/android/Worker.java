@@ -15,7 +15,7 @@ public class Worker implements Runnable
      * @param name
      *            A name for the new thread
      */
-    Worker( String name )
+    public Worker( String name )
     {
 
         Thread t = new Thread( null, this, name );

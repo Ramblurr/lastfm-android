@@ -19,6 +19,8 @@ package fm.last.android;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import fm.last.android.activity.LastFMStreamAdapter;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;

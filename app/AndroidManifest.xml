@@ -10,17 +10,17 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".LastFMHome" android:label="LastFM: Home">
+		<activity android:name=".activity.Home" android:label="LastFM: Home">
 			<intent-filter>
 			</intent-filter>
 		</activity>
-		<activity android:name=".LastFMNewStation" android:label="LastFM: Create a New Station">
+		<activity android:name=".activity.NewStation" android:label="LastFM: Create a New Station">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".LastFMPlayer" android:label="LastFM: Player">
+		<activity android:name=".activity.Player" android:label="LastFM: Player">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />

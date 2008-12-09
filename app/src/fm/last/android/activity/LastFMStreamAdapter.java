@@ -1,6 +1,10 @@
-package fm.last.android;
+package fm.last.android.activity;
 
 import java.util.Hashtable;
+
+import fm.last.android.R;
+import fm.last.android.ViewWrapper;
+import fm.last.android.R.layout;
 
 import android.app.Activity;
 import android.view.LayoutInflater;

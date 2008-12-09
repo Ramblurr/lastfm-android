@@ -31,8 +31,8 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 
-import fm.last.android.LastFMPlayer;
 import fm.last.android.R;
+import fm.last.android.activity.Player;
 
 public class RadioPlayerService extends Service
 {
@@ -105,7 +105,7 @@ public class RadioPlayerService extends Service
                         + currentTrack.getTitle() + " by "
                         + currentTrack.getCreator(), System.currentTimeMillis() );
         PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
-                new Intent( this, LastFMPlayer.class ), 0 );
+                new Intent( this, Player.class ), 0 );
         String info = currentTrack.getTitle() + "\n" + currentTrack.getCreator();
         notification.setLatestEventInfo( this, currentStation.getName(),
                 info, contentIntent );
@@ -190,7 +190,7 @@ public class RadioPlayerService extends Service
                     R.drawable.media_playback_pause, "Last.fm Paused", System
                             .currentTimeMillis() );
             PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
-                    new Intent( this, LastFMPlayer.class ), 0 );
+                    new Intent( this, Player.class ), 0 );
             String info;
             String name;
             if ( currentTrack != null )
