@@ -20,7 +20,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Player" android:label="LastFM: Player" android:configChanges="orientation|keyboardHidden">
+		<activity android:name=".activity.Player" android:label="LastFM: Player" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
