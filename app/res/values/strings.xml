@@ -23,4 +23,5 @@
 
     
     <string name="durationformat"><xliff:g id="format">%2$d:%5$02d</xliff:g></string>
+<string name="logout">Logout</string>
 </resources>

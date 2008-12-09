@@ -76,10 +76,8 @@ public class Home extends Activity
         Button b = ( Button ) findViewById( R.id.home_startnewstation );
         b.setOnClickListener( mNewStationListener );
 
-        /*
-         * b = ( Button ) findViewById( R.id.logout ); b.setOnClickListener(
-         * mLogoutListener );
-         */
+        b = ( Button ) findViewById( R.id.home_logout );
+        b.setOnClickListener( mLogoutListener );
 
         mProfileImage = ( RemoteImageView ) findViewById( R.id.home_profileimage );
 
@@ -125,11 +123,6 @@ public class Home extends Activity
     {
         if( mUser == null)
             return; //TODO HANDLE
-        TextView tv = ( TextView ) findViewById( R.id.home_songsplayed );
-        int playcount = Integer.parseInt(mUser.getPlaycount());
-        NumberFormat format = NumberFormat.getNumberInstance();
-        String count = format.format( playcount );
-        tv.setText( count + " " + getString( R.string.home_tracksplayed ) );
     	ImageUrl[] images = mUser.getImages();
         if ( images.length > 0 )
         {
@@ -208,7 +201,7 @@ public class Home extends Activity
         }
     };
 
-    private OnClickListener mLogoutListener = new OnClickListener()
+    public OnClickListener mLogoutListener = new OnClickListener()
     {
 
         public void onClick( View v )

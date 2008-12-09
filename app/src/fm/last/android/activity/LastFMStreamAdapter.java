@@ -3,13 +3,12 @@ package fm.last.android.activity;
 import java.util.Hashtable;
 
 import fm.last.android.R;
-import fm.last.android.ViewWrapper;
-import fm.last.android.R.layout;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.BaseAdapter;
 
 public class LastFMStreamAdapter extends BaseAdapter
@@ -47,22 +46,16 @@ public class LastFMStreamAdapter extends BaseAdapter
 
     public View getView( int position, View convertView, ViewGroup parent )
     {
-
         View row = convertView;
-        ViewWrapper wrapper = null;
 
         if ( row == null )
         {
             LayoutInflater inflater = context.getLayoutInflater();
-            row = inflater.inflate( R.layout.list_row, null );
-            wrapper = new ViewWrapper( row );
-            row.setTag( wrapper );
+            row = inflater.inflate( R.layout.station_row, null );
         }
-        else
-        {
-            wrapper = ( ViewWrapper ) row.getTag();
-        }
-        wrapper.getLabel().setText( ( String ) getItem( position ) );
+
+        TextView name = (TextView)row.findViewById(R.id.label);
+        name.setText( ( String ) getItem( position ) );
 
         return ( row );
     }

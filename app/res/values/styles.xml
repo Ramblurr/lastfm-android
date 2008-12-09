@@ -112,9 +112,7 @@
 		<item name="android:textSize">12sp</item>
 		<item name="android:textStyle">normal</item>
 	</style>
-	<style name="Home.ListHeaders">
-		<item name="android:textSize">13sp</item>
-	</style>
+	
 	
 	<style name="InfoButton">
 		<item name="android:background">@+drawable/lastfm_button_transparent_bg32</item>
