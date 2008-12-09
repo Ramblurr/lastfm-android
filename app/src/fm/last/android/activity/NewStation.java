@@ -5,7 +5,7 @@
  */
 package fm.last.android.activity;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,7 +39,7 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Artist;
 
-public class NewStation extends Activity
+public class NewStation extends ListActivity
 {
 
     private enum SearchType
@@ -47,6 +47,8 @@ public class NewStation extends Activity
         Artist, Tag, User
     };
 
+    Artist[] mArtists;
+    
     private SearchType searching;
     private EditText searchBar;
     private LastFMStreamAdapter mAdapter;
@@ -68,10 +70,8 @@ public class NewStation extends Activity
         if ( searching == null )
             rgroup.check( R.id.station_type_artist );
 
-        ListView listView = ( ListView ) findViewById( R.id.station_list );
         mAdapter = new LastFMStreamAdapter( this );
-        listView.setAdapter( mAdapter );
-        listView.setOnItemClickListener( mListClickListener );
+        setListAdapter( mAdapter );
 
         mDoingSearch = false;
     }
@@ -210,34 +210,39 @@ public class NewStation extends Activity
         LastFmServer server = AndroidLastFmServerFactory.getServer();
         Artist[] results;
 		try {
-			results = server.searchForArtist( name );
-	        mAdapter.resetList();
-	        for ( Artist artist : results )
-	        {
-	            if ( artist.getStreamable() != "1" )
-	                continue;
-	            System.out.printf("Search match: %s\n", artist.getName());
-	            mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similar" );
-	        }
+			mArtists = server.searchForArtist( name );
+	        
+	        runOnUiThread(updateSearchResults);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
-
-    public OnItemClickListener mListClickListener = new OnItemClickListener()
-    {
-
-        public void onItemClick( AdapterView parent, View v, int position,
-                long id )
-        {
-
-            final Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
-		    Intent intent = new Intent( NewStation.this, Player.class );
-		    intent.putExtra( "radiostation", mAdapter.getStation( position ) );
-		    startActivity( intent );
-        }
+    
+    private Runnable updateSearchResults = new Runnable() {
+    	
+    	public void run() {
+    		mAdapter.resetList();
+    		
+    		for ( Artist artist : mArtists )
+    		{
+    			System.out.println("Artist can stream? " + artist.getStreamable());
+    			if ( artist.getStreamable().equals("1") ) {
+    				System.out.printf("Search match: %s\n", artist.getName());
+    				mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similar" );
+    			}
+    		}
+    	
+    		mAdapter.updateModel();
+    	}
     };
+
+    public void onListItemClick( ListView l, View v, int position, long id ) {
+    	//is the session being used or needed?
+    	final Session session = ( Session )LastFMApplication.getInstance().map.get( "lastfm_session" );
+    	Intent intent = new Intent( NewStation.this, Player.class );
+    	intent.putExtra( "radiostation", mAdapter.getStation( position ) );
+    	startActivity( intent );
+    }
 
 }

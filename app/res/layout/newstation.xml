@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout android:id="@+id/station_layout"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
-	xmlns:android="http://schemas.android.com/apk/res/android" android:background="#000">
+	xmlns:android="http://schemas.android.com/apk/res/android">
 	<RadioGroup android:id="@+id/station_typegroup"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
@@ -29,7 +29,7 @@
 		android:layout_alignParentLeft="true"  android:layout_alignLeft="@+id/station_search"
 		android:layout_width="fill_parent" android:singleLine="true" />	
 
-	<ListView android:id="@+id/station_list" android:layout_width="fill_parent"
+	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:layout_below="@+id/station_editbox"
 		android:layout_alignParentLeft="true" />
 
