@@ -414,8 +414,10 @@ public class RadioPlayerService extends Service
 
         public long getPosition() throws RemoteException
         {
-
-            return mp.getCurrentPosition();
+        	if( mp != null )
+        		return mp.getCurrentPosition();
+        	else
+        		return 0;
         }
 
         public String getArtUrl() throws RemoteException

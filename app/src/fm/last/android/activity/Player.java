@@ -1,10 +1,5 @@
 package fm.last.android.activity;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -14,10 +9,6 @@ import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
-import fm.last.android.R.drawable;
-import fm.last.android.R.id;
-import fm.last.android.R.layout;
-import fm.last.android.R.string;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
 
@@ -31,35 +22,32 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Button;
 
 public class Player extends Activity
 {
 
     private fm.last.android.player.IRadioPlayer mService = null;
-    private ImageButton mLoveButton;
-    private ImageButton mBanButton;
-    private ImageButton mPauseButton;
+    private Button mBackButton;
+    private ImageButton mStopButton;
     private ImageButton mNextButton;
     private RemoteImageView mAlbum;
     private TextView mCurrentTime;
     private TextView mTotalTime;
     private TextView mArtistName;
-    private TextView mAlbumName;
     private TextView mTrackName;
+    private TextView mStationName;
     private ProgressBar mProgress;
     private long mPosOverride = -1;
     private long mDuration;
@@ -68,20 +56,18 @@ public class Player extends Activity
     private boolean mRelaunchAfterConfigChange;
 
     private static final int REFRESH = 1;
-    private static final int QUIT = 2;
 
 
     private Worker mAlbumArtWorker;
     private RemoteImageHandler mAlbumArtHandler;
-
-    // private Toast mToast;
-    // private boolean mRelaunchAfterConfigChange;
 
     @Override
     public void onCreate( Bundle icicle )
     {
 
         super.onCreate( icicle );
+        requestWindowFeature( Window.FEATURE_NO_TITLE );
+
         setContentView( R.layout.audio_player );
 
         mCurrentTime = ( TextView ) findViewById( R.id.currenttime );
@@ -89,18 +75,16 @@ public class Player extends Activity
         mProgress = ( ProgressBar ) findViewById( android.R.id.progress );
         mProgress.setMax( 1000 );
         mAlbum = ( RemoteImageView ) findViewById( R.id.album );
-        mArtistName = ( TextView ) findViewById( R.id.artistname );
-        mAlbumName = ( TextView ) findViewById( R.id.albumname );
-        mTrackName = ( TextView ) findViewById( R.id.trackname );
-        mPauseButton = ( ImageButton ) findViewById( R.id.pause );
-        mPauseButton.requestFocus();
-        mPauseButton.setOnClickListener( mPauseListener );
-        mNextButton = ( ImageButton ) findViewById( R.id.next );
+        mStationName = ( TextView ) findViewById( R.id.station_name );
+        mArtistName = ( TextView ) findViewById( R.id.track_artist );
+        mTrackName = ( TextView ) findViewById( R.id.track_title );
+        mBackButton = ( Button ) findViewById( R.id.player_backBtn );
+        mBackButton.setOnClickListener( mBackListener );
+        mStopButton = ( ImageButton ) findViewById( R.id.stop );
+        mStopButton.requestFocus();
+        mStopButton.setOnClickListener( mStopListener );
+        mNextButton = ( ImageButton ) findViewById( R.id.skip );
         mNextButton.setOnClickListener( mNextListener );
-        mLoveButton = ( ImageButton ) findViewById( R.id.love );
-        //mLoveButton.setOnClickListener( mLoveListener );
-        mBanButton = ( ImageButton ) findViewById( R.id.ban );
-        //mBanButton.setOnClickListener( mBanListener );
         mpIntent = new Intent(
                 this,
                 fm.last.android.player.RadioPlayerService.class );
@@ -119,7 +103,6 @@ public class Player extends Activity
         if ( icicle != null )
         {
             mRelaunchAfterConfigChange = icicle.getBoolean( "configchange" );
-            setTitle( icicle.getString( "title" ) );
         }
     }
 
@@ -155,7 +138,6 @@ public class Player extends Activity
     {
 
         outState.putBoolean( "configchange", getChangingConfigurations() != 0 );
-        outState.putString( "title", ( String ) getTitle() );
         super.onSaveInstanceState( outState );
     }
 
@@ -165,7 +147,6 @@ public class Player extends Activity
 
         super.onResume();
         updateTrackInfo();
-        setPauseButtonImage();
     }
 
     @Override
@@ -233,7 +214,15 @@ public class Player extends Activity
         }
     };
 
-    private View.OnClickListener mPauseListener = new View.OnClickListener()
+    private View.OnClickListener mBackListener = new View.OnClickListener()
+    {
+    	public void onClick( View v )
+    	{
+    		finish();
+    	}
+    };
+    
+    private View.OnClickListener mStopListener = new View.OnClickListener()
     {
 
         public void onClick( View v )
@@ -243,13 +232,13 @@ public class Player extends Activity
                 return;
             try
             {
-                mService.pause();
-                setPauseButtonImage();
+                mService.stop();
             }
             catch ( RemoteException ex )
             {
                 System.out.println( ex.getMessage() );
             }
+            finish();
         }
     };
 
@@ -266,23 +255,16 @@ public class Player extends Activity
                 // redraw the artist/title info and
                 // set new max for progress bar
                 updateTrackInfo();
-                setPauseButtonImage();
-                queueNextRefresh( 1 );
             }
             else if ( action.equals( RadioPlayerService.PLAYBACK_FINISHED ) )
             {
                 finish();
             }
-            else if ( action.equals( RadioPlayerService.PLAYBACK_STATE_CHANGED ) )
-            {
-                setPauseButtonImage();
-            }
             else if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
             {
                 try
                 {
-                    Player.this.setTitle( "LastFM: "
-                            + mService.getStationName() );
+                    mStationName.setText( mService.getStationName() );
                 }
                 catch ( RemoteException e )
                 {
@@ -308,8 +290,6 @@ public class Player extends Activity
              */// TODO if player is done finish()
             String artistName = mService.getArtistName();
             mArtistName.setText( artistName );
-            String albumName = mService.getAlbumName();
-            mAlbumName.setText( albumName );
             mTrackName.setText( mService.getTrackName() );
             String artUrl = mService.getArtUrl();
             if ( artUrl != RadioPlayerService.UNKNOWN )
@@ -322,7 +302,6 @@ public class Player extends Activity
             mDuration = mService.getDuration();
             System.out.println( "Setting track duration to: " + mDuration );
             mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
-            setPauseButtonImage();
         }
         catch ( RemoteException ex )
         {
@@ -375,10 +354,9 @@ public class Player extends Activity
                 Log.d( "LastFMPlayer", "couldn't start playback: " + e );
             }
         }
-        setPauseButtonImage();
         updateTrackInfo();
-        long next = refreshNow();
-        queueNextRefresh( next );
+        //long next = refreshNow();
+        //queueNextRefresh( next );
     }
 
     private void appendRecentStation( String url, String name )
@@ -441,11 +419,11 @@ public class Player extends Activity
         {
             long pos = mPosOverride < 0 ? mService.getPosition() : mPosOverride;
             long remaining = 1000 - ( pos % 1000 );
-            if ( ( pos >= 0 ) && ( mDuration > 0 ) )
+            if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
             {
                 mCurrentTime.setText( makeTimeString( this, pos / 1000 ) );
 
-                if ( mService.isPlaying() )
+            	if ( mService.isPlaying() )
                 {
                     mCurrentTime.setVisibility( View.VISIBLE );
                 }
@@ -477,25 +455,6 @@ public class Player extends Activity
         {
         }
         return 500;
-    }
-
-    private void setPauseButtonImage()
-    {
-
-        try
-        {
-            if ( mService != null && mService.isPlaying() )
-            {
-                mPauseButton.setImageResource( R.drawable.media_playback_pause );
-            }
-            else
-            {
-                mPauseButton.setImageResource( R.drawable.media_playback_start );
-            }
-        }
-        catch ( RemoteException ex )
-        {
-        }
     }
 
     private final Handler mHandler = new Handler()
