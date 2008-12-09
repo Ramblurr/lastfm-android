@@ -187,7 +187,7 @@ public class RadioPlayerService extends Service
             if ( mActive == false )
                 mDeferredStopHandler.deferredStopSelf();
             Notification notification = new Notification(
-                    R.drawable.media_playback_pause, "Last.fm Paused", System
+                    R.drawable.stop, "Last.fm Paused", System
                             .currentTimeMillis() );
             PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
                     new Intent( this, Player.class ), 0 );

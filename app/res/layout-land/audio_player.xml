@@ -113,7 +113,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dip"
-                    android:src="@drawable/ic_mp_song_playback" />
+                    android:src="@drawable/radio_icon" />
 
                 <TextView android:id="@+id/trackname"
                     android:textSize="14sp"
