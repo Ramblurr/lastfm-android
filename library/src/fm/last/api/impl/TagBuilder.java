@@ -1,7 +1,5 @@
 package fm.last.api.impl;
 
-import java.util.List;
-
 import org.w3c.dom.Node;
 
 import fm.last.api.Tag;

@@ -14,8 +14,7 @@
 
 package fm.last.api.impl;
 
-import fm.last.api.Artist;
-import fm.last.api.Friends;
+import fm.last.api.Tag;
 import fm.last.api.Track;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
@@ -34,23 +33,46 @@ import org.xml.sax.SAXException;
  *         Date: Oct 20, 2008
  */
 public class TrackFunctions {
-  private TrackFunctions() {
-  }
+	private TrackFunctions() {
+	}
 
-  public static Track getTrackInfo(String baseUrl, Map<String, String> params) throws IOException {
-    String response = UrlUtil.doGet(baseUrl, params);
+	public static Track getTrackInfo(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
 
-    Document responseXML = null;
-    try {
-      responseXML = XMLUtil.stringToDocument(response);
-    } catch (SAXException e) {
-      throw new IOException(e.getMessage());
-    }
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
 
-    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node trackNode = XMLUtil.findNamedElementNode(lfmNode, "track");
-    TrackBuilder trackBuilder = new TrackBuilder();
-    return trackBuilder.build(trackNode);
-  }
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node trackNode = XMLUtil.findNamedElementNode(lfmNode, "track");
+		TrackBuilder trackBuilder = new TrackBuilder();
+		return trackBuilder.build(trackNode);
+	}
+
+	public static Tag[] getTrackTopTags(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+	    Document responseXML = null;
+	    try {
+	      responseXML = XMLUtil.stringToDocument(response);
+	    } catch (SAXException e) {
+	      throw new IOException(e.getMessage());
+	    }
+
+	    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    Node toptagsNode = XMLUtil.findNamedElementNode(lfmNode, "toptags");
+
+	    Node[] elnodes = XMLUtil.getChildNodes(toptagsNode, Node.ELEMENT_NODE);
+	    TagBuilder tagBuilder = new TagBuilder();
+	    List<Tag> tags = new ArrayList<Tag>();
+	    for (Node node : elnodes) {
+	    	Tag artistObject = tagBuilder.build(node);
+	    	tags.add(artistObject);
+	    }
+	    return tags.toArray(new Tag[tags.size()]);
+	}
 
 }
