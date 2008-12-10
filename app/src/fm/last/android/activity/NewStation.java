@@ -38,6 +38,7 @@ import fm.last.android.R.layout;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Artist;
+import fm.last.api.Tag;
 
 public class NewStation extends ListActivity
 {
@@ -48,6 +49,7 @@ public class NewStation extends ListActivity
     };
 
     Artist[] mArtists;
+    Tag[] mTags;
     
     private SearchType searching;
     private EditText searchBar;
@@ -195,14 +197,16 @@ public class NewStation extends ListActivity
 
     private void _searchTag( String atag, Session session )
     {
+        LastFmServer server = AndroidLastFmServerFactory.getServer();
+        Tag[] results;
+		try {
+			mTags = server.searchForTag( atag );
 
-        /*Collection<String> results = Tag.search( atag, session.getApiKey() );
-        mAdapter.resetList();
-        for ( String tag : results )
-        {
-            Radio.RadioStation r = Radio.RadioStation.globalTag( tag );
-            mAdapter.putStation( tag, r );
-        }*/
+	        runOnUiThread(updateSearchResults);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private void _searchArtist( String name, Session session )
@@ -223,16 +227,23 @@ public class NewStation extends ListActivity
     	
     	public void run() {
     		mAdapter.resetList();
-    		
-    		for ( Artist artist : mArtists )
-    		{
-    			System.out.println("Artist can stream? " + artist.getStreamable());
-    			if ( artist.getStreamable().equals("1") ) {
-    				System.out.printf("Search match: %s\n", artist.getName());
-    				mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similar" );
-    			}
+    	    if( searching == SearchType.Artist) {
+    	        for ( Artist artist : mArtists )
+	            {
+    	            System.out.println("Artist can stream? " + artist.getStreamable());
+    	            if ( artist.getStreamable().equals("1") ) {
+    	                System.out.printf("Search match: %s\n", artist.getName());
+    	                mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similar" );
+	                }
+	            }
+	        } else if( searching == SearchType.Tag) {
+	            for ( Tag tag : mTags )
+                {
+	                mAdapter.putStation( tag.getName(), "lastfm://globaltags/" + Uri.encode(tag.getName()) );
+                }
+    		} else if( searching == SearchType.User) {
+    			// TODO search result parsing for users
     		}
-    	
     		mAdapter.updateModel();
     	}
     };
