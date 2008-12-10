@@ -263,6 +263,7 @@ public class RadioPlayerService extends Service
             i.putExtra( "album", currentTrack.getAlbum() );
             i.putExtra( "track", currentTrack.getTitle() );
         }
+        i.putExtra( "station", currentStation );
         sendBroadcast( i );
     }
 

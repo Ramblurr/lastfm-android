@@ -366,31 +366,14 @@ public class Player extends Activity
         try
         {
             db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-            db
-                    .execSQL( "CREATE TABLE IF NOT EXISTS "
+            db.execSQL( "CREATE TABLE IF NOT EXISTS "
                             + LastFm.DB_TABLE_RECENTSTATIONS
-                            + " (Url VARCHAR UNIQUE NOT NULL, Name VARCHAR NOT NULL, Id INTEGER PRIMARY KEY NOT NULL);" );
-            Cursor c = db.rawQuery( "SELECT Id" + " FROM "
-                    + LastFm.DB_TABLE_RECENTSTATIONS + ";", null );
-            if ( c.getCount() > 4 )
-            {
-                c.moveToFirst();
-                int max = -1;
-                do
-                {
-                    int foo = c.getInt( 0 );
-                    if ( foo > max )
-                        max = foo;
-                }
-                while ( c.moveToNext() );
-                int min = max - 3;
-                db.execSQL( "DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS
-                        + " WHERE Id < " + min + ";" );
-            }
-            c.close();
+                            + " (Url VARCHAR UNIQUE NOT NULL PRIMARY KEY, Name VARCHAR NOT NULL, Timestamp INTEGER NOT NULL);" );
+            db.execSQL( "DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS
+                        + " WHERE Url = '" + url + "'" );
             db.execSQL( "INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS
-                    + "(Url, Name) " + "VALUES ('" + url + "', '" + name
-                    + "');" );
+                    + "(Url, Name, Timestamp) " + "VALUES ('" + url + "', '" + name
+                    + "', " + System.currentTimeMillis() + ")" );
             db.close();
         }
         catch ( Exception e )

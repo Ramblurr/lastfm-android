@@ -1,12 +1,12 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
-
-import android.app.Activity;
+import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,15 +34,14 @@ import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.SeparatedListAdapter;
 import fm.last.android.Worker;
-import fm.last.android.R.id;
-import fm.last.android.R.layout;
-import fm.last.android.R.string;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.Station;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
-public class Home extends Activity
+public class Home extends ListActivity
 {
 
     private SeparatedListAdapter mMainAdapter;
@@ -63,16 +63,7 @@ public class Home extends Activity
                 .get( "lastfm_session" );
         TextView tv = ( TextView ) findViewById( R.id.home_usersname );
         tv.setText( session.getName() );
-
-        ListView mainlistview = ( ListView ) findViewById( R.id.home_main_list );
-        mMainAdapter = new SeparatedListAdapter(this); 
         
-        SetupMyStations( session );
-        SetupRecentStations();
-
-        mainlistview.setAdapter( mMainAdapter );
-        mainlistview.setOnItemClickListener( mStationsClickListener );
-
         Button b = ( Button ) findViewById( R.id.home_startnewstation );
         b.setOnClickListener( mNewStationListener );
 
@@ -84,9 +75,58 @@ public class Home extends Activity
         mProfileImageWorker = new Worker( "profile image worker" );
         mProfileImageHandler = new RemoteImageHandler( mProfileImageWorker
                 .getLooper(), mHandler );
+
         SetupProfile( session );
+        mMyRecentAdapter = new LastFMStreamAdapter( this );
+
+        SetupMyStations( session );
+        SetupRecentStations();
+        RebuildMainMenu();
     }
 
+    @Override
+    public void onStart()
+    {
+        IntentFilter f = new IntentFilter();
+        f.addAction( RadioPlayerService.STATION_CHANGED );
+        registerReceiver( mStatusListener, f );
+        super.onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+    	unregisterReceiver( mStatusListener );
+    	super.onDestroy();
+    }
+    
+    private void RebuildMainMenu() 
+    {
+        mMainAdapter = new SeparatedListAdapter(this);
+        mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
+        mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+        setListAdapter( mMainAdapter );
+        mMainAdapter.notifyDataSetChanged();
+    }
+    
+    private BroadcastReceiver mStatusListener = new BroadcastReceiver()
+    {
+
+        @Override
+        public void onReceive( Context context, Intent intent )
+        {
+
+            String action = intent.getAction();
+            if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
+            {
+            	Station s = (Station)intent.getSerializableExtra("station");
+            	System.out.printf("Station changed: %s (%s)\n", s.getName(), s.getUrl());
+            	SetupRecentStations();
+            	RebuildMainMenu();
+            }
+        }
+    };
+    
+    
     private void SetupProfile( final Session session )
     {
 
@@ -136,13 +176,13 @@ public class Home extends Activity
 
     private void SetupRecentStations()
     {
-        mMyRecentAdapter = new LastFMStreamAdapter( this );
+        mMyRecentAdapter.resetList();
         SQLiteDatabase db = null;
         try
         {
             db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-            Cursor c = db.rawQuery( "SELECT Url,Name" + " FROM "
-                    + LastFm.DB_TABLE_RECENTSTATIONS + " LIMIT 4;", null );
+            Cursor c = db.rawQuery( "SELECT * FROM "
+                    + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null );
             int urlColumn = c.getColumnIndex( "Url" );
             int nameColumn = c.getColumnIndex( "Name" );
             if ( c.getCount() > 0 )
@@ -167,7 +207,6 @@ public class Home extends Activity
         {
             System.out.println( e.getMessage() );
         }
-        mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
 
     }
 
@@ -183,23 +222,16 @@ public class Home extends Activity
         mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
         		"lastfm://user/" + Uri.encode( session.getName() ) + "/neighbours" );
         mMyStationsAdapter.updateModel();
-        mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
     }
 
-    public OnItemClickListener mStationsClickListener = new OnItemClickListener()
+    public void onListItemClick( ListView l, View v, int position, long id )
     {
-
-        public void onItemClick( AdapterView parent, View v, int position,
-                long id )
-        {
-
-            final Session session = ( Session ) LastFMApplication.getInstance().map
+        final Session session = ( Session ) LastFMApplication.getInstance().map
                     .get( "lastfm_session" );
-            Intent intent = new Intent( Home.this, Player.class );
-            intent.putExtra( "radiostation", mMainAdapter.getStation( position ) );
-            startActivity( intent );
-        }
-    };
+        Intent intent = new Intent( Home.this, Player.class );
+        intent.putExtra( "radiostation", mMainAdapter.getStation( position ) );
+        startActivity( intent );
+    }
 
     public OnClickListener mLogoutListener = new OnClickListener()
     {
@@ -274,6 +306,18 @@ public class Home extends Activity
         editor.remove( "lastfm_user" );
         editor.remove( "lastfm_pass" );
         editor.commit();
+        SQLiteDatabase db = null;
+        try
+        {
+            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
+            db.execSQL( "DROP TABLE IF EXISTS "
+                            + LastFm.DB_TABLE_RECENTSTATIONS );
+            db.close();
+        }
+        catch ( Exception e )
+        {
+            System.out.println( e.getMessage() );
+        }
         Intent intent = new Intent( Home.this, LastFm.class );
         startActivity( intent );
         finish();
