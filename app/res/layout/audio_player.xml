@@ -57,16 +57,12 @@
             android:layout_marginTop="1px"
             android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center">
 
-            <ImageButton android:id="@+id/love" android:background="@drawable/love" android:layout_margin="8dip" android:layout_height="wrap_content" android:layout_width="wrap_content"/>
-            
+            <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" android:layout_margin="8dip"/>
+            <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" android:layout_margin="8dip"/>
+            <ImageButton android:id="@+id/playback_menu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog_button" android:layout_margin="8dip"/>
+            <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" android:layout_margin="8dip"/>
+            <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" android:layout_margin="8dip"/>
 
-            <ImageButton android:id="@+id/ban" android:background="@drawable/ban" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="8dip"/><ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog_button" android:id="@+id/playback_menu" android:layout_margin="8dip"></ImageButton><ImageButton android:id="@+id/stop" android:background="@drawable/stop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dip"/>
-
-            <ImageButton android:background="@drawable/skip" android:id="@+id/skip" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_margin="8dip"/>
-            
-            
-
-        
 </LinearLayout>
 
 </LinearLayout>

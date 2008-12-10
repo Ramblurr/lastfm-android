@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="LastFMButton">
+		<item name="android:background">@+drawable/lastfm_button_transparent_bg48
+		</item>
+		<item name="android:layout_width">48dip</item>
+		<item name="android:layout_height">48dip</item>
+	</style>
+	<style name="LastFMButton.Love">
+		<item name="android:src">@+drawable/love</item>
+	</style>
+	<style name="LastFMButton.Ban">
+		<item name="android:src">@+drawable/ban</item>
+	</style>
+	<style name="LastFMButton.Stop">
+		<item name="android:src">@+drawable/stop</item>
+	</style>
+	<style name="LastFMButton.Skip">
+		<item name="android:src">@+drawable/skip</item>
+	</style>
+</resources>
