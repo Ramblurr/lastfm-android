@@ -16,6 +16,8 @@ public interface LastFmServer {
 
   public Artist[] searchForArtist(String artist) throws IOException;
   
+  public Tag[] searchForTag(String Tag) throws IOException;
+  
   /**
    * See http://www.last.fm/api/show?service=263
    * @param user

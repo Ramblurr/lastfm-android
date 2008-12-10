@@ -89,6 +89,14 @@ final class LastFmServerImpl implements LastFmServer {
 	    }
 	    return ArtistFunctions.searchForArtist(baseUrl, params);
 	  }
+  
+  public Tag[] searchForTag(String tag) throws IOException {
+	    Map<String, String> params = createParams("tag.search");
+	    if (tag != null) {
+	      params.put("tag", tag);
+	    }
+	    return TagFunctions.searchForTag(baseUrl, params);
+	  }
 
   public Friends getFriends(String user, String recenttracks, String limit) throws IOException {
     Map<String, String> params = createParams("user.getFriends");
