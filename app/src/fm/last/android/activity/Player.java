@@ -39,7 +39,7 @@ public class Player extends Activity
 {
 
     private fm.last.android.player.IRadioPlayer mService = null;
-    private Button mBackButton;
+    private ImageButton mBackButton;
     private ImageButton mStopButton;
     private ImageButton mNextButton;
     private RemoteImageView mAlbum;
@@ -78,7 +78,7 @@ public class Player extends Activity
         mStationName = ( TextView ) findViewById( R.id.station_name );
         mArtistName = ( TextView ) findViewById( R.id.track_artist );
         mTrackName = ( TextView ) findViewById( R.id.track_title );
-        mBackButton = ( Button ) findViewById( R.id.player_backBtn );
+        mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
         mBackButton.setOnClickListener( mBackListener );
         mStopButton = ( ImageButton ) findViewById( R.id.stop );
         mStopButton.requestFocus();

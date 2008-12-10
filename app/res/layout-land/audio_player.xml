@@ -20,9 +20,10 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" android:background="#000">
 
-    <LinearLayout style="TopBar" android:background="#9d9fa2" android:layout_height="48dip" android:layout_width="fill_parent"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&lt;" android:id="@+id/player_backBtn"></Button>
-<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight="1" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:id="@+id/station_name" android:text="Station Name" android:layout_gravity="center"></TextView>
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="i" android:id="@+id/player_infoBtn"></Button>
+    <LinearLayout style="TopBar" android:background="#9d9fa2" android:layout_height="48dip" android:layout_width="fill_parent">
+	<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/back_button" android:id="@+id/player_backBtn"/>
+	<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight="1" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:id="@+id/station_name" android:text="Station Name" android:layout_gravity="center"></TextView>
+    <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/back_button" android:id="@+id/player_backBtn"/>
 </LinearLayout>
     
 
