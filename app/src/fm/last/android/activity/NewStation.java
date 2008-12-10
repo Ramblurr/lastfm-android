@@ -233,7 +233,7 @@ public class NewStation extends ListActivity
     	            System.out.println("Artist can stream? " + artist.getStreamable());
     	            if ( artist.getStreamable().equals("1") ) {
     	                System.out.printf("Search match: %s\n", artist.getName());
-    	                mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similar" );
+    	                mAdapter.putStation( artist.getName(), "lastfm://artist/" + Uri.encode(artist.getName()) + "/similarartists" );
 	                }
 	            }
 	        } else if( searching == SearchType.Tag) {
