@@ -248,7 +248,8 @@ public class Home extends Activity
         // group -- Not used here.
         // id -- Used only when you want to handle and identify the click yourself.
         // title
-        menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
+        MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
+        logout.setIcon(R.drawable.logout);
         return true;
     }
     
