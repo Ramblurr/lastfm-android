@@ -3,8 +3,11 @@
 package fm.last.api;
 
 import java.io.IOException;
-import java.util.Map;
 
+/**
+ * @author vishna
+ *
+ */
 public interface LastFmServer {
 	/**
 	 * See http://www.last.fm/api/show?service=119
@@ -66,4 +69,14 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public Tag[] getTrackTopTags(String artist, String track, String mbid) throws IOException;
+	
+	/**
+	 * See http://www.lastfm.pl/api/show?service=123
+	 * 
+	 * @param user
+	 * @param limit
+	 * @return
+	 * @throws IOException
+	 */
+	public Tag[] getUserTopTags(String user, Integer limit) throws IOException;
 }

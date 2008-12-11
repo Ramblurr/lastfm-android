@@ -170,7 +170,7 @@ final class LastFmServerImpl implements LastFmServer {
 	@Override
 	public Tag[] getTrackTopTags(String artist, String track, String mbid)
 	throws IOException {
-		Map<String, String> params = createParamsWithSig("track.getTopTags");
+		Map<String, String> params = createParams("track.getTopTags");
 		if (artist != null) {
 			params.put("artist", artist);
 		}
@@ -181,5 +181,17 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("mbid", mbid);
 		}
 		return TrackFunctions.getTrackTopTags(baseUrl, params);
+	}
+
+	@Override
+	public Tag[] getUserTopTags(String user, Integer limit) throws IOException {
+		Map<String, String> params = createParams("user.getTopTags");
+		if (user != null) {
+			params.put("user", user);
+		}
+		if (limit != null) {
+			params.put("limit", limit.toString());
+		}
+		return UserFunctions.getUserTopTags(baseUrl, params);
 	}
 }

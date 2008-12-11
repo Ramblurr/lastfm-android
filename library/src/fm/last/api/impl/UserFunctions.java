@@ -14,37 +14,40 @@
 
 package fm.last.api.impl;
 
+import fm.last.api.Tag;
 import fm.last.api.User;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class UserFunctions {
-  private UserFunctions() {
-  }
+	private UserFunctions() {
+	}
 
-  public static User getUserInfo(String baseUrl, Map<String, String> params) throws IOException {
-    String response = UrlUtil.doGet(baseUrl, params);
+	public static User getUserInfo(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
 
-    Document responseXML = null;
-    try {
-      responseXML = XMLUtil.stringToDocument(response);
-    } catch (SAXException e) {
-      throw new IOException(e.getMessage());
-    }
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
 
-    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node userNode = XMLUtil.findNamedElementNode(lfmNode, "user");
-    UserBuilder builder = new UserBuilder();
-    return builder.build(userNode);
-  }
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node userNode = XMLUtil.findNamedElementNode(lfmNode, "user");
+		UserBuilder builder = new UserBuilder();
+		return builder.build(userNode);
+	}
+	
+	public static Tag[] getUserTopTags(String baseUrl, Map<String, String> params) throws IOException {
+		return TagFunctions.getTopTags(baseUrl, params);
+	}
 
 }
