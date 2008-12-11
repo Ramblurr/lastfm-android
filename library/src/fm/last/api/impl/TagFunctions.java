@@ -42,8 +42,8 @@ public class TagFunctions {
 		}
 		return tags.toArray(new Tag[tags.size()]);
 	}
-
-	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException {
+	
+	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException{
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -54,9 +54,9 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node toptagsNode = XMLUtil.findNamedElementNode(lfmNode, "toptags");
+		Node childNode = XMLUtil.findNamedElementNode(lfmNode, child);
 
-		Node[] elnodes = XMLUtil.getChildNodes(toptagsNode, Node.ELEMENT_NODE);
+		Node[] elnodes = XMLUtil.getChildNodes(childNode, Node.ELEMENT_NODE);
 		TagBuilder tagBuilder = new TagBuilder();
 		List<Tag> tags = new ArrayList<Tag>();
 		for (Node node : elnodes) {
@@ -65,4 +65,13 @@ public class TagFunctions {
 		}
 		return tags.toArray(new Tag[tags.size()]);
 	}
+	
+	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException{
+		return getChildTags(baseUrl, params, "toptags");
+	}
+	
+	public static Tag[] getTags(String baseUrl, Map<String, String> params) throws IOException{
+		return getChildTags(baseUrl, params, "tags");
+	}
+
 }
