@@ -211,4 +211,24 @@ final class LastFmServerImpl implements LastFmServer {
 		signParams(params);
 		return TrackFunctions.getTrackTags(baseUrl, params);
 	}
+
+	@Override
+	public void addTrackTags(String artist, String track, String[] tag,
+			String sk) throws IOException {
+		Map<String, String> params = createParams("track.addTags");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (track != null) {
+			params.put("track", track);
+		}
+		if (tag != null) {
+			params.put("tags", TagFunctions.buildTags(tag));
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+		}
+		signParams(params);
+		TrackFunctions.addTrackTags(baseUrl, params);
+	}
 }

@@ -89,5 +89,6 @@ public interface LastFmServer {
 	 */
 	public Tag[] getTrackTags(String artist, String track, String sk) throws IOException;
 	
+	public void addTrackTags(String artist, String track, String[] tag, String sk) throws IOException;
 	
 }

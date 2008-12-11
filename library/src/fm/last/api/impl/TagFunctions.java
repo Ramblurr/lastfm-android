@@ -17,6 +17,8 @@ import fm.last.util.XMLUtil;
  * @author Casey Link
  */
 public class TagFunctions {
+	private static int TAGS_PER_POST = 10;
+	
 	private TagFunctions() {}
 
 	public static Tag[] searchForTag(String baseUrl, Map<String, String> params) throws IOException {
@@ -42,7 +44,7 @@ public class TagFunctions {
 		}
 		return tags.toArray(new Tag[tags.size()]);
 	}
-	
+
 	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException{
 		String response = UrlUtil.doGet(baseUrl, params);
 
@@ -65,13 +67,34 @@ public class TagFunctions {
 		}
 		return tags.toArray(new Tag[tags.size()]);
 	}
-	
+
 	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException{
 		return getChildTags(baseUrl, params, "toptags");
 	}
-	
+
 	public static Tag[] getTags(String baseUrl, Map<String, String> params) throws IOException{
 		return getChildTags(baseUrl, params, "tags");
+	}
+
+	public static void addTags(String baseUrl, Map<String, String> params) throws IOException {
+		UrlUtil.doPost(baseUrl, params);
+//		int n = (tag.length-1) / TAGS_PER_POST;
+//		int i = 0;
+//		do{
+//			params.put("tags", buildTags(tag, i*TAGS_PER_POST));
+//			
+//		}while (i++ < n);
+	}
+
+	public static String buildTags(String[] tag){
+		String tags = "";
+		if(tag!=null && tag.length > 0){
+			tags = tag[0];
+			for(int i=1; i<TAGS_PER_POST && i<tag.length; i++){
+				tags += ","+tag[i];
+			}
+		}
+		return tags;
 	}
 
 }

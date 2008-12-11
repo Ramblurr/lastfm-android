@@ -57,5 +57,9 @@ public class TrackFunctions {
 	public static Tag[] getTrackTags(String baseUrl, Map<String, String> params) throws IOException {
 	    return TagFunctions.getTags(baseUrl, params);
 	}
+	
+	public static void addTrackTags(String baseUrl, Map<String, String> params) throws IOException {
+		TagFunctions.addTags(baseUrl, params);
+	}
 
 }
