@@ -231,4 +231,24 @@ final class LastFmServerImpl implements LastFmServer {
 		signParams(params);
 		TrackFunctions.addTrackTags(baseUrl, params);
 	}
+
+	@Override
+	public void removeTrackTag(String artist, String track, String tag,
+			String sk) throws IOException {
+		Map<String, String> params = createParams("track.removeTag");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (track != null) {
+			params.put("track", track);
+		}
+		if (tag != null) {
+			params.put("tag", tag);
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+		}
+		signParams(params);
+		TrackFunctions.removeTrackTag(baseUrl, params);
+	}
 }

@@ -97,4 +97,8 @@ public class TagFunctions {
 		return tags;
 	}
 
+	public static void removeTag(String baseUrl, Map<String, String> params) throws IOException {
+		UrlUtil.doPost(baseUrl, params);
+	}
+
 }

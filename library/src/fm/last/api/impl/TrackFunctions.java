@@ -62,4 +62,8 @@ public class TrackFunctions {
 		TagFunctions.addTags(baseUrl, params);
 	}
 
+	public static void removeTrackTag(String baseUrl, Map<String, String> params) throws IOException {
+		TagFunctions.removeTag(baseUrl, params);
+	}
+
 }
