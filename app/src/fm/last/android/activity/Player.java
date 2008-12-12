@@ -28,136 +28,182 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Button;
 
 public class Player extends Activity
 {
 
-    private fm.last.android.player.IRadioPlayer mService = null;
-    private ImageButton mBackButton;
-    private ImageButton mStopButton;
-    private ImageButton mNextButton;
-    private RemoteImageView mAlbum;
-    private TextView mCurrentTime;
-    private TextView mTotalTime;
-    private TextView mArtistName;
-    private TextView mTrackName;
-    private TextView mStationName;
-    private ProgressBar mProgress;
-    private long mPosOverride = -1;
-    private long mDuration;
-    private boolean paused;
-    private Intent mpIntent;
-    private boolean mRelaunchAfterConfigChange;
+	private fm.last.android.player.IRadioPlayer mService = null;
+	private ImageButton mBackButton;
+	private ImageButton mStopButton;
+	private ImageButton mNextButton;
+	private RemoteImageView mAlbum;
+	private TextView mCurrentTime;
+	private TextView mTotalTime;
+	private TextView mArtistName;
+	private TextView mTrackName;
+	private TextView mStationName;
+	private ProgressBar mProgress;
+	private long mPosOverride = -1;
+	private long mDuration;
+	private boolean paused;
+	private Intent mpIntent;
+	private boolean mRelaunchAfterConfigChange;
 
-    private static final int REFRESH = 1;
+	private static final int REFRESH = 1;
 
 
-    private Worker mAlbumArtWorker;
-    private RemoteImageHandler mAlbumArtHandler;
+	private Worker mAlbumArtWorker;
+	private RemoteImageHandler mAlbumArtHandler;
+	private IntentFilter mIntentFilter;
 
-    @Override
-    public void onCreate( Bundle icicle )
-    {
+	@Override
+	public void onCreate( Bundle icicle )
+	{
 
-        super.onCreate( icicle );
-        requestWindowFeature( Window.FEATURE_NO_TITLE );
+		super.onCreate( icicle );
+		requestWindowFeature( Window.FEATURE_NO_TITLE );
 
-        setContentView( R.layout.audio_player );
+		setContentView( R.layout.audio_player );
 
-        mCurrentTime = ( TextView ) findViewById( R.id.currenttime );
-        mTotalTime = ( TextView ) findViewById( R.id.totaltime );
-        mProgress = ( ProgressBar ) findViewById( android.R.id.progress );
-        mProgress.setMax( 1000 );
-        mAlbum = ( RemoteImageView ) findViewById( R.id.album );
-        mStationName = ( TextView ) findViewById( R.id.station_name );
-        mArtistName = ( TextView ) findViewById( R.id.track_artist );
-        mTrackName = ( TextView ) findViewById( R.id.track_title );
-        mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
-        mBackButton.setOnClickListener( mBackListener );
-        mStopButton = ( ImageButton ) findViewById( R.id.stop );
-        mStopButton.requestFocus();
-        mStopButton.setOnClickListener( mStopListener );
-        mNextButton = ( ImageButton ) findViewById( R.id.skip );
-        mNextButton.setOnClickListener( mNextListener );
-        mpIntent = new Intent(
-                this,
-                fm.last.android.player.RadioPlayerService.class );
-        startService( mpIntent );
-        boolean b = bindService( mpIntent, mConnection, 0 );
-        if ( !b )
-        {
-            // something went wrong
-            // mHandler.sendEmptyMessage(QUIT);
-            System.out.println( "Binding to service failed " + mConnection );
-        }
+		mCurrentTime = ( TextView ) findViewById( R.id.currenttime );
+		mTotalTime = ( TextView ) findViewById( R.id.totaltime );
+		mProgress = ( ProgressBar ) findViewById( android.R.id.progress );
+		mProgress.setMax( 1000 );
+		mAlbum = ( RemoteImageView ) findViewById( R.id.album );
+		mStationName = ( TextView ) findViewById( R.id.station_name );
+		mArtistName = ( TextView ) findViewById( R.id.track_artist );
+		mTrackName = ( TextView ) findViewById( R.id.track_title );
+		mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
+		mBackButton.setOnClickListener( mBackListener );
+		mStopButton = ( ImageButton ) findViewById( R.id.stop );
+		mStopButton.requestFocus();
+		mStopButton.setOnClickListener( mStopListener );
+		mNextButton = ( ImageButton ) findViewById( R.id.skip );
+		mNextButton.setOnClickListener( mNextListener );
+		mpIntent = new Intent(
+				this,
+				fm.last.android.player.RadioPlayerService.class );
+		startService( mpIntent );
+		boolean b = bindService( mpIntent, mConnection, 0 );
+		if ( !b )
+		{
+			// something went wrong
+			// mHandler.sendEmptyMessage(QUIT);
+			System.out.println( "Binding to service failed " + mConnection );
+		}
 
-        mAlbumArtWorker = new Worker( "album art worker" );
-        mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
+		mAlbumArtWorker = new Worker( "album art worker" );
+		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
 
-        if ( icicle != null )
-        {
-            mRelaunchAfterConfigChange = icicle.getBoolean( "configchange" );
-        }
-    }
+		if ( icicle != null )
+		{
+			mRelaunchAfterConfigChange = icicle.getBoolean( "configchange" );
+		}
 
-    @Override
-    public void onStart()
-    {
+		mIntentFilter = new IntentFilter();
+		mIntentFilter.addAction( RadioPlayerService.META_CHANGED );
+		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_FINISHED );
+		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_STATE_CHANGED );
+		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
+	}
 
-        super.onStart();
-        paused = false;
-        IntentFilter f = new IntentFilter();
-        f.addAction( RadioPlayerService.META_CHANGED );
-        f.addAction( RadioPlayerService.PLAYBACK_FINISHED );
-        f.addAction( RadioPlayerService.PLAYBACK_STATE_CHANGED );
-        f.addAction( RadioPlayerService.STATION_CHANGED );
-        registerReceiver( mStatusListener, new IntentFilter( f ) );
-        long next = refreshNow();
-        queueNextRefresh( next );
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.player, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
 
-    @Override
-    public void onStop()
-    {
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.tag_menu_item:
+			fireTagIntent();
+			break;
 
-        paused = true;
-        mHandler.removeMessages( REFRESH );
-        unregisterReceiver( mStatusListener );
-        unbindService( mConnection );
-        super.onStop();
-    }
+		default:
+			break;
+		}
 
-    @Override
-    public void onSaveInstanceState( Bundle outState )
-    {
+		return super.onOptionsItemSelected(item);
+	}
 
-        outState.putBoolean( "configchange", getChangingConfigurations() != 0 );
-        super.onSaveInstanceState( outState );
-    }
+	private void fireTagIntent(){
+		String artist = null;
+		String track = null;
 
-    @Override
-    public void onResume()
-    {
+		try {
+			artist = mService.getArtistName();
+			track = mService.getTrackName();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		Intent myIntent = new Intent(this, Tag.class);
+		myIntent.putExtra("lastfm.artist", artist);
+		myIntent.putExtra("lastfm.track", track);
+		startActivity(myIntent);
+	}
 
-        super.onResume();
-        updateTrackInfo();
-    }
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		paused = false;
+		long next = refreshNow();
+		queueNextRefresh( next );
+	}
 
-    @Override
-    public void onDestroy()
-    {
+	@Override
+	public void onStop()
+	{
 
-        mAlbumArtWorker.quit();
-        super.onDestroy();
-    }
+		paused = true;
+		mHandler.removeMessages( REFRESH );
 
-    /*private View.OnClickListener mLoveListener = new View.OnClickListener()
+		
+		super.onStop();
+	}
+
+	@Override
+	public void onSaveInstanceState( Bundle outState )
+	{
+
+		outState.putBoolean( "configchange", getChangingConfigurations() != 0 );
+		super.onSaveInstanceState( outState );
+	}
+
+	@Override
+	protected void onPause() {
+		unregisterReceiver( mStatusListener );
+		super.onPause();
+	}
+
+	@Override
+	public void onResume()
+	{
+		registerReceiver( mStatusListener, mIntentFilter );
+		super.onResume();
+		updateTrackInfo();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+
+		unbindService( mConnection );
+		mAlbumArtWorker.quit();
+		super.onDestroy();
+	}
+
+	/*private View.OnClickListener mLoveListener = new View.OnClickListener()
     {
 
         public void onClick( View v )
@@ -176,7 +222,7 @@ public class Player extends Activity
         }
     };*/
 
-    /*private View.OnClickListener mBanListener = new View.OnClickListener()
+	/*private View.OnClickListener mBanListener = new View.OnClickListener()
     {
 
         public void onClick( View v )
@@ -195,318 +241,318 @@ public class Player extends Activity
         }
     };*/
 
-    private View.OnClickListener mNextListener = new View.OnClickListener()
-    {
+	private View.OnClickListener mNextListener = new View.OnClickListener()
+	{
 
-        public void onClick( View v )
-        {
+		public void onClick( View v )
+		{
 
-            if ( mService == null )
-                return;
-            try
-            {
-                mService.skip();
-            }
-            catch ( RemoteException ex )
-            {
-                System.out.println( ex.getMessage() );
-            }
-        }
-    };
+			if ( mService == null )
+				return;
+			try
+			{
+				mService.skip();
+			}
+			catch ( RemoteException ex )
+			{
+				System.out.println( ex.getMessage() );
+			}
+		}
+	};
 
-    private View.OnClickListener mBackListener = new View.OnClickListener()
-    {
-    	public void onClick( View v )
-    	{
-    		finish();
-    	}
-    };
-    
-    private View.OnClickListener mStopListener = new View.OnClickListener()
-    {
+	private View.OnClickListener mBackListener = new View.OnClickListener()
+	{
+		public void onClick( View v )
+		{
+			finish();
+		}
+	};
 
-        public void onClick( View v )
-        {
+	private View.OnClickListener mStopListener = new View.OnClickListener()
+	{
 
-            if ( mService == null )
-                return;
-            try
-            {
-                mService.stop();
-            }
-            catch ( RemoteException ex )
-            {
-                System.out.println( ex.getMessage() );
-            }
-            finish();
-        }
-    };
+		public void onClick( View v )
+		{
 
-    private BroadcastReceiver mStatusListener = new BroadcastReceiver()
-    {
+			if ( mService == null )
+				return;
+			try
+			{
+				mService.stop();
+			}
+			catch ( RemoteException ex )
+			{
+				System.out.println( ex.getMessage() );
+			}
+			finish();
+		}
+	};
 
-        @Override
-        public void onReceive( Context context, Intent intent )
-        {
+	private BroadcastReceiver mStatusListener = new BroadcastReceiver()
+	{
 
-            String action = intent.getAction();
-            if ( action.equals( RadioPlayerService.META_CHANGED ) )
-            {
-                // redraw the artist/title info and
-                // set new max for progress bar
-                updateTrackInfo();
-            }
-            else if ( action.equals( RadioPlayerService.PLAYBACK_FINISHED ) )
-            {
-                finish();
-            }
-            else if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
-            {
-                try
-                {
-                    mStationName.setText( mService.getStationName() );
-                }
-                catch ( RemoteException e )
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
+		@Override
+		public void onReceive( Context context, Intent intent )
+		{
 
-    private void updateTrackInfo()
-    {
+			String action = intent.getAction();
+			if ( action.equals( RadioPlayerService.META_CHANGED ) )
+			{
+				// redraw the artist/title info and
+				// set new max for progress bar
+				updateTrackInfo();
+			}
+			else if ( action.equals( RadioPlayerService.PLAYBACK_FINISHED ) )
+			{
+				finish();
+			}
+			else if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
+			{
+				try
+				{
+					mStationName.setText( mService.getStationName() );
+				}
+				catch ( RemoteException e )
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	};
 
-        System.out.println( "Updating track info" );
-        if ( mService == null )
-        {
-            return;
-        }
-        try
-        {
-            /*
-             * if (mService.getPath() == null) { finish(); return; }
-             */// TODO if player is done finish()
-            String artistName = mService.getArtistName();
-            mArtistName.setText( artistName );
-            mTrackName.setText( mService.getTrackName() );
-            String artUrl = mService.getArtUrl();
-            if ( artUrl != RadioPlayerService.UNKNOWN )
-            {
-                mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-                mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
-                        .sendToTarget();
-            }
+	private void updateTrackInfo()
+	{
 
-            mDuration = mService.getDuration();
-            System.out.println( "Setting track duration to: " + mDuration );
-            mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
-        }
-        catch ( RemoteException ex )
-        {
-            finish();
-        }
-    }
+		System.out.println( "Updating track info" );
+		if ( mService == null )
+		{
+			return;
+		}
+		try
+		{
+			/*
+			 * if (mService.getPath() == null) { finish(); return; }
+			 */// TODO if player is done finish()
+			String artistName = mService.getArtistName();
+			mArtistName.setText( artistName );
+			mTrackName.setText( mService.getTrackName() );
+			String artUrl = mService.getArtUrl();
+			if ( artUrl != RadioPlayerService.UNKNOWN )
+			{
+				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
+				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
+				.sendToTarget();
+			}
 
-    private ServiceConnection mConnection = new ServiceConnection()
-    {
+			mDuration = mService.getDuration();
+			System.out.println( "Setting track duration to: " + mDuration );
+			mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
+		}
+		catch ( RemoteException ex )
+		{
+			finish();
+		}
+	}
 
-        public void onServiceConnected( ComponentName className, IBinder service )
-        {
+	private ServiceConnection mConnection = new ServiceConnection()
+	{
 
-            mService = fm.last.android.player.IRadioPlayer.Stub
-                    .asInterface( service );
-            startPlayback();
-        }
+		public void onServiceConnected( ComponentName className, IBinder service )
+		{
 
-        public void onServiceDisconnected( ComponentName className )
-        {
+			mService = fm.last.android.player.IRadioPlayer.Stub
+			.asInterface( service );
+			startPlayback();
+		}
 
-            mService = null;
-        }
-    };
+		public void onServiceDisconnected( ComponentName className )
+		{
 
-    private void startPlayback()
-    {
+			mService = null;
+		}
+	};
 
-        if ( mService == null )
-            return;
-        
-        Intent intent = getIntent();
-        if ( intent.hasExtra( "radiostation" ) )
-        {
-            String url = intent.getExtras().getString( "radiostation" );
-            try
-            {
-                Session session = ( Session ) LastFMApplication.getInstance().map
-                        .get( "lastfm_session" );
-                if ( !mRelaunchAfterConfigChange )
-                {
-                    mService.setSession( session );
-                    mService.tune( url, session );
-                    mService.startRadio();
-                    appendRecentStation( url, mService.getStationName() );
-                }
-            }
-            catch ( Exception e )
-            {
-                Log.d( "LastFMPlayer", "couldn't start playback: " + e );
-            }
-        }
-        updateTrackInfo();
-        //long next = refreshNow();
-        //queueNextRefresh( next );
-    }
+	private void startPlayback()
+	{
 
-    private void appendRecentStation( String url, String name )
-    {
+		if ( mService == null )
+			return;
 
-        SQLiteDatabase db = null;
-        try
-        {
-            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-            db.execSQL( "CREATE TABLE IF NOT EXISTS "
-                            + LastFm.DB_TABLE_RECENTSTATIONS
-                            + " (Url VARCHAR UNIQUE NOT NULL PRIMARY KEY, Name VARCHAR NOT NULL, Timestamp INTEGER NOT NULL);" );
-            db.execSQL( "DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS
-                        + " WHERE Url = '" + url + "'" );
-            db.execSQL( "INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS
-                    + "(Url, Name, Timestamp) " + "VALUES ('" + url + "', '" + name
-                    + "', " + System.currentTimeMillis() + ")" );
-            db.close();
-        }
-        catch ( Exception e )
-        {
-            System.out.println( e.getMessage() );
-        }
-    }
+		Intent intent = getIntent();
+		if ( intent.hasExtra( "radiostation" ) )
+		{
+			String url = intent.getExtras().getString( "radiostation" );
+			try
+			{
+				Session session = ( Session ) LastFMApplication.getInstance().map
+				.get( "lastfm_session" );
+				if ( !mRelaunchAfterConfigChange )
+				{
+					mService.setSession( session );
+					mService.tune( url, session );
+					mService.startRadio();
+					appendRecentStation( url, mService.getStationName() );
+				}
+			}
+			catch ( Exception e )
+			{
+				Log.d( "LastFMPlayer", "couldn't start playback: " + e );
+			}
+		}
+		updateTrackInfo();
+		//long next = refreshNow();
+		//queueNextRefresh( next );
+	}
 
-    private void queueNextRefresh( long delay )
-    {
+	private void appendRecentStation( String url, String name )
+	{
 
-        if ( !paused )
-        {
-            Message msg = mHandler.obtainMessage( REFRESH );
-            mHandler.removeMessages( REFRESH );
-            mHandler.sendMessageDelayed( msg, delay );
-        }
-    }
+		SQLiteDatabase db = null;
+		try
+		{
+			db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
+			db.execSQL( "CREATE TABLE IF NOT EXISTS "
+					+ LastFm.DB_TABLE_RECENTSTATIONS
+					+ " (Url VARCHAR UNIQUE NOT NULL PRIMARY KEY, Name VARCHAR NOT NULL, Timestamp INTEGER NOT NULL);" );
+			db.execSQL( "DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS
+					+ " WHERE Url = '" + url + "'" );
+			db.execSQL( "INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS
+					+ "(Url, Name, Timestamp) " + "VALUES ('" + url + "', '" + name
+					+ "', " + System.currentTimeMillis() + ")" );
+			db.close();
+		}
+		catch ( Exception e )
+		{
+			System.out.println( e.getMessage() );
+		}
+	}
 
-    private long refreshNow()
-    {
+	private void queueNextRefresh( long delay )
+	{
 
-        if ( mService == null )
-            return 500;
-        try
-        {
-            long pos = mPosOverride < 0 ? mService.getPosition() : mPosOverride;
-            long remaining = 1000 - ( pos % 1000 );
-            if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
-            {
-                mCurrentTime.setText( makeTimeString( this, pos / 1000 ) );
+		if ( !paused )
+		{
+			Message msg = mHandler.obtainMessage( REFRESH );
+			mHandler.removeMessages( REFRESH );
+			mHandler.sendMessageDelayed( msg, delay );
+		}
+	}
 
-            	if ( mService.isPlaying() )
-                {
-                    mCurrentTime.setVisibility( View.VISIBLE );
-                }
-                else
-                {
-                    // blink the counter
-                    int vis = mCurrentTime.getVisibility();
-                    mCurrentTime
-                            .setVisibility( vis == View.INVISIBLE ? View.VISIBLE
-                                    : View.INVISIBLE );
-                    remaining = 500;
-                }
+	private long refreshNow()
+	{
 
-                mProgress.setProgress( ( int ) ( 1000 * pos / mDuration ) );
+		if ( mService == null )
+			return 500;
+		try
+		{
+			long pos = mPosOverride < 0 ? mService.getPosition() : mPosOverride;
+			long remaining = 1000 - ( pos % 1000 );
+			if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
+			{
+				mCurrentTime.setText( makeTimeString( this, pos / 1000 ) );
 
-                mProgress
-                        .setSecondaryProgress( mService.getBufferPercent() * 10 );
-            }
-            else
-            {
-                mCurrentTime.setText( "--:--" );
-                mProgress.setProgress( 1000 );
-            }
-            // return the number of milliseconds until the next full second, so
-            // the counter can be updated at just the right time
-            return remaining;
-        }
-        catch ( RemoteException ex )
-        {
-        }
-        return 500;
-    }
+				if ( mService.isPlaying() )
+				{
+					mCurrentTime.setVisibility( View.VISIBLE );
+				}
+				else
+				{
+					// blink the counter
+					int vis = mCurrentTime.getVisibility();
+					mCurrentTime
+					.setVisibility( vis == View.INVISIBLE ? View.VISIBLE
+							: View.INVISIBLE );
+					remaining = 500;
+				}
 
-    private final Handler mHandler = new Handler()
-    {
+				mProgress.setProgress( ( int ) ( 1000 * pos / mDuration ) );
 
-        public void handleMessage( Message msg )
-        {
+				mProgress
+				.setSecondaryProgress( mService.getBufferPercent() * 10 );
+			}
+			else
+			{
+				mCurrentTime.setText( "--:--" );
+				mProgress.setProgress( 1000 );
+			}
+			// return the number of milliseconds until the next full second, so
+			// the counter can be updated at just the right time
+			return remaining;
+		}
+		catch ( RemoteException ex )
+		{
+		}
+		return 500;
+	}
 
-            switch ( msg.what )
-            {
-            case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-                mAlbum.setArtwork( ( Bitmap ) msg.obj );
-                mAlbum.invalidate();
-                break;
+	private final Handler mHandler = new Handler()
+	{
 
-            case REFRESH:
-                long next = refreshNow();
-                queueNextRefresh( next );
-                break;
+		public void handleMessage( Message msg )
+		{
 
-            /*
-             * case QUIT: // This can be moved back to onCreate once the bug
-             * that prevents // Dialogs from being started from
-             * onCreate/onResume is fixed. new
-             * AlertDialog.Builder(MediaPlaybackActivity.this)
-             * .setTitle(R.string.service_start_error_title)
-             * .setMessage(R.string.service_start_error_msg)
-             * .setPositiveButton(R.string.service_start_error_button, new
-             * DialogInterface.OnClickListener() { public void
-             * onClick(DialogInterface dialog, int whichButton) { finish(); } })
-             * .setCancelable(false) .show(); break;
-             */
+			switch ( msg.what )
+			{
+			case RemoteImageHandler.REMOTE_IMAGE_DECODED:
+				mAlbum.setArtwork( ( Bitmap ) msg.obj );
+				mAlbum.invalidate();
+				break;
 
-            default:
-                break;
-            }
-        }
-    };
+			case REFRESH:
+				long next = refreshNow();
+				queueNextRefresh( next );
+				break;
 
-    /*
-     * Try to use String.format() as little as possible, because it creates a
-     * new Formatter every time you call it, which is very inefficient. Reusing
-     * an existing Formatter more than tripled the speed of makeTimeString().
-     * This Formatter/StringBuilder are also used by makeAlbumSongsLabel()
-     */
-    private static StringBuilder sFormatBuilder = new StringBuilder();
-    private static Formatter sFormatter = new Formatter( sFormatBuilder, Locale
-            .getDefault() );
-    private static final Object[] sTimeArgs = new Object[5];
+				/*
+				 * case QUIT: // This can be moved back to onCreate once the bug
+				 * that prevents // Dialogs from being started from
+				 * onCreate/onResume is fixed. new
+				 * AlertDialog.Builder(MediaPlaybackActivity.this)
+				 * .setTitle(R.string.service_start_error_title)
+				 * .setMessage(R.string.service_start_error_msg)
+				 * .setPositiveButton(R.string.service_start_error_button, new
+				 * DialogInterface.OnClickListener() { public void
+				 * onClick(DialogInterface dialog, int whichButton) { finish(); } })
+				 * .setCancelable(false) .show(); break;
+				 */
 
-    public static String makeTimeString( Context context, long secs )
-    {
+			default:
+				break;
+			}
+		}
+	};
 
-        String durationformat = context.getString( R.string.durationformat );
+	/*
+	 * Try to use String.format() as little as possible, because it creates a
+	 * new Formatter every time you call it, which is very inefficient. Reusing
+	 * an existing Formatter more than tripled the speed of makeTimeString().
+	 * This Formatter/StringBuilder are also used by makeAlbumSongsLabel()
+	 */
+	private static StringBuilder sFormatBuilder = new StringBuilder();
+	private static Formatter sFormatter = new Formatter( sFormatBuilder, Locale
+			.getDefault() );
+	private static final Object[] sTimeArgs = new Object[5];
 
-        /*
-         * Provide multiple arguments so the format can be changed easily by
-         * modifying the xml.
-         */
-        sFormatBuilder.setLength( 0 );
+	public static String makeTimeString( Context context, long secs )
+	{
 
-        final Object[] timeArgs = sTimeArgs;
-        timeArgs[0] = secs / 3600;
-        timeArgs[1] = secs / 60;
-        timeArgs[2] = ( secs / 60 ) % 60;
-        timeArgs[3] = secs;
-        timeArgs[4] = secs % 60;
+		String durationformat = context.getString( R.string.durationformat );
 
-        return sFormatter.format( durationformat, timeArgs ).toString();
-    }
+		/*
+		 * Provide multiple arguments so the format can be changed easily by
+		 * modifying the xml.
+		 */
+		sFormatBuilder.setLength( 0 );
+
+		final Object[] timeArgs = sTimeArgs;
+		timeArgs[0] = secs / 3600;
+		timeArgs[1] = secs / 60;
+		timeArgs[2] = ( secs / 60 ) % 60;
+		timeArgs[3] = secs;
+		timeArgs[4] = secs % 60;
+
+		return sFormatter.format( durationformat, timeArgs ).toString();
+	}
 
 }

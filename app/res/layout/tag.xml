@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<!--
+		Copyright (C) 2008 Lukasz Wisniewski <luke.cherrish@gmail.com>
+
+		Licensed under the Apache License, Version 2.0 (the "License"); you
+		may not use this file except in compliance with the License. You may
+		obtain a copy of the License at
+
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+	<!-- The NavBar -->
+	<LinearLayout style="TopBar" android:background="#9d9fa2"
+		android:layout_height="46px" android:layout_width="fill_parent"
+		android:gravity="center_vertical">
+		<Button android:layout_width="wrap_content" android:id="@+id/navbar_back"
+			android:text="@string/cancel" android:gravity="center_vertical"
+			android:padding="8px" android:textColor="#fff" android:layout_height="30px"
+			android:background="#c5c6c8" android:layout_marginLeft="8px"></Button>
+		<TextView android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:layout_weight="1"
+			android:textColor="#fff" android:textStyle="bold" android:gravity="center"
+			android:id="@+id/station_name" android:text="Add a Tag"
+			android:layout_gravity="center"></TextView>
+		<Button android:layout_width="wrap_content" android:id="@+id/navbar_forward"
+			android:text="@string/done" android:gravity="center_vertical"
+			android:padding="8px" android:textColor="#fff" android:layout_height="30px"
+			android:background="#c5c6c8" android:layout_marginRight="8px" />
+	</LinearLayout>
+
+	<!-- TextInput -->
+	<LinearLayout style="TopBar" android:background="#9d9fa2"
+		android:layout_height="46px" android:layout_width="fill_parent"
+		android:gravity="center_vertical">
+		<EditText android:id="@+id/tag_text_edit"
+			android:layout_width="fill_parent" android:layout_height="40px"
+			android:singleLine="true" android:layout_marginTop="2px"
+			android:layout_marginLeft="8px" android:layout_weight="1"
+			android:layout_marginRight="8px" android:hint="@string/tag_hint" android:textSize="12px"></EditText>
+		<Button android:layout_width="wrap_content" android:id="@+id/tag_add_button"
+			android:text="@string/tag" android:gravity="center_vertical"
+			android:padding="8px" android:textColor="#fff" android:layout_height="30px"
+			android:background="#c5c6c8" android:layout_marginRight="8px"></Button>
+	</LinearLayout>
+
+	<!--
+		<org.lastfm.player.widget.TopBar android:id="@+id/TopBar"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" />
+	-->
+
+	<fm.last.android.widget.TagLayout
+		android:id="@+id/TagLayout" android:layout_width="fill_parent"
+		android:layout_height="175px">
+	</fm.last.android.widget.TagLayout>
+
+	<ListView android:id="@+id/TagList" android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+	</ListView>
+
+</LinearLayout>
