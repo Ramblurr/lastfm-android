@@ -167,7 +167,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserInfo(baseUrl, params);
 	}
 
-	@Override
 	public Tag[] getTrackTopTags(String artist, String track, String mbid)
 	throws IOException {
 		Map<String, String> params = createParams("track.getTopTags");
@@ -183,7 +182,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTopTags(baseUrl, params);
 	}
 
-	@Override
 	public Tag[] getUserTopTags(String user, Integer limit) throws IOException {
 		Map<String, String> params = createParams("user.getTopTags");
 		if (user != null) {
@@ -195,7 +193,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserTopTags(baseUrl, params);
 	}
 
-	@Override
 	public Tag[] getTrackTags(String artist, String track, String sk)
 			throws IOException {
 		Map<String, String> params = createParams("track.getTags");
@@ -212,7 +209,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTags(baseUrl, params);
 	}
 
-	@Override
 	public void addTrackTags(String artist, String track, String[] tag,
 			String sk) throws IOException {
 		Map<String, String> params = createParams("track.addTags");
@@ -232,7 +228,6 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.addTrackTags(baseUrl, params);
 	}
 
-	@Override
 	public void removeTrackTag(String artist, String track, String tag,
 			String sk) throws IOException {
 		Map<String, String> params = createParams("track.removeTag");
