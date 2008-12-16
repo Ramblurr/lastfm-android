@@ -10,43 +10,52 @@ import java.io.Serializable;
  * @author Mike Jennings
  */
 public class Artist implements Serializable {
-  private String name;
-  private String mbid;
-  private String match;
-  private String url;
-  private ImageUrl[] images;
-  private String streamable;
+	private String name;
+	private String mbid;
+	private String match;
+	private String url;
+	private ImageUrl[] images;
+	private String streamable;
+	private Bio bio;
 
-  public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable) {
-    this.name = name;
-    this.mbid = mbid;
-    this.match = match;
-    this.url = url;
-    this.images = images;
-    this.streamable = streamable;
-  }
+	public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable) {
+		this.name = name;
+		this.mbid = mbid;
+		this.match = match;
+		this.url = url;
+		this.images = images;
+		this.streamable = streamable;
+	}
 
-  public String getName() {
-    return name;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public String getMbid() {
-    return mbid;
-  }
+	public String getMbid() {
+		return mbid;
+	}
 
-  public String getMatch() {
-    return match;
-  }
+	public String getMatch() {
+		return match;
+	}
 
-  public String getUrl() {
-    return url;
-  }
+	public String getUrl() {
+		return url;
+	}
 
-  public ImageUrl[] getImages() {
-    return images;
-  }
-  
-  public String getStreamable() {
-	return streamable;
-  }
+	public ImageUrl[] getImages() {
+		return images;
+	}
+
+	public String getStreamable() {
+		return streamable;
+	}
+
+	public void setBio(Bio bio) {
+		this.bio = bio;
+	}
+
+	public Bio getBio() {
+		return bio;
+	}
 }

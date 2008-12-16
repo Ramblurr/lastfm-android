@@ -7,7 +7,9 @@ import org.w3c.dom.Node;
 import java.util.List;
 
 import fm.last.api.Artist;
+import fm.last.api.Bio;
 import fm.last.api.ImageUrl;
+import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
 
 /**
@@ -29,6 +31,16 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
     for (Node imageNode : imageNodes) {
       images[i++] =imageBuilder.build(imageNode);
     }
-    return new Artist(name, mbid, match, url, images, streamable);
+    Artist artist = new Artist(name, mbid, match, url, images, streamable);
+    
+    Node bioNode = getChildNode("bio");
+    //Node bioNode = XMLUtil.findNamedElementNode(node, "bio");
+    if(bioNode != null){
+    	BioBuilder bioBuilder = new BioBuilder();
+    	Bio bio = bioBuilder.build(bioNode);
+    	artist.setBio(bio);
+    }
+    
+    return artist;
   }
 }

@@ -113,4 +113,15 @@ public interface LastFmServer {
 	 */
 	public void removeTrackTag(String artist, String track, String tag, String sk) throws IOException;
 	
+	/**
+	 * See http://www.last.fm/api/show?service=267
+	 * 
+	 * @param artist (Optional) : The artist name in question
+	 * @param mbid (Optional) : The musicbrainz id for the artist
+	 * @param lang (Optional) : The language to return the biography in, expressed as an ISO 639 alpha-2 code.
+	 * @return Artist instance
+	 * @throws IOException
+	 */
+	public Artist getArtistInfo(String artist, String mbid, String lang) throws IOException;
+	
 }

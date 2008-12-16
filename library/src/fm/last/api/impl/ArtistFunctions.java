@@ -30,53 +30,72 @@ import org.xml.sax.SAXException;
  *         Date: Oct 20, 2008
  */
 public class ArtistFunctions {
-  private ArtistFunctions() {
-  }
+	private ArtistFunctions() {
+	}
 
-  public static Artist[] getSimilarArtists(String baseUrl, Map<String, String> params) throws IOException {
-    String response = UrlUtil.doGet(baseUrl, params);
+	public static Artist[] getSimilarArtists(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
 
-    Document responseXML = null;
-    try {
-      responseXML = XMLUtil.stringToDocument(response);
-    } catch (SAXException e) {
-      throw new IOException(e.getMessage());
-    }
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
 
-    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node similarArtistsNode = XMLUtil.findNamedElementNode(lfmNode, "similarartists");
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node similarArtistsNode = XMLUtil.findNamedElementNode(lfmNode, "similarartists");
 
-    Node[] elnodes = XMLUtil.getChildNodes(similarArtistsNode, Node.ELEMENT_NODE);
-    ArtistBuilder artistBuilder = new ArtistBuilder();
-    List<Artist> artists = new ArrayList<Artist>();
-    for (Node node : elnodes) {
-      Artist artistObject = artistBuilder.build(node);
-      artists.add(artistObject);
-    }
-    return artists.toArray(new Artist[artists.size()]);
-  }
+		Node[] elnodes = XMLUtil.getChildNodes(similarArtistsNode, Node.ELEMENT_NODE);
+		ArtistBuilder artistBuilder = new ArtistBuilder();
+		List<Artist> artists = new ArrayList<Artist>();
+		for (Node node : elnodes) {
+			Artist artistObject = artistBuilder.build(node);
+			artists.add(artistObject);
+		}
+		return artists.toArray(new Artist[artists.size()]);
+	}
 
-  public static Artist[] searchForArtist(String baseUrl, Map<String, String> params) throws IOException {
-	    String response = UrlUtil.doGet(baseUrl, params);
+	public static Artist[] searchForArtist(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
 
-	    Document responseXML = null;
-	    try {
-	      responseXML = XMLUtil.stringToDocument(response);
-	    } catch (SAXException e) {
-	      throw new IOException(e.getMessage());
-	    }
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
 
-	    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
-	    Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "artistmatches");
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
+		Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "artistmatches");
 
-	    Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
-	    ArtistBuilder artistBuilder = new ArtistBuilder();
-	    List<Artist> artists = new ArrayList<Artist>();
-	    for (Node node : elnodes) {
-	      Artist artistObject = artistBuilder.build(node);
-	      artists.add(artistObject);
-	    }
-	    return artists.toArray(new Artist[artists.size()]);
-	  }
+		Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
+		ArtistBuilder artistBuilder = new ArtistBuilder();
+		List<Artist> artists = new ArrayList<Artist>();
+		for (Node node : elnodes) {
+			Artist artistObject = artistBuilder.build(node);
+			artists.add(artistObject);
+		}
+		return artists.toArray(new Artist[artists.size()]);
+	}
+	
+	public static Artist getArtistInfo(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node artistNode = XMLUtil.findNamedElementNode(lfmNode, "artist");
+
+		ArtistBuilder artistBuilder = new ArtistBuilder();
+
+		return artistBuilder.build(artistNode);
+	}
+
 }
