@@ -83,7 +83,6 @@ public class TagLayout extends ViewGroup {
 
 		tagButton.setOnClickListener(new OnClickListener(){
 
-			@Override
 			public void onClick(View v) {
 				removeTag(tag);				
 			}

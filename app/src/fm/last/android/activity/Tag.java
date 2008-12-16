@@ -97,7 +97,6 @@ public class Tag extends Activity {
 		
 		mTagButton.setOnClickListener(new OnClickListener(){
 
-			@Override
 			public void onClick(View v) {
 				addTag(mTagEditText.getText().toString());
 			}
@@ -106,7 +105,6 @@ public class Tag extends Activity {
 		
 		mTagBackButton.setOnClickListener(new OnClickListener(){
 
-			@Override
 			public void onClick(View v) {
 				finish();
 			}
@@ -115,7 +113,6 @@ public class Tag extends Activity {
 		
 		mTagForwardButton.setOnClickListener(new OnClickListener(){
 
-			@Override
 			public void onClick(View v) {
 				commit();
 				finish();
@@ -147,7 +144,6 @@ public class Tag extends Activity {
 		
 		mTagLayout.setTagLayoutListener(new TagLayoutListener(){
 
-			@Override
 			public void tagRemoved(String tag) {
 				removeTag(tag);
 			}
@@ -156,7 +152,6 @@ public class Tag extends Activity {
 
 		mTagList.setOnItemClickListener(new OnItemClickListener(){
 
-			@Override
 			public void onItemClick(final AdapterView<?> parent, final View view, final int position,
 					long time) {
 				if(!animate){
