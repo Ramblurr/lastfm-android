@@ -248,6 +248,8 @@ public class Home extends ListActivity implements TabBarListener
         		"lastfm://user/" + Uri.encode( session.getName() ) + "/recommended" );
         mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
         		"lastfm://user/" + Uri.encode( session.getName() ) + "/neighbours" );
+        mMyStationsAdapter.putStation( getString(R.string.home_mytags), 
+        		"tags://" );
         mMyStationsAdapter.updateModel();
     }
 

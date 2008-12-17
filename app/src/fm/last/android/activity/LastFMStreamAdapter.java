@@ -1,5 +1,6 @@
 package fm.last.android.activity;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import fm.last.android.R;
@@ -13,29 +14,26 @@ import android.widget.BaseAdapter;
 
 public class LastFMStreamAdapter extends BaseAdapter
 {
-
-    Hashtable<String, String> mData;
-
+	ArrayList<String> mLabels;
+	ArrayList<String> mStations;
     Activity context;
 
     LastFMStreamAdapter( Activity context )
     {
-
-        mData = new Hashtable<String, String>();
+    	mLabels = new ArrayList<String>();
+    	mStations = new ArrayList<String>();
         this.context = context;
     }
 
     public int getCount()
     {
 
-        return mData.size();
+        return mLabels.size();
     }
 
     public Object getItem( int position )
     {
-
-        Object item = mData.keySet().toArray()[position];
-        return item;
+        return mLabels.get(position);
     }
 
     public long getItemId( int position )
@@ -51,25 +49,28 @@ public class LastFMStreamAdapter extends BaseAdapter
         if ( row == null )
         {
             LayoutInflater inflater = context.getLayoutInflater();
-            row = inflater.inflate( R.layout.station_row, null );
+        	if(mStations.get(position).startsWith("lastfm://"))
+                row = inflater.inflate( R.layout.station_row, null );
+        	else
+                row = inflater.inflate( R.layout.disclosure_row, null );
         }
 
         TextView name = (TextView)row.findViewById(R.id.label);
-        name.setText( ( String ) getItem( position ) );
+        name.setText( mLabels.get(position) );
 
         return ( row );
     }
 
     public void putStation( String label, String station )
     {
-
-        mData.put( label, station );
+    	mLabels.add(label);
+    	mStations.add(station);
     }
 
     public void resetList()
     {
-
-        mData.clear();
+    	mLabels.clear();
+    	mStations.clear();
     }
 
     public void updateModel()
@@ -80,14 +81,12 @@ public class LastFMStreamAdapter extends BaseAdapter
 
     public String getLabel( int position )
     {
-
-        return ( String ) getItem( position );
+        return mLabels.get(position);
     }
 
     public String getStation( int position )
     {
-
-        return mData.get( getLabel( position ) );
+        return mStations.get(position);
     }
 
 }
