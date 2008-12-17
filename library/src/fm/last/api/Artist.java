@@ -15,6 +15,7 @@ public class Artist implements Serializable {
 	private String match;
 	private String url;
 	private ImageUrl[] images;
+	private Artist[] similar;
 	private String streamable;
 	private Bio bio;
 
@@ -57,5 +58,13 @@ public class Artist implements Serializable {
 
 	public Bio getBio() {
 		return bio;
+	}
+
+	public void setSimilar(Artist[] similar) {
+		this.similar = similar;
+	}
+
+	public Artist[] getSimilar() {
+		return similar;
 	}
 }

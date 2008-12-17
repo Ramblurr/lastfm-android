@@ -34,12 +34,26 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
     Artist artist = new Artist(name, mbid, match, url, images, streamable);
     
     Node bioNode = getChildNode("bio");
-    //Node bioNode = XMLUtil.findNamedElementNode(node, "bio");
     if(bioNode != null){
     	BioBuilder bioBuilder = new BioBuilder();
     	Bio bio = bioBuilder.build(bioNode);
     	artist.setBio(bio);
     }
+    
+    Node similarNode = getChildNode("similar");
+    if(similarNode != null){
+    	List<Node> similarArtistNodes = XMLUtil.findNamedElementNodes(similarNode, "artist");
+    	if(similarArtistNodes != null){
+    		Artist[] similar = new Artist[similarArtistNodes.size()];
+    		int j=0;
+    		ArtistBuilder similarArtistBuilder = new ArtistBuilder();
+    		for(Node similarArtistNode : similarArtistNodes){
+    			similar[j++] = similarArtistBuilder.build(similarArtistNode);
+    		}
+    		artist.setSimilar(similar);
+    	}
+    }
+    
     
     return artist;
   }
