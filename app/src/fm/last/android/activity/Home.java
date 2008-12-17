@@ -15,17 +15,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.RemoteException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ViewFlipper;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -35,23 +35,34 @@ import fm.last.android.RemoteImageView;
 import fm.last.android.SeparatedListAdapter;
 import fm.last.android.Worker;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.widget.TabBar;
+import fm.last.android.widget.TabBarListener;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
-public class Home extends ListActivity
+public class Home extends ListActivity implements TabBarListener
 {
 
+	private static int TAB_RADIO = 0;
+	private static int TAB_PROFILE = 1;
+	
     private SeparatedListAdapter mMainAdapter;
+    private SeparatedListAdapter mProfileAdapter;
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
     private Worker mProfileImageWorker;
     private RemoteImageHandler mProfileImageHandler;
     private RemoteImageView mProfileImage;
     private User mUser;
+	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
+	TabBar mTabBar;
+	ViewFlipper mViewFlipper;
+	ListView mProfileList;
+	
     @Override
     public void onCreate( Bundle icicle )
     {
@@ -70,6 +81,14 @@ public class Home extends ListActivity
         b = ( Button ) findViewById( R.id.home_logout );
         b.setOnClickListener( mLogoutListener );
 
+		mTabBar = (TabBar) findViewById(R.id.TabBar);
+		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
+		mTabBar.setViewFlipper(mViewFlipper);
+		mTabBar.setListener(this);
+		mTabBar.addTab("Radio", TAB_RADIO);
+		mTabBar.addTab("Profile", TAB_PROFILE);
+		mTabBar.setActive("Radio");
+       
         mProfileImage = ( RemoteImageView ) findViewById( R.id.home_profileimage );
 
         mProfileImageWorker = new Worker( "profile image worker" );
@@ -82,8 +101,17 @@ public class Home extends ListActivity
         SetupMyStations( session );
         SetupRecentStations();
         RebuildMainMenu();
+        
+        mProfileList = (ListView)findViewById(R.id.profile_list_view);
+        String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"};
+        mProfileList.setAdapter(new ArrayAdapter<String>(this, 
+                R.layout.disclosure_row, R.id.label, mStrings)); 
     }
-
+    
+	public void tabChanged(String text, int index) {
+		Log.i("Lukasz", "Changed tab to "+text+", index="+index);
+	}
+	
     @Override
     public void onStart()
     {
@@ -147,9 +175,8 @@ public class Home extends ListActivity
             @Override
             public void run()
             {
-                LastFmServer server = AndroidLastFmServerFactory.getServer();
                 try {
-					mUser = server.getUserInfo( session.getKey() );
+					mUser = mServer.getUserInfo( session.getKey() );
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
