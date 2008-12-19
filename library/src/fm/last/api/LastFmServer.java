@@ -4,10 +4,6 @@ package fm.last.api;
 
 import java.io.IOException;
 
-/**
- * @author vishna
- *
- */
 public interface LastFmServer {
 	/**
 	 * See http://www.last.fm/api/show?service=119
@@ -123,5 +119,18 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public Artist getArtistInfo(String artist, String mbid, String lang) throws IOException;
+	
+	
+	
+	/**
+	 * See http://www.lastfm.pl/api/show?service=312
+	 * 
+	 * @param track track (Optional) : The track name in question
+	 * @param artist artist (Optional) : The artist name in question
+	 * @param mbid mbid (Optional) : The musicbrainz id for the track
+	 * @return
+	 * @throws IOException
+	 */
+	public User[] getTrackTopFans(String track, String artist, String mbid) throws IOException;
 	
 }

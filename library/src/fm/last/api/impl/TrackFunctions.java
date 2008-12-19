@@ -16,10 +16,12 @@ package fm.last.api.impl;
 
 import fm.last.api.Tag;
 import fm.last.api.Track;
+import fm.last.api.User;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -64,6 +66,28 @@ public class TrackFunctions {
 
 	public static void removeTrackTag(String baseUrl, Map<String, String> params) throws IOException {
 		TagFunctions.removeTag(baseUrl, params);
+	}
+	
+	public static User[] getTrackTopFans(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node topFansNode = XMLUtil.findNamedElementNode(lfmNode, "topfans");
+		UserBuilder userBuilder = new UserBuilder();
+		List<Node> fansNodes = XMLUtil.findNamedElementNodes(topFansNode, "user");
+		User[] fans = new User[fansNodes.size()];
+		int i = 0;
+		for(Node fanNode : fansNodes){
+			fans[i++] = userBuilder.build(fanNode);
+		}
+		return fans;
 	}
 
 }

@@ -257,9 +257,25 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		if (mbid != null) {
+		if (lang != null) {
 			params.put("lang", lang);
 		}
 		return ArtistFunctions.getArtistInfo(baseUrl, params);
+	}
+
+	@Override
+	public User[] getTrackTopFans(String track, String artist, String mbid)
+			throws IOException {
+		Map<String, String> params = createParams("track.getTopFans");
+		if (track != null) {
+			params.put("track", track);
+		}
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (mbid != null) {
+			params.put("mbid", mbid);
+		}
+		return TrackFunctions.getTrackTopFans(baseUrl, params);
 	}
 }
