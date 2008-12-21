@@ -64,7 +64,7 @@ public class EventBuilder extends XMLBuilder<Event> {
 		try {
 			String text = getText("startTime");
 			if(text != null){
-				startTime = dateFormat.parse(text);
+				startTime = timeFormat.parse(text);
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
