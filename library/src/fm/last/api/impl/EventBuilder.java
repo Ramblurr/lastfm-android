@@ -71,7 +71,12 @@ public class EventBuilder extends XMLBuilder<Event> {
 		}
 
 		// description
-		String description = getText("description");
+		// FIXME String description = getText("description");
+		String description = null;
+		Node descriptionNode = getChildNode("description").getFirstChild();
+		if(descriptionNode != null){
+			description = descriptionNode.getNodeValue();
+		}
 
 		// images
 		List<Node> imageNodes = getChildNodes("image");
