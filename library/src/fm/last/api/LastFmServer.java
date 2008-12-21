@@ -128,9 +128,18 @@ public interface LastFmServer {
 	 * @param track track (Optional) : The track name in question
 	 * @param artist artist (Optional) : The artist name in question
 	 * @param mbid mbid (Optional) : The musicbrainz id for the track
-	 * @return
+	 * @return top fans array
 	 * @throws IOException
 	 */
 	public User[] getTrackTopFans(String track, String artist, String mbid) throws IOException;
+	
+	/**
+	 * See http://www.lastfm.pl/api/show?service=117
+	 * 
+	 * @param artist (Required) : The artist name in question
+	 * @return artist events array
+	 * @throws IOException
+	 */
+	public Event[] getArtistEvents(String artist) throws IOException;
 	
 }

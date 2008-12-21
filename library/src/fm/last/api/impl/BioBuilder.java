@@ -16,9 +16,9 @@ public class BioBuilder extends XMLBuilder<Bio> {
 		
 		String published = getText("published");
 		// FIXME String summary = getText("summary");
-		String summary = getChildNode("summary").getChildNodes().item(0).getNodeValue();
+		String summary = getChildNode("summary").getFirstChild().getNodeValue();
 		// FIXME String content = getText("content");
-		String content = getChildNode("content").getChildNodes().item(0).getNodeValue();
+		String content = getChildNode("content").getFirstChild().getNodeValue();
 		return new Bio(published, summary, content);
 	}
 

@@ -13,6 +13,7 @@
 package fm.last.api.impl;
 
 import fm.last.api.Artist;
+import fm.last.api.Event;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
@@ -96,6 +97,31 @@ public class ArtistFunctions {
 		ArtistBuilder artistBuilder = new ArtistBuilder();
 
 		return artistBuilder.build(artistNode);
+	}
+
+	public static Event[] getArtistEvents(String baseUrl,
+			Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		Node eventsNode = XMLUtil.findNamedElementNode(lfmNode, "events");
+		
+		List<Node> eventNodes = XMLUtil.findNamedElementNodes(eventsNode, "event");
+		EventBuilder eventBuilder = new EventBuilder();
+		Event[] events = new Event[eventNodes.size()];
+		int i = 0;
+		for(Node eventNode : eventNodes){
+			events[i++] = eventBuilder.build(eventNode);
+		}
+
+		return events;
 	}
 
 }
