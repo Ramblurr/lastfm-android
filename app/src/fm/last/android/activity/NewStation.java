@@ -249,11 +249,7 @@ public class NewStation extends ListActivity
     };
 
     public void onListItemClick( ListView l, View v, int position, long id ) {
-    	//is the session being used or needed?
-    	final Session session = ( Session )LastFMApplication.getInstance().map.get( "lastfm_session" );
-    	Intent intent = new Intent( NewStation.this, Player.class );
-    	intent.putExtra( "radiostation", mAdapter.getStation( position ) );
-    	startActivity( intent );
+    	LastFMApplication.getInstance().playRadioStation(this, mAdapter.getStation(position));
     }
 
 }

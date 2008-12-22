@@ -31,6 +31,7 @@ public class ListAdapter extends BaseAdapter{
 	 */
 	public ListAdapter(Activity context){
 		this.mContext = context;
+		this.mList = new ArrayList<String>();
 	}
 
 	/**

@@ -63,6 +63,8 @@ public class Home extends ListActivity implements TabBarListener
 	ViewFlipper mViewFlipper;
 	ListView mProfileList;
 	
+	public int test = 5;
+	
     @Override
     public void onCreate( Bundle icicle )
     {
@@ -255,11 +257,7 @@ public class Home extends ListActivity implements TabBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
-        final Session session = ( Session ) LastFMApplication.getInstance().map
-                    .get( "lastfm_session" );
-        Intent intent = new Intent( Home.this, Player.class );
-        intent.putExtra( "radiostation", mMainAdapter.getStation( position ) );
-        startActivity( intent );
+    	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position));
     }
 
     public OnClickListener mLogoutListener = new OnClickListener()
@@ -342,6 +340,9 @@ public class Home extends ListActivity implements TabBarListener
             db.execSQL( "DROP TABLE IF EXISTS "
                             + LastFm.DB_TABLE_RECENTSTATIONS );
             db.close();
+
+            if(LastFMApplication.getInstance().player != null)
+        		LastFMApplication.getInstance().player.stop();
         }
         catch ( Exception e )
         {

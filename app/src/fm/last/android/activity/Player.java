@@ -40,7 +40,7 @@ import android.widget.TextView;
 public class Player extends Activity
 {
 
-	private fm.last.android.player.IRadioPlayer mService = null;
+	private ImageButton mInfoButton;
 	private ImageButton mBackButton;
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
@@ -83,22 +83,13 @@ public class Player extends Activity
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
 		mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
 		mBackButton.setOnClickListener( mBackListener );
+		mInfoButton = ( ImageButton ) findViewById( R.id.player_infoBtn );
+		mInfoButton.setOnClickListener( mInfoListener );
 		mStopButton = ( ImageButton ) findViewById( R.id.stop );
 		mStopButton.requestFocus();
 		mStopButton.setOnClickListener( mStopListener );
 		mNextButton = ( ImageButton ) findViewById( R.id.skip );
 		mNextButton.setOnClickListener( mNextListener );
-		mpIntent = new Intent(
-				this,
-				fm.last.android.player.RadioPlayerService.class );
-		startService( mpIntent );
-		boolean b = bindService( mpIntent, mConnection, 0 );
-		if ( !b )
-		{
-			// something went wrong
-			// mHandler.sendEmptyMessage(QUIT);
-			System.out.println( "Binding to service failed " + mConnection );
-		}
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
@@ -126,7 +117,7 @@ public class Player extends Activity
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.tag_menu_item:
-			fireTagIntent();
+			fireTagActivity();
 			break;
 
 		default:
@@ -136,20 +127,35 @@ public class Player extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
-	private void fireTagIntent(){
+	private void fireTagActivity(){
 		String artist = null;
 		String track = null;
 
 		try {
-			artist = mService.getArtistName();
-			track = mService.getTrackName();
+			artist = LastFMApplication.getInstance().player.getArtistName();
+			track = LastFMApplication.getInstance().player.getTrackName();
+			Intent myIntent = new Intent(this, Tag.class);
+			myIntent.putExtra("lastfm.artist", artist);
+			myIntent.putExtra("lastfm.track", track);
+			startActivity(myIntent);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		Intent myIntent = new Intent(this, Tag.class);
-		myIntent.putExtra("lastfm.artist", artist);
-		myIntent.putExtra("lastfm.track", track);
-		startActivity(myIntent);
+	}
+	
+	private void fireMetadataActivity(){
+		try {
+			String artist = LastFMApplication.getInstance().player.getArtistName();
+			String track = LastFMApplication.getInstance().player.getTrackName();
+			String album = LastFMApplication.getInstance().player.getAlbumName();
+			Intent myIntent = new Intent(this, Metadata.class);
+			myIntent.putExtra("lastfm.artist", artist);
+			myIntent.putExtra("lastfm.album", album);
+			myIntent.putExtra("lastfm.track", track);
+			startActivity(myIntent);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -157,6 +163,13 @@ public class Player extends Activity
 	{
 		super.onStart();
 		paused = false;
+		try {
+			mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		updateTrackInfo();
 		long next = refreshNow();
 		queueNextRefresh( next );
 	}
@@ -197,8 +210,6 @@ public class Player extends Activity
 	@Override
 	public void onDestroy()
 	{
-
-		unbindService( mConnection );
 		mAlbumArtWorker.quit();
 		super.onDestroy();
 	}
@@ -209,11 +220,11 @@ public class Player extends Activity
         public void onClick( View v )
         {
 
-            if ( mService == null )
+            if ( LastFMApplication.getInstance().player == null )
                 return;
             try
             {
-                mService.love();
+                LastFMApplication.getInstance().player.love();
             }
             catch ( RemoteException ex )
             {
@@ -228,11 +239,11 @@ public class Player extends Activity
         public void onClick( View v )
         {
 
-            if ( mService == null )
+            if ( LastFMApplication.getInstance().player == null )
                 return;
             try
             {
-                mService.ban();
+                LastFMApplication.getInstance().player.ban();
             }
             catch ( RemoteException ex )
             {
@@ -247,11 +258,11 @@ public class Player extends Activity
 		public void onClick( View v )
 		{
 
-			if ( mService == null )
+			if ( LastFMApplication.getInstance().player == null )
 				return;
 			try
 			{
-				mService.skip();
+				LastFMApplication.getInstance().player.skip();
 			}
 			catch ( RemoteException ex )
 			{
@@ -267,6 +278,14 @@ public class Player extends Activity
 			finish();
 		}
 	};
+	
+	private View.OnClickListener mInfoListener = new View.OnClickListener()
+	{
+		public void onClick( View v )
+		{
+			fireMetadataActivity();
+		}
+	};
 
 	private View.OnClickListener mStopListener = new View.OnClickListener()
 	{
@@ -274,11 +293,11 @@ public class Player extends Activity
 		public void onClick( View v )
 		{
 
-			if ( mService == null )
+			if ( LastFMApplication.getInstance().player == null )
 				return;
 			try
 			{
-				mService.stop();
+				LastFMApplication.getInstance().player.stop();
 			}
 			catch ( RemoteException ex )
 			{
@@ -310,7 +329,7 @@ public class Player extends Activity
 			{
 				try
 				{
-					mStationName.setText( mService.getStationName() );
+					mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
 				}
 				catch ( RemoteException e )
 				{
@@ -325,19 +344,19 @@ public class Player extends Activity
 	{
 
 		System.out.println( "Updating track info" );
-		if ( mService == null )
+		if ( LastFMApplication.getInstance().player == null )
 		{
 			return;
 		}
 		try
 		{
 			/*
-			 * if (mService.getPath() == null) { finish(); return; }
+			 * if (LastFMApplication.getInstance().player.getPath() == null) { finish(); return; }
 			 */// TODO if player is done finish()
-			String artistName = mService.getArtistName();
+			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
-			mTrackName.setText( mService.getTrackName() );
-			String artUrl = mService.getArtUrl();
+			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
+			String artUrl = LastFMApplication.getInstance().player.getArtUrl();
 			if ( artUrl != RadioPlayerService.UNKNOWN )
 			{
 				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
@@ -345,86 +364,13 @@ public class Player extends Activity
 				.sendToTarget();
 			}
 
-			mDuration = mService.getDuration();
+			mDuration = LastFMApplication.getInstance().player.getDuration();
 			System.out.println( "Setting track duration to: " + mDuration );
 			mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
 		}
 		catch ( RemoteException ex )
 		{
 			finish();
-		}
-	}
-
-	private ServiceConnection mConnection = new ServiceConnection()
-	{
-
-		public void onServiceConnected( ComponentName className, IBinder service )
-		{
-
-			mService = fm.last.android.player.IRadioPlayer.Stub
-			.asInterface( service );
-			startPlayback();
-		}
-
-		public void onServiceDisconnected( ComponentName className )
-		{
-
-			mService = null;
-		}
-	};
-
-	private void startPlayback()
-	{
-
-		if ( mService == null )
-			return;
-
-		Intent intent = getIntent();
-		if ( intent.hasExtra( "radiostation" ) )
-		{
-			String url = intent.getExtras().getString( "radiostation" );
-			try
-			{
-				Session session = ( Session ) LastFMApplication.getInstance().map
-				.get( "lastfm_session" );
-				if ( !mRelaunchAfterConfigChange )
-				{
-					mService.setSession( session );
-					mService.tune( url, session );
-					mService.startRadio();
-					appendRecentStation( url, mService.getStationName() );
-				}
-			}
-			catch ( Exception e )
-			{
-				Log.d( "LastFMPlayer", "couldn't start playback: " + e );
-			}
-		}
-		updateTrackInfo();
-		//long next = refreshNow();
-		//queueNextRefresh( next );
-	}
-
-	private void appendRecentStation( String url, String name )
-	{
-
-		SQLiteDatabase db = null;
-		try
-		{
-			db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-			db.execSQL( "CREATE TABLE IF NOT EXISTS "
-					+ LastFm.DB_TABLE_RECENTSTATIONS
-					+ " (Url VARCHAR UNIQUE NOT NULL PRIMARY KEY, Name VARCHAR NOT NULL, Timestamp INTEGER NOT NULL);" );
-			db.execSQL( "DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS
-					+ " WHERE Url = '" + url + "'" );
-			db.execSQL( "INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS
-					+ "(Url, Name, Timestamp) " + "VALUES ('" + url + "', '" + name
-					+ "', " + System.currentTimeMillis() + ")" );
-			db.close();
-		}
-		catch ( Exception e )
-		{
-			System.out.println( e.getMessage() );
 		}
 	}
 
@@ -442,17 +388,17 @@ public class Player extends Activity
 	private long refreshNow()
 	{
 
-		if ( mService == null )
+		if ( LastFMApplication.getInstance().player == null )
 			return 500;
 		try
 		{
-			long pos = mPosOverride < 0 ? mService.getPosition() : mPosOverride;
+			long pos = mPosOverride < 0 ? LastFMApplication.getInstance().player.getPosition() : mPosOverride;
 			long remaining = 1000 - ( pos % 1000 );
 			if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
 			{
 				mCurrentTime.setText( makeTimeString( this, pos / 1000 ) );
 
-				if ( mService.isPlaying() )
+				if ( LastFMApplication.getInstance().player.isPlaying() )
 				{
 					mCurrentTime.setVisibility( View.VISIBLE );
 				}
@@ -469,7 +415,7 @@ public class Player extends Activity
 				mProgress.setProgress( ( int ) ( 1000 * pos / mDuration ) );
 
 				mProgress
-				.setSecondaryProgress( mService.getBufferPercent() * 10 );
+				.setSecondaryProgress( LastFMApplication.getInstance().player.getBufferPercent() * 10 );
 			}
 			else
 			{

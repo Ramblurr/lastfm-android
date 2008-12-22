@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Copyright (C) 2008 Lukasz Wisniewski <luke.cherrish@gmail.com> 
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+  
+          http://www.apache.org/licenses/LICENSE-2.0
+  
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:orientation="vertical"
+	android:minHeight="45px" android:layout_height="fill_parent">
+	<LinearLayout android:layout_width="fill_parent"
+		android:orientation="horizontal" android:minHeight="45px"
+		android:layout_height="fill_parent">
+		<ImageView android:id="@+id/ExtendedRowImage"
+			android:adjustViewBounds="true" android:layout_height="wrap_content"
+			android:layout_width="45px" android:maxHeight="45px"
+			android:maxWidth="45px" android:layout_gravity="center_vertical" />
+
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:orientation="vertical"
+			android:gravity="left|center_vertical" android:layout_marginLeft="10px">
+
+			<TextView android:id="@+id/ExtendedRowBiggerText"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical" android:textSize="15sp"
+				android:singleLine="true"></TextView>
+			<TextView android:id="@+id/ExtendedRowSmallerText0"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical" android:textSize="10sp"
+				android:singleLine="true"></TextView>
+			<TextView android:id="@+id/ExtendedRowSmallerText1"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical" android:textSize="10sp"
+				android:singleLine="true"></TextView>
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:orientation="horizontal"
+				android:gravity="left|center_vertical"  android:layout_marginRight="5px">
+				<TextView android:id="@+id/ExtendedRowSmallerText2"
+					android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:layout_gravity="center_vertical" android:textSize="10sp"
+					android:singleLine="true"></TextView>
+				<TextView android:id="@+id/ExtendedRowSmallerText2Right"
+					android:layout_width="fill_parent" android:layout_height="wrap_content"
+					android:gravity="right" android:layout_gravity="center_vertical"
+					android:textSize="10sp" android:visibility="gone"
+					android:singleLine="true"></TextView>
+			</LinearLayout>
+
+		</LinearLayout>
+
+		<LinearLayout android:layout_width="fill_parent"
+			android:layout_height="fill_parent" android:orientation="horizontal"
+			android:gravity="right|center_vertical">
+			<ViewSwitcher android:id="@+id/ExtendedRowViewSwitcher"
+				android:visibility="invisible" android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				<ImageView android:adjustViewBounds="true"
+					android:layout_height="wrap_content" android:layout_width="45px"
+					android:maxHeight="45px" android:maxWidth="45px" android:src="@drawable/arrow"></ImageView>
+				<ProgressBar android:layout_width="32px"
+					android:layout_height="32px" android:indeterminate="true"
+					android:layout_gravity="center_vertical|center_horizontal"></ProgressBar>
+			</ViewSwitcher>
+		</LinearLayout>
+
+	</LinearLayout>
+	<TextView android:id="@+id/ExtendedRowDescription"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:visibility="gone" android:paddingTop="4sp"></TextView>
+</LinearLayout>
