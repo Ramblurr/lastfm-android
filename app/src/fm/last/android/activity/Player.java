@@ -414,8 +414,8 @@ public class Player extends Activity
 
 				mProgress.setProgress( ( int ) ( 1000 * pos / mDuration ) );
 
-				mProgress
-				.setSecondaryProgress( LastFMApplication.getInstance().player.getBufferPercent() * 10 );
+				//mProgress
+				//.setSecondaryProgress( LastFMApplication.getInstance().player.getBufferPercent() * 10 );
 			}
 			else
 			{

@@ -15,49 +15,7 @@
 -->
 
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <item android:id="@android:id/background">
-        <shape>
-            <corners android:radius="5dip" />
-            <gradient
-                    android:startColor="#ff9d9e9d"
-                    android:centerColor="#ff5a5d5a"
-                    android:centerY="0.75"
-                    android:endColor="#ff747674"
-                    android:angle="270"
-            />
-        </shape>
-    </item>
-    
-    <item android:id="@android:id/secondaryProgress">
-        <clip>
-            <shape>
-                <corners android:radius="5dip" />
-                <gradient
-                        android:startColor="#80c03b4a"
-                        android:centerColor="#80861f2e"
-                        android:centerY="0.75"
-                        android:endColor="#a0c03b4a"
-                        android:angle="270"
-                />
-            </shape>
-        </clip>
-    </item>
-    
-    <item android:id="@android:id/progress">
-        <clip>
-            <shape>
-                <corners android:radius="5dip" />
-                <gradient
-                        android:startColor="#ffc03b4a"
-                        android:centerColor="#ff861f2e"
-                        android:centerY="0.75"
-                        android:endColor="#ffc03b4a"
-                        android:angle="270"
-                />
-            </shape>
-        </clip>
-    </item>
-    
+    <item android:id="@android:id/background" android:drawable="@drawable/timeline_bkg"/>
+    <item android:id="@android:id/progress" android:drawable="@drawable/timeline_bars"/>
 </layer-list>
 

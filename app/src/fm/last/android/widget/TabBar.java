@@ -6,6 +6,7 @@ import fm.last.android.R;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +44,7 @@ public class TabBar extends LinearLayout {
 		private void init(){
 			this.setTextColor(0xffffffff); //TODO remove hardcoded value white
 			this.setGravity(Gravity.CENTER);
+			this.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
 		}
 
 		public TabText(Context context, AttributeSet attrs, int defStyle) {
@@ -62,12 +64,12 @@ public class TabBar extends LinearLayout {
 
 		@Override
 		public void setActive() {
-			setBackgroundColor(mActiveTabColor);
+			setBackgroundResource(R.drawable.tab_front);
 		}
 
 		@Override
 		public void setInactive() {
-			setBackgroundColor(mInactiveTabColor);
+			setBackgroundResource(R.drawable.tab_back);
 		}
 
 		@Override

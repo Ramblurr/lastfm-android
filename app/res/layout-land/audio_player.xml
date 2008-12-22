@@ -53,7 +53,7 @@
 
 			<ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" android:layout_margin="8dip"/>
             <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/playback_menu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog_button" android:layout_margin="8dip"/>
+            <ImageButton android:id="@+id/playback_menu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog" android:layout_margin="8dip"/>
             <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" android:layout_margin="8dip"/>
             <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" android:layout_margin="8dip"/>
 </LinearLayout></RelativeLayout>

@@ -5,4 +5,4 @@
 	android:paddingBottom="2dip"
 	android:paddingLeft="5dip"
 	android:layout_gravity="center_horizontal" android:gravity="center"
-	android:text="Header" android:textColor="#fff" android:textSize="13sp" android:textStyle="bold" android:singleLine="false" android:layout_height="32dip" android:background="@drawable/section_header" android:paddingTop="8dip"/>
+	android:text="Header" android:textColor="#fff" android:textSize="13sp" android:textStyle="bold" android:singleLine="false" android:layout_height="38dip" android:background="@drawable/list_group_header" android:paddingTop="8dip"/>

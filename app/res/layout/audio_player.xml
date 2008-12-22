@@ -20,11 +20,23 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" android:background="#000">
 
-    <LinearLayout style="TopBar" android:background="#9d9fa2" android:layout_height="48dip" android:layout_width="fill_parent" android:gravity="center_vertical">
-    <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/back_button" android:id="@+id/player_backBtn" android:layout_marginLeft="8px"/>
-<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight="1" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:id="@+id/station_name" android:text="Station Name" android:layout_gravity="center"></TextView>
-<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/info_button" android:id="@+id/player_infoBtn" android:layout_marginRight="8px"/>
-</LinearLayout>
+	<LinearLayout android:id="@+id/NavBar" style="@style/NavBar">
+    	<ImageButton android:id="@+id/player_backBtn"
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_gravity="left|center_vertical"
+    		android:background="@drawable/back_button"/>
+		<TextView android:id="@+id/station_name"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:layout_weight="1" style="@style/NavBar_Title"
+			android:layout_gravity="center" android:gravity="center"
+			android:text="Station Name"/>
+    	<ImageButton android:id="@+id/player_infoBtn"
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_gravity="right|center_vertical"
+    		android:background="@drawable/info_button"/>
+	</LinearLayout>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dip"
@@ -34,36 +46,100 @@
         xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
 
         <fm.last.android.RemoteImageView android:id="@+id/album"
-            lfm:unknownImage="@+drawable/albumart_mp_unknown" android:background="@drawable/albumart_mp_unknown" android:layout_height="220dip" android:layout_width="220dip"/>
+            lfm:unknownImage="@+drawable/albumart_mp_unknown"
+            android:background="@drawable/albumart_mp_unknown"
+            android:layout_height="220dip" android:layout_width="220dip"/>
 
     </LinearLayout>
 
-    
+	<TableLayout android:id="@+id/track_metadata"
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:layout_marginBottom="16dip"
+		android:layout_gravity="fill_vertical|fill_horizontal">
+		
+		<TableRow
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:gravity="center">
+			
+			<TextView android:id="@+id/track_artist"
+				style="@style/playback_info"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:gravity="center"/>
+		</TableRow>
+		
+		<TableRow 
+			android:layout_height="wrap_content"
+			android:gravity="center">
+			
+			<TextView android:id="@+id/track_title"
+				style="@style/playback_info"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center"
+				android:layout_marginBottom="8dip"
+				android:gravity="center"/>
+		</TableRow>
+		
+		<TableRow 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center">
+			
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content">
+				
+				<TextView android:id="@+id/currenttime"
+					style="@style/playback_time"
+					android:layout_gravity="bottom"
+					android:paddingLeft="5dip"
+					android:layout_height="wrap_content"
+					android:layout_width="48dip"
+					android:gravity="right"
+					android:maxWidth="48dip"
+					android:width="48dip" />
+					
+				<ProgressBar android:id="@android:id/progress"
+					android:background="#000"
+					android:layout_height="8px"
+					android:paddingLeft="5px"
+					android:paddingRight="5px"
+					android:paddingBottom="4px"
+					android:indeterminateOnly="false"
+					android:progressDrawable="@+drawable/progress_horizontal"
+					android:layout_width="200dip"
+					android:layout_marginLeft="8dip"
+					android:layout_marginRight="8dip"
+					android:layout_gravity="center_vertical" />
+	
+				<TextView android:id="@+id/totaltime"
+					style="@style/playback_time"
+					android:layout_gravity="bottom"
+					android:paddingLeft="5dip"
+					android:layout_height="wrap_content"
+					android:layout_width="48dip"
+					android:gravity="left"
+					android:maxWidth="48dip"
+					android:width="48dip" />
+	
+			</LinearLayout>
+		</TableRow>
+	</TableLayout>
 
-    
+	<LinearLayout
+	    android:orientation="horizontal"
+	    android:layout_gravity="bottom"
+	    android:layout_marginTop="1px"
+	    android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center">
+	
+	    <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love"/>
+	    <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban"/>
+	    <ImageButton android:id="@+id/playback_menu" style="@+style/LastFMButton.Menu"/>
+	    <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop"/>
+	    <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip"/>
 
-    
-
-    
-
-<TableLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_gravity="fill_vertical|fill_horizontal" android:id="@+id/track_metadata"><TableRow android:id="@+id/TableRow01" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center"><TextView android:layout_height="wrap_content" android:id="@+id/track_artist" android:layout_gravity="center" android:gravity="center"></TextView>
-</TableRow><TableRow android:layout_height="wrap_content" android:id="@+id/TableRow02" android:gravity="center"><TextView android:layout_height="wrap_content" android:id="@+id/track_title" android:layout_gravity="center" android:gravity="center"></TextView>
-</TableRow>
-<TableRow android:id="@+id/TableRow03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dip" android:gravity="center"><LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/currenttime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:layout_gravity="bottom" android:paddingLeft="5dip" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="right" android:maxWidth="48dip" android:width="48dip" /><ProgressBar android:id="@android:id/progress" android:background="#80000000" android:layout_height="18px" android:paddingLeft="5px" android:paddingRight="5px" android:paddingBottom="4px" android:indeterminateDuration="3500" android:indeterminateBehavior="repeat" android:indeterminateOnly="false" android:progressDrawable="@+drawable/progress_horizontal" android:indeterminateDrawable="@+drawable/progress_indeterminate_horizontal" android:layout_width="200dip" android:layout_marginLeft="8dip" android:layout_marginRight="8dip" /><TextView android:id="@+id/totaltime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:paddingRight="5px" android:layout_gravity="bottom" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="left" android:maxWidth="48dip" android:width="48dip" /></LinearLayout>
-</TableRow>
-</TableLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="1px"
-            android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center">
-
-            <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/playback_menu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog_button" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" android:layout_margin="8dip"/>
-
-</LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>

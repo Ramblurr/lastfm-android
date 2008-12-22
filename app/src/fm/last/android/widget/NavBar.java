@@ -63,8 +63,6 @@ public class NavBar extends LinearLayout {
 	 */
 	private void init() {
 		//LayoutInflater.from(getContext()).inflate(R.layout.nav_bar, this);
-		this.setBackgroundColor(0xff9d9fa2); // TODO color resource
-		this.setGravity(Gravity.CENTER_VERTICAL);
 	}
 
 	@Override

@@ -21,11 +21,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
+import android.widget.AdapterView.OnItemSelectedListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -37,13 +40,15 @@ import fm.last.android.Worker;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
+import fm.last.android.widget.NavBar;
+import fm.last.android.widget.NavBarListener;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
-public class Home extends ListActivity implements TabBarListener
+public class Home extends ListActivity implements TabBarListener,NavBarListener
 {
 
 	private static int TAB_RADIO = 0;
@@ -62,6 +67,7 @@ public class Home extends ListActivity implements TabBarListener
 	TabBar mTabBar;
 	ViewFlipper mViewFlipper;
 	ListView mProfileList;
+	View previousSelectedView = null;
 	
 	public int test = 5;
 	
@@ -80,8 +86,8 @@ public class Home extends ListActivity implements TabBarListener
         Button b = ( Button ) findViewById( R.id.home_startnewstation );
         b.setOnClickListener( mNewStationListener );
 
-        b = ( Button ) findViewById( R.id.home_logout );
-        b.setOnClickListener( mLogoutListener );
+        NavBar n = ( NavBar ) findViewById( R.id.NavBar );
+        n.setListener(this);
 
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
@@ -108,11 +114,55 @@ public class Home extends ListActivity implements TabBarListener
         String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"};
         mProfileList.setAdapter(new ArrayAdapter<String>(this, 
                 R.layout.disclosure_row, R.id.label, mStrings)); 
+        
+        getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
+
+			@Override
+			public void onItemSelected(AdapterView<?> adapter, View view,
+					int position, long id) {
+				if(previousSelectedView != null) {
+					if(previousSelectedView.getTag() == "bottom")
+						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
+					else
+						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
+					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
+					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
+				}
+				if(position > 0) {
+					if(view.getTag() == "bottom")
+						view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
+					else
+						view.setBackgroundResource(R.drawable.list_item_focus);
+					((ImageView)view.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_focus);
+					((TextView)view.findViewById(R.id.label)).setTextColor(0xFFFFFFFF);
+					previousSelectedView = view;
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+        });
     }
     
 	public void tabChanged(String text, int index) {
 		Log.i("Lukasz", "Changed tab to "+text+", index="+index);
 	}
+	
+	public void backClicked(View child) {
+		logout();
+	}
+
+	public void middleClicked(View child, int index) {
+		
+	}
+
+	public void forwardClicked(View child) {
+		
+	}
+
 	
     @Override
     public void onStart()
@@ -250,25 +300,14 @@ public class Home extends ListActivity implements TabBarListener
         		"lastfm://user/" + Uri.encode( session.getName() ) + "/recommended" );
         mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
         		"lastfm://user/" + Uri.encode( session.getName() ) + "/neighbours" );
-        mMyStationsAdapter.putStation( getString(R.string.home_mytags), 
-        		"tags://" );
         mMyStationsAdapter.updateModel();
     }
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
+    	getListView().setSelection(position);
     	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position));
     }
-
-    public OnClickListener mLogoutListener = new OnClickListener()
-    {
-
-        public void onClick( View v )
-        {
-
-            logout();
-        }
-    };
 
     private OnClickListener mNewStationListener = new OnClickListener()
     {
