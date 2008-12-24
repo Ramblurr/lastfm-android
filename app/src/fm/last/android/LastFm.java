@@ -8,6 +8,7 @@ import fm.last.android.activity.Home;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
+import fm.last.api.WSError;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -133,6 +134,12 @@ public class LastFm extends Activity
                 String password = ( ( EditText ) findViewById( R.id.password ) )
                         .getText().toString();
 
+                if(user.length() == 0 || password.length() == 0) {
+					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_MISSINGINFO_TITLE),
+							getResources().getString(R.string.ERROR_MISSINGINFO));
+					return;
+                }
+                
                 try
                 {
                     doLogin( user, password );
@@ -145,12 +152,19 @@ public class LastFm extends Activity
                     startActivity( intent );
                     finish();
                 }
+                catch ( WSError e )
+                {
+                    LastFMApplication.getInstance().presentError(v.getContext(), e);
+                }
                 catch ( Exception e )
-                { // login failed
-                    TextView tv = new TextView( LastFm.this );
-                    tv.setText( "Error Logging in: " + e.getMessage() );
-                    LinearLayout l = ( LinearLayout ) findViewById( R.id.loginLayout );
-                    l.addView( tv );
+                {
+                	if(e.getMessage().contains("code 403")) {
+    					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_AUTH_TITLE),
+    							getResources().getString(R.string.ERROR_AUTH));
+                	} else {
+    					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
+    							getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
+                	}
                 }
             }
         } );
@@ -166,16 +180,15 @@ public class LastFm extends Activity
         }
     };
 
-    void doLogin( String user, String pass ) throws Exception
+    void doLogin( String user, String pass ) throws Exception, WSError
     {
         LastFmServer server = AndroidLastFmServerFactory.getServer();
         String md5Password = MD5.getInstance().hash(pass);
         String authToken = MD5.getInstance().hash(user + md5Password);
         Session session = server.getMobileSession(user, authToken);
-        if ( session == null )
-            throw ( new Exception( "Could not log in." ) );
+        if(session == null)
+        	throw(new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
         LastFMApplication.getInstance().map.put( "lastfm_session", session );
-
     }
 
 }

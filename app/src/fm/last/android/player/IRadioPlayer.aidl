@@ -1,10 +1,11 @@
 package fm.last.android.player;
 
 import fm.last.api.Session;
+import fm.last.api.WSError;
 
 interface IRadioPlayer {
 	void setSession(in Session session);
-	void tune(in String url, in Session session);
+	boolean tune(in String url, in Session session);
 
 	void pause();
 	void stop();
@@ -25,4 +26,5 @@ interface IRadioPlayer {
 	String getStationName();
 	String getStationUrl();
 	
+	WSError getError();
 } 

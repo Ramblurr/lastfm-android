@@ -30,5 +30,34 @@
 	<string name="done">Done</string>
 	<string name="tag">Tag</string>
 	<string name="tag_hint">Type tags here, or choose from below</string>
-<string name="home_mytags">My Tags</string>
+	
+	<string name="home_mytags">My Tags</string>
+
+	<string name="ERROR_AUTH">Unable to login to Last.fm.  Please check your username and password and try again.</string>
+	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>
+	<string name="ERROR_CHART_EMPTY">This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.</string>
+	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
+	<string name="ERROR_INSUFFICIENT_CONTENT">There is not enough content available to play this station.  Please try another station.</string>
+	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Insufficient Content</string>
+	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>
+	<string name="ERROR_INSUFFICIENT_MEMBERS">There are not enough members in this group to play this station.  Please try another group.</string>
+	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">Your musical neighbourhood hasn't been calculated yet.  Try listening to more music and try again in a few days.</string>
+	<string name="ERROR_MISSINGINFO">You must have a valid Last.fm username and password.  If you don't have an account, click the Sign Up button.</string>
+	<string name="ERROR_MISSINGINFO_TITLE">Missing Information</string>
+	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
+	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
+	<string name="ERROR_PLAYBACK_FAILED">An error occured while trying to play this track.  Please try again shortly.</string>
+	<string name="ERROR_PLAYBACK_FAILED_TITLE">Playback Failed</string>
+	<string name="ERROR_REGFAILURE_TITLE">Account Creation Failed</string>
+	<string name="ERROR_SERVER_UNAVAILABLE">There was a problem communicating with the Last.fm servers.  Please try again shortly.</string>
+	<string name="ERROR_SERVER_UNAVAILABLE_TITLE">Communication Error</string>
+	<string name="ERROR_SESSION">This application is no longer linked with your Last.fm account.  Please log in again.</string>
+	<string name="ERROR_SESSION_TITLE">Invalid Session</string>
+	<string name="ERROR_STATION_TITLE">Station Not Available</string>
+	<string name="ERROR_SUBSCRIPTION">Please check your subscription status at the Last.fm website.</string>
+	<string name="ERROR_SUBSCRIPTION_TITLE">Subscribers Only</string>
+	<string name="ERROR_NOSUCHUSER">Unable to find a user with this username.  Please check the spelling and try again</string>
+	<string name="ERROR_NOSUCHUSER_TITLE">User Not Found</string>
+	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
+	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>
 </resources>

@@ -13,6 +13,7 @@ import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -51,11 +52,9 @@ public class Player extends Activity
 	private TextView mTrackName;
 	private TextView mStationName;
 	private ProgressBar mProgress;
-	private long mPosOverride = -1;
 	private long mDuration;
 	private boolean paused;
-	private Intent mpIntent;
-	private boolean mRelaunchAfterConfigChange;
+    private ProgressDialog mProgressDialog;
 
 	private static final int REFRESH = 1;
 
@@ -93,11 +92,6 @@ public class Player extends Activity
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
-
-		if ( icicle != null )
-		{
-			mRelaunchAfterConfigChange = icicle.getBoolean( "configchange" );
-		}
 
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.META_CHANGED );
@@ -260,14 +254,19 @@ public class Player extends Activity
 
 			if ( LastFMApplication.getInstance().player == null )
 				return;
-			try
-			{
-				LastFMApplication.getInstance().player.skip();
-			}
-			catch ( RemoteException ex )
-			{
-				System.out.println( ex.getMessage() );
-			}
+			Thread t = new Thread() {
+				public void run() {
+					try
+					{  
+						LastFMApplication.getInstance().player.skip();
+					}
+					catch ( RemoteException ex )
+					{
+						System.out.println( ex.getMessage() );
+					}
+				}
+			};
+			t.start();
 		}
 	};
 
@@ -363,10 +362,6 @@ public class Player extends Activity
 				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
 				.sendToTarget();
 			}
-
-			mDuration = LastFMApplication.getInstance().player.getDuration();
-			System.out.println( "Setting track duration to: " + mDuration );
-			mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
 		}
 		catch ( RemoteException ex )
 		{
@@ -392,35 +387,27 @@ public class Player extends Activity
 			return 500;
 		try
 		{
-			long pos = mPosOverride < 0 ? LastFMApplication.getInstance().player.getPosition() : mPosOverride;
+			mDuration = LastFMApplication.getInstance().player.getDuration();
+			long pos = LastFMApplication.getInstance().player.getPosition();
 			long remaining = 1000 - ( pos % 1000 );
 			if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
 			{
 				mCurrentTime.setText( makeTimeString( this, pos / 1000 ) );
-
-				if ( LastFMApplication.getInstance().player.isPlaying() )
-				{
-					mCurrentTime.setVisibility( View.VISIBLE );
-				}
-				else
-				{
-					// blink the counter
-					int vis = mCurrentTime.getVisibility();
-					mCurrentTime
-					.setVisibility( vis == View.INVISIBLE ? View.VISIBLE
-							: View.INVISIBLE );
-					remaining = 500;
-				}
-
+				mTotalTime.setText( makeTimeString( this, mDuration / 1000 ) );
 				mProgress.setProgress( ( int ) ( 1000 * pos / mDuration ) );
-
-				//mProgress
-				//.setSecondaryProgress( LastFMApplication.getInstance().player.getBufferPercent() * 10 );
+				if(mProgressDialog != null) {
+					mProgressDialog.dismiss();
+					mProgressDialog = null;
+				}
 			}
 			else
 			{
 				mCurrentTime.setText( "--:--" );
-				mProgress.setProgress( 1000 );
+				mTotalTime.setText( "--:--" );
+				mProgress.setProgress( 0 );
+				if(mProgressDialog == null) {
+					mProgressDialog = ProgressDialog.show(this, "", "Buffering", true, false);
+				}
 			}
 			// return the number of milliseconds until the next full second, so
 			// the counter can be updated at just the right time

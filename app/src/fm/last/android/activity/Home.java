@@ -198,8 +198,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             String action = intent.getAction();
             if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
             {
-            	Station s = (Station)intent.getSerializableExtra("station");
-            	System.out.printf("Station changed: %s (%s)\n", s.getName(), s.getUrl());
             	SetupRecentStations();
             	RebuildMainMenu();
             }
@@ -305,7 +303,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
-    	getListView().setSelection(position);
     	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position));
     }
 

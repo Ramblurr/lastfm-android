@@ -13,6 +13,7 @@ import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
+import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
 
 import android.app.Notification;
@@ -48,6 +49,8 @@ public class RadioPlayerService extends Service
     private boolean mPlaying = false;
     private NotificationManager nm = null;
     private int bufferPercent;
+    private WSError mError = null;
+    private String currentStationURL = null;
 
     /**
      * Tracks whether there are activities currently bound to the service so
@@ -62,6 +65,7 @@ public class RadioPlayerService extends Service
     public static final String PLAYBACK_FINISHED = "fm.last.android.playbackfinished";
     public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playbackstatechanged";
     public static final String STATION_CHANGED = "fm.last.android.stationchanged";
+    public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
     public static final String UNKNOWN = "fm.last.android.unknown";
 
     @Override
@@ -226,7 +230,7 @@ public class RadioPlayerService extends Service
         // NOT IMPLEMENTED FOR LASTFM
     }
 
-    private void refreshPlaylist()
+    private void refreshPlaylist() throws WSError
     {
         if ( currentStation == null )
             return;
@@ -234,22 +238,24 @@ public class RadioPlayerService extends Service
         RadioPlayList playlist;
 		try {
 			playlist = server.getRadioPlayList( currentSession.getKey() );
-	        if ( playlist != null )
-	        {
-	        	RadioTrack[] tracks = playlist.getTracks();
-	        	for( int i=0; i < tracks.length; i++ ) {
-	        		currentQueue.add(tracks[i]);
-	        	}
-	        }
-	        else
-	        {
-	            System.out.println( "PLAYLIST IS NULL ZOMG" );
-	            notifyChange( PLAYBACK_FINISHED );
-	            nm.cancel( NOTIFY_ID );
-	        }
+			if(playlist == null || playlist.getTracks().length == 0)
+				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
+			
+        	RadioTrack[] tracks = playlist.getTracks();
+        	for( int i=0; i < tracks.length; i++ ) {
+        		currentQueue.add(tracks[i]);
+        	}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(e.getMessage().contains("code 503")) {
+				System.out.print("Server unavailable, retrying...");
+				refreshPlaylist();
+			}
+		} catch (WSError e) {
+            notifyChange( PLAYBACK_ERROR );
+            nm.cancel( NOTIFY_ID );
+			mError = e;
+			throw e;
 		}
     }
 
@@ -267,19 +273,23 @@ public class RadioPlayerService extends Service
         sendBroadcast( i );
     }
 
-	private void tune(String url, Session session)
+	private void tune(String url, Session session) throws IOException, WSError
     {
+		System.out.printf("Tuning to station: %s\n", url);
+		if(mp.isPlaying()) {
+            nm.cancel( NOTIFY_ID );
+            mp.stop();
+		}
+		currentQueue.clear();
         currentSession = session;
         LastFmServer server = AndroidLastFmServerFactory.getServer();
-		System.out.printf("Tuning to station: %s\n", url);
-		try {
-			currentStation = server.tuneToStation(url, session.getKey());
+		currentStation = server.tuneToStation(url, session.getKey());
+		if(currentStation != null) {
 			System.out.printf("Station name: %s\n", currentStation.getName());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			refreshPlaylist();
+			currentStationURL = url;
+	        notifyChange( STATION_CHANGED );
 		}
-        notifyChange( STATION_CHANGED );
     }
 
     /**
@@ -350,21 +360,25 @@ public class RadioPlayerService extends Service
             mp.stop();
         }
 
-        public void tune( String url, Session session ) throws DeadObjectException
+        public boolean tune( String url, Session session ) throws DeadObjectException, WSError
         {
-			RadioPlayerService.this.tune( url, session );
+        	mError = null;
+        	
+			try {
+				RadioPlayerService.this.tune( url, session );
+				return true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (WSError e) {
+				mError = e;
+			}
+			return false;
         }
 
         public void startRadio() throws RemoteException
         {
-            if ( currentStation == null )
-                return;
-			refreshPlaylist();
-            if ( currentQueue == null )
-                return;
-            if ( currentQueue.size() > 0 )
-                playTrack( currentQueue.poll() );
-
+           	nextSong();            		
         }
 
         public void skip() throws RemoteException
@@ -394,8 +408,10 @@ public class RadioPlayerService extends Service
 
         public long getDuration() throws RemoteException
         {
-
-            return mp.getDuration();
+        	if( mp != null && mp.isPlaying() )
+        		return mp.getDuration();
+        	else
+        		return 0;
         }
 
         public String getTrackName() throws RemoteException
@@ -415,7 +431,7 @@ public class RadioPlayerService extends Service
 
         public long getPosition() throws RemoteException
         {
-        	if( mp != null )
+        	if( mp != null && mp.isPlaying() )
         		return mp.getCurrentPosition();
         	else
         		return 0;
@@ -453,9 +469,16 @@ public class RadioPlayerService extends Service
         {
 
             if ( currentStation != null )
-                return currentStation.getUrl();
+                return currentStationURL;
             return null;
         }
+
+		@Override
+		public WSError getError() throws RemoteException {
+			WSError error = mError;
+			mError = null;
+			return error;
+		}
 
     };
 
