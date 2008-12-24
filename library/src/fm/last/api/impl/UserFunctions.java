@@ -41,9 +41,19 @@ public class UserFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node userNode = XMLUtil.findNamedElementNode(lfmNode, "user");
-		UserBuilder builder = new UserBuilder();
-		return builder.build(userNode);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node userNode = XMLUtil.findNamedElementNode(lfmNode, "user");
+			UserBuilder builder = new UserBuilder();
+			return builder.build(userNode);
+	    }
 	}
 	
 	public static Tag[] getUserTopTags(String baseUrl, Map<String, String> params) throws IOException {

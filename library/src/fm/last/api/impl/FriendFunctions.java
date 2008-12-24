@@ -16,6 +16,7 @@ package fm.last.api.impl;
 
 import fm.last.api.Artist;
 import fm.last.api.Friends;
+import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
@@ -36,7 +37,7 @@ public class FriendFunctions {
   private FriendFunctions() {
   }
 
-  public static Friends getFriends(String baseUrl, Map<String, String> params) throws IOException {
+  public static Friends getFriends(String baseUrl, Map<String, String> params) throws IOException, WSError {
     String response = UrlUtil.doGet(baseUrl, params);
 
     Document responseXML = null;
@@ -47,9 +48,19 @@ public class FriendFunctions {
     }
 
     Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node friendsNode = XMLUtil.findNamedElementNode(lfmNode, "friends");
-    FriendsBuilder builder = new FriendsBuilder();
-    return builder.build(friendsNode);
+    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+    if(!status.contains("ok")) {
+    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+    	if(errorNode != null) {
+	    	WSErrorBuilder eb = new WSErrorBuilder();
+	    	throw eb.build(params.get("method"), errorNode);
+    	}
+    	return null;
+    } else {
+	    Node friendsNode = XMLUtil.findNamedElementNode(lfmNode, "friends");
+	    FriendsBuilder builder = new FriendsBuilder();
+	    return builder.build(friendsNode);
+    }
   }
 
 }

@@ -14,6 +14,7 @@ package fm.last.api.impl;
 
 import fm.last.api.Artist;
 import fm.last.api.Event;
+import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
@@ -34,7 +35,7 @@ public class ArtistFunctions {
 	private ArtistFunctions() {
 	}
 
-	public static Artist[] getSimilarArtists(String baseUrl, Map<String, String> params) throws IOException {
+	public static Artist[] getSimilarArtists(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -45,19 +46,29 @@ public class ArtistFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node similarArtistsNode = XMLUtil.findNamedElementNode(lfmNode, "similarartists");
-
-		Node[] elnodes = XMLUtil.getChildNodes(similarArtistsNode, Node.ELEMENT_NODE);
-		ArtistBuilder artistBuilder = new ArtistBuilder();
-		List<Artist> artists = new ArrayList<Artist>();
-		for (Node node : elnodes) {
-			Artist artistObject = artistBuilder.build(node);
-			artists.add(artistObject);
-		}
-		return artists.toArray(new Artist[artists.size()]);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node similarArtistsNode = XMLUtil.findNamedElementNode(lfmNode, "similarartists");
+	
+			Node[] elnodes = XMLUtil.getChildNodes(similarArtistsNode, Node.ELEMENT_NODE);
+			ArtistBuilder artistBuilder = new ArtistBuilder();
+			List<Artist> artists = new ArrayList<Artist>();
+			for (Node node : elnodes) {
+				Artist artistObject = artistBuilder.build(node);
+				artists.add(artistObject);
+			}
+			return artists.toArray(new Artist[artists.size()]);
+	    }
 	}
 
-	public static Artist[] searchForArtist(String baseUrl, Map<String, String> params) throws IOException {
+	public static Artist[] searchForArtist(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -68,20 +79,30 @@ public class ArtistFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
-		Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "artistmatches");
-
-		Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
-		ArtistBuilder artistBuilder = new ArtistBuilder();
-		List<Artist> artists = new ArrayList<Artist>();
-		for (Node node : elnodes) {
-			Artist artistObject = artistBuilder.build(node);
-			artists.add(artistObject);
-		}
-		return artists.toArray(new Artist[artists.size()]);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
+			Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "artistmatches");
+	
+			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
+			ArtistBuilder artistBuilder = new ArtistBuilder();
+			List<Artist> artists = new ArrayList<Artist>();
+			for (Node node : elnodes) {
+				Artist artistObject = artistBuilder.build(node);
+				artists.add(artistObject);
+			}
+			return artists.toArray(new Artist[artists.size()]);
+	    }
 	}
 	
-	public static Artist getArtistInfo(String baseUrl, Map<String, String> params) throws IOException {
+	public static Artist getArtistInfo(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -92,15 +113,25 @@ public class ArtistFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node artistNode = XMLUtil.findNamedElementNode(lfmNode, "artist");
-
-		ArtistBuilder artistBuilder = new ArtistBuilder();
-
-		return artistBuilder.build(artistNode);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node artistNode = XMLUtil.findNamedElementNode(lfmNode, "artist");
+	
+			ArtistBuilder artistBuilder = new ArtistBuilder();
+	
+			return artistBuilder.build(artistNode);
+	    }
 	}
 
 	public static Event[] getArtistEvents(String baseUrl,
-			Map<String, String> params) throws IOException {
+			Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -111,17 +142,27 @@ public class ArtistFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node eventsNode = XMLUtil.findNamedElementNode(lfmNode, "events");
-		
-		List<Node> eventNodes = XMLUtil.findNamedElementNodes(eventsNode, "event");
-		EventBuilder eventBuilder = new EventBuilder();
-		Event[] events = new Event[eventNodes.size()];
-		int i = 0;
-		for(Node eventNode : eventNodes){
-			events[i++] = eventBuilder.build(eventNode);
-		}
-
-		return events;
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node eventsNode = XMLUtil.findNamedElementNode(lfmNode, "events");
+			
+			List<Node> eventNodes = XMLUtil.findNamedElementNodes(eventsNode, "event");
+			EventBuilder eventBuilder = new EventBuilder();
+			Event[] events = new Event[eventNodes.size()];
+			int i = 0;
+			for(Node eventNode : eventNodes){
+				events[i++] = eventBuilder.build(eventNode);
+			}
+	
+			return events;
+	    }
 	}
 
 }

@@ -71,7 +71,7 @@ final class LastFmServerImpl implements LastFmServer {
 	 * @return
 	 * @throws IOException
 	 */
-	public Artist[] getSimilarArtists(String artist, String limit) throws IOException {
+	public Artist[] getSimilarArtists(String artist, String limit) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getsimilar");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -82,7 +82,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return ArtistFunctions.getSimilarArtists(baseUrl, params);
 	}
 
-	public Artist[] searchForArtist(String artist) throws IOException {
+	public Artist[] searchForArtist(String artist) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.search");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -90,7 +90,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return ArtistFunctions.searchForArtist(baseUrl, params);
 	}
 
-	public Tag[] searchForTag(String tag) throws IOException {
+	public Tag[] searchForTag(String tag) throws IOException, WSError {
 		Map<String, String> params = createParams("tag.search");
 		if (tag != null) {
 			params.put("tag", tag);
@@ -98,7 +98,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return TagFunctions.searchForTag(baseUrl, params);
 	}
 
-	public Friends getFriends(String user, String recenttracks, String limit) throws IOException {
+	public Friends getFriends(String user, String recenttracks, String limit) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getFriends");
 		if (user != null) {
 			params.put("user", user);
@@ -112,7 +112,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return FriendFunctions.getFriends(baseUrl, params);
 	}
 
-	public Track getTrackInfo(String artist, String track, String mbid) throws IOException {
+	public Track getTrackInfo(String artist, String track, String mbid) throws IOException, WSError {
 		Map<String, String> params = createParams("track.getInfo");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -126,7 +126,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackInfo(baseUrl, params);
 	}
 
-	public Session getMobileSession(String username, String authToken) throws IOException {
+	public Session getMobileSession(String username, String authToken) throws IOException, WSError {
 		Map<String, String> params = createParamsWithSig("auth.getMobileSession");
 		if (username != null) {
 			params.put("username", username);
@@ -137,7 +137,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return AuthFunctions.getMobileSession(baseUrl, params);
 	}
 
-	public Station tuneToStation(String station, String sk) throws IOException {
+	public Station tuneToStation(String station, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("radio.tune");
 		if (station != null) {
 			params.put("station", station);
@@ -149,7 +149,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return RadioFunctions.tuneToStation(baseUrl, params);
 	}
 
-	public RadioPlayList getRadioPlayList(String sk) throws IOException {
+	public RadioPlayList getRadioPlayList(String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("radio.getPlaylist");
 		if (sk != null) {
 			params.put("sk", sk);
@@ -158,7 +158,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return RadioFunctions.getRadioPlaylist(baseUrl, params);
 	}
 
-	public User getUserInfo(String sk) throws IOException {
+	public User getUserInfo(String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getInfo");
 		if (sk != null) {
 			params.put("sk", sk);
@@ -168,7 +168,7 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	public Tag[] getTrackTopTags(String artist, String track, String mbid)
-	throws IOException {
+	throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTopTags");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -182,7 +182,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTopTags(baseUrl, params);
 	}
 
-	public Tag[] getUserTopTags(String user, Integer limit) throws IOException {
+	public Tag[] getUserTopTags(String user, Integer limit) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getTopTags");
 		if (user != null) {
 			params.put("user", user);
@@ -194,7 +194,7 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	public Tag[] getTrackTags(String artist, String track, String sk)
-	throws IOException {
+	throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTags");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -210,7 +210,7 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	public void addTrackTags(String artist, String track, String[] tag,
-			String sk) throws IOException {
+			String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("track.addTags");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -229,7 +229,7 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	public void removeTrackTag(String artist, String track, String tag,
-			String sk) throws IOException {
+			String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("track.removeTag");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -249,7 +249,7 @@ final class LastFmServerImpl implements LastFmServer {
 
 	@Override
 	public Artist getArtistInfo(String artist, String mbid, String lang)
-	throws IOException {
+	throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getInfo");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -265,7 +265,7 @@ final class LastFmServerImpl implements LastFmServer {
 
 	@Override
 	public User[] getTrackTopFans(String track, String artist, String mbid)
-	throws IOException {
+	throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTopFans");
 		if (track != null) {
 			params.put("track", track);
@@ -280,7 +280,7 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	@Override
-	public Event[] getArtistEvents(String artist) throws IOException {
+	public Event[] getArtistEvents(String artist) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getEvents");
 		if (artist != null) {
 			params.put("artist", artist);

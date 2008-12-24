@@ -47,9 +47,19 @@ public class TrackFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node trackNode = XMLUtil.findNamedElementNode(lfmNode, "track");
-		TrackBuilder trackBuilder = new TrackBuilder();
-		return trackBuilder.build(trackNode);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node trackNode = XMLUtil.findNamedElementNode(lfmNode, "track");
+			TrackBuilder trackBuilder = new TrackBuilder();
+			return trackBuilder.build(trackNode);
+	    }
 	}
 
 	public static Tag[] getTrackTopTags(String baseUrl, Map<String, String> params) throws IOException {
@@ -79,15 +89,25 @@ public class TrackFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node topFansNode = XMLUtil.findNamedElementNode(lfmNode, "topfans");
-		UserBuilder userBuilder = new UserBuilder();
-		List<Node> fansNodes = XMLUtil.findNamedElementNodes(topFansNode, "user");
-		User[] fans = new User[fansNodes.size()];
-		int i = 0;
-		for(Node fanNode : fansNodes){
-			fans[i++] = userBuilder.build(fanNode);
-		}
-		return fans;
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node topFansNode = XMLUtil.findNamedElementNode(lfmNode, "topfans");
+			UserBuilder userBuilder = new UserBuilder();
+			List<Node> fansNodes = XMLUtil.findNamedElementNodes(topFansNode, "user");
+			User[] fans = new User[fansNodes.size()];
+			int i = 0;
+			for(Node fanNode : fansNodes){
+				fans[i++] = userBuilder.build(fanNode);
+			}
+			return fans;
+	    }
 	}
 
 }

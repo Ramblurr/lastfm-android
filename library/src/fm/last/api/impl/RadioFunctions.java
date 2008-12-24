@@ -36,7 +36,7 @@ public class RadioFunctions {
   private RadioFunctions() {
   }
 
-  public static Station tuneToStation(String baseUrl, Map<String, String> params) throws IOException {
+  public static Station tuneToStation(String baseUrl, Map<String, String> params) throws IOException, WSError {
     String query = UrlUtil.buildQuery(params);
     String response = UrlUtil.doPost(new URL(baseUrl), query);
 
@@ -48,9 +48,19 @@ public class RadioFunctions {
     }
 
     Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node stationNode = XMLUtil.findNamedElementNode(lfmNode, "station");
-    StationBuilder sb = new StationBuilder();
-    return sb.build(stationNode);
+    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+    if(!status.contains("ok")) {
+    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+    	if(errorNode != null) {
+	    	WSErrorBuilder eb = new WSErrorBuilder();
+	    	throw eb.build(params.get("method"), errorNode);
+    	}
+    	return null;
+    } else {
+	    Node stationNode = XMLUtil.findNamedElementNode(lfmNode, "station");
+	    StationBuilder sb = new StationBuilder();
+	    return sb.build(stationNode);
+    }
   }
 /*
 
@@ -172,7 +182,7 @@ public class RadioFunctions {
  */
 
 
-  public static RadioPlayList getRadioPlaylist(String baseUrl, Map<String, String> params) throws IOException {
+  public static RadioPlayList getRadioPlaylist(String baseUrl, Map<String, String> params) throws IOException, WSError {
     String query = UrlUtil.buildQuery(params);
     String response = UrlUtil.doPost(new URL(baseUrl), query);
 
@@ -184,13 +194,19 @@ public class RadioFunctions {
     }
 
     Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    Node playListNode = XMLUtil.findNamedElementNode(lfmNode, "playlist");
-
-    RadioPlayListBuilder playlistBuilder = new RadioPlayListBuilder();
-
-//    System.out.println("response=" + response);
-    RadioPlayList playList = playlistBuilder.build(playListNode);
-    return playList;
+    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+    if(!status.contains("ok")) {
+    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+    	if(errorNode != null) {
+	    	WSErrorBuilder eb = new WSErrorBuilder();
+	    	throw eb.build(params.get("method"), errorNode);
+    	}
+    	return null;
+    } else {
+	    Node playListNode = XMLUtil.findNamedElementNode(lfmNode, "playlist");
+	    RadioPlayListBuilder playlistBuilder = new RadioPlayListBuilder();
+	    RadioPlayList playList = playlistBuilder.build(playListNode);
+	    return playList;
+    }
   }
-
 }

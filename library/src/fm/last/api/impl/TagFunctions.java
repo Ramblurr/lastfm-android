@@ -10,6 +10,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import fm.last.api.Tag;
+import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
@@ -21,7 +22,7 @@ public class TagFunctions {
 	
 	private TagFunctions() {}
 
-	public static Tag[] searchForTag(String baseUrl, Map<String, String> params) throws IOException {
+	public static Tag[] searchForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -32,20 +33,30 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
-		Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "tagmatches");
-
-		Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
-		TagBuilder tagBuilder = new TagBuilder();
-		List<Tag> tags = new ArrayList<Tag>();
-		for (Node node : elnodes) {
-			Tag artistObject = tagBuilder.build(node);
-			tags.add(artistObject);
-		}
-		return tags.toArray(new Tag[tags.size()]);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
+			Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "tagmatches");
+	
+			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
+			TagBuilder tagBuilder = new TagBuilder();
+			List<Tag> tags = new ArrayList<Tag>();
+			for (Node node : elnodes) {
+				Tag artistObject = tagBuilder.build(node);
+				tags.add(artistObject);
+			}
+			return tags.toArray(new Tag[tags.size()]);
+	    }
 	}
 
-	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException{
+	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
 
 		Document responseXML = null;
@@ -56,34 +67,61 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		Node childNode = XMLUtil.findNamedElementNode(lfmNode, child);
-
-		Node[] elnodes = XMLUtil.getChildNodes(childNode, Node.ELEMENT_NODE);
-		TagBuilder tagBuilder = new TagBuilder();
-		List<Tag> tags = new ArrayList<Tag>();
-		for (Node node : elnodes) {
-			Tag artistObject = tagBuilder.build(node);
-			tags.add(artistObject);
-		}
-		return tags.toArray(new Tag[tags.size()]);
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node childNode = XMLUtil.findNamedElementNode(lfmNode, child);
+	
+			Node[] elnodes = XMLUtil.getChildNodes(childNode, Node.ELEMENT_NODE);
+			TagBuilder tagBuilder = new TagBuilder();
+			List<Tag> tags = new ArrayList<Tag>();
+			for (Node node : elnodes) {
+				Tag artistObject = tagBuilder.build(node);
+				tags.add(artistObject);
+			}
+			return tags.toArray(new Tag[tags.size()]);
+	    }
 	}
 
-	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException{
+	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		return getChildTags(baseUrl, params, "toptags");
 	}
 
-	public static Tag[] getTags(String baseUrl, Map<String, String> params) throws IOException{
+	public static Tag[] getTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		return getChildTags(baseUrl, params, "tags");
 	}
 
-	public static void addTags(String baseUrl, Map<String, String> params) throws IOException {
-		UrlUtil.doPost(baseUrl, params);
+	public static void addTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doPost(baseUrl, params);
 //		int n = (tag.length-1) / TAGS_PER_POST;
 //		int i = 0;
 //		do{
 //			params.put("tags", buildTags(tag, i*TAGS_PER_POST));
 //			
 //		}while (i++ < n);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    }
 	}
 
 	public static String buildTags(String[] tag){
@@ -98,7 +136,23 @@ public class TagFunctions {
 	}
 
 	public static void removeTag(String baseUrl, Map<String, String> params) throws IOException {
-		UrlUtil.doPost(baseUrl, params);
+		String response = UrlUtil.doPost(baseUrl, params);
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    }
 	}
 
 }
