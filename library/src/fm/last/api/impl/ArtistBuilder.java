@@ -17,7 +17,7 @@ import fm.last.xml.XMLBuilder;
  */
 public class ArtistBuilder extends XMLBuilder<Artist> {
   private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
-
+  
   public Artist build(Node artistNode) {
     node = artistNode;
     String name = getText("name");
@@ -25,13 +25,21 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
     String match = getText("match");
     String url = getText("url");
     String streamable = getText("streamable");
+    String listeners = "0";
+    String playcount = "0";
+    Node statsNode = getChildNode("stats");
+    if(statsNode != null) {
+    	playcount = XMLUtil.findNamedElementNode(statsNode, "playcount").getFirstChild().getNodeValue();
+    	listeners = XMLUtil.findNamedElementNode(statsNode, "listeners").getFirstChild().getNodeValue();
+    }
+    
     List<Node> imageNodes = getChildNodes("image");
     ImageUrl[] images = new ImageUrl[imageNodes.size()];
     int i = 0;
     for (Node imageNode : imageNodes) {
       images[i++] =imageBuilder.build(imageNode);
     }
-    Artist artist = new Artist(name, mbid, match, url, images, streamable);
+    Artist artist = new Artist(name, mbid, match, url, images, streamable, playcount, listeners);
     
     Node bioNode = getChildNode("bio");
     if(bioNode != null){

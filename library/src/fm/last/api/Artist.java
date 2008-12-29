@@ -18,14 +18,18 @@ public class Artist implements Serializable {
 	private Artist[] similar;
 	private String streamable;
 	private Bio bio;
+	private String playcount;
+	private String listeners;
 
-	public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable) {
+	public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable, String playcount, String listeners) {
 		this.name = name;
 		this.mbid = mbid;
 		this.match = match;
 		this.url = url;
 		this.images = images;
 		this.streamable = streamable;
+		this.playcount = playcount;
+		this.listeners = listeners;
 	}
 
 	public String getName() {
@@ -66,5 +70,13 @@ public class Artist implements Serializable {
 
 	public Artist[] getSimilar() {
 		return similar;
+	}
+	
+	public String getPlaycount() {
+		return playcount;
+	}
+	
+	public String getListeners() {
+		return listeners;
 	}
 }
