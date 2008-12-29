@@ -11,6 +11,7 @@ import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
+import fm.last.api.WSError;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -329,6 +330,25 @@ public class Player extends Activity
 				try
 				{
 					mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
+				}
+				catch ( RemoteException e )
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
+			{
+				// TODO add a skip counter and try to skip 3 times before display an error message
+				try
+				{
+					WSError error = LastFMApplication.getInstance().player.getError();
+					if(error != null) {
+						LastFMApplication.getInstance().presentError(context, error);
+					} else {
+    					LastFMApplication.getInstance().presentError(context, getResources().getString(R.string.ERROR_PLAYBACK_FAILED_TITLE),
+    							getResources().getString(R.string.ERROR_PLAYBACK_FAILED));
+					}
 				}
 				catch ( RemoteException e )
 				{

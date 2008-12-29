@@ -16,7 +16,8 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:orientation="vertical"
-	android:minHeight="45px" android:layout_height="fill_parent">
+	android:minHeight="45px" android:layout_height="fill_parent"
+	android:background="@drawable/list_item_rest">
 	<LinearLayout android:layout_width="fill_parent"
 		android:orientation="horizontal" android:minHeight="45px"
 		android:layout_height="fill_parent">
@@ -32,14 +33,17 @@
 			<TextView android:id="@+id/ExtendedRowBiggerText"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical" android:textSize="15sp"
+				android:textColor="#000"
 				android:singleLine="true"></TextView>
 			<TextView android:id="@+id/ExtendedRowSmallerText0"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical" android:textSize="10sp"
+				android:textColor="#000"
 				android:singleLine="true"></TextView>
 			<TextView android:id="@+id/ExtendedRowSmallerText1"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_gravity="center_vertical" android:textSize="10sp"
+				android:textColor="#000"
 				android:singleLine="true"></TextView>
 			<LinearLayout android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:orientation="horizontal"
@@ -47,11 +51,13 @@
 				<TextView android:id="@+id/ExtendedRowSmallerText2"
 					android:layout_width="wrap_content" android:layout_height="wrap_content"
 					android:layout_gravity="center_vertical" android:textSize="10sp"
+					android:textColor="#000"
 					android:singleLine="true"></TextView>
 				<TextView android:id="@+id/ExtendedRowSmallerText2Right"
 					android:layout_width="fill_parent" android:layout_height="wrap_content"
 					android:gravity="right" android:layout_gravity="center_vertical"
 					android:textSize="10sp" android:visibility="gone"
+					android:textColor="#000"
 					android:singleLine="true"></TextView>
 			</LinearLayout>
 
@@ -75,5 +81,5 @@
 	</LinearLayout>
 	<TextView android:id="@+id/ExtendedRowDescription"
 		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:visibility="gone" android:paddingTop="4sp"></TextView>
+		android:visibility="gone" android:paddingTop="4sp" android:textColor="#000"></TextView>
 </LinearLayout>

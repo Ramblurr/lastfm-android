@@ -4,8 +4,7 @@
 		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_alignParentTop">true</item>
 		<item name="android:layout_alignParentLeft">true</item>
-		<item name="android:layout_height">48dip</item>
-		<item name="android:layout_marginBottom">8dip</item>
+		<item name="android:layout_height">58dip</item>
 		<item name="android:gravity">center_vertical</item>
 		<item name="android:background">@+drawable/title_bar</item>
 		<item name="android:paddingLeft">7dip</item>

@@ -105,7 +105,7 @@ public class RadioPlayerService extends Service
         if ( currentTrack == null )
             return;
         Notification notification = new Notification(
-                R.drawable.stat_notify_musicplayer, "Streaming: "
+                R.drawable.as_statusbar, "Streaming: "
                         + currentTrack.getTitle() + " by "
                         + currentTrack.getCreator(), System.currentTimeMillis() );
         PendingIntent contentIntent = PendingIntent.getActivity( this, 0,

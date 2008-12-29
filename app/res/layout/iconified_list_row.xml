@@ -16,14 +16,15 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:orientation="horizontal"
-	android:minHeight="45px" android:layout_height="wrap_content">
+	android:background="@drawable/list_item_rest" android:layout_height="wrap_content">
 	<ImageView android:id="@+id/radio_row_img"
 		android:adjustViewBounds="true" android:layout_height="wrap_content"
 		android:layout_width="45px" android:maxHeight="45px" android:maxWidth="45px"
 		android:layout_gravity="center_vertical" />
 	<TextView android:id="@+id/radio_row_name"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_gravity="center_vertical" android:textSize="20sp"
+		android:layout_gravity="center_vertical"
+		android:textSize="16dip" android:textStyle="bold" android:textColor="#000"
 		android:layout_marginLeft="10px"></TextView>
 	<LinearLayout android:layout_width="fill_parent"
 		android:layout_height="45px" android:orientation="horizontal"

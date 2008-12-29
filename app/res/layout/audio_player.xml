@@ -106,7 +106,6 @@
 					android:layout_height="8px"
 					android:paddingLeft="5px"
 					android:paddingRight="5px"
-					android:paddingBottom="4px"
 					android:indeterminateOnly="false"
 					android:progressDrawable="@+drawable/progress_horizontal"
 					android:layout_width="200dip"
@@ -132,7 +131,7 @@
 	    android:orientation="horizontal"
 	    android:layout_gravity="bottom"
 	    android:layout_marginTop="1px"
-	    android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center">
+	    android:layout_height="76px" android:layout_width="fill_parent" android:gravity="center">
 	
 	    <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love"/>
 	    <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban"/>

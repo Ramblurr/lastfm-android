@@ -96,7 +96,8 @@ public class TabBar extends LinearLayout {
 			LayoutInflater.from(getContext()).inflate(R.layout.tab_image, this);
 			mImageButton = (ImageButton) findViewById(R.id.tab_image_button);
 			mTextView = (TextView) findViewById (R.id.tab_text_view);
-			mTextView.setTextColor(0xffffffff); // TODO remove hardcoded value
+			/*mTextView.setTextColor(0xffffffff); // TODO remove hardcoded value
+			mTextView.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);*/
 		}
 		
 		public TabImage(Context context, AttributeSet attrs) {
@@ -118,13 +119,13 @@ public class TabBar extends LinearLayout {
 
 		@Override
 		public void setActive() {
-			setBackgroundColor(mActiveTabColor);
+			setBackgroundResource(R.drawable.tab_front_focused);
 			mImageButton.setImageResource(mActiveId);
 		}
 
 		@Override
 		public void setInactive() {
-			setBackgroundColor(mInactiveTabColor);
+			setBackgroundResource(R.drawable.tab_back);
 			mImageButton.setImageResource(mInactiveId);
 		}
 		
