@@ -363,7 +363,9 @@ public class Metadata extends Activity implements TabBarListener {
         public void onPostExecute(Boolean result) {
         	if(result) {
         		mEventList.setAdapter(mEventAdapter);
+        		mEventList.setOnItemClickListener(mEventOnItemClickListener);
         	} else {
+        		mEventList.setOnItemClickListener(null);
     	        String[] strings = new String[]{"No Upcoming Events"};
     	        mEventList.setAdapter(new ArrayAdapter<String>(Metadata.this, 
     	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
