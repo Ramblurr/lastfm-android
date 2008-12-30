@@ -32,12 +32,6 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Metadata" android:label="LastFM: Metadata" android:theme="@android:style/Theme.NoTitleBar">
-			<intent-filter>
-				<action android:name="android.intent.action.VIEW" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</activity>
 		<service android:name=".player.RadioPlayerService" android:process=":remote" />
 	</application>
 </manifest> 

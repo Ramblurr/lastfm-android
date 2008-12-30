@@ -118,7 +118,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         
 		getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
 
-			@Override
 			public void onItemSelected(AdapterView<?> adapter, View view,
 					int position, long id) {
 				if(previousSelectedView != null) {
@@ -140,7 +139,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 				}
 			}
 
-			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				if(previousSelectedView != null) {
 					if(previousSelectedView.getTag() == "bottom")
@@ -155,7 +153,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	    });
 		getListView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
-			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(v == getListView()) {
 					if(hasFocus)
@@ -324,6 +321,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
+    	l.setEnabled(false);
     	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
     	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
     	switcher.showNext();

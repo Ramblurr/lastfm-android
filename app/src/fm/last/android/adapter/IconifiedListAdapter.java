@@ -162,7 +162,6 @@ public class IconifiedListAdapter extends ListAdapter implements ImageDownloader
 		}
 	}
 
-	@Override
 	public void asynOperationEnded() {
 		this.notifyDataSetChanged();
 		
@@ -171,7 +170,6 @@ public class IconifiedListAdapter extends ListAdapter implements ImageDownloader
 //		}
 	}
 
-	@Override
 	public void imageDownloadProgress(int imageDownloaded, int imageCount) {
 		// TODO if scrolling do notifyDataSetChanged
 //		if(mListener != null){
@@ -185,7 +183,6 @@ public class IconifiedListAdapter extends ListAdapter implements ImageDownloader
 		}
 	}
 
-	@Override
 	public void asynOperationStarted() {
 		// TODO mDownloading = true;
 //		if(mListener != null){
@@ -222,13 +219,11 @@ public class IconifiedListAdapter extends ListAdapter implements ImageDownloader
 	}
 
 
-	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
 	}
 
 
-	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		mScrolling = true;
 	}

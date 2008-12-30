@@ -1,16 +1,32 @@
 package fm.last.android.activity;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Locale;
 
+import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
+import fm.last.android.adapter.EventListAdapter;
+import fm.last.android.adapter.IconifiedEntry;
+import fm.last.android.adapter.IconifiedListAdapter;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.utils.ImageCache;
+import fm.last.android.utils.Rotate3dAnimation;
+import fm.last.android.utils.UserTask;
+import fm.last.android.widget.TabBar;
+import fm.last.api.Artist;
+import fm.last.api.Event;
+import fm.last.api.ImageUrl;
+import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.Tag;
+import fm.last.api.User;
 import fm.last.api.WSError;
 
 import android.app.Activity;
@@ -34,10 +50,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
+import android.webkit.WebView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class Player extends Activity
 {
@@ -56,8 +83,35 @@ public class Player extends Activity
 	private long mDuration;
 	private boolean paused;
     private ProgressDialog mProgressDialog;
+    private ViewFlipper mDetailFlipper;
 
 	private static final int REFRESH = 1;
+
+	private final static int TAB_BIO = 0;
+	private final static int TAB_SIMILAR = 1;
+	private final static int TAB_TAGS = 2;
+	private final static int TAB_EVENTS = 3;
+	private final static int TAB_LISTENERS = 4;
+
+	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
+	//Session mSession = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+
+	private ImageCache mImageCache;
+	private String mBio;
+	private IconifiedListAdapter mSimilarAdapter;
+	private IconifiedListAdapter mFanAdapter;
+	private ArrayAdapter<String> mTagAdapter;
+	private EventListAdapter mEventAdapter;
+	private String mLastInfoArtist = "";
+	
+	TextView mTextView;
+	TabBar mTabBar;
+	ViewFlipper mViewFlipper;
+	WebView mWebView;
+	ListView mSimilarList;
+	ListView mTagList;
+	ListView mFanList;
+	ListView mEventList;
 
 
 	private Worker mAlbumArtWorker;
@@ -90,6 +144,24 @@ public class Player extends Activity
 		mStopButton.setOnClickListener( mStopListener );
 		mNextButton = ( ImageButton ) findViewById( R.id.skip );
 		mNextButton.setOnClickListener( mNextListener );
+		mDetailFlipper = ( ViewFlipper ) findViewById( R.id.playback_detail_flipper );
+		mDetailFlipper.setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE);
+		mTabBar = (TabBar) findViewById(R.id.TabBar);
+		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
+		mWebView = (WebView) findViewById(R.id.webview);
+		mSimilarList = (ListView) findViewById(R.id.similar_list_view);
+		mTagList = (ListView) findViewById(R.id.tags_list_view);
+		mFanList = (ListView) findViewById(R.id.listeners_list_view);
+		mEventList = (ListView) findViewById(R.id.events_list_view);
+
+		mTabBar.setViewFlipper(mViewFlipper);
+		//mTabBar.setListener(this);
+		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, TAB_BIO);
+		mTabBar.addTab("Similar Artists", R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
+		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, TAB_TAGS);
+		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, TAB_EVENTS);
+		mTabBar.addTab("Top Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
+		mTabBar.setActive("Bio");
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
@@ -138,21 +210,6 @@ public class Player extends Activity
 		}
 	}
 	
-	private void fireMetadataActivity(){
-		try {
-			String artist = LastFMApplication.getInstance().player.getArtistName();
-			String track = LastFMApplication.getInstance().player.getTrackName();
-			String album = LastFMApplication.getInstance().player.getAlbumName();
-			Intent myIntent = new Intent(this, Metadata.class);
-			myIntent.putExtra("lastfm.artist", artist);
-			myIntent.putExtra("lastfm.album", album);
-			myIntent.putExtra("lastfm.track", track);
-			startActivity(myIntent);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-	}
-
 	@Override
 	public void onStart()
 	{
@@ -283,10 +340,63 @@ public class Player extends Activity
 	{
 		public void onClick( View v )
 		{
-			fireMetadataActivity();
+			final float centerX = mDetailFlipper.getWidth() / 2.0f;
+            final float centerY = mDetailFlipper.getHeight() / 2.0f;
+            Rotate3dAnimation rotation;
+            if(mDetailFlipper.getDisplayedChild() == 0) {
+            	rotation = new Rotate3dAnimation(360, 270, centerX, centerY, 310.0f, false);
+            	if(!mLastInfoArtist.contentEquals(mArtistName.getText())) {
+            		mLastInfoArtist = mArtistName.getText().toString();
+	    			new LoadBioTask().execute((Void)null);
+	    			new LoadSimilarTask().execute((Void)null);
+	    			new LoadListenersTask().execute((Void)null);
+	    			new LoadTagsTask().execute((Void)null);
+	    			new LoadEventsTask().execute((Void)null);
+            	}
+    			mTabBar.setActive("Bio");
+    			mViewFlipper.setDisplayedChild(TAB_BIO);
+    			mStationName.setText(mLastInfoArtist);
+            } else {
+            	rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 310.0f, false);
+            	try {
+					mStationName.setText(LastFMApplication.getInstance().player.getStationName());
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+            rotation.setDuration(250);
+            rotation.setFillAfter(true);
+            rotation.setInterpolator(new AccelerateInterpolator());
+            rotation.setAnimationListener(new DisplayNextView());
+            mDetailFlipper.startAnimation(rotation);
 		}
 	};
 
+    private final class DisplayNextView implements Animation.AnimationListener {
+        public void onAnimationStart(Animation animation) {
+        }
+
+        public void onAnimationEnd(Animation animation) {
+            final float centerX = mDetailFlipper.getWidth() / 2.0f;
+            final float centerY = mDetailFlipper.getHeight() / 2.0f;
+            Rotate3dAnimation rotation;
+            if(mDetailFlipper.getDisplayedChild() == 0) {
+            	rotation = new Rotate3dAnimation(90, 0, centerX, centerY, 310.0f, false);
+            } else {
+            	rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 310.0f, false);
+            }
+            rotation.setDuration(250);
+            rotation.setFillAfter(true);
+            rotation.setInterpolator(new DecelerateInterpolator());
+        	mDetailFlipper.showNext();
+            mDetailFlipper.startAnimation(rotation);
+        }
+
+        public void onAnimationRepeat(Animation animation) {
+        }
+    }	
+	
 	private View.OnClickListener mStopListener = new View.OnClickListener()
 	{
 
@@ -508,4 +618,237 @@ public class Player extends Activity
 		return sFormatter.format( durationformat, timeArgs ).toString();
 	}
 
+    private class LoadBioTask extends UserTask<Void, Void, Boolean> {
+        @Override
+    	public void onPreExecute() {
+   			mWebView.loadData("Loading...", "text/html", "utf-8");
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+        	Artist artist;
+            boolean success = false;
+            
+    		try {
+    			artist = mServer.getArtistInfo(mArtistName.getText().toString(), null, null);
+    			String imageURL = "";
+    			for(ImageUrl image : artist.getImages()) {
+    				if(image.getSize().contentEquals("large")) {
+    					imageURL = image.getUrl();
+    					break;
+    				}
+    			}
+    			mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>" +
+					"<div style='padding:17px; margin:0; top:0px; left:0px; width:286; position:absolute;'>" +
+					"<img src='" + imageURL + "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; height:64px; border:1px solid gray; padding: 1px;'/>" +
+					"<div style='float:right; width: 180px; padding:0px; margin:0px; margin-top:1px; margin-left:3px;'>" +
+					"<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>" + mArtistName.getText() + "</span><br/>" +
+					"<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + artist.getListeners() + " listeners<br/>" +
+					artist.getPlaycount() + " plays</span></div>" +
+					"<br style='clear:both;'/>" + artist.getBio().getContent() + "</div></body></html>";
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+    			mWebView.loadData(mBio, "text/html", "utf-8");
+       		 } else {
+    			mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
+       		 }
+        }
+    }
+	
+    private class LoadSimilarTask extends UserTask<Void, Void, Boolean> {
+    	
+        @Override
+    	public void onPreExecute() {
+	        String[] strings = new String[]{"Loading..."};
+	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
+	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+            
+			mSimilarAdapter = new IconifiedListAdapter(Player.this, getImageCache());
+
+    		try {
+    			Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
+    			ArrayList<IconifiedEntry> iconifiedEntries = new ArrayList<IconifiedEntry>();
+    			for(int i=0; i< similar.length; i++){
+    				IconifiedEntry entry = new IconifiedEntry(similar[i], 
+    						R.drawable.albumart_mp_unknown, 
+    						similar[i].getName(), 
+    						similar[i].getImages()[0].getUrl());
+    				iconifiedEntries.add(entry);
+    			}
+    			mSimilarAdapter.setSourceIconified(iconifiedEntries);
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		mSimilarList.setAdapter(mSimilarAdapter);
+        		mSimilarList.setOnScrollListener(mSimilarAdapter.getOnScrollListener());
+        	} else {
+    	        String[] strings = new String[]{"No Similar Artists"};
+    	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
+    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        	}
+        }
+    }
+
+    private class LoadListenersTask extends UserTask<Void, Void, Boolean> {
+    	
+        @Override
+    	public void onPreExecute() {
+   	        String[] strings = new String[]{"Loading..."};
+   	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
+   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+            
+			mFanAdapter = new IconifiedListAdapter(Player.this, getImageCache());
+
+    		try {
+    			User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
+    			ArrayList<IconifiedEntry> iconifiedEntries = new ArrayList<IconifiedEntry>();
+    			for(int i=0; i< fans.length; i++){
+    				IconifiedEntry entry = new IconifiedEntry(fans[i], 
+    						R.drawable.albumart_mp_unknown, 
+    						fans[i].getName(), 
+    						fans[i].getImages()[0].getUrl());
+    				iconifiedEntries.add(entry);
+    			}
+    			mFanAdapter.setSourceIconified(iconifiedEntries);
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		mFanList.setAdapter(mFanAdapter);
+        		mFanList.setOnScrollListener(mFanAdapter.getOnScrollListener());
+        	} else {
+    	        String[] strings = new String[]{"No Top Listeners"};
+    	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
+    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        	}
+        }
+    }
+	
+    private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
+    	
+        @Override
+    	public void onPreExecute() {
+   	        String[] strings = new String[]{"Loading..."};
+   	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
+   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+    		try {
+    			Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
+    			ArrayList<String> entries = new ArrayList<String>();
+    			for(int i=0; i< tags.length; i++){
+    				String entry = tags[i].getName();
+    				entries.add(entry);
+    			}
+    			mTagAdapter = new ArrayAdapter<String>(Player.this, R.layout.iconified_list_row, R.id.radio_row_name, entries);
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		mTagList.setAdapter(mTagAdapter);
+        	} else {
+    	        String[] strings = new String[]{"No Tags"};
+    	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
+    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        	}
+        }
+    }
+	
+	private OnItemClickListener mEventOnItemClickListener = new OnItemClickListener(){
+
+		public void onItemClick(final AdapterView<?> parent, final View v,
+				final int position, long id) {
+			mEventAdapter.toggleDescription(position);
+		}
+
+	};
+	
+    private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
+    	
+        @Override
+    	public void onPreExecute() {
+   	        String[] strings = new String[]{"Loading..."};
+   	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
+   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            mEventAdapter = new EventListAdapter(Player.this, getImageCache());
+
+    		try {
+    			Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
+    			mEventAdapter.setEventsSource(events, events.toString());
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		mEventList.setAdapter(mEventAdapter);
+        		mEventList.setOnItemClickListener(mEventOnItemClickListener);
+        	} else {
+        		mEventList.setOnItemClickListener(null);
+    	        String[] strings = new String[]{"No Upcoming Events"};
+    	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
+    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+        	}
+        }
+    }
+	
+	private ImageCache getImageCache(){
+		if(mImageCache == null){
+			mImageCache = new ImageCache();
+		}
+		return mImageCache;
+	}
+	
+	
 }

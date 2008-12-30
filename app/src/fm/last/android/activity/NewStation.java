@@ -81,7 +81,6 @@ public class NewStation extends ListActivity
         setListAdapter( mAdapter );
 		getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
 
-			@Override
 			public void onItemSelected(AdapterView<?> adapter, View view,
 					int position, long id) {
 				if(previousSelectedView != null) {
@@ -103,7 +102,6 @@ public class NewStation extends ListActivity
 				}
 			}
 
-			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
 				if(previousSelectedView != null) {
 					if(previousSelectedView.getTag() == "bottom")
@@ -118,7 +116,6 @@ public class NewStation extends ListActivity
 	    });
 		getListView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
 
-			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
 				if(v == getListView()) {
 					if(hasFocus)

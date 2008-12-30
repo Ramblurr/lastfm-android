@@ -473,7 +473,6 @@ public class RadioPlayerService extends Service
             return null;
         }
 
-		@Override
 		public WSError getError() throws RemoteException {
 			WSError error = mError;
 			mError = null;

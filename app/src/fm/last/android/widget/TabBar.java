@@ -62,17 +62,14 @@ public class TabBar extends LinearLayout {
 			init();
 		}
 
-		@Override
 		public void setActive() {
 			setBackgroundResource(R.drawable.tab_front);
 		}
 
-		@Override
 		public void setInactive() {
 			setBackgroundResource(R.drawable.tab_back);
 		}
 
-		@Override
 		public View getView() {
 			return this;
 		}
@@ -117,19 +114,16 @@ public class TabBar extends LinearLayout {
 			//requestLayout();
 		}
 
-		@Override
 		public void setActive() {
 			setBackgroundResource(R.drawable.tab_front_focused);
 			mImageButton.setImageResource(mActiveId);
 		}
 
-		@Override
 		public void setInactive() {
 			setBackgroundResource(R.drawable.tab_back);
 			mImageButton.setImageResource(mInactiveId);
 		}
 		
-		@Override
 		public View getView() {
 			return this;
 		}
@@ -228,7 +222,6 @@ public class TabBar extends LinearLayout {
 	private void configureTab(Tab v, final String text, final int childIndex){
 		v.getView().setOnClickListener(new OnClickListener(){
 
-			@Override
 			public void onClick(View v) {
 				setActive(text);
 				if(mViewFlipper != null){
