@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
+import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemSelectedListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -115,7 +116,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mProfileList.setAdapter(new ArrayAdapter<String>(this, 
                 R.layout.disclosure_row, R.id.label, mStrings)); 
         
-        getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
+		getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
 			public void onItemSelected(AdapterView<?> adapter, View view,
@@ -128,7 +129,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
 					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
 				}
-				if(position > 0) {
+				if(position > 0 && getListView().isFocused()) {
 					if(view.getTag() == "bottom")
 						view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
 					else
@@ -141,10 +142,30 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
 			@Override
 			public void onNothingSelected(AdapterView<?> arg0) {
-				// TODO Auto-generated method stub
-				
+				if(previousSelectedView != null) {
+					if(previousSelectedView.getTag() == "bottom")
+						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
+					else
+						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
+					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
+					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
+				}
+				previousSelectedView = null;
 			}
-        });
+	    });
+		getListView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if(v == getListView()) {
+					if(hasFocus)
+						getListView().getOnItemSelectedListener().onItemSelected(getListView(), getListView().getSelectedView(), getListView().getSelectedItemPosition(), getListView().getSelectedItemId());
+					else
+						getListView().getOnItemSelectedListener().onNothingSelected(null);
+				}
+			}
+			
+		});
     }
     
 	public void tabChanged(String text, int index) {
@@ -303,6 +324,9 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
+    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
+    	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
+    	switcher.showNext();
     	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position));
     }
 

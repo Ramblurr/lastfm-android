@@ -32,7 +32,7 @@ public class LastFMApplication extends Application
 	public fm.last.android.player.IRadioPlayer player = null;
 
     private static LastFMApplication instance;
-    private ProgressDialog mProgress;
+    private Context mCtx;
 
     public static LastFMApplication getInstance()
     {
@@ -100,7 +100,7 @@ public class LastFMApplication extends Application
 		if ( LastFMApplication.getInstance().player == null )
 			return;
 
-		mProgress = ProgressDialog.show(ctx, "", "Tuning Radio Station", true, false);
+		mCtx = ctx;
 		new TuneRadioTask().execute(new String[] {url});
 	}
 	
@@ -241,15 +241,13 @@ public class LastFMApplication extends Application
         @Override
         public void onPostExecute(Boolean result) {
         	unregisterReceiver( mStatusListener );
-        	Context ctx = mProgress.getContext();
-            mProgress.dismiss();
             if (!result) {
 				try {
 					WSError error = LastFMApplication.getInstance().player.getError();
 					if(error != null)
-						LastFMApplication.getInstance().presentError(ctx, error);
+						LastFMApplication.getInstance().presentError(mCtx, error);
 					else
-						LastFMApplication.getInstance().presentError(ctx, getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
+						LastFMApplication.getInstance().presentError(mCtx, getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
 								getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
