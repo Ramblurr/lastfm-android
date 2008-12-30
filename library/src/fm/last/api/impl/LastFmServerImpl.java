@@ -247,7 +247,6 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.removeTrackTag(baseUrl, params);
 	}
 
-	@Override
 	public Artist getArtistInfo(String artist, String mbid, String lang)
 	throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getInfo");
@@ -263,7 +262,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return ArtistFunctions.getArtistInfo(baseUrl, params);
 	}
 
-	@Override
 	public User[] getTrackTopFans(String track, String artist, String mbid)
 	throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTopFans");
@@ -279,7 +277,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTopFans(baseUrl, params);
 	}
 
-	@Override
 	public Event[] getArtistEvents(String artist) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getEvents");
 		if (artist != null) {

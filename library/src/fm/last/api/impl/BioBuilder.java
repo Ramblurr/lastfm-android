@@ -13,12 +13,16 @@ public class BioBuilder extends XMLBuilder<Bio> {
 	@Override
 	public Bio build(Node bioNode) {
 		node = bioNode;
+		String summary = "";
+		String content = "";
 		
 		String published = getText("published");
 		// FIXME String summary = getText("summary");
-		String summary = getChildNode("summary").getFirstChild().getNodeValue();
+		if(getChildNode("summary") != null)
+			summary = getChildNode("summary").getFirstChild().getNodeValue();
 		// FIXME String content = getText("content");
-		String content = getChildNode("content").getFirstChild().getNodeValue();
+		if(getChildNode("content") != null)
+			content = getChildNode("content").getFirstChild().getNodeValue();
 		return new Bio(published, summary, content);
 	}
 
