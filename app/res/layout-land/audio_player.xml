@@ -20,41 +20,173 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" android:background="#000">
 
-    <LinearLayout style="TopBar" android:background="#9d9fa2" android:layout_height="48dip" android:layout_width="fill_parent">
-	<ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/back_button" android:id="@+id/player_backBtn"/>
-	<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_weight="1" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:id="@+id/station_name" android:text="Station Name" android:layout_gravity="center"></TextView>
-    <ImageButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/back_button" android:id="@+id/player_backBtn"/>
-</LinearLayout>
-    
+	<LinearLayout android:id="@+id/NavBar" style="@style/NavBar">
+    	<ImageButton android:id="@+id/player_backBtn"
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_gravity="left|center_vertical"
+    		android:background="@drawable/back_button"/>
+		<TextView android:id="@+id/station_name"
+			android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:layout_weight="1" style="@style/NavBar_Title"
+			android:layout_gravity="center" android:gravity="center"
+			android:text="Station Name"/>
+    	<ImageButton android:id="@+id/player_infoBtn"
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:layout_gravity="right|center_vertical"
+    		android:background="@drawable/info_button"/>
+	</LinearLayout>
+	<ViewFlipper android:id="@+id/playback_detail_flipper"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+		
+		<!-- Playback view -->
+		<RelativeLayout
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+	        xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
+		
+	        <fm.last.android.RemoteImageView android:id="@+id/album"
+	            lfm:unknownImage="@+drawable/albumart_mp_unknown"
+	            android:background="@drawable/albumart_mp_unknown"
+	            android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_height="120dip" android:layout_width="120dip"/>
+		
+			<LinearLayout android:id="@+id/playback_controls" android:orientation="horizontal"
+			    android:layout_gravity="bottom"
+			    android:layout_marginTop="1px"
+			    android:layout_height="76px" android:layout_width="fill_parent" android:gravity="center" android:layout_alignParentBottom="true" android:background="@drawable/player_controls_bkg_portrait">
+			
+			    <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love"/>
+			    <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban"/>
+			    <ImageButton android:id="@+id/playback_menu" style="@+style/LastFMButton.Menu"/>
+			    <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop"/>
+			    <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip"/>
+		
+			</LinearLayout>
+		
+			<TableLayout android:id="@+id/track_metadata"
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:layout_marginBottom="16dip" android:layout_centerHorizontal="true" 
+				android:layout_above="@id/playback_controls" android:layout_toRightOf="@id/album">
+				
+				<TableRow
+					android:layout_height="wrap_content"
+					android:layout_width="fill_parent"
+					android:layout_gravity="center"
+					android:gravity="center">
+					
+					<TextView android:id="@+id/track_artist"
+						style="@style/playback_info"
+						android:layout_height="wrap_content"
+						android:layout_width="fill_parent"
+						android:layout_gravity="center"
+						android:gravity="center"/>
+				</TableRow>
+				
+				<TableRow 
+					android:layout_height="wrap_content"
+					android:layout_width="fill_parent"
+					android:gravity="center">
+					
+					<TextView android:id="@+id/track_title"
+						style="@style/playback_info"
+						android:layout_height="wrap_content"
+						android:layout_width="fill_parent"
+						android:layout_gravity="center"
+						android:layout_marginBottom="8dip"
+						android:gravity="center"/>
+				</TableRow>
+				
+				<TableRow 
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:gravity="center">
+					
+					<LinearLayout
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content">
+						
+						<TextView android:id="@+id/currenttime"
+							style="@style/playback_time"
+							android:layout_gravity="bottom"
+							android:paddingLeft="5dip"
+							android:layout_height="wrap_content"
+							android:layout_width="48dip"
+							android:gravity="right"
+							android:maxWidth="48dip"
+							android:width="48dip" />
+							
+						<ProgressBar android:id="@android:id/progress"
+							android:background="#000"
+							android:layout_height="8px"
+							android:paddingLeft="5px"
+							android:paddingRight="5px"
+							android:indeterminateOnly="false"
+							android:progressDrawable="@+drawable/progress_horizontal"
+							android:layout_width="200dip"
+							android:layout_marginLeft="8dip"
+							android:layout_marginRight="8dip"
+							android:layout_gravity="center_vertical" />
+			
+						<TextView android:id="@+id/totaltime"
+							style="@style/playback_time"
+							android:layout_gravity="bottom"
+							android:paddingLeft="5dip"
+							android:layout_height="wrap_content"
+							android:layout_width="48dip"
+							android:gravity="left"
+							android:maxWidth="48dip"
+							android:width="48dip" />
+			
+					</LinearLayout>
+				</TableRow>
+			</TableLayout>
+		</RelativeLayout>
+		
+		<!--  metadata view -->
+		<LinearLayout android:orientation="vertical" 
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+			<fm.last.android.widget.TabBar
+				android:id="@+id/TabBar" android:layout_width="fill_parent"
+				android:layout_height="44dip" android:layout_marginTop="2dip"/>
+			<LinearLayout android:background="#2d5275" android:layout_width="fill_parent"
+				android:layout_height="5dip" android:layout_marginBottom="1dip"/>
+			<ViewFlipper android:id="@+id/ViewFlipper"
+				android:layout_width="fill_parent" android:layout_height="fill_parent">
+		
+				<!-- Bio tab -->
+				<WebView android:id="@+id/webview" android:layout_width="fill_parent"
+					android:layout_height="fill_parent" android:fadingEdge="none">
+				</WebView>
+				
+				<!-- Similar tab -->
+				<ListView android:id="@+id/similar_list_view"
+					android:background="#fff"
+					android:divider="#d9d7d7"
+					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+					
+				<!-- Top Tags tab -->
+				<ListView android:id="@+id/tags_list_view"
+					android:background="#fff"
+					android:divider="#d9d7d7"
+					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+					
+				<!-- Events tab -->
+				<ListView android:id="@+id/events_list_view"
+					android:background="#fff"
+					android:divider="#d9d7d7"
+					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+					
+				<!-- Top Listeners tab -->
+				<ListView android:id="@+id/listeners_list_view"
+					android:background="#fff"
+					android:divider="#d9d7d7"
+					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+		
+			</ViewFlipper>
+		</LinearLayout>
+	</ViewFlipper>
 
-    
-
-    
-
-    
-
-    
-
-
-        
-
-
-<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content" xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
-<fm.last.android.RemoteImageView android:id="@+id/album" lfm:unknownImage="@+drawable/albumart_mp_unknown" android:background="@drawable/albumart_mp_unknown" android:layout_width="220dip" android:layout_height="220dip"/>
-<TableLayout android:layout_width="fill_parent" android:id="@+id/track_metadata" android:layout_toRightOf="@+id/album" android:layout_height="wrap_content" android:layout_centerVertical="true">
-<TableRow android:id="@+id/TableRow01" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center">
-<TextView android:layout_height="wrap_content" android:id="@+id/track_artist" android:layout_gravity="center" android:gravity="center"></TextView>
-</TableRow><TableRow android:layout_height="wrap_content" android:id="@+id/TableRow02" android:gravity="center"><TextView android:layout_height="wrap_content" android:id="@+id/track_title" android:layout_gravity="center" android:gravity="center"></TextView>
-</TableRow>
-<TableRow android:id="@+id/TableRow03" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dip" android:gravity="center"><LinearLayout android:id="@+id/LinearLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content"><TextView android:id="@+id/currenttime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:layout_gravity="bottom" android:paddingLeft="5dip" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="right" android:maxWidth="48dip" android:width="48dip" /><ProgressBar android:id="@android:id/progress" android:background="#80000000" android:layout_height="18px" android:paddingLeft="5px" android:paddingRight="5px" android:paddingBottom="4px" android:indeterminateDuration="3500" android:indeterminateBehavior="repeat" android:indeterminateOnly="false" android:progressDrawable="@+drawable/progress_horizontal" android:indeterminateDrawable="@+drawable/progress_indeterminate_horizontal" android:layout_width="200dip" android:layout_marginLeft="8dip" android:layout_marginRight="8dip" /><TextView android:id="@+id/totaltime" android:textAppearance="?android:attr/textAppearanceMedium" android:textSize="14sp" android:textStyle="bold" android:shadowColor="#ff000000" android:shadowDx="0" android:shadowDy="0" android:shadowRadius="3" android:paddingRight="5px" android:layout_gravity="bottom" android:layout_height="wrap_content" android:layout_width="48dip" android:gravity="left" android:maxWidth="48dip" android:width="48dip" /></LinearLayout>
-</TableRow>
-</TableLayout><LinearLayout android:orientation="horizontal" android:layout_marginTop="1px" android:layout_height="60px" android:layout_width="fill_parent" android:gravity="center" android:layout_toRightOf="@+id/album" android:layout_alignParentBottom="true">
-
-
-			<ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/playback_menu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/cog" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" android:layout_margin="8dip"/>
-            <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" android:layout_margin="8dip"/>
-</LinearLayout></RelativeLayout>
 </LinearLayout>
