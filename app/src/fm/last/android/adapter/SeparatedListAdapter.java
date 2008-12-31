@@ -14,12 +14,13 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-package fm.last.android;
+package fm.last.android.adapter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import fm.last.android.activity.LastFMStreamAdapter;
+import fm.last.android.R;
+import fm.last.android.R.layout;
 
 import android.content.Context;
 import android.view.View;

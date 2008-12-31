@@ -1,4 +1,4 @@
-package fm.last.android.activity;
+package fm.last.android.adapter;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
 
@@ -18,7 +19,7 @@ public class LastFMStreamAdapter extends BaseAdapter
 	ArrayList<String> mStations;
     Activity context;
 
-    LastFMStreamAdapter( Activity context )
+    public LastFMStreamAdapter( Activity context )
     {
     	mLabels = new ArrayList<String>();
     	mStations = new ArrayList<String>();
@@ -49,14 +50,16 @@ public class LastFMStreamAdapter extends BaseAdapter
         if ( row == null )
         {
             LayoutInflater inflater = context.getLayoutInflater();
-        	if(mStations.get(position).startsWith("lastfm://"))
-                row = inflater.inflate( R.layout.station_row, null );
-        	else
-                row = inflater.inflate( R.layout.disclosure_row, null );
+            row = inflater.inflate( R.layout.list_row, null );
         }
 
-        TextView name = (TextView)row.findViewById(R.id.label);
+        TextView name = (TextView)row.findViewById(R.id.row_label);
         name.setText( mLabels.get(position) );
+        
+        row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
+        ImageView icon = (ImageView)row.findViewById(R.id.row_disclosure_icon);
+        icon.setImageResource(R.drawable.radio_icon);
+        
         if(position == mLabels.size() - 1) {
         	row.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
         	row.setTag("bottom");

@@ -16,28 +16,26 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:orientation="horizontal"
-	android:minHeight="45px" android:layout_height="wrap_content">
-	<ImageView android:id="@+id/radio_row_img"
+	android:layout_width="fill_parent" android:layout_height="wrap_content"
+	android:orientation="horizontal" android:id="@+id/station_row" android:background="@drawable/list_item_rest">
+	<ImageView android:id="@+id/row_icon"
 		android:adjustViewBounds="true" android:layout_height="wrap_content"
 		android:layout_width="45px" android:maxHeight="45px" android:maxWidth="45px"
-		android:layout_gravity="center_vertical" />
-	<TextView android:id="@+id/radio_row_name"
-		android:layout_width="wrap_content" android:layout_height="wrap_content"
-		android:layout_gravity="center_vertical" android:textSize="20sp"
-		android:layout_marginLeft="10px"></TextView>
-	<LinearLayout android:layout_width="fill_parent"
-		android:layout_height="45px" android:orientation="horizontal"
-		android:gravity="right|center_vertical">
-		<ViewSwitcher android:id="@+id/row_view_switcher"
-			android:visibility="invisible" android:layout_width="wrap_content"
-			android:layout_height="wrap_content">
-			<ImageView android:adjustViewBounds="true"
-				android:layout_height="wrap_content" android:layout_width="45px"
-				android:maxHeight="45px" android:maxWidth="45px" android:src="@drawable/arrow"></ImageView>
-			<ProgressBar android:layout_width="32px"
-				android:layout_height="32px" android:indeterminate="true"
-				android:layout_gravity="center_vertical|center_horizontal"></ProgressBar>
-		</ViewSwitcher>
-	</LinearLayout>
+		android:layout_gravity="center_vertical" android:visibility="gone"/>
+	<TextView android:id="@+id/row_label" android:layout_width="fill_parent"
+			android:layout_height="wrap_content" android:text="Black Eyed Peas"
+			android:layout_weight="1" android:paddingLeft="16dip"  
+			android:layout_gravity="center" android:gravity="left" android:textSize="16dip" android:textStyle="bold" android:textColor="#000"/>
+	<ViewSwitcher android:id="@+id/row_view_switcher"
+		android:layout_width="wrap_content" android:layout_gravity="center"
+		android:layout_height="wrap_content" android:visibility="gone">
+		<ImageView android:id="@+id/row_disclosure_icon" android:paddingLeft="16dip" android:paddingRight="16dip"
+			android:src="@drawable/arrow"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<ProgressBar android:layout_width="32px"
+			android:layout_height="32px" android:indeterminate="true"
+			android:indeterminateDrawable="@+drawable/spinner_small"
+			android:layout_gravity="center_vertical|center_horizontal"/>
+	</ViewSwitcher>
 </LinearLayout>

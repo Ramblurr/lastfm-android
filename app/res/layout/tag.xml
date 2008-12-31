@@ -19,8 +19,7 @@
 	android:layout_height="fill_parent">
 
 	<!-- The NavBar -->
-	<LinearLayout style="TopBar" android:background="#9d9fa2"
-		android:layout_height="46px" android:layout_width="fill_parent"
+	<LinearLayout style="@style/NavBar" android:layout_height="46px" android:layout_width="fill_parent"
 		android:gravity="center_vertical">
 		<Button android:layout_width="wrap_content" android:id="@+id/navbar_back"
 			android:text="@string/cancel" android:gravity="center_vertical"
@@ -38,7 +37,7 @@
 	</LinearLayout>
 
 	<!-- TextInput -->
-	<LinearLayout style="TopBar" android:background="#9d9fa2"
+	<LinearLayout style="@style/NavBar"
 		android:layout_height="46px" android:layout_width="fill_parent"
 		android:gravity="center_vertical">
 		<EditText android:id="@+id/tag_text_edit"
@@ -60,11 +59,11 @@
 
 	<fm.last.android.widget.TagLayout
 		android:id="@+id/TagLayout" android:layout_width="fill_parent"
-		android:layout_height="175px">
+		android:layout_height="175px" android:background="@drawable/tagareabg">
 	</fm.last.android.widget.TagLayout>
 
 	<ListView android:id="@+id/TagList" android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
+		android:layout_height="fill_parent" android:background="#ffffff">
 	</ListView>
 
 </LinearLayout>

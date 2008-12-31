@@ -36,9 +36,11 @@ import java.util.Collection;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.R.id;
 import fm.last.android.R.layout;
+import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Artist;
@@ -59,7 +61,6 @@ public class NewStation extends ListActivity
     private EditText searchBar;
     private LastFMStreamAdapter mAdapter;
     private boolean mDoingSearch;
-    private View previousSelectedView;
 
     @Override
     public void onCreate( Bundle icicle )
@@ -79,53 +80,7 @@ public class NewStation extends ListActivity
 
         mAdapter = new LastFMStreamAdapter( this );
         setListAdapter( mAdapter );
-		getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			public void onItemSelected(AdapterView<?> adapter, View view,
-					int position, long id) {
-				if(previousSelectedView != null) {
-					if(previousSelectedView.getTag() == "bottom")
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-					else
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
-					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
-					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
-				}
-				if(position >= 0 && getListView().isFocused()) {
-					if(view.getTag() == "bottom")
-						view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
-					else
-						view.setBackgroundResource(R.drawable.list_item_focus);
-					((ImageView)view.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_focus);
-					((TextView)view.findViewById(R.id.label)).setTextColor(0xFFFFFFFF);
-					previousSelectedView = view;
-				}
-			}
-
-			public void onNothingSelected(AdapterView<?> arg0) {
-				if(previousSelectedView != null) {
-					if(previousSelectedView.getTag() == "bottom")
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-					else
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
-					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
-					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
-				}
-				previousSelectedView = null;
-			}
-	    });
-		getListView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(v == getListView()) {
-					if(hasFocus)
-						getListView().getOnItemSelectedListener().onItemSelected(getListView(), getListView().getSelectedView(), getListView().getSelectedItemPosition(), getListView().getSelectedItemId());
-					else
-						getListView().getOnItemSelectedListener().onNothingSelected(null);
-				}
-			}
-			
-		});
+		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
         mDoingSearch = false;
     }
 

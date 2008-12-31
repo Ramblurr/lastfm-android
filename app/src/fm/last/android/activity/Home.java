@@ -33,11 +33,13 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
+import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
-import fm.last.android.SeparatedListAdapter;
 import fm.last.android.Worker;
+import fm.last.android.adapter.LastFMStreamAdapter;
+import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
@@ -114,55 +116,9 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mProfileList = (ListView)findViewById(R.id.profile_list_view);
         String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"};
         mProfileList.setAdapter(new ArrayAdapter<String>(this, 
-                R.layout.disclosure_row, R.id.label, mStrings)); 
+                R.layout.list_row, R.id.row_label, mStrings)); 
         
-		getListView().setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			public void onItemSelected(AdapterView<?> adapter, View view,
-					int position, long id) {
-				if(previousSelectedView != null) {
-					if(previousSelectedView.getTag() == "bottom")
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-					else
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
-					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
-					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
-				}
-				if(position > 0 && getListView().isFocused()) {
-					if(view.getTag() == "bottom")
-						view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
-					else
-						view.setBackgroundResource(R.drawable.list_item_focus);
-					((ImageView)view.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_focus);
-					((TextView)view.findViewById(R.id.label)).setTextColor(0xFFFFFFFF);
-					previousSelectedView = view;
-				}
-			}
-
-			public void onNothingSelected(AdapterView<?> arg0) {
-				if(previousSelectedView != null) {
-					if(previousSelectedView.getTag() == "bottom")
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-					else
-						previousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
-					((ImageView)previousSelectedView.findViewById(R.id.icon)).setImageResource(R.drawable.list_radio_icon_rest);
-					((TextView)previousSelectedView.findViewById(R.id.label)).setTextColor(0xFF000000);
-				}
-				previousSelectedView = null;
-			}
-	    });
-		getListView().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(v == getListView()) {
-					if(hasFocus)
-						getListView().getOnItemSelectedListener().onItemSelected(getListView(), getListView().getSelectedView(), getListView().getSelectedItemPosition(), getListView().getSelectedItemId());
-					else
-						getListView().getOnItemSelectedListener().onNothingSelected(null);
-				}
-			}
-			
-		});
+		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
     }
     
 	public void tabChanged(String text, int index) {

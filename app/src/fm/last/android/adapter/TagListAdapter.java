@@ -59,35 +59,51 @@ public class TagListAdapter extends ListAdapter {
 
 		if (row==null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
-			row=inflater.inflate(R.layout.tag_row, null);
+			row=inflater.inflate(R.layout.list_row, null);
 			
 			holder = new ViewHolder();
-			holder.iv = (ImageView)row.findViewById(R.id.radio_row_img);
-			holder.radioName = (TextView)row.findViewById(R.id.radio_row_name);
+			holder.icon = (ImageView)row.findViewById(R.id.row_icon);
+			holder.label = (TextView)row.findViewById(R.id.row_label);
 			
 			row.setTag(holder);
 		} else {
 			holder = (ViewHolder)row.getTag();
 		}
 
-		if(mResId != 0){
+		/*if(mResId != 0){
 			holder.iv.setImageResource(mResId);
 		}
 		else {
 			holder.iv.setVisibility(View.GONE);
-		}
+		}*/
 		
 		// TODO remove hardcoded colors
 		if(mList.get(position).added){
-			holder.radioName.setTextColor(0x337a7a7a);
+			holder.label.setTextColor(0x337a7a7a);
 		} else {
-			holder.radioName.setTextColor(0xff7a7a7a);
+			holder.label.setTextColor(0xff7a7a7a);
 		}
 		
-		holder.radioName.setText(mList.get(position).text);
+		holder.label.setText(mList.get(position).text);
 
 		return row;
 	}
+
+	public int getCount() {
+		if(mList != null)
+			return mList.size();
+		else
+			return 0;
+	}
+
+	public Object getItem(int position) {
+		return mList.get(position).text;
+	}
+
+	public long getItemId(int position) {
+		return position;
+	}
+	
 	
 	/**
 	 * Holder pattern implementation, performance boost
@@ -95,18 +111,16 @@ public class TagListAdapter extends ListAdapter {
 	 * @author Lukasz Wisniewski
 	 */
 	static class ViewHolder {
-        TextView radioName;
-        ImageView iv;
+        TextView label;
+        ImageView icon;
     }
 	
-	@Override
 	public void setSource(ArrayList<String> list) {
 		mList = new ArrayList<Entry>();
 		for(int i=0; i<list.size(); i++){
 			mList.add(new Entry(list.get(i), false));
 		}
-		
-		super.setSource(list);
+		notifyDataSetChanged();
 	}
 	
 	/**

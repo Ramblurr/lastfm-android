@@ -34,7 +34,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
  * 
  * @author Lukasz Wisniewski
  */
-public class EventListAdapter extends IconifiedListAdapter{
+public class EventListAdapter extends ListAdapter{
 
 	private static String TAG = "EventListAdapter";
 

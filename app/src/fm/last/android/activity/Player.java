@@ -8,13 +8,14 @@ import java.util.Locale;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
+import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.adapter.EventListAdapter;
-import fm.last.android.adapter.IconifiedEntry;
-import fm.last.android.adapter.IconifiedListAdapter;
+import fm.last.android.adapter.ListEntry;
+import fm.last.android.adapter.ListAdapter;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.Rotate3dAnimation;
@@ -40,6 +41,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -64,6 +66,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
+import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class Player extends Activity
@@ -98,9 +101,9 @@ public class Player extends Activity
 
 	private ImageCache mImageCache;
 	private String mBio;
-	private IconifiedListAdapter mSimilarAdapter;
-	private IconifiedListAdapter mFanAdapter;
-	private ArrayAdapter<String> mTagAdapter;
+	private ListAdapter mSimilarAdapter;
+	private ListAdapter mFanAdapter;
+	private ListAdapter mTagAdapter;
 	private EventListAdapter mEventAdapter;
 	private String mLastInfoArtist = "";
 	
@@ -150,8 +153,11 @@ public class Player extends Activity
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mWebView = (WebView) findViewById(R.id.webview);
 		mSimilarList = (ListView) findViewById(R.id.similar_list_view);
+		mSimilarList.setOnItemSelectedListener(new OnListRowSelectedListener(mSimilarList));
 		mTagList = (ListView) findViewById(R.id.tags_list_view);
+		mTagList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagList));
 		mFanList = (ListView) findViewById(R.id.listeners_list_view);
+		mFanList.setOnItemSelectedListener(new OnListRowSelectedListener(mFanList));
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 
 		mTabBar.setViewFlipper(mViewFlipper);
@@ -201,7 +207,7 @@ public class Player extends Activity
 		try {
 			artist = LastFMApplication.getInstance().player.getArtistName();
 			track = LastFMApplication.getInstance().player.getTrackName();
-			Intent myIntent = new Intent(this, Tag.class);
+			Intent myIntent = new Intent(this, fm.last.android.activity.Tag.class);
 			myIntent.putExtra("lastfm.artist", artist);
 			myIntent.putExtra("lastfm.track", track);
 			startActivity(myIntent);
@@ -440,6 +446,8 @@ public class Player extends Activity
 				try
 				{
 					mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
+					if(mDetailFlipper.getDisplayedChild() != 0)
+						mInfoListener.onClick(mInfoButton);
 				}
 				catch ( RemoteException e )
 				{
@@ -668,24 +676,36 @@ public class Player extends Activity
         @Override
     	public void onPreExecute() {
 	        String[] strings = new String[]{"Loading..."};
+	        mSimilarList.setOnItemClickListener(null);
 	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
-	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+	                R.layout.list_row, R.id.row_label, strings)); 
         }
     	
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
             
-			mSimilarAdapter = new IconifiedListAdapter(Player.this, getImageCache());
+			mSimilarAdapter = new ListAdapter(Player.this, getImageCache());
+			mSimilarList.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> l, View v,
+						int position, long id) {
+					Artist artist = (Artist)mSimilarAdapter.getItem(position);
+					mSimilarAdapter.enableLoadBar(position);
+			    	LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+				}
+				
+			});
 
     		try {
     			Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
-    			ArrayList<IconifiedEntry> iconifiedEntries = new ArrayList<IconifiedEntry>();
-    			for(int i=0; i< similar.length; i++){
-    				IconifiedEntry entry = new IconifiedEntry(similar[i], 
+    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    			for(int i=0; i< ((similar.length < 10) ? similar.length : 10); i++){
+    				ListEntry entry = new ListEntry(similar[i], 
     						R.drawable.albumart_mp_unknown, 
     						similar[i].getName(), 
-    						similar[i].getImages()[0].getUrl());
+    						similar[i].getImages()[0].getUrl(),
+    						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);
     			}
     			mSimilarAdapter.setSourceIconified(iconifiedEntries);
@@ -704,7 +724,7 @@ public class Player extends Activity
         	} else {
     	        String[] strings = new String[]{"No Similar Artists"};
     	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+    	                R.layout.list_row, R.id.row_label, strings)); 
         	}
         }
     }
@@ -715,23 +735,24 @@ public class Player extends Activity
     	public void onPreExecute() {
    	        String[] strings = new String[]{"Loading..."};
    	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+   	                R.layout.list_row, R.id.row_label, strings)); 
         }
     	
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
             
-			mFanAdapter = new IconifiedListAdapter(Player.this, getImageCache());
+			mFanAdapter = new ListAdapter(Player.this, getImageCache());
 
     		try {
     			User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
-    			ArrayList<IconifiedEntry> iconifiedEntries = new ArrayList<IconifiedEntry>();
-    			for(int i=0; i< fans.length; i++){
-    				IconifiedEntry entry = new IconifiedEntry(fans[i], 
+    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    			for(int i=0; i< ((fans.length < 10) ? fans.length : 10); i++){
+    				ListEntry entry = new ListEntry(fans[i], 
     						R.drawable.albumart_mp_unknown, 
     						fans[i].getName(), 
-    						fans[i].getImages()[0].getUrl());
+    						fans[i].getImages()[0].getUrl(),
+    						R.drawable.arrow);
     				iconifiedEntries.add(entry);
     			}
     			mFanAdapter.setSourceIconified(iconifiedEntries);
@@ -750,7 +771,7 @@ public class Player extends Activity
         	} else {
     	        String[] strings = new String[]{"No Top Listeners"};
     	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+    	                R.layout.list_row, R.id.row_label, strings)); 
         	}
         }
     }
@@ -761,21 +782,37 @@ public class Player extends Activity
     	public void onPreExecute() {
    	        String[] strings = new String[]{"Loading..."};
    	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+   	                R.layout.list_row, R.id.row_label, strings));
+   	        mTagList.setOnItemClickListener(null);
         }
     	
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
 
+			mTagAdapter = new ListAdapter(Player.this, getImageCache());
+			mTagList.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> l, View v,
+						int position, long id) {
+					Tag tag = (Tag)mTagAdapter.getItem(position);
+					mTagAdapter.enableLoadBar(position);
+			    	LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
+				}
+				
+			});
+
     		try {
     			Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
-    			ArrayList<String> entries = new ArrayList<String>();
-    			for(int i=0; i< tags.length; i++){
-    				String entry = tags[i].getName();
-    				entries.add(entry);
+    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
+    				ListEntry entry = new ListEntry(tags[i], 
+    						R.drawable.tag_icon,
+    						tags[i].getName(), 
+    						R.drawable.radio_icon);
+    				iconifiedEntries.add(entry);
     			}
-    			mTagAdapter = new ArrayAdapter<String>(Player.this, R.layout.iconified_list_row, R.id.radio_row_name, entries);
+    			mTagAdapter.setSourceIconified(iconifiedEntries);
     			success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
@@ -790,7 +827,7 @@ public class Player extends Activity
         	} else {
     	        String[] strings = new String[]{"No Tags"};
     	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+    	                R.layout.list_row, R.id.row_label, strings)); 
         	}
         }
     }
@@ -810,7 +847,7 @@ public class Player extends Activity
     	public void onPreExecute() {
    	        String[] strings = new String[]{"Loading..."};
    	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+   	                R.layout.list_row, R.id.row_label, strings)); 
         }
     	
         @Override
@@ -838,7 +875,7 @@ public class Player extends Activity
         		mEventList.setOnItemClickListener(null);
     	        String[] strings = new String[]{"No Upcoming Events"};
     	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.iconified_list_row, R.id.radio_row_name, strings)); 
+    	                R.layout.list_row, R.id.row_label, strings)); 
         	}
         }
     }

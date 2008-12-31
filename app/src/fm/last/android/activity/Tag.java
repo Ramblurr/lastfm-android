@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.TagListAdapter;
 import fm.last.android.widget.TagLayout;
 import fm.last.android.widget.TagLayoutListener;

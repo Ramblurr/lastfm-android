@@ -69,11 +69,10 @@ public class LastFMApplication extends Application
         @Override
         public void onReceive( Context context, Intent intent )
         {
-
             String action = intent.getAction();
             if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
             {
-       			Intent i = new Intent( LastFMApplication.getInstance(), Player.class );
+       			Intent i = new Intent( mCtx, Player.class );
        			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
        			startActivity( i );
             }
@@ -93,15 +92,20 @@ public class LastFMApplication extends Application
 			player = null;
 		}
 	};
-    
+	
 	public void playRadioStation(Context ctx, String url)
+	{
+		playRadioStation(ctx,url,true);
+	}
+	
+	public void playRadioStation(Context ctx, String url, boolean showPlayer)
 	{
 
 		if ( LastFMApplication.getInstance().player == null )
 			return;
 
 		mCtx = ctx;
-		new TuneRadioTask().execute(new String[] {url});
+		new TuneRadioTask(showPlayer).execute(new String[] {url});
 	}
 	
 	private void appendRecentStation( String url, String name )
@@ -209,10 +213,18 @@ public class LastFMApplication extends Application
     }
 
     private class TuneRadioTask extends UserTask<String, Integer, Boolean> {
+    	boolean showPlayer = true;
+    	
+    	public TuneRadioTask(boolean showPlayer) {
+    		this.showPlayer = showPlayer;
+    	}
+    	
     	public void onPreExecute() {
-            IntentFilter f = new IntentFilter();
-            f.addAction( RadioPlayerService.STATION_CHANGED );
-            registerReceiver( mStatusListener, f );
+    		if(showPlayer) {
+                IntentFilter f = new IntentFilter();
+                f.addAction( RadioPlayerService.STATION_CHANGED );
+                registerReceiver( mStatusListener, f );
+    		}
     	}
     	
         public Boolean doInBackground(String... urls) {
@@ -240,7 +252,9 @@ public class LastFMApplication extends Application
 
         @Override
         public void onPostExecute(Boolean result) {
-        	unregisterReceiver( mStatusListener );
+        	if(showPlayer)
+        		unregisterReceiver( mStatusListener );
+        	
             if (!result) {
 				try {
 					WSError error = LastFMApplication.getInstance().player.getError();
