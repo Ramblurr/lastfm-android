@@ -16,14 +16,10 @@
 		</activity>
 		<activity android:name=".activity.NewStation" android:label="LastFM: Create a New Station" android:configChanges="orientation|keyboardHidden">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Player" android:label="LastFM: Player" android:configChanges="keyboardHidden">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Tag" android:label="LastFM: Tag" android:theme="@android:style/Theme.NoTitleBar">

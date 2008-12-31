@@ -50,6 +50,7 @@ public class LastFm extends Activity
                 doLogin( user, pass );
                 Intent intent = new Intent( LastFm.this, Home.class );
                 startActivity( intent );
+                finish();
             }
             catch ( Exception e )
             { // login failed
