@@ -62,68 +62,17 @@ public class LastFm extends Activity
 
         if ( icicle != null )
         {
-            mLoginShown = icicle.getBoolean( "loginshown" );
-            if ( mLoginShown )
-            {
-                user = icicle.getString( "username" );
-                pass = icicle.getString( "pass" );
-                showLogin( user, pass );
-                return;
-            }
+			user = icicle.getString( "username" );
+			pass = icicle.getString( "pass" );
+			if(user != null)
+				( ( EditText ) findViewById( R.id.username ) ).setText( user );
+			
+			if(pass != null)
+				( ( EditText ) findViewById( R.id.password ) ).setText( pass );
         }
-
-        setContentView( R.layout.main );
-        Button b = ( Button ) findViewById( R.id.buttonSetup );
-        b.setOnClickListener( mGoListener );
-
-        ImageView i = ( ImageView ) findViewById( R.id.main_logo );
-        i.setAdjustViewBounds( true );
-        i.setBackgroundResource( R.drawable.lastfm_revolution );
-
-    }
-
-    @Override
-    public void onSaveInstanceState( Bundle outState )
-    {
-
-        outState.putBoolean( "loginshown", mLoginShown );
-        if ( mLoginShown )
-        {
-            String user = ( ( EditText ) findViewById( R.id.username ) )
-                    .getText().toString();
-            String password = ( ( EditText ) findViewById( R.id.password ) )
-                    .getText().toString();
-            outState.putString( "username", user );
-            outState.putString( "passowrd", password );
-        }
-        super.onSaveInstanceState( outState );
-    }
-
-    private void showLogin( String user, String pass )
-    {
 
         setContentView( R.layout.login );
-        mLoginShown = true;
-        if ( user != null && pass != null )
-        {
-            ( ( EditText ) findViewById( R.id.username ) ).setText( user );
-            ( ( EditText ) findViewById( R.id.password ) ).setText( pass );
-        }
-        LastFm.this.setTitle( "LastFM: Login" );
-        Button button = ( Button ) findViewById( R.id.cancel );
-
-        button.setOnClickListener( new View.OnClickListener()
-        {
-
-            public void onClick( View v )
-            {
-
-                setResult( RESULT_CANCELED );
-                finish();
-            }
-        } );
-
-        button = ( Button ) findViewById( R.id.login );
+        Button button = ( Button ) findViewById( R.id.sign_in_button );
         button.setOnClickListener( new View.OnClickListener()
         {
 
@@ -162,6 +111,7 @@ public class LastFm extends Activity
                 	if(e.getMessage().contains("code 403")) {
     					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_AUTH_TITLE),
     							getResources().getString(R.string.ERROR_AUTH));
+    					( ( EditText ) findViewById( R.id.password ) ).setText( "" );
                 	} else {
     					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
     							getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
@@ -171,15 +121,22 @@ public class LastFm extends Activity
         } );
     }
 
-    private OnClickListener mGoListener = new OnClickListener()
+    @Override
+    public void onSaveInstanceState( Bundle outState )
     {
 
-        public void onClick( View v )
+        outState.putBoolean( "loginshown", mLoginShown );
+        if ( mLoginShown )
         {
-
-            showLogin( null, null );
+            String user = ( ( EditText ) findViewById( R.id.username ) )
+                    .getText().toString();
+            String password = ( ( EditText ) findViewById( R.id.password ) )
+                    .getText().toString();
+            outState.putString( "username", user );
+            outState.putString( "passowrd", password );
         }
-    };
+        super.onSaveInstanceState( outState );
+    }
 
     void doLogin( String user, String pass ) throws Exception, WSError
     {

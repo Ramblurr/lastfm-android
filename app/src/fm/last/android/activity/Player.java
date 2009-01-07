@@ -73,6 +73,7 @@ public class Player extends Activity
 {
 
 	private ImageButton mInfoButton;
+	private ImageButton mInfoButton_flip;
 	private ImageButton mBackButton;
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
@@ -139,7 +140,15 @@ public class Player extends Activity
 		mArtistName = ( TextView ) findViewById( R.id.track_artist );
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
 		mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
-		mBackButton.setOnClickListener( mBackListener );
+		if(mBackButton != null)
+			mBackButton.setOnClickListener( mBackListener );
+		
+		//flip-side, if available
+		mInfoButton_flip = ( ImageButton ) findViewById( R.id.player_infoBtn_flip );
+		if(mInfoButton_flip != null)
+			mInfoButton_flip.setOnClickListener( mInfoListener );
+		
+		//playback-side
 		mInfoButton = ( ImageButton ) findViewById( R.id.player_infoBtn );
 		mInfoButton.setOnClickListener( mInfoListener );
 		mStopButton = ( ImageButton ) findViewById( R.id.stop );
@@ -222,7 +231,8 @@ public class Player extends Activity
 		super.onStart();
 		paused = false;
 		try {
-			mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
+			if(mStationName != null)
+				mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -361,15 +371,25 @@ public class Player extends Activity
             	}
     			mTabBar.setActive("Bio");
     			mViewFlipper.setDisplayedChild(TAB_BIO);
-    			mStationName.setText(mLastInfoArtist);
+    			if(mStationName != null)
+        			mStationName.setText(mLastInfoArtist);
+    			if(mInfoButton_flip != null)
+    				mInfoButton_flip.setImageBitmap(mAlbum.getArtwork());
+    			else
+    				mInfoButton.setImageBitmap(mAlbum.getArtwork());
             } else {
             	rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 310.0f, false);
             	try {
-					mStationName.setText(LastFMApplication.getInstance().player.getStationName());
+        			if(mStationName != null)
+      					mStationName.setText(LastFMApplication.getInstance().player.getStationName());
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+    			if(mInfoButton_flip != null)
+    				mInfoButton_flip.setImageResource(R.drawable.info_button);
+    			else
+    				mInfoButton.setImageResource(R.drawable.info_button);
             }
             rotation.setDuration(250);
             rotation.setFillAfter(true);
@@ -445,7 +465,8 @@ public class Player extends Activity
 			{
 				try
 				{
-					mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
+					if(mStationName != null)
+						mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
 					if(mDetailFlipper.getDisplayedChild() != 0)
 						mInfoListener.onClick(mInfoButton);
 				}

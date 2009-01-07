@@ -11,6 +11,8 @@ import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
@@ -26,7 +28,6 @@ public class TagButton extends ImageButton {
 	public static final String TAG = "TagButton";
 	
 	private String mText;
-	private Paint mRectPaint;
 	private TextPaint mTextPaint;
 	
 	// animation support
@@ -38,12 +39,15 @@ public class TagButton extends ImageButton {
 	private float mTextSize = 17;
 	private int mTagButtonHeight;
 	private int mTextBottomPadding = 2;
-	private int mBgColor = 0xff719ef6;
 	private int mHeadOffset;
 	private int mTailOffset;
 	
-	private Bitmap mHead;
-	private Bitmap mTail;
+	private Bitmap mHead_rest;
+	private Bitmap mTail_rest;
+	private Bitmap mMiddle_rest;
+	private Bitmap mHead_focus;
+	private Bitmap mTail_focus;
+	private Bitmap mMiddle_focus;
 
 	public TagButton(Context context) {
 		super(context);
@@ -68,25 +72,36 @@ public class TagButton extends ImageButton {
 		
 		mText = "";
 		
-		/* Init painter used to draw the rectangle behind the text */
-		mRectPaint = new Paint();
-		mRectPaint.setColor(mBgColor);
-		
 		/* Init painter used to draw the text inside the tag button */
 	    mTextPaint = new TextPaint();
 	    mTextPaint.setTextSize(mTextSize);
 	    mTextPaint.setARGB(255, 255, 255, 255);
 	    mTextPaint.setAntiAlias(true);
 	    
-	    /* Load head and tail .png */
-	    mHead = BitmapFactory.decodeResource(getResources(), R.drawable.tag_button_head);
-	    mTail = BitmapFactory.decodeResource(getResources(), R.drawable.tag_button_tail);
+	    /* Load resources */
+	    mHead_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_left);
+	    mTail_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_right);
+	    mMiddle_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_middle);
+	    mHead_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_left);
+	    mTail_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_right);
+	    mMiddle_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_middle);
 	    
 	    /* Setting some values*/
-	    mTagButtonHeight = mHead.getHeight();
-	    mHeadOffset = mHead.getWidth();
-	    mTailOffset = mTail.getWidth();
+	    mTagButtonHeight = mHead_rest.getHeight();
+	    mHeadOffset = mHead_rest.getWidth();
+	    mTailOffset = mTail_rest.getWidth();
 
+		this.setFocusable(true);
+		this.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+			public void onFocusChange(View v, boolean hasFocus) {
+				System.out.print("Focus changed!");
+				if(v == TagButton.this && hasFocus) {
+					System.out.print("Tag got focused!");
+				}
+			}
+			
+		});
 	}
 
 	@Override
@@ -105,23 +120,41 @@ public class TagButton extends ImageButton {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		
-		// drawing tag head and tag tail
-		canvas.drawBitmap(mHead, 0, 0, null);
-		canvas.drawBitmap(mTail, mHeadOffset+getTextWidth(mText), 0, null);
-		
-		// drawing rectangle behind text
-		Rect r = new Rect(mHeadOffset, 
-				0, 
-				mHeadOffset+getTextWidth(mText), 
-				getHeight());
-		canvas.drawRect(r, mRectPaint);
-		
-		// drawing tag text
-		canvas.drawText(mText, 
-				mHeadOffset, 
-				(getHeight()+mTextSize)/2-mTextBottomPadding, 
-				mTextPaint);
-		
+		if(this.isFocused()) {
+			// drawing tag head and tag tail
+			canvas.drawBitmap(mHead_focus, 0, 0, null);
+			canvas.drawBitmap(mTail_focus, mHeadOffset+getTextWidth(mText), 0, null);
+			
+			// drawing rectangle behind text
+			Rect r = new Rect(mHeadOffset, 
+					0, 
+					mHeadOffset+getTextWidth(mText), 
+					getHeight());
+			canvas.drawBitmap(mMiddle_focus, null, r, null);
+			
+			// drawing tag text
+			canvas.drawText(mText, 
+					mHeadOffset, 
+					(getHeight()+mTextSize)/2-mTextBottomPadding, 
+					mTextPaint);
+		} else {
+			// drawing tag head and tag tail
+			canvas.drawBitmap(mHead_rest, 0, 0, null);
+			canvas.drawBitmap(mTail_rest, mHeadOffset+getTextWidth(mText), 0, null);
+			
+			// drawing rectangle behind text
+			Rect r = new Rect(mHeadOffset, 
+					0, 
+					mHeadOffset+getTextWidth(mText), 
+					getHeight());
+			canvas.drawBitmap(mMiddle_rest, null, r, null);
+			
+			// drawing tag text
+			canvas.drawText(mText, 
+					mHeadOffset, 
+					(getHeight()+mTextSize)/2-mTextBottomPadding, 
+					mTextPaint);
+		}
 		super.onDraw(canvas);
 	}
 

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/home"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android"
+	android:background="#000">
+
+	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:id="@+id/TabBarContainer">
+		<fm.last.android.widget.TabBar
+			android:id="@+id/TabBar" android:layout_width="400dip"
+			android:layout_height="48dip" android:layout_weight="1.0"/>
+	<Button android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/now_playing" android:background="@drawable/now_playing" android:layout_gravity="center" android:layout_margin="4dip"/>
+</LinearLayout>
+	<LinearLayout android:id="@+id/TabBarSpacer"
+		android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
+		android:layout_height="5dip"
+		android:layout_below="@id/TabBarContainer"
+		android:layout_marginBottom="4dip"/>
+	<ViewFlipper android:id="@+id/ViewFlipper"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"  android:layout_below="@+id/TabBarSpacer"
+		>
+
+		<!-- Radio tab -->
+		<ListView android:layout_width="fill_parent"
+			android:layout_alignParentLeft="true"
+			android:divider="#d9d7d7"
+			android:listSelector="#00000000"
+			android:id="@android:id/list" android:layout_height="fill_parent" />
+		<!-- </LinearLayout> -->
+		
+		<!-- Profile tab -->
+		<ListView android:id="@+id/profile_list_view"
+			android:dividerHeight="2dip" android:divider="@drawable/black_divider"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	</ViewFlipper>
+	
+</RelativeLayout>

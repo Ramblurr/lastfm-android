@@ -1,68 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:id="@+id/loginLayout"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent" 
-              android:stretchColumns="1"
-              android:layout_weight="3" android:background="#000">
-        <TableRow  xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_height="wrap_content"
-                  android:layout_width="fill_parent">
-        <TextView
-                android:text="@string/main_user"
-                android:textStyle="bold"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:padding="3dip"
-                android:gravity="right"/>
-
-        <EditText android:id="@+id/username"
-                  android:text=""
-                  android:layout_height="wrap_content"
-                  android:padding="3dip"
-                  android:scrollHorizontally="true" android:layout_width="fill_parent"/>
-    </TableRow>
-    <TableRow xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:layout_height="wrap_content"
-                  android:layout_width="fill_parent">
-    <TextView
-            android:text="@string/main_password"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:textStyle="bold"
-            android:padding="3dip"
-            android:singleLine="true" />
-
-    <EditText android:id="@+id/password"
-              android:text=""
-              android:password="true"
-              android:layout_height="wrap_content"
-              android:padding="3dip"
-              android:scrollHorizontally="true"
-              android:layout_width="fill_parent"
-              android:singleLine="true"/>
-    </TableRow>
-
- <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:id="@+id/loginLayout"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:gravity="center">
-    <Button android:id="@+id/cancel"
-            android:layout_height="wrap_content"
-            android:layout_width="75dip"
-            android:text="@string/main_cancel"
-            style="@+style/LastFMButton.Logout"
-            android:layout_marginRight="5dip"
-            android:layout_gravity="center_horizontal"/>
-
-    <Button android:id="@+id/login"
-            android:layout_height="wrap_content"
-            android:layout_width="75dip"
-            android:text="@string/main_login"
-            style="@+style/LastFMButton.Logout"
-            android:layout_gravity="center_horizontal"/>
+<LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/sign_in_background_gradient" android:orientation="vertical" android:gravity="center_horizontal"><ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sign_in_logo" android:layout_margin="48dip"></ImageView>
+<EditText android:id="@+id/username" android:layout_height="wrap_content" android:hint="Username" android:layout_width="200dip" android:singleLine="true"/>
+<EditText android:id="@+id/password" android:layout_height="wrap_content" android:hint="Password" android:layout_width="200dip" android:password="true" android:maxLines="1" android:singleLine="true"/>
+<Button android:layout_height="wrap_content" android:background="@drawable/sign_in_button" android:id="@+id/sign_in_button" android:text="@string/main_login" android:textColor="#fff" android:textStyle="bold" android:layout_width="200dip" android:layout_marginTop="24dip"/>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/main_newaccount" android:layout_marginTop="54dip"></TextView>
+<Button android:layout_height="wrap_content" android:background="@drawable/sign_up_button" android:id="@+id/sign_up_button" android:text="@string/main_signup" android:textColor="#fff" android:textStyle="bold" android:layout_width="200dip" android:layout_marginTop="12dip"/>
 </LinearLayout>
- </TableLayout>

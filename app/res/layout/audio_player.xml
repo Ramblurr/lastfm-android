@@ -32,8 +32,9 @@
 			android:layout_gravity="center" android:gravity="center"
 			android:text="Station Name"/>
     	<ImageButton android:id="@+id/player_infoBtn"
-    		android:layout_width="wrap_content"
-    		android:layout_height="wrap_content"
+    		android:layout_width="36dip"
+    		android:layout_height="36dip"
+    		android:scaleType="fitXY"
     		android:layout_gravity="right|center_vertical"
     		android:background="@drawable/info_button"/>
 	</LinearLayout>
@@ -60,7 +61,6 @@
 			
 			    <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love"/>
 			    <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban"/>
-			    <ImageButton android:id="@+id/playback_menu" style="@+style/LastFMButton.Menu"/>
 			    <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop"/>
 			    <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip"/>
 		
@@ -152,7 +152,7 @@
 			<fm.last.android.widget.TabBar
 				android:id="@+id/TabBar" android:layout_width="fill_parent"
 				android:layout_height="44dip" android:layout_marginTop="2dip"/>
-			<LinearLayout android:background="#2d5275" android:layout_width="fill_parent"
+			<LinearLayout android:background="@drawable/tab_bar_focused" android:layout_width="fill_parent"
 				android:layout_height="5dip" android:layout_marginBottom="1dip"/>
 			<ViewFlipper android:id="@+id/ViewFlipper"
 				android:layout_width="fill_parent" android:layout_height="fill_parent">
@@ -166,24 +166,28 @@
 				<ListView android:id="@+id/similar_list_view"
 					android:background="#fff"
 					android:divider="#d9d7d7"
+					android:listSelector="#00000000"
 					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
 					
 				<!-- Top Tags tab -->
 				<ListView android:id="@+id/tags_list_view"
 					android:background="#fff"
 					android:divider="#d9d7d7"
+					android:listSelector="#00000000"
 					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
 					
 				<!-- Events tab -->
 				<ListView android:id="@+id/events_list_view"
 					android:background="#fff"
 					android:divider="#d9d7d7"
+					android:listSelector="#00000000"
 					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
 					
 				<!-- Top Listeners tab -->
 				<ListView android:id="@+id/listeners_list_view"
 					android:background="#fff"
 					android:divider="#d9d7d7"
+					android:listSelector="#00000000"
 					android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
 		
 			</ViewFlipper>

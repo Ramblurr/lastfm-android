@@ -15,7 +15,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.RemoteException;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -84,14 +86,21 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         Session session = ( Session ) LastFMApplication.getInstance().map
                 .get( "lastfm_session" );
         TextView tv = ( TextView ) findViewById( R.id.home_usersname );
-        tv.setText( session.getName() );
+        if(tv != null)
+        	tv.setText( session.getName() );
         
-        Button b = ( Button ) findViewById( R.id.home_startnewstation );
-        b.setOnClickListener( mNewStationListener );
-
         NavBar n = ( NavBar ) findViewById( R.id.NavBar );
-        n.setListener(this);
+        if(n != null)
+        	n.setListener(this);
 
+        Button b = new Button(this);
+        b.setOnClickListener( mNewStationListener );
+        b.setBackgroundResource( R.drawable.list_station_starter_rest );
+        b.setText(R.string.home_newstation);
+        b.setTextColor(0xffffffff);
+		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+        getListView().addHeaderView(b);
+        
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mTabBar.setViewFlipper(mViewFlipper);
@@ -130,11 +139,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	}
 
 	public void middleClicked(View child, int index) {
-		
+		if(index == 1) { //Now Playing button (portrait)
+			mNowPlayingListener.onClick(child);
+		}
 	}
 
 	public void forwardClicked(View child) {
-		
 	}
 
 	
@@ -162,6 +172,29 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mMainAdapter.notifyDataSetChanged();
     }
     
+    @Override
+    public void onResume() {
+    	SetupRecentStations();
+    	RebuildMainMenu();
+    	try {
+			if(LastFMApplication.getInstance().player.isPlaying()) {
+				if(mProfileImage != null)
+					mProfileImage.setVisibility(View.GONE);
+				findViewById( R.id.now_playing ).setVisibility(View.VISIBLE);
+		        Button b = (Button)findViewById(R.id.now_playing);
+		        b.setOnClickListener( mNowPlayingListener );
+			} else {
+				if(mProfileImage != null)
+					mProfileImage.setVisibility(View.VISIBLE);
+				findViewById( R.id.now_playing ).setVisibility(View.GONE);
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onResume();
+    }
+    
     private BroadcastReceiver mStatusListener = new BroadcastReceiver()
     {
 
@@ -169,12 +202,16 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         public void onReceive( Context context, Intent intent )
         {
 
-            String action = intent.getAction();
+            /*String action = intent.getAction();
             if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
             {
-            	SetupRecentStations();
-            	RebuildMainMenu();
             }
+            if ( action.equals( RadioPlayerService.PLAYBACK_FINISHED ) )
+            {
+            	if(mProfileImage != null)
+            		mProfileImage.setVisibility(View.VISIBLE);
+            	findViewById( R.id.now_playing ).setVisibility(View.GONE);
+            }*/
         }
     };
     
@@ -281,7 +318,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
     	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
     	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
     	switcher.showNext();
-    	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position));
+    	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position-1));
     }
 
     private OnClickListener mNewStationListener = new OnClickListener()
@@ -295,6 +332,17 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         }
     };
 
+    private OnClickListener mNowPlayingListener = new OnClickListener()
+    {
+
+        public void onClick( View v )
+        {
+
+            Intent intent = new Intent( Home.this, Player.class );
+            startActivity( intent );
+        }
+    };
+
     private final Handler mHandler = new Handler()
     {
 
@@ -304,8 +352,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             switch ( msg.what )
             {
             case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-                mProfileImage.setArtwork( ( Bitmap ) msg.obj );
-                mProfileImage.invalidate();
+            	if(mProfileImage != null) {
+                    mProfileImage.setArtwork( ( Bitmap ) msg.obj );
+                    mProfileImage.invalidate();
+            	}
                 break;
 
             default:

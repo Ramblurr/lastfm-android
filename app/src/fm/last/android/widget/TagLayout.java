@@ -69,6 +69,7 @@ public class TagLayout extends ViewGroup {
 		mAnimating = false;
 
 		mAnimations = new ArrayList<Animation>();
+		this.setFocusable(true);
 	}
 
 	/**

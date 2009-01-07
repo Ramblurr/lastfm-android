@@ -104,6 +104,10 @@ public class RemoteImageView extends RelativeLayout
         }
     }
 
+    public Bitmap getArtwork() {
+    	return mBit;
+    }
+    
     private void drawArtwork( Canvas canvas )
     {
 

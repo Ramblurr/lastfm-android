@@ -358,6 +358,7 @@ public class RadioPlayerService extends Service
 
             nm.cancel( NOTIFY_ID );
             mp.stop();
+            RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
         }
 
         public boolean tune( String url, Session session ) throws DeadObjectException, WSError

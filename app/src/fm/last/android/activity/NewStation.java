@@ -16,8 +16,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -26,6 +29,7 @@ import android.widget.RadioGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -41,12 +45,14 @@ import fm.last.android.R;
 import fm.last.android.R.id;
 import fm.last.android.R.layout;
 import fm.last.android.adapter.LastFMStreamAdapter;
+import fm.last.android.widget.TabBar;
+import fm.last.android.widget.TabBarListener;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Artist;
 import fm.last.api.Tag;
 
-public class NewStation extends ListActivity
+public class NewStation extends ListActivity implements TabBarListener
 {
 
     private enum SearchType
@@ -61,22 +67,33 @@ public class NewStation extends ListActivity
     private EditText searchBar;
     private LastFMStreamAdapter mAdapter;
     private boolean mDoingSearch;
+    private TabBar mTabBar;
+    
+    private final int TAB_ARTIST = 0;
+    private final int TAB_TAG = 1;
+    private final int TAB_USER = 2;
 
     @Override
     public void onCreate( Bundle icicle )
     {
 
         super.onCreate( icicle );
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView( R.layout.newstation );
 
-        // requestWindowFeature(Window.FEATURE_NO_TITLE);
         searchBar = ( EditText ) findViewById( R.id.station_editbox );
-        searchBar.setOnKeyListener( mNewStation );
+        findViewById( R.id.search ).setOnClickListener( mNewStation );
 
-        RadioGroup rgroup = ( RadioGroup ) findViewById( R.id.station_typegroup );
-        rgroup.setOnCheckedChangeListener( mRGroup );
+		mTabBar = (TabBar) findViewById(R.id.TabBar);
+		mTabBar.setListener(this);
+		mTabBar.addTab("Artist", TAB_ARTIST);
+		mTabBar.addTab("Tag", TAB_TAG);
+		mTabBar.addTab("User", TAB_USER);
+		mTabBar.setActive("Artist");
+		tabChanged("Artist", TAB_ARTIST);
+        
         if ( searching == null )
-            rgroup.check( R.id.station_type_artist );
+            mTabBar.setActive("Artist");
 
         mAdapter = new LastFMStreamAdapter( this );
         setListAdapter( mAdapter );
@@ -91,113 +108,98 @@ public class NewStation extends ListActivity
         mAdapter.updateModel();
     }
     
-    private OnCheckedChangeListener mRGroup = new OnCheckedChangeListener()
-    {
-
-        public void onCheckedChanged( RadioGroup group, int checked )
+	public void tabChanged(String text, int index) {
+        if ( index == TAB_ARTIST )
         {
-
-            if ( checked == R.id.station_type_artist )
-            {
-                searching = SearchType.Artist;
-                searchBar.setHint( "Enter an Artist" );
-            }
-            else if ( checked == R.id.station_type_tag )
-            {
-                searching = SearchType.Tag;
-                searchBar.setHint( "Enter a Tag" );
-            }
-            else if ( checked == R.id.station_type_user )
-            {
-                searching = SearchType.User;
-                searchBar.setHint( "Enter a Username" );
-            }
+            searching = SearchType.Artist;
+            searchBar.setHint( "Enter an Artist" );
         }
-    };
+        else if ( index == TAB_TAG )
+        {
+            searching = SearchType.Tag;
+            searchBar.setHint( "Enter a Tag" );
+        }
+        else if ( index == TAB_USER )
+        {
+            searching = SearchType.User;
+            searchBar.setHint( "Enter a Username" );
+        }
+	}
 
-    private OnKeyListener mNewStation = new OnKeyListener()
+    private OnClickListener mNewStation = new OnClickListener()
     {
 
-        public boolean onKey( View v, int i, KeyEvent e )
+        public void onClick( View v )
         {
-
-            if ( e.getKeyCode() == KeyEvent.KEYCODE_ENTER
-                    && e.getAction() == KeyEvent.ACTION_DOWN )
-            {
-                if ( mDoingSearch )
-                    return true;
-                final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
-                        .getText().toString();
-                final Handler uiThreadCallback = new Handler();
-                final Runnable runInUIThread = new Runnable()
-                {
-
-                    public void run()
-                    {
-
-                        updateList();
-                    }
-                };
-                final Session session = ( Session ) LastFMApplication
-                        .getInstance().map.get( "lastfm_session" );
-                if ( searching == SearchType.Artist )
-                {
-                    mDoingSearch = true;
-                    new Thread()
-                    {
-
-                        @Override
-                        public void run()
-                        {
-
-                            _searchArtist( txt, session );
-                            uiThreadCallback.post( runInUIThread );
-                        }
-                    }.start();
-                    Toast.makeText( NewStation.this, "Searching...",
-                            Toast.LENGTH_LONG ).show();
-                }
-                else if ( searching == SearchType.Tag )
-                {
-                    mDoingSearch = true;
-                    new Thread()
-                    {
-
-                        @Override
-                        public void run()
-                        {
-
-                            _searchTag( txt, session );
-                            uiThreadCallback.post( runInUIThread );
-                        }
-                    }.start();
-                    Toast.makeText( NewStation.this, "Searching...",
-                            Toast.LENGTH_LONG ).show();
-                }
-                else if ( searching == SearchType.User )
-                {
-                    boolean exists = false;//User.userExists( txt, session.getApiKey() );
-                    if ( !exists )
-                    {
-                        AlertDialog.Builder error = new AlertDialog.Builder(
-                                NewStation.this );
-                        error.setTitle( "Error" ).setMessage(
-                                "No such user '" + txt + "'." )
-                                .setPositiveButton( "OK", null ).show();
-                        return false;
-                    }
-                    else
-                    {
-                        mAdapter.resetList();
-                        /*Radio.RadioStation r = Radio.RadioStation
-                                .personal( txt );
-                        mAdapter.putStation( txt + "'s Library", r );*/
-                        updateList();
-                    }
-                }
-                return true;
-            }
-            return false;
+	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
+	                .getText().toString();
+	        final Handler uiThreadCallback = new Handler();
+	        final Runnable runInUIThread = new Runnable()
+	        {
+	
+	            public void run()
+	            {
+	
+	                updateList();
+	            }
+	        };
+	        final Session session = ( Session ) LastFMApplication
+	                .getInstance().map.get( "lastfm_session" );
+	        if ( searching == SearchType.Artist )
+	        {
+	            mDoingSearch = true;
+	            new Thread()
+	            {
+	
+	                @Override
+	                public void run()
+	                {
+	
+	                    _searchArtist( txt, session );
+	                    uiThreadCallback.post( runInUIThread );
+	                }
+	            }.start();
+	            Toast.makeText( NewStation.this, "Searching...",
+	                    Toast.LENGTH_LONG ).show();
+	        }
+	        else if ( searching == SearchType.Tag )
+	        {
+	            mDoingSearch = true;
+	            new Thread()
+	            {
+	
+	                @Override
+	                public void run()
+	                {
+	
+	                    _searchTag( txt, session );
+	                    uiThreadCallback.post( runInUIThread );
+	                }
+	            }.start();
+	            Toast.makeText( NewStation.this, "Searching...",
+	                    Toast.LENGTH_LONG ).show();
+	        }
+	        else if ( searching == SearchType.User )
+	        {
+	            boolean exists = false;//User.userExists( txt, session.getApiKey() );
+	            if ( !exists )
+	            {
+	                AlertDialog.Builder error = new AlertDialog.Builder(
+	                        NewStation.this );
+	                error.setTitle( "Error" ).setMessage(
+	                        "No such user '" + txt + "'." )
+	                        .setPositiveButton( "OK", null ).show();
+	                return;
+	            }
+	            else
+	            {
+	                mAdapter.resetList();
+	                /*Radio.RadioStation r = Radio.RadioStation
+	                        .personal( txt );
+	                mAdapter.putStation( txt + "'s Library", r );*/
+	                updateList();
+	            }
+	        }
         }
     };
 
@@ -258,6 +260,8 @@ public class NewStation extends ListActivity
     			// TODO search result parsing for users
     		}
     		mAdapter.updateModel();
+    		getListView().setVisibility(View.VISIBLE);
+    		findViewById(R.id.search_hint).setVisibility(View.GONE);
     	}
     };
 

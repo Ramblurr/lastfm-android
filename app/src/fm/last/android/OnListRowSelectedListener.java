@@ -36,7 +36,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			((ImageView)previousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageDrawable(mDisclosureDrawable);
 			((TextView)previousSelectedView.findViewById(R.id.row_label)).setTextColor(0xFF000000);
 		}
-		if(position >= 0 && mListView.isFocused() && mListView.getAdapter().isEnabled(position)) {
+		if(position >= 0 && mListView.isFocused() && mListView.getAdapter().isEnabled(position) && view != null && view.findViewById(R.id.row_disclosure_icon) != null) {
 			if(view.getTag() == "bottom")
 				view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
 			else

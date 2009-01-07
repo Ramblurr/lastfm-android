@@ -29,8 +29,8 @@
 		<item name="android:shadowRadius">3</item>
 	</style>
 	<style name="LastFMButton">
-		<item name="android:background">@+drawable/player_controls_portrait</item>
-		<item name="android:layout_width">64dip</item>
+		<item name="android:background">@+drawable/player_controls</item>
+		<item name="android:layout_width">80dip</item>
 		<item name="android:layout_height">76dip</item>
 	</style>
 	<style name="LastFMButton.Love">

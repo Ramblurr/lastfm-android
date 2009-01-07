@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">LastFM</string>
-	<string name="main_user">Username :</string>
-	<string name="main_password">Password :</string>
 	<string name="main_cancel">Cancel</string>
-	<string name="main_login">Login</string>
+	<string name="main_login">Log in</string>
 	<string name="main_setup">Setup</string>
+	<string name="main_signup">Sign up</string>
+	<string name="main_newaccount">Haven't got an account yet?</string>
 
 	<string name="home_logout">Logout</string>
 	<string name="home_tracksplayed">plays</string>
@@ -17,10 +17,13 @@
 	<string name="home_mystations">My Stations</string>
 	<string name="home_recentstations">Recent Stations</string>
 
+	<string name="search">Search</string>
 	<string name="newstation_artist">Artist</string>
 	<string name="newstation_tag">Tag</string>
 	<string name="newstation_user">User</string>
-
+	<string name="newstation_hint_artist">Type in an artist you like to get started.</string>
+	<string name="newstation_hint_tag">Type in a tag to get started.</string>
+	<string name="newstation_hint_user">Type in a user name to get started.</string>
 
 	<string name="durationformat">
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
