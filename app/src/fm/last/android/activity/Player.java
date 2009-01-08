@@ -1,6 +1,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Locale;
@@ -172,10 +173,10 @@ public class Player extends Activity
 		mTabBar.setViewFlipper(mViewFlipper);
 		//mTabBar.setListener(this);
 		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, TAB_BIO);
-		mTabBar.addTab("Similar Artists", R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
+		mTabBar.addTab("Similar", R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
 		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, TAB_TAGS);
 		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, TAB_EVENTS);
-		mTabBar.addTab("Top Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
+		mTabBar.addTab("Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
 		mTabBar.setActive("Bio");
 
 		mAlbumArtWorker = new Worker( "album art worker" );
@@ -857,7 +858,41 @@ public class Player extends Activity
 
 		public void onItemClick(final AdapterView<?> parent, final View v,
 				final int position, long id) {
-			mEventAdapter.toggleDescription(position);
+            Intent intent = new Intent( Player.this, fm.last.android.activity.Event.class );
+            Event event = (Event)mEventAdapter.getItem(position);
+            intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
+            intent.putExtra("lastfm.event.title", event.getTitle());
+            String artists = "";
+            for(String artist : event.getArtists()) {
+            	if(artists.length() > 0)
+            		artists += ", ";
+           		artists += artist;
+            }
+            for(ImageUrl image : event.getImages()) {
+            	if(image.getSize().contentEquals("large"))
+                    intent.putExtra("lastfm.event.poster", image.getUrl());
+            }
+            intent.putExtra("lastfm.event.artists", artists);
+            intent.putExtra("lastfm.event.venue", event.getVenue().getName());
+            intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+            intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
+            intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+            try {
+            	Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
+            	for(Event e : events) {
+            		System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
+            		if(e.getId() == event.getId()) {
+            			System.out.printf("Matched! Status: %s\n", e.getStatus());
+            			intent.putExtra("lastfm.event.status", e.getStatus());
+            			break;
+            		}
+            			
+            	}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+            startActivity( intent );
 		}
 
 	};

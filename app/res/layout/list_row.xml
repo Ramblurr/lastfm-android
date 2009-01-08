@@ -17,7 +17,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="wrap_content"
-	android:orientation="horizontal" android:id="@+id/station_row" android:background="@drawable/list_item_rest"
+	android:orientation="horizontal" android:id="@+id/station_row" android:background="@drawable/list_item_rest_fullwidth"
 	>
 	<ImageView android:id="@+id/row_icon"
 		android:adjustViewBounds="true" android:layout_height="wrap_content"

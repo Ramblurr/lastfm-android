@@ -53,6 +53,8 @@ public class LastFMStreamAdapter extends BaseAdapter
             row = inflater.inflate( R.layout.list_row, null );
         }
 
+        row.setBackgroundResource(R.drawable.list_item_rest);
+        
         TextView name = (TextView)row.findViewById(R.id.row_label);
         name.setText( mLabels.get(position) );
         

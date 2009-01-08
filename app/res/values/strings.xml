@@ -25,11 +25,17 @@
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
 	<string name="newstation_hint_user">Type in a user name to get started.</string>
 
+	<string name="event_showmap">Show Map</string>
+	<string name="event_attending">I\'m attending</string>
+	<string name="event_notattending">I\'m not attending</string>
+	<string name="event_maybe">I might attend</string>
+
 	<string name="durationformat">
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
 	<string name="logout">Logout</string>
 	<string name="cancel">Cancel</string>
+	<string name="ok">OK</string>
 	<string name="done">Done</string>
 	<string name="tag">Tag</string>
 	<string name="tag_hint">Type tags here, or choose from below</string>

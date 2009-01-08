@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@drawable/sign_in_background_gradient" android:orientation="vertical" android:gravity="center_horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent"><ImageView android:id="@+id/ImageView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/sign_in_logo" android:layout_margin="32dip"></ImageView>
+<LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_gravity="center" android:gravity="center"><EditText android:id="@+id/username" android:layout_height="wrap_content" android:hint="Username" android:singleLine="true" android:layout_width="140dip" android:layout_marginRight="4dip"/><EditText android:id="@+id/password" android:layout_height="wrap_content" android:hint="Password" android:password="true" android:maxLines="1" android:singleLine="true" android:layout_width="140dip"/><Button android:layout_height="wrap_content" android:background="@drawable/sign_in_button" android:id="@+id/sign_in_button" android:text="@string/main_login" android:textColor="#fff" android:textStyle="bold" android:layout_width="140dip" android:layout_marginLeft="4dip"/></LinearLayout>
+
+
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/main_newaccount" android:layout_marginTop="25dip"></TextView>
+<Button android:layout_height="wrap_content" android:background="@drawable/sign_up_button" android:id="@+id/sign_up_button" android:text="@string/main_signup" android:textColor="#fff" android:textStyle="bold" android:layout_width="200dip" android:layout_marginTop="12dip"/>
+
+</LinearLayout>

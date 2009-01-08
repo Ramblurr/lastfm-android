@@ -128,6 +128,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 R.layout.list_row, R.id.row_label, mStrings)); 
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
+		((OnListRowSelectedListener)getListView().getOnItemSelectedListener()).setResources(R.drawable.list_item_rest, R.drawable.list_item_focus);
     }
     
 	public void tabChanged(String text, int index) {

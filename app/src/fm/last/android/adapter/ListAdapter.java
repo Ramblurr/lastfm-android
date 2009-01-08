@@ -101,12 +101,12 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		if(mLoadingBar == position) {
 			holder.vs.setDisplayedChild(1);
 			holder.label.setTextColor(0xFFFFFFFF);
-	    	row.setBackgroundResource(R.drawable.list_item_focus);
+	    	row.setBackgroundResource(R.drawable.list_item_focus_fullwidth);
 		}
 		else{
 			holder.vs.setDisplayedChild(0);
 			holder.label.setTextColor(0xFF000000);
-	    	row.setBackgroundResource(R.drawable.list_item_rest);
+	    	row.setBackgroundResource(R.drawable.list_item_rest_fullwidth);
 		}
 
 		// optionally if an URL is specified
