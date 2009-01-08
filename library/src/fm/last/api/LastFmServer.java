@@ -142,4 +142,22 @@ public interface LastFmServer {
 	 */
 	public Event[] getArtistEvents(String artist) throws IOException;
 	
+	/**
+	 * See http://www.lastfm.pl/api/show?service=291
+	 * 
+	 * @param user (Required) : The user name in question
+	 * @return user events array
+	 * @throws IOException
+	 */
+	public Event[] getUserEvents(String user) throws IOException;
+
+	/**
+	 * See http://www.lastfm.pl/api/show?service=307
+	 * 
+	 * @param event (Required) : The event id
+	 * @param status (Required) : The status
+	 * @return
+	 * @throws IOException
+	 */
+	public void attendEvent(String event, String status, String sk) throws IOException, WSError;
 }

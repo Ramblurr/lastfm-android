@@ -107,11 +107,14 @@ public class EventBuilder extends XMLBuilder<Event> {
 		
 		// url
 		String url = getText("url");
+		
+		// status
+		String status = this.getAttribute("status");
 
 		return new Event(id, title, artists, headliner,
 				venue, 
 				startDate, startTime, description,
-				images, attendance, reviews, tag, url);
+				images, attendance, reviews, tag, url, status);
 	}
 
 }

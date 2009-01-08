@@ -24,11 +24,12 @@ public class Event implements Serializable{
 	private int reviews;
 	private String tag;
 	private String url;
+	private String status;
 
 	public Event(int id, String title, String[] artists, String headliner,
 			Venue venue, Date startDate, Date startTime, String description,
 			ImageUrl[] images, int attendance, int reviews, String tag,
-			String url) {
+			String url, String status) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -43,6 +44,7 @@ public class Event implements Serializable{
 		this.reviews = reviews;
 		this.tag = tag;
 		this.url = url;
+		this.status = status;
 	}
 
 	public int getId() {
@@ -147,6 +149,10 @@ public class Event implements Serializable{
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	public String getStatus() {
+		return status;
 	}
 	
 }

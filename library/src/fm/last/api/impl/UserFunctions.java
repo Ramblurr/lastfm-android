@@ -14,12 +14,15 @@
 
 package fm.last.api.impl;
 
+import fm.last.api.Event;
 import fm.last.api.Tag;
 import fm.last.api.User;
+import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -60,4 +63,58 @@ public class UserFunctions {
 		return TagFunctions.getTopTags(baseUrl, params);
 	}
 
+	public static Event[] getUserEvents(String baseUrl,
+			Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node eventsNode = XMLUtil.findNamedElementNode(lfmNode, "events");
+			
+			List<Node> eventNodes = XMLUtil.findNamedElementNodes(eventsNode, "event");
+			EventBuilder eventBuilder = new EventBuilder();
+			Event[] events = new Event[eventNodes.size()];
+			int i = 0;
+			for(Node eventNode : eventNodes){
+				events[i++] = eventBuilder.build(eventNode);
+			}
+	
+			return events;
+	    }
+	}
+
+	public static void attendEvent(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doPost(baseUrl, params);
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    }
+	}
 }

@@ -284,4 +284,21 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		return ArtistFunctions.getArtistEvents(baseUrl, params);
 	}
+
+	public Event[] getUserEvents(String user) throws IOException, WSError {
+		Map<String, String> params = createParams("user.getEvents");
+		if (user != null) {
+			params.put("user", user);
+		}
+		return UserFunctions.getUserEvents(baseUrl, params);
+	}
+	
+	public void attendEvent(String event, String status, String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("event.attend");
+		params.put("event", event);
+		params.put("status", status);
+		params.put("sk", sk);
+		signParams(params);
+		UserFunctions.attendEvent(baseUrl, params);
+	}
 }
