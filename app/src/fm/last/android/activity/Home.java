@@ -58,6 +58,7 @@ import fm.last.android.widget.NavBar;
 import fm.last.android.widget.NavBarListener;
 import fm.last.api.Album;
 import fm.last.api.Artist;
+import fm.last.api.Friends;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -107,6 +108,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
     private ListAdapter mTopTracksAdapter;
     ListView mRecentTracksList;
     private ListAdapter mRecentTracksAdapter;
+    ListView mEventsList;
+    private ListAdapter mEventsAdapter;
+    ListView mFriendsList;
+    private ListAdapter mFriendsAdapter;
 	
 	public int test = 5;
 	
@@ -175,6 +180,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
         mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
         mRecentTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mRecentTracksList));
+        mEventsList = (ListView) findViewById(R.id.profileevents_list_view);
+        mEventsList.setOnItemSelectedListener(new OnListRowSelectedListener(mEventsList));
+        mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
+        mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
     }
     
 	public void tabChanged(int index) {
@@ -427,8 +436,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 new LoadRecentTracksTask().execute((Void)null);
                 break;
             case PROFILE_EVENTS: //"Events"
+                new LoadEventsTask().execute((Void)null);
                 break;
             case PROFILE_FRIENDS: //"Friends"
+                new LoadFriendsTask().execute((Void)null);
                 break;
             default: 
                 break;
@@ -681,6 +692,134 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             } else {
                 String[] strings = new String[]{"No Recent Tracks"};
                 mRecentTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
+                        R.layout.list_row, R.id.row_label, strings));
+            }
+        }
+    }
+    
+    private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mEventsList.setOnItemClickListener(null);
+            mEventsList.setAdapter(new ArrayAdapter<String>(Home.this,
+                    R.layout.list_row, R.id.row_label, strings));
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_EVENTS + 1);
+        }
+
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            mEventsAdapter = new ListAdapter(Home.this, getImageCache());
+            mEventsList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+//                    Track track = (Track) mEventsAdapter.getItem(position);
+                    /*mEventsAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
+//                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+                }
+
+            });
+
+            try {
+                fm.last.api.Event[] events = mServer.getUserEvents(mUser.getName());
+                if(events.length == 0 )
+                    return false;
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((events.length < 10) ? events.length : 10); i++){
+                    ListEntry entry = new ListEntry(events[i],
+                            R.drawable.events,
+                            events[i].getTitle(), //TODO this should be prettified somehow
+                            events[i].getImages().length == 0 ? "" : events[i].getImages()[0].getUrl(), // some tracks don't have images
+                            R.drawable.radio_icon); //TODO different icon
+                    iconifiedEntries.add(entry);
+                }
+                mEventsAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mEventsList.setAdapter(mEventsAdapter);
+                mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"User Has No Events"};
+                mEventsList.setAdapter(new ArrayAdapter<String>(Home.this,
+                        R.layout.list_row, R.id.row_label, strings));
+            }
+        }
+    }
+    
+    private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mFriendsList.setOnItemClickListener(null);
+            mFriendsList.setAdapter(new ArrayAdapter<String>(Home.this,
+                    R.layout.list_row, R.id.row_label, strings));
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
+        }
+
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            mFriendsAdapter = new ListAdapter(Home.this, getImageCache());
+            mFriendsList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+//                    Track track = (Track) mFriendsAdapter.getItem(position);
+                    /*mFriendsAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
+//                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+                }
+
+            });
+
+            try {
+                User[] friends = mServer.getFriends(mUser.getName(), null, null).getFriends();
+                if(friends.length == 0 )
+                    return false;
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((friends.length < 10) ? friends.length : 10); i++){
+                    ListEntry entry = new ListEntry(friends[i],
+                            R.drawable.profile_unknown,
+                            friends[i].getName(), //TODO this should be prettified somehow
+                            friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl(), // some tracks don't have images
+                            R.drawable.radio_icon); //TODO different icon
+                    iconifiedEntries.add(entry);
+                }
+                mFriendsAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mFriendsList.setAdapter(mFriendsAdapter);
+                mFriendsList.setOnScrollListener(mFriendsAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"No Friends Retrieved"};
+                mFriendsList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
         }
