@@ -12,9 +12,12 @@
 
 package fm.last.api.impl;
 
+import java.util.List;
+
 import org.w3c.dom.Node;
 
 import fm.last.api.Artist;
+import fm.last.api.ImageUrl;
 import fm.last.api.Track;
 import fm.last.api.Album;
 import fm.last.xml.XMLBuilder;
@@ -24,7 +27,8 @@ import fm.last.xml.XMLBuilder;
  */
 public class TrackBuilder extends XMLBuilder<Track> {
   private ArtistBuilder artistBuilder = new ArtistBuilder();
-  private AlbumBuilder albumBuilder = new AlbumBuilder();
+//  private AlbumBuilder albumBuilder = new AlbumBuilder();
+  private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
 
   public Track build(Node trackNode) {
     node = trackNode;
@@ -37,9 +41,17 @@ public class TrackBuilder extends XMLBuilder<Track> {
     String listeners = getText("listeners");
     String playcount = getText("playcount");
     Node artistNode = getChildNode("artist");
+    
+    List<Node> imageNodes = getChildNodes("image");
+    ImageUrl[] images = new ImageUrl[imageNodes.size()];
+    int i = 0;
+    for (Node imageNode : imageNodes) {
+      images[i++] =imageBuilder.build(imageNode);
+    }
+    
     Artist artist = artistBuilder.build(artistNode);
-    Node albumNode = getChildNode("album");
-    Album album = albumBuilder.build(albumNode);
-    return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, album);
+//    Node albumNode = getChildNode("album");
+//    Album album = albumBuilder.build(albumNode);
+    return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images);
   }
 }

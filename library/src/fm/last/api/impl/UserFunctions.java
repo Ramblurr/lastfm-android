@@ -18,6 +18,7 @@ import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.Tag;
 import fm.last.api.Artist;
+import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -71,6 +72,10 @@ public class UserFunctions {
 	
 	public static Album[] getUserTopAlbums(String baseUrl, Map<String, String> params) throws IOException {
         return AlbumFunctions.getTopAlbums(baseUrl, params);
+    }
+	
+	public static Track[] getUserTopTracks(String baseUrl, Map<String, String> params) throws IOException {
+        return TrackFunctions.getTopTracks(baseUrl, params);
     }
 
 	public static Event[] getUserEvents(String baseUrl,

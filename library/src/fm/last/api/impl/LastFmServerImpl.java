@@ -324,4 +324,16 @@ final class LastFmServerImpl implements LastFmServer {
         }
         return UserFunctions.getUserTopAlbums(baseUrl, params);
     }
+
+    @Override
+    public Track[] getUserTopTracks(String user, String period) throws IOException {
+        Map<String, String> params = createParams("user.getTopTracks");
+        if (user != null) {
+            params.put("user", user);
+        }
+        if (period != null) {
+            params.put("period", period);
+        }
+        return UserFunctions.getUserTopTracks(baseUrl, params);
+    }
 }

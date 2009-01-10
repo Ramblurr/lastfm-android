@@ -96,6 +96,16 @@ public interface LastFmServer {
      */
     public Album[] getUserTopAlbums(String user, String period) throws IOException;
 	
+    /**
+     * See http://www.lastfm.pl/api/show?service=301
+     * 
+     * @param user
+     * @param period overall | 3month | 6month | 12month
+     * @return An array of tracks
+     * @throws IOException
+     */
+    public Track[] getUserTopTracks(String user, String period) throws IOException;
+    
 	/**
 	 * See http://www.lastfm.pl/api/show?service=320
 	 * 
