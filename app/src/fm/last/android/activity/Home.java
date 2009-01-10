@@ -1,6 +1,8 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Stack;
 
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -18,6 +20,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,8 +32,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -41,12 +46,18 @@ import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.adapter.LastFMStreamAdapter;
+import fm.last.android.adapter.ListAdapter;
+import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.utils.ImageCache;
+import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
 import fm.last.android.widget.NavBar;
 import fm.last.android.widget.NavBarListener;
+import fm.last.api.Album;
+import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -59,6 +70,15 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	private static int TAB_RADIO = 0;
 	private static int TAB_PROFILE = 1;
 	
+	
+	//Goddamn Java doesn't let you treat enums as ints easily, so we have to have this mess 
+	private static final int PROFILE_TOPARTISTS = 0;
+	private static final int PROFILE_TOPALBUMS = 1;
+	private static final int PROFILE_TOPTRACKS = 2;
+	private static final int PROFILE_RECENTLYPLAYED = 3;
+	private static final int PROFILE_EVENTS = 4;
+	private static final int PROFILE_FRIENDS = 5;
+
     private SeparatedListAdapter mMainAdapter;
     private SeparatedListAdapter mProfileAdapter;
     private LastFMStreamAdapter mMyStationsAdapter;
@@ -71,8 +91,19 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
 	TabBar mTabBar;
 	ViewFlipper mViewFlipper;
+	ViewFlipper mNestedViewFlipper;
 	ListView mProfileList;
+    private Stack<Integer> mViewHistory;
+	
 	View previousSelectedView = null;
+	
+	private ImageCache mImageCache;
+	ListView mTopArtistsList;
+	private ListAdapter mTopArtistsAdapter;
+	ListView mTopAlbumsList;
+    private ListAdapter mTopAlbumsAdapter;
+    ListView mTopTracksList;
+    private ListAdapter mTopTracksAdapter;
 	
 	public int test = 5;
 	
@@ -101,8 +132,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
         getListView().addHeaderView(b);
         
+        mViewHistory = new Stack<Integer>();
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
+		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.setListener(this);
 		mTabBar.addTab("Radio", TAB_RADIO);
@@ -123,12 +156,20 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         RebuildMainMenu();
         
         mProfileList = (ListView)findViewById(R.id.profile_list_view);
-        String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"};
+        String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"}; // this order must match the ProfileActions enum
         mProfileList.setAdapter(new ArrayAdapter<String>(this, 
                 R.layout.list_row, R.id.row_label, mStrings)); 
+        mProfileList.setOnItemClickListener(mProfileClickListener);
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
 		((OnListRowSelectedListener)getListView().getOnItemSelectedListener()).setResources(R.drawable.list_item_rest, R.drawable.list_item_focus);
+		
+		mTopArtistsList = (ListView) findViewById(R.id.topartists_list_view);
+		mTopArtistsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopArtistsList));
+		mTopAlbumsList = (ListView) findViewById(R.id.topalbums_list_view);
+        mTopAlbumsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopAlbumsList));
+        mTopTracksList = (ListView) findViewById(R.id.toptracks_list_view);
+        mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
     }
     
 	public void tabChanged(String text, int index) {
@@ -315,6 +356,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
+        
     	l.setEnabled(false);
     	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
     	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
@@ -343,7 +385,176 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             startActivity( intent );
         }
     };
+    
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if( keyCode == KeyEvent.KEYCODE_BACK )
+        {
+            if( mViewFlipper.getDisplayedChild() == TAB_PROFILE && !mViewHistory.isEmpty() )
+            {
+                mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    private OnItemClickListener mProfileClickListener = new OnItemClickListener()
+    {
 
+        @Override
+        public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+                long id) 
+        {
+            switch ( position )
+            {
+            case PROFILE_TOPARTISTS: //"Top Artists"
+                new LoadTopArtistsTask().execute((Void)null);
+                break;
+            case PROFILE_TOPALBUMS: //"Top Albums"
+                new LoadTopAlbumsTask().execute((Void)null);
+                break;
+            case PROFILE_TOPTRACKS: //"Top Tracks"
+                break;
+            case PROFILE_RECENTLYPLAYED: //"Recently Played"
+                break;
+            case PROFILE_EVENTS: //"Events"
+                break;
+            case PROFILE_FRIENDS: //"Friends"
+                break;
+            default: 
+                break;
+            
+            }
+            
+        }
+        
+    };
+    
+    private class LoadTopArtistsTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mTopArtistsList.setOnItemClickListener(null);
+            mTopArtistsList.setAdapter(new ArrayAdapter<String>(Home.this, 
+                    R.layout.list_row, R.id.row_label, strings)); 
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPARTISTS + 1); 
+        }
+        
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+            
+            mTopArtistsAdapter = new ListAdapter(Home.this, getImageCache());
+            mTopArtistsList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+                    Artist artist = (Artist)mTopArtistsAdapter.getItem(position);
+                    mTopArtistsAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+                }
+                
+            });
+
+            try {
+                Artist[] topartists = mServer.getUserTopArtists(mUser.getName(), "overall");
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++){
+                    ListEntry entry = new ListEntry(topartists[i], 
+                            R.drawable.albumart_mp_unknown, 
+                            topartists[i].getName(), 
+                            topartists[i].getImages()[0].getUrl(),
+                            R.drawable.radio_icon);
+                    iconifiedEntries.add(entry);
+                }
+                mTopArtistsAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mTopArtistsList.setAdapter(mTopArtistsAdapter);
+                mTopArtistsList.setOnScrollListener(mTopArtistsAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"No Top Artists"};
+                mTopArtistsList.setAdapter(new ArrayAdapter<String>(Home.this, 
+                        R.layout.list_row, R.id.row_label, strings)); 
+            }
+        }
+    }
+
+    private class LoadTopAlbumsTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mTopAlbumsList.setOnItemClickListener(null);
+            mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Home.this, 
+                    R.layout.list_row, R.id.row_label, strings)); 
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPALBUMS + 1); 
+        }
+        
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+            
+            mTopAlbumsAdapter = new ListAdapter(Home.this, getImageCache());
+            mTopAlbumsList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
+                    /*mTopAlbumsAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
+                    Toast.makeText( Home.this, "Clicked " + album.getTitle(), Toast.LENGTH_LONG ).show();
+                }
+                
+            });
+
+            try {
+                Album[] topalbums = mServer.getUserTopAlbums(mUser.getName(), "overall");
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++){
+                    ListEntry entry = new ListEntry(topalbums[i], 
+                            R.drawable.albumart_mp_unknown, 
+                            topalbums[i].getTitle(), //TODO this should be prettified somehow  
+                            topalbums[i].getImages()[0].getUrl(),
+                            R.drawable.radio_icon); //TODO different icon
+                    iconifiedEntries.add(entry);
+                }
+                mTopAlbumsAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mTopAlbumsList.setAdapter(mTopAlbumsAdapter);
+                mTopAlbumsList.setOnScrollListener(mTopAlbumsAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"No Top Albums"};
+                mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Home.this, 
+                        R.layout.list_row, R.id.row_label, strings)); 
+            }
+        }
+    }
+    
     private final Handler mHandler = new Handler()
     {
 
@@ -416,6 +627,13 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         Intent intent = new Intent( Home.this, LastFm.class );
         startActivity( intent );
         finish();
+    }
+    
+    private ImageCache getImageCache(){
+        if(mImageCache == null){
+            mImageCache = new ImageCache();
+        }
+        return mImageCache;
     }
 
 
