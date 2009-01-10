@@ -77,6 +77,10 @@ public class UserFunctions {
 	public static Track[] getUserTopTracks(String baseUrl, Map<String, String> params) throws IOException {
         return TrackFunctions.getTopTracks(baseUrl, params);
     }
+	
+	public static Track[] getUserRecentTracks(String baseUrl, Map<String, String> params) throws IOException {
+        return TrackFunctions.getRecentTracks(baseUrl, params);
+    }
 
 	public static Event[] getUserEvents(String baseUrl,
 			Map<String, String> params) throws IOException, WSError {

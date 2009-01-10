@@ -336,4 +336,16 @@ final class LastFmServerImpl implements LastFmServer {
         }
         return UserFunctions.getUserTopTracks(baseUrl, params);
     }
+
+    @Override
+    public Track[] getUserRecentTracks(String user, int limit) throws IOException {
+        Map<String, String> params = createParams("user.getRecentTracks");
+        if (user != null) {
+            params.put("user", user);
+        }
+        if (limit > 0) {
+            params.put("limit", String.valueOf(limit));
+        }
+        return UserFunctions.getUserRecentTracks(baseUrl, params);
+    }
 }

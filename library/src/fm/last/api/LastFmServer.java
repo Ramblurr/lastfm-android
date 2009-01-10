@@ -106,6 +106,16 @@ public interface LastFmServer {
      */
     public Track[] getUserTopTracks(String user, String period) throws IOException;
     
+    /**
+     * See http://www.lastfm.pl/api/show?service=278
+     * 
+     * @param user
+     * @param limit 
+     * @return An array of tracks
+     * @throws IOException
+     */
+    public Track[] getUserRecentTracks(String user, int limit) throws IOException;
+    
 	/**
 	 * See http://www.lastfm.pl/api/show?service=320
 	 * 
