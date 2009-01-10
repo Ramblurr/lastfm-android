@@ -105,6 +105,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
     private ListAdapter mTopAlbumsAdapter;
     ListView mTopTracksList;
     private ListAdapter mTopTracksAdapter;
+    ListView mRecentTracksList;
+    private ListAdapter mRecentTracksAdapter;
 	
 	public int test = 5;
 	
@@ -171,6 +173,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mTopAlbumsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopAlbumsList));
         mTopTracksList = (ListView) findViewById(R.id.toptracks_list_view);
         mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
+        mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
+        mRecentTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mRecentTracksList));
     }
     
 	public void tabChanged(int index) {
@@ -420,6 +424,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 new LoadTopTracksTask().execute((Void)null);
                 break;
             case PROFILE_RECENTLYPLAYED: //"Recently Played"
+                new LoadRecentTracksTask().execute((Void)null);
                 break;
             case PROFILE_EVENTS: //"Events"
                 break;
@@ -594,7 +599,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                     ListEntry entry = new ListEntry(toptracks[i],
                             R.drawable.albumart_mp_unknown,
                             toptracks[i].getName(), //TODO this should be prettified somehow
-                            toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(),
+                            toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(), // some tracks don't have images
                             R.drawable.radio_icon); //TODO different icon
                     iconifiedEntries.add(entry);
                 }
@@ -614,6 +619,68 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             } else {
                 String[] strings = new String[]{"No Top Tracks"};
                 mTopTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
+                        R.layout.list_row, R.id.row_label, strings));
+            }
+        }
+    }
+    
+    private class LoadRecentTracksTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mRecentTracksList.setOnItemClickListener(null);
+            mRecentTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
+                    R.layout.list_row, R.id.row_label, strings));
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_RECENTLYPLAYED + 1);
+        }
+
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            mRecentTracksAdapter = new ListAdapter(Home.this, getImageCache());
+            mRecentTracksList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+                    Track track = (Track) mRecentTracksAdapter.getItem(position);
+                    /*mRecentTracksAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
+                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+                }
+
+            });
+
+            try {
+                Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((recenttracks.length < 10) ? recenttracks.length : 10); i++){
+                    ListEntry entry = new ListEntry(recenttracks[i],
+                            R.drawable.albumart_mp_unknown,
+                            recenttracks[i].getName(), //TODO this should be prettified somehow
+                            recenttracks[i].getImages().length == 0 ? "" : recenttracks[i].getImages()[0].getUrl(), // some tracks don't have images
+                            R.drawable.radio_icon); //TODO different icon
+                    iconifiedEntries.add(entry);
+                }
+                mRecentTracksAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mRecentTracksList.setAdapter(mRecentTracksAdapter);
+                mRecentTracksList.setOnScrollListener(mRecentTracksAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"No Recent Tracks"};
+                mRecentTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
         }
