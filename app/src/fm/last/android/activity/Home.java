@@ -61,6 +61,7 @@ import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
+import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
@@ -416,6 +417,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 new LoadTopAlbumsTask().execute((Void)null);
                 break;
             case PROFILE_TOPTRACKS: //"Top Tracks"
+                new LoadTopTracksTask().execute((Void)null);
                 break;
             case PROFILE_RECENTLYPLAYED: //"Recently Played"
                 break;
@@ -551,6 +553,68 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 String[] strings = new String[]{"No Top Albums"};
                 mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Home.this, 
                         R.layout.list_row, R.id.row_label, strings)); 
+            }
+        }
+    }
+    
+    private class LoadTopTracksTask extends UserTask<Void, Void, Boolean> {
+
+
+        @Override
+        public void onPreExecute() {
+            String[] strings = new String[]{"Loading..."};
+            mTopTracksList.setOnItemClickListener(null);
+            mTopTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
+                    R.layout.list_row, R.id.row_label, strings));
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPTRACKS + 1);
+        }
+
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            mTopTracksAdapter = new ListAdapter(Home.this, getImageCache());
+            mTopTracksList.setOnItemClickListener(new OnItemClickListener() {
+
+                public void onItemClick(AdapterView<?> l, View v,
+                        int position, long id) {
+                    Track track = (Track) mTopTracksAdapter.getItem(position);
+                    /*mTopTracksAdapter.enableLoadBar(position);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
+                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+                }
+
+            });
+
+            try {
+                Track[] toptracks = mServer.getUserTopTracks(mUser.getName(), "overall");
+                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+                for(int i=0; i< ((toptracks.length < 10) ? toptracks.length : 10); i++){
+                    ListEntry entry = new ListEntry(toptracks[i],
+                            R.drawable.albumart_mp_unknown,
+                            toptracks[i].getName(), //TODO this should be prettified somehow
+                            toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(),
+                            R.drawable.radio_icon); //TODO different icon
+                    iconifiedEntries.add(entry);
+                }
+                mTopTracksAdapter.setSourceIconified(iconifiedEntries);
+                success = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            if(result) {
+                mTopTracksList.setAdapter(mTopTracksAdapter);
+                mTopTracksList.setOnScrollListener(mTopTracksAdapter.getOnScrollListener());
+            } else {
+                String[] strings = new String[]{"No Top Tracks"};
+                mTopTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
+                        R.layout.list_row, R.id.row_label, strings));
             }
         }
     }
