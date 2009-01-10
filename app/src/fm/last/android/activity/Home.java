@@ -481,6 +481,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
             try {
                 Artist[] topartists = mServer.getUserTopArtists(mUser.getName(), "overall");
+                if(topartists.length == 0 )
+                    return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++){
                     ListEntry entry = new ListEntry(topartists[i], 
@@ -543,6 +545,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
             try {
                 Album[] topalbums = mServer.getUserTopAlbums(mUser.getName(), "overall");
+                if(topalbums.length == 0 )
+                    return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++){
                     ListEntry entry = new ListEntry(topalbums[i], 
@@ -605,10 +609,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
             try {
                 Track[] toptracks = mServer.getUserTopTracks(mUser.getName(), "overall");
+                if(toptracks.length == 0 )
+                    return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((toptracks.length < 10) ? toptracks.length : 10); i++){
                     ListEntry entry = new ListEntry(toptracks[i],
-                            R.drawable.albumart_mp_unknown,
+                            R.drawable.song_icon,
                             toptracks[i].getName(), //TODO this should be prettified somehow
                             toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(), // some tracks don't have images
                             R.drawable.radio_icon); //TODO different icon
@@ -667,10 +673,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
             try {
                 Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
+                if(recenttracks.length == 0 )
+                    return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((recenttracks.length < 10) ? recenttracks.length : 10); i++){
                     ListEntry entry = new ListEntry(recenttracks[i],
-                            R.drawable.albumart_mp_unknown,
+                            R.drawable.song_icon,
                             recenttracks[i].getName(), //TODO this should be prettified somehow
                             recenttracks[i].getImages().length == 0 ? "" : recenttracks[i].getImages()[0].getUrl(), // some tracks don't have images
                             R.drawable.radio_icon); //TODO different icon
