@@ -456,7 +456,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                         int position, long id) {
                     Artist artist = (Artist)mTopArtistsAdapter.getItem(position);
                     mTopArtistsAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
                 }
                 
             });
