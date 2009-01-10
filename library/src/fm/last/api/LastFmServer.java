@@ -77,6 +77,26 @@ public interface LastFmServer {
 	public Tag[] getUserTopTags(String user, Integer limit) throws IOException;
 	
 	/**
+     * See http://www.lastfm.pl/api/show?service=300
+     * 
+     * @param user
+     * @param period overall | 3month | 6month | 12month
+     * @return An array of artists
+     * @throws IOException
+     */
+    public Artist[] getUserTopArtists(String user, String period) throws IOException;
+    
+    /**
+     * See http://www.lastfm.pl/api/show?service=299
+     * 
+     * @param user
+     * @param period overall | 3month | 6month | 12month
+     * @return An array of albums
+     * @throws IOException
+     */
+    public Album[] getUserTopAlbums(String user, String period) throws IOException;
+	
+	/**
 	 * See http://www.lastfm.pl/api/show?service=320
 	 * 
 	 * @param artist The artist name in question

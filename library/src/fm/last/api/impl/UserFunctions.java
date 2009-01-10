@@ -14,8 +14,10 @@
 
 package fm.last.api.impl;
 
+import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.Tag;
+import fm.last.api.Artist;
 import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -62,6 +64,14 @@ public class UserFunctions {
 	public static Tag[] getUserTopTags(String baseUrl, Map<String, String> params) throws IOException {
 		return TagFunctions.getTopTags(baseUrl, params);
 	}
+	
+	public static Artist[] getUserTopArtists(String baseUrl, Map<String, String> params) throws IOException {
+        return ArtistFunctions.getTopArtists(baseUrl, params);
+    }
+	
+	public static Album[] getUserTopAlbums(String baseUrl, Map<String, String> params) throws IOException {
+        return AlbumFunctions.getTopAlbums(baseUrl, params);
+    }
 
 	public static Event[] getUserEvents(String baseUrl,
 			Map<String, String> params) throws IOException, WSError {

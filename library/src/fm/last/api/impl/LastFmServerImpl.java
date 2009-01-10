@@ -301,4 +301,27 @@ final class LastFmServerImpl implements LastFmServer {
 		signParams(params);
 		UserFunctions.attendEvent(baseUrl, params);
 	}
+	
+    public Artist[] getUserTopArtists(String user, String period) throws IOException {
+        Map<String, String> params = createParams("user.getTopArtists");
+        if (user != null) {
+            params.put("user", user);
+        }
+        if (period != null) {
+            params.put("period", period);
+        }
+        return UserFunctions.getUserTopArtists(baseUrl, params);
+    }
+
+    @Override
+    public Album[] getUserTopAlbums(String user, String period) throws IOException {
+        Map<String, String> params = createParams("user.getTopAlbums");
+        if (user != null) {
+            params.put("user", user);
+        }
+        if (period != null) {
+            params.put("period", period);
+        }
+        return UserFunctions.getUserTopAlbums(baseUrl, params);
+    }
 }
