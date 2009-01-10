@@ -40,6 +40,9 @@
 	            android:background="@drawable/albumart_mp_unknown"
 	            android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
 	            android:layout_height="200dip" android:layout_width="200dip" android:layout_margin="8dip"/>
+	            
+	        <ImageButton android:id="@+id/ontour" android:src="@drawable/ontour" android:layout_height="wrap_content"
+				android:layout_width="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:background="@null" android:visibility="gone"/>
 		
 			<LinearLayout android:id="@+id/playback_controls" android:orientation="horizontal"
 			    android:layout_gravity="bottom"

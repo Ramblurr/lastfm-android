@@ -10,8 +10,7 @@ public interface TabBarListener {
 	/**
 	 * Notifies of tab clicked
 	 * 
-	 * @param text String tab text
 	 * @param index ViewFlipper child's index
 	 */
-	public void tabChanged(String text, int index);
+	public void tabChanged(int index);
 }

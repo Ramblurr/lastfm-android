@@ -137,13 +137,13 @@ public class TabBar extends LinearLayout {
 		
 	}
 
-	private Hashtable<String, Tab> mTabs;
+	private Hashtable<Integer, Tab> mTabs;
 
 	private ViewFlipper mViewFlipper;
 	private int mActiveTabColor;
 	private int mInactiveTabColor;
 	private int mPadding;
-	private String mActiveTab;
+	private Integer mActiveTab;
 
 	private TabBarListener mListener;
 
@@ -223,17 +223,11 @@ public class TabBar extends LinearLayout {
 		v.getView().setOnClickListener(new OnClickListener(){
 
 			public void onClick(View v) {
-				setActive(text);
-				if(mViewFlipper != null){
-					mViewFlipper.setDisplayedChild(childIndex);
-				}
-				if(mListener != null){
-					mListener.tabChanged(text, childIndex);
-				}
+				setActive(childIndex);
 			}
 
 		});
-		getTabs().put(text, v);
+		getTabs().put(childIndex, v);
 		
 		LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		params.weight = 1;
@@ -244,9 +238,9 @@ public class TabBar extends LinearLayout {
 	/**
 	 * Sets a tab to active and disables the old one
 	 * 
-	 * @param text
+	 * @param text Child to which ViewFillper should switch when pressed
 	 */
-	public void setActive(String text){
+	public void setActive(int childIndex){
 		if(mActiveTab != null){
 			// deactivate old tab
 			Tab tab = getTab(mActiveTab);
@@ -256,15 +250,22 @@ public class TabBar extends LinearLayout {
 		}
 
 		// activate new tab
-		Tab tab = getTab(text);
+		Tab tab = getTab(childIndex);
 		if(tab != null){
 			tab.setActive();
 		}
 
-		mActiveTab = text;
+		mActiveTab = childIndex;
+		
+		if(mViewFlipper != null){
+			mViewFlipper.setDisplayedChild(childIndex);
+		}
+		if(mListener != null){
+			mListener.tabChanged(childIndex);
+		}
 	}
 	
-	public String getActive() {
+	public int getActive() {
 		return mActiveTab;
 	}
 
@@ -285,16 +286,16 @@ public class TabBar extends LinearLayout {
 //		
 //	}
 
-	private Tab getTab(String text){
-		if(getTabs().containsKey(text)){
-			return getTabs().get(text);
+	private Tab getTab(int childIndex){
+		if(getTabs().containsKey(childIndex)){
+			return getTabs().get(childIndex);
 		}
 		return null;
 	}
 
-	private Hashtable<String, Tab> getTabs(){
+	private Hashtable<Integer, Tab> getTabs(){
 		if(mTabs == null){
-			mTabs = new Hashtable<String, Tab>();
+			mTabs = new Hashtable<Integer, Tab>();
 		}
 		return mTabs;
 	}

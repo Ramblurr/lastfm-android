@@ -78,6 +78,7 @@ public class Player extends Activity
 	private ImageButton mBackButton;
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
+	private ImageButton mOntourButton;
 	private RemoteImageView mAlbum;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
@@ -157,6 +158,8 @@ public class Player extends Activity
 		mStopButton.setOnClickListener( mStopListener );
 		mNextButton = ( ImageButton ) findViewById( R.id.skip );
 		mNextButton.setOnClickListener( mNextListener );
+		mOntourButton = ( ImageButton ) findViewById( R.id.ontour );
+		mOntourButton.setOnClickListener( mOntourListener );
 		mDetailFlipper = ( ViewFlipper ) findViewById( R.id.playback_detail_flipper );
 		mDetailFlipper.setPersistentDrawingCache(ViewGroup.PERSISTENT_ANIMATION_CACHE);
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
@@ -177,7 +180,7 @@ public class Player extends Activity
 		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, TAB_TAGS);
 		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, TAB_EVENTS);
 		mTabBar.addTab("Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
-		mTabBar.setActive("Bio");
+		//mTabBar.setActive("Bio");
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
@@ -353,6 +356,16 @@ public class Player extends Activity
 		}
 	};
 	
+	private View.OnClickListener mOntourListener = new View.OnClickListener(){
+
+		@Override
+		public void onClick(View v) {
+			mInfoListener.onClick(v);
+			mTabBar.setActive(TAB_EVENTS);
+		}
+		
+	};
+	
 	private View.OnClickListener mInfoListener = new View.OnClickListener()
 	{
 		public void onClick( View v )
@@ -368,10 +381,10 @@ public class Player extends Activity
 	    			new LoadSimilarTask().execute((Void)null);
 	    			new LoadListenersTask().execute((Void)null);
 	    			new LoadTagsTask().execute((Void)null);
-	    			new LoadEventsTask().execute((Void)null);
+	    			//new LoadEventsTask().execute((Void)null);
             	}
-    			mTabBar.setActive("Bio");
-    			mViewFlipper.setDisplayedChild(TAB_BIO);
+    			mTabBar.setActive(TAB_BIO);
+    			//mViewFlipper.setDisplayedChild(TAB_BIO);
     			if(mStationName != null)
         			mStationName.setText(mLastInfoArtist);
     			if(mInfoButton_flip != null)
@@ -521,6 +534,12 @@ public class Player extends Activity
 				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
 				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
 				.sendToTarget();
+			}
+			
+			// fetching artist events (On Tour indicator & Events tab)
+			if(!mLoadEventsTaskArtist.equals(artistName)){
+				mLoadEventsTaskArtist = artistName;
+				new LoadEventsTask().execute((Void)null);
 			}
 		}
 		catch ( RemoteException ex )
@@ -901,6 +920,8 @@ public class Player extends Activity
     	
         @Override
     	public void onPreExecute() {
+        	mOntourButton.setVisibility(View.GONE);
+        	
    	        String[] strings = new String[]{"Loading..."};
    	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
    	                R.layout.list_row, R.id.row_label, strings)); 
@@ -915,7 +936,8 @@ public class Player extends Activity
     		try {
     			Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
     			mEventAdapter.setEventsSource(events, events.toString());
-    			success = true;
+    			if(events.length > 0)
+    				success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
     		}
@@ -927,14 +949,18 @@ public class Player extends Activity
         	if(result) {
         		mEventList.setAdapter(mEventAdapter);
         		mEventList.setOnItemClickListener(mEventOnItemClickListener);
+        		mOntourButton.setVisibility(View.VISIBLE);
         	} else {
         		mEventList.setOnItemClickListener(null);
     	        String[] strings = new String[]{"No Upcoming Events"};
     	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.list_row, R.id.row_label, strings)); 
+    	                R.layout.list_row, R.id.row_label, strings));
+    	        mOntourButton.setVisibility(View.GONE);
         	}
         }
     }
+    private LoadEventsTask mLoadEventsTask;
+    private String mLoadEventsTaskArtist = "";
 	
 	private ImageCache getImageCache(){
 		if(mImageCache == null){

@@ -140,7 +140,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 		mTabBar.setListener(this);
 		mTabBar.addTab("Radio", TAB_RADIO);
 		mTabBar.addTab("Profile", TAB_PROFILE);
-		mTabBar.setActive("Radio");
+		mTabBar.setActive(TAB_RADIO);
        
         mProfileImage = ( RemoteImageView ) findViewById( R.id.home_profileimage );
 
@@ -172,8 +172,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
     }
     
-	public void tabChanged(String text, int index) {
-		Log.i("Lukasz", "Changed tab to "+text+", index="+index);
+	public void tabChanged(int index) {
+		//Log.i("Lukasz", "Changed tab to "+text+", index="+index);
 	}
 	
 	public void backClicked(View child) {

@@ -89,11 +89,11 @@ public class NewStation extends ListActivity implements TabBarListener
 		mTabBar.addTab("Artist", TAB_ARTIST);
 		mTabBar.addTab("Tag", TAB_TAG);
 		mTabBar.addTab("User", TAB_USER);
-		mTabBar.setActive("Artist");
-		tabChanged("Artist", TAB_ARTIST);
+		mTabBar.setActive(TAB_ARTIST);
+		//tabChanged("Artist", TAB_ARTIST);
         
         if ( searching == null )
-            mTabBar.setActive("Artist");
+            mTabBar.setActive(TAB_ARTIST);
 
         mAdapter = new LastFMStreamAdapter( this );
         setListAdapter( mAdapter );
@@ -108,7 +108,7 @@ public class NewStation extends ListActivity implements TabBarListener
         mAdapter.updateModel();
     }
     
-	public void tabChanged(String text, int index) {
+	public void tabChanged(int index) {
         if ( index == TAB_ARTIST )
         {
             searching = SearchType.Artist;
