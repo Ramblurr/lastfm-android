@@ -1,8 +1,5 @@
 package fm.last.android;
 
-import java.util.HashMap;
-import java.util.WeakHashMap;
-
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.activity.Home;
 import fm.last.api.LastFmServer;
@@ -14,12 +11,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.ImageView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
@@ -30,6 +25,9 @@ public class LastFm extends Activity
     public static final String DB_NAME = "lastfm";
     public static final String DB_TABLE_RECENTSTATIONS = "t_recentstations";
     private boolean mLoginShown;
+    private EditText mPassField;
+    private EditText mUserField;
+    private Button mLoginButton;
 
     String authInfo;
 
@@ -59,30 +57,43 @@ public class LastFm extends Activity
                 setResult( RESULT_CANCELED, data );
             }
         }
+        setContentView( R.layout.login );
+        mPassField = ( EditText ) findViewById( R.id.password );
+        mUserField = ( EditText ) findViewById( R.id.username );
+        mLoginButton = ( Button ) findViewById( R.id.sign_in_button );
+        mPassField.setOnKeyListener( new View.OnKeyListener()
+        {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                switch ( event.getKeyCode() ) {
+                case KeyEvent.KEYCODE_ENTER:
+                    mLoginButton.setPressed(true);
+                    mLoginButton.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         if ( icicle != null )
         {
 			user = icicle.getString( "username" );
 			pass = icicle.getString( "pass" );
 			if(user != null)
-				( ( EditText ) findViewById( R.id.username ) ).setText( user );
+			    mUserField.setText( user );
 			
 			if(pass != null)
-				( ( EditText ) findViewById( R.id.password ) ).setText( pass );
+			    mPassField.setText( pass );
         }
-
-        setContentView( R.layout.login );
-        Button button = ( Button ) findViewById( R.id.sign_in_button );
-        button.setOnClickListener( new View.OnClickListener()
+        mLoginButton.setOnClickListener( new View.OnClickListener()
         {
 
             public void onClick( View v )
             {
 
-                String user = ( ( EditText ) findViewById( R.id.username ) )
-                        .getText().toString();
-                String password = ( ( EditText ) findViewById( R.id.password ) )
-                        .getText().toString();
+                String user = mUserField.getText().toString();
+                String password = mPassField.getText().toString();
 
                 if(user.length() == 0 || password.length() == 0) {
 					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_MISSINGINFO_TITLE),
@@ -128,10 +139,8 @@ public class LastFm extends Activity
         outState.putBoolean( "loginshown", mLoginShown );
         if ( mLoginShown )
         {
-            String user = ( ( EditText ) findViewById( R.id.username ) )
-                    .getText().toString();
-            String password = ( ( EditText ) findViewById( R.id.password ) )
-                    .getText().toString();
+            String user = mUserField.getText().toString();
+            String password = mPassField.getText().toString();
             outState.putString( "username", user );
             outState.putString( "passowrd", password );
         }
