@@ -25,6 +25,7 @@ import fm.last.android.utils.ImageDownloaderListener;
  * allows icon customization
  * 
  * @author Lukasz Wisniewski
+ * @author Casey Link
  */
 public class ListAdapter extends BaseAdapter implements ImageDownloaderListener, OnScrollListener {
 	
@@ -74,6 +75,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 
 			holder = new ViewHolder();
 			holder.label = (TextView)row.findViewById(R.id.row_label);
+			holder.label_second = (TextView)row.findViewById(R.id.row_label_second);
 			holder.image = (ImageView)row.findViewById(R.id.row_icon);
 			holder.disclosure = (ImageView)row.findViewById(R.id.row_disclosure_icon);
 			holder.vs = (ViewSwitcher)row.findViewById(R.id.row_view_switcher);
@@ -85,6 +87,8 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		}
 
 		holder.label.setText(mList.get(position).text);
+		if(mList.get(position).text_second != null)
+		    holder.label_second.setText(mList.get(position).text_second);
 		if(mList.get(position).icon_id == -1)
 			holder.image.setVisibility(View.GONE);
 		else
@@ -101,11 +105,13 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		if(mLoadingBar == position) {
 			holder.vs.setDisplayedChild(1);
 			holder.label.setTextColor(0xFFFFFFFF);
+			holder.label_second.setTextColor(0xFFFFFFFF);
 	    	row.setBackgroundResource(R.drawable.list_item_focus_fullwidth);
 		}
 		else{
 			holder.vs.setDisplayedChild(0);
 			holder.label.setTextColor(0xFF000000);
+			holder.label_second.setTextColor(0xFF000000);
 	    	row.setBackgroundResource(R.drawable.list_item_rest_fullwidth);
 		}
 
@@ -129,9 +135,11 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 	 * performance boost
 	 * 
 	 * @author Lukasz Wisniewski
+	 * @author Casey Link
 	 */
 	static class ViewHolder {
 		TextView label;
+		TextView label_second;
 		ImageView image;
 		ImageView disclosure;
 		ViewSwitcher vs;

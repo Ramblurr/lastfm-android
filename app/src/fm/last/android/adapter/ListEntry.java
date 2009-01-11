@@ -13,6 +13,11 @@ public class ListEntry{
 	String text;
 	
 	/**
+     * The 2nd row of text that will appear in ListView's row
+     */
+    String text_second;
+	
+	/**
 	 * Value that will be returned by Adapter.getItem
 	 */
 	Object value;
@@ -56,4 +61,13 @@ public class ListEntry{
 		
 		this.disclosure_id = disclosure_id;
 	}
+	public ListEntry(Object value, int id, String text, String url, String text_second) {
+        this(value, id, text, url);
+        this.text_second = text_second;
+    }
+	public ListEntry(Object value, int id, String text, String url, int disclosure_id, String text_second) {
+	    this(value, id, text, url, disclosure_id);
+        
+        this.text_second = text_second;
+    }
 }
