@@ -51,6 +51,23 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		mContext = context;
 		init(imageCache);
 	}
+	
+	/**
+     * Constructor that takes an array of strings as data
+     * 
+     * @param context
+     * @param data
+     */
+    public ListAdapter(Activity context, String[] data) {
+        mContext = context;
+        mList = new ArrayList<ListEntry>();
+        for(int i=0; i < data.length; i++){
+            ListEntry entry = new ListEntry(data[i], 
+                    -1, 
+                    data[i], R.drawable.arrow);
+            mList.add(entry);
+        }
+    }
 
 	/**
 	 * Sharable code between constructors
