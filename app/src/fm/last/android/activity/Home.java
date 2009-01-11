@@ -1,6 +1,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -18,7 +19,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,14 +29,12 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -45,6 +43,7 @@ import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
+import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
@@ -58,10 +57,9 @@ import fm.last.android.widget.NavBar;
 import fm.last.android.widget.NavBarListener;
 import fm.last.api.Album;
 import fm.last.api.Artist;
-import fm.last.api.Friends;
+import fm.last.api.Event;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
-import fm.last.api.Station;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
@@ -82,7 +80,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	private static final int PROFILE_FRIENDS = 5;
 
     private SeparatedListAdapter mMainAdapter;
-    private SeparatedListAdapter mProfileAdapter;
+    private ListAdapter mProfileAdapter;
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
     private Worker mProfileImageWorker;
@@ -109,7 +107,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
     ListView mRecentTracksList;
     private ListAdapter mRecentTracksAdapter;
     ListView mEventsList;
-    private ListAdapter mEventsAdapter;
+    private EventListAdapter mEventsAdapter;
     ListView mFriendsList;
     private ListAdapter mFriendsAdapter;
 	
@@ -165,8 +163,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         
         mProfileList = (ListView)findViewById(R.id.profile_list_view);
         String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"}; // this order must match the ProfileActions enum
-        mProfileList.setAdapter(new ArrayAdapter<String>(this, 
-                R.layout.list_row, R.id.row_label, mStrings)); 
+        mProfileAdapter = new ListAdapter(Home.this, mStrings);
+        mProfileList.setAdapter(mProfileAdapter); 
         mProfileList.setOnItemClickListener(mProfileClickListener);
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
@@ -406,6 +404,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         {
             if( mViewFlipper.getDisplayedChild() == TAB_PROFILE && !mViewHistory.isEmpty() )
             {
+                mProfileAdapter.disableLoadBar();
                 mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
                 return true;
             }
@@ -421,6 +420,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                 long id) 
         {
+            mProfileAdapter.enableLoadBar(position);
             switch ( position )
             {
             case PROFILE_TOPARTISTS: //"Top Artists"
@@ -451,17 +451,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
     };
     
     private class LoadTopArtistsTask extends UserTask<Void, Void, Boolean> {
-
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mTopArtistsList.setOnItemClickListener(null);
-            mTopArtistsList.setAdapter(new ArrayAdapter<String>(Home.this, 
-                    R.layout.list_row, R.id.row_label, strings)); 
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPARTISTS + 1); 
-        }
         
         @Override
         public Boolean doInBackground(Void...params) {
@@ -510,21 +499,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 mTopArtistsList.setAdapter(new ArrayAdapter<String>(Home.this, 
                         R.layout.list_row, R.id.row_label, strings)); 
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPARTISTS + 1);
         }
     }
 
     private class LoadTopAlbumsTask extends UserTask<Void, Void, Boolean> {
-
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mTopAlbumsList.setOnItemClickListener(null);
-            mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Home.this, 
-                    R.layout.list_row, R.id.row_label, strings)); 
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPALBUMS + 1); 
-        }
         
         @Override
         public Boolean doInBackground(Void...params) {
@@ -553,7 +533,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                             R.drawable.albumart_mp_unknown, 
                             topalbums[i].getTitle(), //TODO this should be prettified somehow  
                             topalbums[i].getImages()[0].getUrl(),
-                            R.drawable.radio_icon); //TODO different icon
+                            topalbums[i].getArtist());
                     iconifiedEntries.add(entry);
                 }
                 mTopAlbumsAdapter.setSourceIconified(iconifiedEntries);
@@ -574,21 +554,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Home.this, 
                         R.layout.list_row, R.id.row_label, strings)); 
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPALBUMS + 1); 
         }
     }
     
     private class LoadTopTracksTask extends UserTask<Void, Void, Boolean> {
-
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mTopTracksList.setOnItemClickListener(null);
-            mTopTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
-                    R.layout.list_row, R.id.row_label, strings));
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPTRACKS + 1);
-        }
 
         @Override
         public Boolean doInBackground(Void...params) {
@@ -617,7 +588,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                             R.drawable.song_icon,
                             toptracks[i].getName(), //TODO this should be prettified somehow
                             toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(), // some tracks don't have images
-                            R.drawable.radio_icon); //TODO different icon
+                            toptracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
                 }
                 mTopTracksAdapter.setSourceIconified(iconifiedEntries);
@@ -638,21 +609,12 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 mTopTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TOPTRACKS + 1);
         }
     }
     
     private class LoadRecentTracksTask extends UserTask<Void, Void, Boolean> {
-
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mRecentTracksList.setOnItemClickListener(null);
-            mRecentTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
-                    R.layout.list_row, R.id.row_label, strings));
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_RECENTLYPLAYED + 1);
-        }
 
         @Override
         public Boolean doInBackground(Void...params) {
@@ -681,7 +643,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                             R.drawable.song_icon,
                             recenttracks[i].getName(), //TODO this should be prettified somehow
                             recenttracks[i].getImages().length == 0 ? "" : recenttracks[i].getImages()[0].getUrl(), // some tracks don't have images
-                            R.drawable.radio_icon); //TODO different icon
+                            recenttracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
                 }
                 mRecentTracksAdapter.setSourceIconified(iconifiedEntries);
@@ -702,54 +664,23 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 mRecentTracksList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_RECENTLYPLAYED + 1);
         }
     }
     
     private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
 
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mEventsList.setOnItemClickListener(null);
-            mEventsList.setAdapter(new ArrayAdapter<String>(Home.this,
-                    R.layout.list_row, R.id.row_label, strings));
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_EVENTS + 1);
-        }
-
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
 
-            mEventsAdapter = new ListAdapter(Home.this, getImageCache());
-            mEventsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-//                    Track track = (Track) mEventsAdapter.getItem(position);
-                    /*mEventsAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
-//                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
-                }
-
-            });
-
+            mEventsAdapter = new EventListAdapter(Home.this, getImageCache());
             try {
                 fm.last.api.Event[] events = mServer.getUserEvents(mUser.getName());
-                if(events.length == 0 )
-                    return false;
-                ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-                for(int i=0; i< ((events.length < 10) ? events.length : 10); i++){
-                    ListEntry entry = new ListEntry(events[i],
-                            R.drawable.events,
-                            events[i].getTitle(), //TODO this should be prettified somehow
-                            events[i].getImages().length == 0 ? "" : events[i].getImages()[0].getUrl(), // some tracks don't have images
-                            R.drawable.radio_icon); //TODO different icon
-                    iconifiedEntries.add(entry);
-                }
-                mEventsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
+                mEventsAdapter.setEventsSource(events, events.toString());
+                if(events.length > 0)
+                    success = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -761,26 +692,61 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             if(result) {
                 mEventsList.setAdapter(mEventsAdapter);
                 mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
+                mEventsList.setOnItemClickListener(mEventOnItemClickListener);
             } else {
-                String[] strings = new String[]{"User Has No Events"};
+                String[] strings = new String[]{"No Upcoming Events"};
                 mEventsList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_EVENTS + 1);
         }
     }
     
-    private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
+    private OnItemClickListener mEventOnItemClickListener = new OnItemClickListener(){
 
-
-        @Override
-        public void onPreExecute() {
-            String[] strings = new String[]{"Loading..."};
-            mFriendsList.setOnItemClickListener(null);
-            mFriendsList.setAdapter(new ArrayAdapter<String>(Home.this,
-                    R.layout.list_row, R.id.row_label, strings));
-            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-            mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
+        public void onItemClick(final AdapterView<?> parent, final View v,
+                final int position, long id) {
+            Intent intent = new Intent( Home.this, fm.last.android.activity.Event.class );
+            Event event = (Event)mEventsAdapter.getItem(position);
+            intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
+            intent.putExtra("lastfm.event.title", event.getTitle());
+            String artists = "";
+            for(String artist : event.getArtists()) {
+                if(artists.length() > 0)
+                    artists += ", ";
+                artists += artist;
+            }
+            for(ImageUrl image : event.getImages()) {
+                if(image.getSize().contentEquals("large"))
+                    intent.putExtra("lastfm.event.poster", image.getUrl());
+            }
+            intent.putExtra("lastfm.event.artists", artists);
+            intent.putExtra("lastfm.event.venue", event.getVenue().getName());
+            intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+            intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
+            intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+            try {
+                Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
+                for(Event e : events) {
+                    System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
+                    if(e.getId() == event.getId()) {
+                        System.out.printf("Matched! Status: %s\n", e.getStatus());
+                        intent.putExtra("lastfm.event.status", e.getStatus());
+                        break;
+                    }
+                        
+                }
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            startActivity( intent );
         }
+
+    };
+    
+    private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
 
         @Override
         public Boolean doInBackground(Void...params) {
@@ -808,8 +774,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                     ListEntry entry = new ListEntry(friends[i],
                             R.drawable.profile_unknown,
                             friends[i].getName(), //TODO this should be prettified somehow
-                            friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl(), // some tracks don't have images
-                            R.drawable.radio_icon); //TODO different icon
+                            friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl()); // some tracks don't have images
                     iconifiedEntries.add(entry);
                 }
                 mFriendsAdapter.setSourceIconified(iconifiedEntries);
@@ -830,6 +795,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Home.this,
                         R.layout.list_row, R.id.row_label, strings));
             }
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
         }
     }
     
