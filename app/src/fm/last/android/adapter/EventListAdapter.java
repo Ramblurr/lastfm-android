@@ -6,26 +6,17 @@ import java.util.Iterator;
 
 import fm.last.android.R;
 import fm.last.android.utils.ImageCache;
-import fm.last.android.utils.MathUtils;
 import fm.last.api.Event;
-import fm.last.api.GeoPoint;
-import fm.last.api.Venue;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
 /**
  * ListView adapter for Events
@@ -49,8 +40,6 @@ public class EventListAdapter extends ListAdapter{
 	SimpleDateFormat mHourFormat = new SimpleDateFormat("HH:mm");
 
 //	private OnCreateContextMenuListener mOnCreateContextMenuListener;
-	private Location mLocation;
-	private static int DEFAULT_RES_ID = R.drawable.events;
 
 	private EventListAdapterListener mAdapterListener;
 	private int mProvidedPages;
@@ -65,10 +54,8 @@ public class EventListAdapter extends ListAdapter{
 	 */
 	private class Entry{
 		Event event;
-		boolean unrolled = false;
-		String artists;
-		String description;
-		String distance;
+		//String artists;
+		//String distance;
 	}
 
 	/**
@@ -107,7 +94,6 @@ public class EventListAdapter extends ListAdapter{
 	 * Adds data source to the adapter, tag param is used by ImageDownloader
 	 * class to avoid executing same threads twice.
 	 * 
-	 * @param events
 	 * @param tag
 	 */
 	public void addEventsSource(Event[] events){
@@ -118,9 +104,6 @@ public class EventListAdapter extends ListAdapter{
 			Entry entry = new Entry();
 			entry.event = event;
 			mEntries.add(entry);
-
-			String url = event.getImages()[0].getUrl();
-			//mUrls.add(url);
 		}
 
 		notifyDataSetChanged();
@@ -130,7 +113,6 @@ public class EventListAdapter extends ListAdapter{
 	 * Sets data source for the adapter, tag param is used by ImageDownloader
 	 * class to avoid executing same threads twice.
 	 * 
-	 * @param events
 	 * @param tag
 	 */
 	public void setEventsSource(Event[] events){
@@ -177,11 +159,8 @@ public class EventListAdapter extends ListAdapter{
 
 			holder = new ViewHolder();
 			holder.eventName = (TextView)row.findViewById(R.id.ExtendedRowBiggerText);
-			holder.artists = (TextView)row.findViewById(R.id.ExtendedRowSmallerText0);
-			holder.venueName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText1);
-			holder.time = (TextView)row.findViewById(R.id.ExtendedRowSmallerText2);
-			holder.distance = (TextView)row.findViewById(R.id.ExtendedRowSmallerText2Right);
-			holder.vs = (ViewSwitcher)row.findViewById(R.id.ExtendedRowViewSwitcher);
+			holder.venueName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText0);
+			holder.countryName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText1);
 
 			row.setTag(holder);
 		}
@@ -190,73 +169,19 @@ public class EventListAdapter extends ListAdapter{
 		}
 
 		holder.eventName.setText(mEntries.get(position).event.getTitle());
-		holder.venueName.setText(mEntries.get(position).event.getVenue().getName());
+		holder.venueName.setText(mEntries.get(position).event.getVenue().getName()+", "
+				+mEntries.get(position).event.getVenue().getLocation().getCity());
+		holder.countryName.setText(mEntries.get(position).event.getVenue().getLocation().getCountry());
 
-		String date = "";
-		if(mEntries.get(position).event.getStartDate() != null){
-			date = mDateFormat.format(mEntries.get(position).event.getStartDate());
-		}
-
-		String hour = "";
-		if(mEntries.get(position).event.getStartTime() != null){
-			hour = mHourFormat.format(mEntries.get(position).event.getStartTime());
-		}
-
-		holder.time.setText( date + " " + hour );
-
-		// formating artists text
-		if(mEntries.get(position).artists == null){
-			String[] artists = mEntries.get(position).event.getArtists();
-			String output = "";
-			for (int i = 0; i< artists.length; i++) {
-				String artist = artists[i];
-				output += artist;
-				if(i + 1 < artists.length){
-					output += ", ";
-				}
-			}
-			mEntries.get(position).artists = output;
-		}
-		holder.artists.setText(mEntries.get(position).artists);
-		//holder.artists.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
-
-		// formating description text
-		if(mEntries.get(position).unrolled && mEntries.get(position).description == null){
-			String text = mEntries.get(position).event.getDescription();
-			if(text == null){
-				text = "";
-			}
-
-			// removing HTML tags
-			text = text.replaceAll("\\<.*?\\>", "");
-
-			// adding quotes
-			text = text.replaceAll("&quot;", "\"");
-			mEntries.get(position).description = text;
-		}
-
-		holder.vs.setVisibility(View.GONE);
-
-		// calculate distance if location is provided
-		if(mLocation != null){
-			Venue venue = mEntries.get(position).event.getVenue();
-			if(venue == null){
-				holder.distance.setText("unknown");
-			}
-			else {
-				if(mEntries.get(position).distance == null){
-					fm.last.api.Location venueLocation = venue.getLocation();
-					GeoPoint geoPoint = venueLocation.getGeoPoint();
-					double d = MathUtils.distance(mLocation.getLatitude(), mLocation.getLongitude(),
-							geoPoint.getLatitude(), geoPoint.getLongitude());
-					mEntries.get(position).distance = String.format("%.2f km away", d);
-				}
-				holder.distance.setText(mEntries.get(position).distance);
-			}
-			holder.distance.setVisibility(View.VISIBLE);
-		} else {
-			holder.distance.setVisibility(View.GONE);
-		}
+//		String date = "";
+//		if(mEntries.get(position).event.getStartDate() != null){
+//			date = mDateFormat.format(mEntries.get(position).event.getStartDate());
+//		}
+//
+//		String hour = "";
+//		if(mEntries.get(position).event.getStartTime() != null){
+//			hour = mHourFormat.format(mEntries.get(position).event.getStartTime());
+//		}
 
 		return row;
 	}
@@ -269,11 +194,8 @@ public class EventListAdapter extends ListAdapter{
 	 */
 	static class ViewHolder {
 		TextView eventName;
-		TextView artists;
 		TextView venueName;
-		TextView time;
-		TextView distance;
-		ViewSwitcher vs;
+		TextView countryName;
 	}
 
 	/**
@@ -334,14 +256,14 @@ public class EventListAdapter extends ListAdapter{
 	 */
 	public void setCurrentLocation(Location l){
 		// clean old distances
-		if(mEntries != null){
-			Iterator<Entry> it = mEntries.iterator();
-			while(it.hasNext()){
-				Entry e = it.next();
-				e.distance = null;
-			}
-		}
-		this.mLocation = l;
+//		if(mEntries != null){
+//			Iterator<Entry> it = mEntries.iterator();
+//			while(it.hasNext()){
+//				Entry e = it.next();
+//				e.distance = null;
+//			}
+//		}
+//		this.mLocation = l;
 	}
 
 	private boolean fetchingMore = false;
