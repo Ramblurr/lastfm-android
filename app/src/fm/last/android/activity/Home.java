@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,7 +33,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
@@ -78,6 +79,9 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	private static final int PROFILE_RECENTLYPLAYED = 3;
 	private static final int PROFILE_EVENTS = 4;
 	private static final int PROFILE_FRIENDS = 5;
+	
+	private static final int DIALOG_ALBUM = 0 ;
+	private static final int DIALOG_TRACK = 1;
 
     private SeparatedListAdapter mMainAdapter;
     private ListAdapter mProfileAdapter;
@@ -97,6 +101,10 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 	
 	View previousSelectedView = null;
 	
+	ListView mDialogList;
+	private ListAdapter mDialogAdapter;;
+	
+	//Profile lists
 	private ImageCache mImageCache;
 	ListView mTopArtistsList;
 	private ListAdapter mTopArtistsAdapter;
@@ -243,7 +251,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 				findViewById( R.id.now_playing ).setVisibility(View.GONE);
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		super.onResume();
@@ -293,7 +300,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 try {
 					mUser = mServer.getUserInfo( session.getKey() );
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
                 uiThreadCallback.post( runInUIThread );
@@ -475,7 +481,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++){
                     ListEntry entry = new ListEntry(topartists[i], 
-                            R.drawable.albumart_mp_unknown, 
+                            R.drawable.artist_icon, 
                             topartists[i].getName(), 
                             topartists[i].getImages()[0].getUrl(),
                             R.drawable.radio_icon);
@@ -515,10 +521,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
-                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
-                    /*mTopAlbumsAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
-                    Toast.makeText( Home.this, "Clicked " + album.getTitle(), Toast.LENGTH_LONG ).show();
+//                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
+                    showDialog(DIALOG_ALBUM);
                 }
                 
             });
@@ -531,7 +535,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++){
                     ListEntry entry = new ListEntry(topalbums[i], 
                             R.drawable.albumart_mp_unknown, 
-                            topalbums[i].getTitle(), //TODO this should be prettified somehow  
+                            topalbums[i].getTitle(),  
                             topalbums[i].getImages()[0].getUrl(),
                             topalbums[i].getArtist());
                     iconifiedEntries.add(entry);
@@ -571,9 +575,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
                     Track track = (Track) mTopTracksAdapter.getItem(position);
-                    /*mTopTracksAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
-                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+                    showDialog(DIALOG_TRACK);
                 }
 
             });
@@ -586,7 +588,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 for(int i=0; i< ((toptracks.length < 10) ? toptracks.length : 10); i++){
                     ListEntry entry = new ListEntry(toptracks[i],
                             R.drawable.song_icon,
-                            toptracks[i].getName(), //TODO this should be prettified somehow
+                            toptracks[i].getName(), 
                             toptracks[i].getImages().length == 0 ? "" : toptracks[i].getImages()[0].getUrl(), // some tracks don't have images
                             toptracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
@@ -625,10 +627,8 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
 
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
-                    Track track = (Track) mRecentTracksAdapter.getItem(position);
-                    /*mRecentTracksAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Home.this, "lastfm://artist/"+Uri.encode(album.getArtist())+"/similarartists", false);*/
-                    Toast.makeText( Home.this, "Clicked " + track.getName(), Toast.LENGTH_LONG ).show();
+//                    Track track = (Track) mRecentTracksAdapter.getItem(position);
+                    showDialog(DIALOG_TRACK);
                 }
 
             });
@@ -641,7 +641,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 for(int i=0; i< ((recenttracks.length < 10) ? recenttracks.length : 10); i++){
                     ListEntry entry = new ListEntry(recenttracks[i],
                             R.drawable.song_icon,
-                            recenttracks[i].getName(), //TODO this should be prettified somehow
+                            recenttracks[i].getName(), 
                             recenttracks[i].getImages().length == 0 ? "" : recenttracks[i].getImages()[0].getUrl(), // some tracks don't have images
                             recenttracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
@@ -738,7 +738,6 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                         
                 }
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
             startActivity( intent );
@@ -773,7 +772,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
                 for(int i=0; i< ((friends.length < 10) ? friends.length : 10); i++){
                     ListEntry entry = new ListEntry(friends[i],
                             R.drawable.profile_unknown,
-                            friends[i].getName(), //TODO this should be prettified somehow
+                            friends[i].getName(), 
                             friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl()); // some tracks don't have images
                     iconifiedEntries.add(entry);
                 }
@@ -845,6 +844,52 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             return true;
         }
         return false;
+    }
+    
+    protected Dialog onCreateDialog(int id) 
+    {
+        final int dialogId = id;
+        if( mDialogList == null )
+            mDialogList = new ListView(Home.this);
+        mDialogAdapter = new ListAdapter(Home.this, getImageCache());
+        ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+
+        ListEntry entry = new ListEntry("Browse in Amazon Store", R.drawable.song_icon, "Browse in Amazon Store"); // TODO need amazon icon
+        iconifiedEntries.add(entry);
+        entry = new ListEntry("Listen to Similar Artists", R.drawable.radio_icon, "Listen to Similar Artists");
+        iconifiedEntries.add(entry);
+        switch (id) {
+        case DIALOG_ALBUM: 
+            entry = new ListEntry("Tag Album", R.drawable.tag_icon, "Tag Album");
+            iconifiedEntries.add(entry);
+            break;
+        case DIALOG_TRACK:
+            entry = new ListEntry("Tag Track", R.drawable.tag_icon, "Tag Track");
+            iconifiedEntries.add(entry);
+            break;
+            default:
+                break;
+        }
+        mDialogAdapter.setSourceIconified(iconifiedEntries);
+        mDialogList.setAdapter(mDialogAdapter);
+        mDialogList.setOnScrollListener(mDialogAdapter.getOnScrollListener());
+        mDialogList.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> l, View v, int position, long id) 
+            {
+               switch (position)
+               {
+                   case 0: // Amazon
+                       break;
+                   case 1: // Play
+                       
+                       break;
+                   case 2: // Tag
+                       break;
+               }
+               dismissDialog(dialogId);
+            }
+            });
+        return new AlertDialog.Builder(Home.this).setTitle("Select Action").setView(mDialogList).create();
     }
     
     private void logout()
