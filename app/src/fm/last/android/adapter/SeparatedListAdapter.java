@@ -33,7 +33,7 @@ import android.widget.BaseAdapter;
 public class SeparatedListAdapter extends BaseAdapter
 {
     public final Map<String,Adapter> sections = new LinkedHashMap<String,Adapter>();
-    public final ArrayAdapter<String> headers;
+    public ArrayAdapter<String> headers;
     public final static int TYPE_SECTION_HEADER = 0;
 
     public SeparatedListAdapter(Context context) {

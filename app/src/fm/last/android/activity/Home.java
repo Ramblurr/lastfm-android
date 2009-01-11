@@ -675,7 +675,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         public Boolean doInBackground(Void...params) {
             boolean success = false;
 
-            mEventsAdapter = new EventListAdapter(Home.this, getImageCache());
+            mEventsAdapter = new EventListAdapter(Home.this);
             try {
                 fm.last.api.Event[] events = mServer.getUserEvents(mUser.getName());
                 mEventsAdapter.setEventsSource(events);
@@ -691,7 +691,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
         public void onPostExecute(Boolean result) {
             if(result) {
                 mEventsList.setAdapter(mEventsAdapter);
-                mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
+                //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
                 mEventsList.setOnItemClickListener(mEventOnItemClickListener);
             } else {
                 String[] strings = new String[]{"No Upcoming Events"};

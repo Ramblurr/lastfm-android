@@ -931,7 +931,7 @@ public class Player extends Activity
         public Boolean doInBackground(Void...params) {
             boolean success = false;
 
-            mEventAdapter = new EventListAdapter(Player.this, getImageCache());
+            mEventAdapter = new EventListAdapter(Player.this);
 
     		try {
     			Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
