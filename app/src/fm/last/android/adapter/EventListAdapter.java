@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -27,10 +26,9 @@ import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 /**
- * ListView adapter for Events, comes with ContextMenu
+ * ListView adapter for Events
  * 
  * @author Lukasz Wisniewski
  */
@@ -50,8 +48,7 @@ public class EventListAdapter extends ListAdapter{
 	SimpleDateFormat mDateFormat = new SimpleDateFormat("dd/MM/yy");
 	SimpleDateFormat mHourFormat = new SimpleDateFormat("HH:mm");
 
-	private ArrayList<String> mUrls;
-	private OnCreateContextMenuListener mOnCreateContextMenuListener;
+//	private OnCreateContextMenuListener mOnCreateContextMenuListener;
 	private Location mLocation;
 	private static int DEFAULT_RES_ID = R.drawable.events;
 
@@ -90,20 +87,20 @@ public class EventListAdapter extends ListAdapter{
 	 * Standard class fields initialization shared between all constructors
 	 */
 	private void init(){
-		mOnCreateContextMenuListener = new OnCreateContextMenuListener(){
-
-			public void onCreateContextMenu(ContextMenu menu, View v,
-					ContextMenuInfo menuInfo) {
-
-				menu.add(Menu.NONE, CONTEXTMENU_ATTENDING, Menu.NONE, "Attending");
-				menu.add(Menu.NONE, CONTEXTMENU_MAYBE_ATTENDING, Menu.NONE, "Maybe attending");
-				menu.add(Menu.NONE, CONTEXTMENU_NOT_ATTENDING, Menu.NONE, "Not attending");
-				menu.add(Menu.NONE, CONTEXTMENU_MAP, Menu.NONE, "Show on map");
-				menu.add(Menu.NONE, CONTEXTMENU_WWW, Menu.NONE, "Website");
-
-			}
-
-		};
+//		mOnCreateContextMenuListener = new OnCreateContextMenuListener(){
+//
+//			public void onCreateContextMenu(ContextMenu menu, View v,
+//					ContextMenuInfo menuInfo) {
+//
+//				menu.add(Menu.NONE, CONTEXTMENU_ATTENDING, Menu.NONE, "Attending");
+//				menu.add(Menu.NONE, CONTEXTMENU_MAYBE_ATTENDING, Menu.NONE, "Maybe attending");
+//				menu.add(Menu.NONE, CONTEXTMENU_NOT_ATTENDING, Menu.NONE, "Not attending");
+//				menu.add(Menu.NONE, CONTEXTMENU_MAP, Menu.NONE, "Show on map");
+//				menu.add(Menu.NONE, CONTEXTMENU_WWW, Menu.NONE, "Website");
+//
+//			}
+//
+//		};
 	}
 	
 	/**
@@ -113,7 +110,7 @@ public class EventListAdapter extends ListAdapter{
 	 * @param events
 	 * @param tag
 	 */
-	public void addEventsSource(Event[] events, String tag){
+	public void addEventsSource(Event[] events){
 
 		for (int i = 0 ; i < events.length; i++) {
 			Event event = events[i];
@@ -123,12 +120,9 @@ public class EventListAdapter extends ListAdapter{
 			mEntries.add(entry);
 
 			String url = event.getImages()[0].getUrl();
-			mUrls.add(url);
+			//mUrls.add(url);
 		}
 
-		if(mImageDownloader.getUserTask(tag) == null){
-			mImageDownloader.getImages(mUrls, tag);
-		}
 		notifyDataSetChanged();
 	}
 
@@ -139,15 +133,14 @@ public class EventListAdapter extends ListAdapter{
 	 * @param events
 	 * @param tag
 	 */
-	public void setEventsSource(Event[] events, String tag){
+	public void setEventsSource(Event[] events){
 
 		mTotalPages = 1;
 		mProvidedPages = 1;
 
 		mEntries = new ArrayList<Entry>();
-		mUrls = new ArrayList<String>();
 		
-		addEventsSource(events, tag);
+		addEventsSource(events);
 	}
 
 	public void setListener(EventListAdapterListener l){
@@ -188,8 +181,6 @@ public class EventListAdapter extends ListAdapter{
 			holder.venueName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText1);
 			holder.time = (TextView)row.findViewById(R.id.ExtendedRowSmallerText2);
 			holder.distance = (TextView)row.findViewById(R.id.ExtendedRowSmallerText2Right);
-			holder.description = (TextView)row.findViewById(R.id.ExtendedRowDescription);
-			holder.image = (ImageView)row.findViewById(R.id.ExtendedRowImage);
 			holder.vs = (ViewSwitcher)row.findViewById(R.id.ExtendedRowViewSwitcher);
 
 			row.setTag(holder);
@@ -246,26 +237,6 @@ public class EventListAdapter extends ListAdapter{
 
 		holder.vs.setVisibility(View.GONE);
 
-		// turn on/off event description
-		if(mEntries.get(position).unrolled){
-			holder.description.setText(mEntries.get(position).description);
-			holder.description.setVisibility(View.VISIBLE);
-		} else {
-			holder.description.setVisibility(View.GONE);
-		}
-
-		// optionally if an URL is specified
-		if(mUrls.get(position) != null){
-			Bitmap bmp = mImageCache.get(mUrls.get(position));
-			if(bmp != null){
-				holder.image.setImageBitmap(bmp);
-			} else {
-				holder.image.setImageResource(DEFAULT_RES_ID);
-			}
-		} else {
-			holder.image.setImageResource(DEFAULT_RES_ID);
-		}
-
 		// calculate distance if location is provided
 		if(mLocation != null){
 			Venue venue = mEntries.get(position).event.getVenue();
@@ -301,20 +272,8 @@ public class EventListAdapter extends ListAdapter{
 		TextView artists;
 		TextView venueName;
 		TextView time;
-		TextView description;
 		TextView distance;
-		ImageView image;
 		ViewSwitcher vs;
-	}
-
-	/**
-	 * Toggles on/off detailed description of the event
-	 * 
-	 * @param position
-	 */
-	public void toggleDescription(int position){
-		mEntries.get(position).unrolled = !mEntries.get(position).unrolled;
-		notifyDataSetChanged();
 	}
 
 	/**
@@ -324,7 +283,8 @@ public class EventListAdapter extends ListAdapter{
 	 * @return
 	 */
 	public OnCreateContextMenuListener getOnCreateContextMenuListener() {
-		return mOnCreateContextMenuListener;
+		//return mOnCreateContextMenuListener;
+		return null;
 	}
 
 //	/**

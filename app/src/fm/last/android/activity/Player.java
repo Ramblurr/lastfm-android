@@ -935,7 +935,7 @@ public class Player extends Activity
 
     		try {
     			Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
-    			mEventAdapter.setEventsSource(events, events.toString());
+    			mEventAdapter.setEventsSource(events);
     			if(events.length > 0)
     				success = true;
     		} catch (IOException e) {

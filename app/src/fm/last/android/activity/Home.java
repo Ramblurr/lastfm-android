@@ -678,7 +678,7 @@ public class Home extends ListActivity implements TabBarListener,NavBarListener
             mEventsAdapter = new EventListAdapter(Home.this, getImageCache());
             try {
                 fm.last.api.Event[] events = mServer.getUserEvents(mUser.getName());
-                mEventsAdapter.setEventsSource(events, events.toString());
+                mEventsAdapter.setEventsSource(events);
                 if(events.length > 0)
                     success = true;
             } catch (IOException e) {

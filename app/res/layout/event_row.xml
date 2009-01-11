@@ -21,11 +21,13 @@
 	<LinearLayout android:layout_width="fill_parent"
 		android:orientation="horizontal" android:minHeight="45px"
 		android:layout_height="fill_parent">
+		<!-- 
 		<ImageView android:id="@+id/ExtendedRowImage"
 			android:adjustViewBounds="true" android:layout_height="wrap_content"
 			android:layout_width="45px" android:maxHeight="45px"
 			android:maxWidth="45px" android:layout_gravity="center_vertical" />
-
+		 -->
+		
 		<LinearLayout android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:orientation="vertical"
 			android:gravity="left|center_vertical" android:layout_marginLeft="10px">
@@ -79,7 +81,4 @@
 		</LinearLayout>
 
 	</LinearLayout>
-	<TextView android:id="@+id/ExtendedRowDescription"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"
-		android:visibility="gone" android:paddingTop="4sp" android:textColor="#000"></TextView>
 </LinearLayout>
