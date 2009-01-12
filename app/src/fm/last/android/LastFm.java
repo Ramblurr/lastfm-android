@@ -1,7 +1,7 @@
 package fm.last.android;
 
 import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.activity.Home;
+import fm.last.android.activity.Profile;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
@@ -46,7 +46,7 @@ public class LastFm extends Activity
             try
             {
                 doLogin( user, pass );
-                Intent intent = new Intent( LastFm.this, Home.class );
+                Intent intent = new Intent( LastFm.this, Profile.class );
                 startActivity( intent );
                 finish();
             }
@@ -109,7 +109,7 @@ public class LastFm extends Activity
                     editor.putString( "lastfm_user", user );
                     editor.putString( "lastfm_pass", password );
                     editor.commit();
-                    Intent intent = new Intent( LastFm.this, Home.class );
+                    Intent intent = new Intent( LastFm.this, Profile.class );
                     startActivity( intent );
                     finish();
                 }

@@ -2,7 +2,7 @@ package fm.last.android;
 
 import java.util.WeakHashMap;
 
-import fm.last.android.activity.Home;
+import fm.last.android.activity.Profile;
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;

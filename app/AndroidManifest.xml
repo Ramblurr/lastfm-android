@@ -10,7 +10,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Home" android:label="LastFM: Home" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.Profile" android:label="LastFM: Profile" android:configChanges="keyboardHidden">
 			<intent-filter>
 			</intent-filter>
 		</activity>
