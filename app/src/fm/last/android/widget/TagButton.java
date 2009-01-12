@@ -3,11 +3,6 @@ package fm.last.android.widget;
 import fm.last.android.R;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -15,7 +10,7 @@ import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageButton;
+import android.widget.Button;
 
 // TODO usage of NinePath
 /**
@@ -23,7 +18,7 @@ import android.widget.ImageButton;
  * 
  * @author Lukasz Wisniewski
  */
-public class TagButton extends ImageButton {
+public class TagButton extends Button {
 	
 	public static final String TAG = "TagButton";
 	
@@ -35,20 +30,6 @@ public class TagButton extends ImageButton {
 	int old_x;
 	int old_y;
 	
-	// TODO remove hardcoded values from ImageButton
-	private float mTextSize = 17;
-	private int mTagButtonHeight;
-	private int mTextBottomPadding = 2;
-	private int mHeadOffset;
-	private int mTailOffset;
-	
-	private Bitmap mHead_rest;
-	private Bitmap mTail_rest;
-	private Bitmap mMiddle_rest;
-	private Bitmap mHead_focus;
-	private Bitmap mTail_focus;
-	private Bitmap mMiddle_focus;
-
 	public TagButton(Context context) {
 		super(context);
 		init();
@@ -68,29 +49,11 @@ public class TagButton extends ImageButton {
 	 * Sharable code between constructors
 	 */
 	private void init(){
-		setBackgroundDrawable(null);
+		setBackgroundResource(R.drawable.tag);
+		setTextColor(0xFFFFFFFF);
 		
 		mText = "";
 		
-		/* Init painter used to draw the text inside the tag button */
-	    mTextPaint = new TextPaint();
-	    mTextPaint.setTextSize(mTextSize);
-	    mTextPaint.setARGB(255, 255, 255, 255);
-	    mTextPaint.setAntiAlias(true);
-	    
-	    /* Load resources */
-	    mHead_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_left);
-	    mTail_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_right);
-	    mMiddle_rest = BitmapFactory.decodeResource(getResources(), R.drawable.tag_rest_middle);
-	    mHead_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_left);
-	    mTail_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_right);
-	    mMiddle_focus = BitmapFactory.decodeResource(getResources(), R.drawable.tag_focus_middle);
-	    
-	    /* Setting some values*/
-	    mTagButtonHeight = mHead_rest.getHeight();
-	    mHeadOffset = mHead_rest.getWidth();
-	    mTailOffset = mTail_rest.getWidth();
-
 		this.setFocusable(true);
 		this.setOnFocusChangeListener(new OnFocusChangeListener() {
 
@@ -117,75 +80,9 @@ public class TagButton extends ImageButton {
 		super.onLayout(changed, left, top, right, bottom);
 	}
 
-	@Override
-	protected void onDraw(Canvas canvas) {
-		
-		if(this.isFocused()) {
-			// drawing tag head and tag tail
-			canvas.drawBitmap(mHead_focus, 0, 0, null);
-			canvas.drawBitmap(mTail_focus, mHeadOffset+getTextWidth(mText), 0, null);
-			
-			// drawing rectangle behind text
-			Rect r = new Rect(mHeadOffset, 
-					0, 
-					mHeadOffset+getTextWidth(mText), 
-					getHeight());
-			canvas.drawBitmap(mMiddle_focus, null, r, null);
-			
-			// drawing tag text
-			canvas.drawText(mText, 
-					mHeadOffset, 
-					(getHeight()+mTextSize)/2-mTextBottomPadding, 
-					mTextPaint);
-		} else {
-			// drawing tag head and tag tail
-			canvas.drawBitmap(mHead_rest, 0, 0, null);
-			canvas.drawBitmap(mTail_rest, mHeadOffset+getTextWidth(mText), 0, null);
-			
-			// drawing rectangle behind text
-			Rect r = new Rect(mHeadOffset, 
-					0, 
-					mHeadOffset+getTextWidth(mText), 
-					getHeight());
-			canvas.drawBitmap(mMiddle_rest, null, r, null);
-			
-			// drawing tag text
-			canvas.drawText(mText, 
-					mHeadOffset, 
-					(getHeight()+mTextSize)/2-mTextBottomPadding, 
-					mTextPaint);
-		}
-		super.onDraw(canvas);
-	}
-
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		heightMeasureSpec = mTagButtonHeight ;
-		widthMeasureSpec = mHeadOffset + getTextWidth(mText) + mTailOffset;
-		setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-		
-		//super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	}
-
 	public void setText(String text) {
 		mText = text;
-	}
-	
-	/**
-	 * Returns text width within mTextPaint
-	 * 
-	 * @param text
-	 * @return
-	 */
-	private int getTextWidth(String text)
-	{
-		int count = text.length();
-		float[] widths = new float[count];
-		mTextPaint.getTextWidths(text, widths);
-		int textWidth = 0;
-		for (int i = 0; i < count; i++)
-			textWidth += widths[i];
-		return textWidth;
+		super.setText(mText);
 	}
 	
 	/**

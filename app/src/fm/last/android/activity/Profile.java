@@ -739,11 +739,11 @@ public class Profile extends ListActivity implements TabBarListener
         iconifiedEntries.add(entry);
         switch (id) {
         case DIALOG_ALBUM: 
-            entry = new ListEntry("Tag Album", R.drawable.tag_icon, "Tag Album");
+            entry = new ListEntry("Tag Album", R.drawable.list_tag, "Tag Album");
             iconifiedEntries.add(entry);
             break;
         case DIALOG_TRACK:
-            entry = new ListEntry("Tag Track", R.drawable.tag_icon, "Tag Track");
+            entry = new ListEntry("Tag Track", R.drawable.list_tag, "Tag Track");
             iconifiedEntries.add(entry);
             break;
             default:
