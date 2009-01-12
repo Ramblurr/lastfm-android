@@ -8,6 +8,8 @@ import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.TagListAdapter;
+import fm.last.android.widget.TabBar;
+import fm.last.android.widget.TabBarListener;
 import fm.last.android.widget.TagLayout;
 import fm.last.android.widget.TagLayoutListener;
 import fm.last.api.LastFmServer;
@@ -28,6 +30,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
@@ -35,10 +38,9 @@ import android.widget.AdapterView.OnItemClickListener;
  * 
  * @author Lukasz Wisniewski
  */
-public class Tag extends Activity {
+public class Tag extends Activity implements TabBarListener {
 	String mArtist;
 	String mTrack;
-	//Login mLogin;
 	
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 	Session mSession = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
@@ -54,15 +56,18 @@ public class Tag extends Activity {
 	Animation mFadeOutAnimation;
 	boolean animate = false;
 
+	private final int TAB_TOPTAGS = 0;
+	private final int TAB_MYTAGS = 1;
+	
 	// --------------------------------
 	// XML LAYOUT start
 	// --------------------------------
-	//TopBar mTopBar;
 	EditText mTagEditText;
 	Button mTagBackButton;
 	Button mTagForwardButton;
 	Button mTagButton;
 	TagLayout mTagLayout;
+	TabBar mTabBar;
 	ListView mTagList;
 	// --------------------------------
 	// XML LAYOUT start
@@ -81,17 +86,21 @@ public class Tag extends Activity {
 		setContentView(R.layout.tag);
 
 		// binding views to XML-layout
-		//mTopBar = (TopBar) findViewById(R.id.TopBar);
 		mTagEditText = (EditText) findViewById(R.id.tag_text_edit);
 		mTagButton = (Button) findViewById(R.id.tag_add_button);
-		mTagBackButton = (Button) findViewById(R.id.navbar_back);
-		mTagForwardButton = (Button) findViewById(R.id.navbar_forward);
 		mTagLayout = (TagLayout)findViewById(R.id.TagLayout);
 		mTagList = (ListView)findViewById(R.id.TagList);
+		mTabBar = (TabBar)findViewById(R.id.TabBar);
 
 		// loading & setting animations
 		mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.tag_row_fadeout);
 		mTagLayout.setAnimationsEnabled(true);
+		
+		// configure the tabs
+		mTabBar.setListener(this);
+		mTabBar.addTab("Top Tags", TAB_TOPTAGS);
+		mTabBar.addTab("My Tags", TAB_MYTAGS);
+		mTabBar.setActive(TAB_TOPTAGS);
 		
 		// restoring or creatingData
 		restoreMe();
@@ -103,45 +112,6 @@ public class Tag extends Activity {
 			}
 			
 		});
-		
-		mTagBackButton.setOnClickListener(new OnClickListener(){
-
-			public void onClick(View v) {
-				finish();
-			}
-			
-		});
-		
-		mTagForwardButton.setOnClickListener(new OnClickListener(){
-
-			public void onClick(View v) {
-				commit();
-				finish();
-			}
-			
-		});
-				
-//		mTopBar.setTopBarListener(new TopBarListener(){
-//
-//			@Override
-//			public void getText(String text) {
-//				addTag(text);				
-//			}
-//
-//			@Override
-//			public void actionButtonPressed() {
-//				commit();
-//				finish();
-//			}
-//
-//			@Override
-//			public void backButtonPressed() {
-//				finish();
-//			}
-//			
-//		});
-//
-//		mTopBar.setActionImageResource(R.drawable.tag_button_top);
 		
 		mTagLayout.setTagLayoutListener(new TagLayoutListener(){
 
@@ -342,27 +312,45 @@ public class Tag extends Activity {
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.tag, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        
+        // Parameters for menu.add are:
+        // group -- Not used here.
+        // id -- Used only when you want to handle and identify the click yourself.
+        // title
+        MenuItem save = menu.add(Menu.NONE, 1, Menu.NONE, "Save");
+        save.setIcon(android.R.drawable.ic_menu_save);
+        MenuItem cancel = menu.add(Menu.NONE, 0, Menu.NONE, "Cancel");
+        cancel.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+        return true;
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.top_tags_menu_item:
-			mTagList.setAdapter(mTopTagListAdapter);
+		case 0:
+			finish();
 			break;
-		case R.id.my_tags_menu_item:
-			mTagList.setAdapter(mUserTagListAdapter);
+		case 1:
+			commit();
+			finish();
 			break;
 		default:
 			break;
 		}
-
 		return super.onOptionsItemSelected(item);
+	}
+
+    public void tabChanged(int index) {
+    	switch(index) {
+	    	case TAB_MYTAGS:
+				mTagList.setAdapter(mUserTagListAdapter);
+	    		break;
+	    	case TAB_TOPTAGS:
+				mTagList.setAdapter(mTopTagListAdapter);
+	    		break;
+    	}
 	}
 
 	/**

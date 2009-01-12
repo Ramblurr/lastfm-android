@@ -137,7 +137,6 @@ public class Player extends Activity
 		mProgress = ( ProgressBar ) findViewById( android.R.id.progress );
 		mProgress.setMax( 1000 );
 		mAlbum = ( RemoteImageView ) findViewById( R.id.album );
-		mStationName = ( TextView ) findViewById( R.id.station_name );
 		mArtistName = ( TextView ) findViewById( R.id.track_artist );
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
 		

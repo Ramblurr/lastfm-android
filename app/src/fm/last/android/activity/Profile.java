@@ -54,8 +54,6 @@ import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
-import fm.last.android.widget.NavBar;
-import fm.last.android.widget.NavBarListener;
 import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
