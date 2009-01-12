@@ -318,7 +318,6 @@ final class LastFmServerImpl implements LastFmServer {
         return UserFunctions.getUserTopArtists(baseUrl, params);
     }
 
-    @Override
     public Album[] getUserTopAlbums(String user, String period) throws IOException {
         Map<String, String> params = createParams("user.getTopAlbums");
         if (user != null) {
@@ -330,7 +329,6 @@ final class LastFmServerImpl implements LastFmServer {
         return UserFunctions.getUserTopAlbums(baseUrl, params);
     }
 
-    @Override
     public Track[] getUserTopTracks(String user, String period) throws IOException {
         Map<String, String> params = createParams("user.getTopTracks");
         if (user != null) {
@@ -342,7 +340,6 @@ final class LastFmServerImpl implements LastFmServer {
         return UserFunctions.getUserTopTracks(baseUrl, params);
     }
 
-    @Override
     public Track[] getUserRecentTracks(String user, int limit) throws IOException {
         Map<String, String> params = createParams("user.getRecentTracks");
         if (user != null) {
