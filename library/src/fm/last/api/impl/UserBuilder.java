@@ -45,4 +45,26 @@ public class UserBuilder extends XMLBuilder<User> {
 
     return new User(name, url, images, country, age, gender, playcount);
   }
+  
+  /**
+   * Build a user from the old 1.0 style service
+   * http://ws.audioscrobbler.com/1.0/user/c99koder/profile.xml
+   */
+  public User buildOld(Node userNode) {
+      node = userNode;
+      String name = getAttribute("username");
+      String url = getText("url");
+      String country = getText("country");
+      String age = getText("age");
+      String gender = getText("gender");
+      String playcount = getText("playcount");
+      List<Node> imageNodes = getChildNodes("icon");
+      ImageUrl[] images = new ImageUrl[imageNodes.size()];
+      int i = 0;
+      for (Node imageNode : imageNodes) {
+        images[i++] =imageBuilder.build(imageNode);
+      }
+
+      return new User(name, url, images, country, age, gender, playcount);
+    }
 }

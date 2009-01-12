@@ -25,6 +25,7 @@ import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,23 @@ public class UserFunctions {
 			return builder.build(userNode);
 	    }
 	}
+	
+	   public static User getAnyUserInfo(String url) throws IOException {
+	        URL theUrl = new URL(url);
+	        String response = UrlUtil.doGet(theUrl);
+
+
+	        Document responseXML = null;
+	        try {
+	            responseXML = XMLUtil.stringToDocument(response);
+	        } catch (SAXException e) {
+	            throw new IOException(e.getMessage());
+	        }
+
+	        Node profileNode = XMLUtil.findNamedElementNode(responseXML, "profile");
+            UserBuilder builder = new UserBuilder();
+            return builder.buildOld(profileNode);
+	    }
 	
 	public static Tag[] getUserTopTags(String baseUrl, Map<String, String> params) throws IOException {
 		return TagFunctions.getTopTags(baseUrl, params);

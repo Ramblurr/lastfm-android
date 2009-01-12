@@ -54,6 +54,7 @@ public interface LastFmServer {
 	public RadioPlayList getRadioPlayList(String sk) throws IOException;
 
 	public User getUserInfo(String sk) throws IOException;
+	public User getAnyUserInfo(String username) throws IOException;
 
 	/**
 	 * See http://www.lastfm.pl/api/show?service=289

@@ -166,6 +166,11 @@ final class LastFmServerImpl implements LastFmServer {
 		signParams(params);
 		return UserFunctions.getUserInfo(baseUrl, params);
 	}
+	
+    public User getAnyUserInfo(String username) throws IOException {
+        String url = "http://ws.audioscrobbler.com/1.0/user/"+username+"/profile.xml";
+        return UserFunctions.getAnyUserInfo(url);
+    }
 
 	public Tag[] getTrackTopTags(String artist, String track, String mbid)
 	throws IOException, WSError {
