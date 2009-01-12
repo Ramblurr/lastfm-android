@@ -33,6 +33,7 @@ import fm.last.api.WSError;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -49,6 +50,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -73,9 +75,6 @@ import android.widget.AdapterView.OnItemClickListener;
 public class Player extends Activity
 {
 
-	private ImageButton mInfoButton;
-	private ImageButton mInfoButton_flip;
-	private ImageButton mBackButton;
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
 	private ImageButton mOntourButton;
@@ -141,18 +140,7 @@ public class Player extends Activity
 		mStationName = ( TextView ) findViewById( R.id.station_name );
 		mArtistName = ( TextView ) findViewById( R.id.track_artist );
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
-		mBackButton = ( ImageButton ) findViewById( R.id.player_backBtn );
-		if(mBackButton != null)
-			mBackButton.setOnClickListener( mBackListener );
 		
-		//flip-side, if available
-		mInfoButton_flip = ( ImageButton ) findViewById( R.id.player_infoBtn_flip );
-		if(mInfoButton_flip != null)
-			mInfoButton_flip.setOnClickListener( mInfoListener );
-		
-		//playback-side
-		mInfoButton = ( ImageButton ) findViewById( R.id.player_infoBtn );
-		mInfoButton.setOnClickListener( mInfoListener );
 		mStopButton = ( ImageButton ) findViewById( R.id.stop );
 		mStopButton.requestFocus();
 		mStopButton.setOnClickListener( mStopListener );
@@ -199,9 +187,31 @@ public class Player extends Activity
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	public void showMetadata() {
+    	if(!mLastInfoArtist.contentEquals(mArtistName.getText())) {
+    		mLastInfoArtist = mArtistName.getText().toString();
+			new LoadBioTask().execute((Void)null);
+			new LoadSimilarTask().execute((Void)null);
+			new LoadListenersTask().execute((Void)null);
+			new LoadTagsTask().execute((Void)null);
+			//new LoadEventsTask().execute((Void)null);
+    	}
+		mTabBar.setActive(TAB_BIO);
+		mDetailFlipper.showNext();
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case R.id.info_menu_item:
+			showMetadata();
+			break;
+		case R.id.buy_menu_item:
+            Intent intent = new Intent( Intent.ACTION_SEARCH );
+            intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
+            intent.putExtra(SearchManager.QUERY, "test");
+            startActivity( intent );
+            break;
 		case R.id.tag_menu_item:
 			fireTagActivity();
 			break;
@@ -358,84 +368,28 @@ public class Player extends Activity
 	
 	private View.OnClickListener mOntourListener = new View.OnClickListener(){
 
-		@Override
 		public void onClick(View v) {
-			mInfoListener.onClick(v);
+			showMetadata();
 			mTabBar.setActive(TAB_EVENTS);
 		}
 		
 	};
 	
-	private View.OnClickListener mInfoListener = new View.OnClickListener()
-	{
-		public void onClick( View v )
-		{
-			final float centerX = mDetailFlipper.getWidth() / 2.0f;
-            final float centerY = mDetailFlipper.getHeight() / 2.0f;
-            Rotate3dAnimation rotation;
-            if(mDetailFlipper.getDisplayedChild() == 0) {
-            	rotation = new Rotate3dAnimation(360, 270, centerX, centerY, 310.0f, false);
-            	if(!mLastInfoArtist.contentEquals(mArtistName.getText())) {
-            		mLastInfoArtist = mArtistName.getText().toString();
-	    			new LoadBioTask().execute((Void)null);
-	    			new LoadSimilarTask().execute((Void)null);
-	    			new LoadListenersTask().execute((Void)null);
-	    			new LoadTagsTask().execute((Void)null);
-	    			//new LoadEventsTask().execute((Void)null);
-            	}
-    			mTabBar.setActive(TAB_BIO);
-    			//mViewFlipper.setDisplayedChild(TAB_BIO);
-    			if(mStationName != null)
-        			mStationName.setText(mLastInfoArtist);
-    			if(mInfoButton_flip != null)
-    				mInfoButton_flip.setImageBitmap(mAlbum.getArtwork());
-    			else
-    				mInfoButton.setImageBitmap(mAlbum.getArtwork());
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if( keyCode == KeyEvent.KEYCODE_BACK )
+        {
+            if( mDetailFlipper.getDisplayedChild() == 1 )
+            {
+            	mDetailFlipper.showPrevious();
+                return true;
             } else {
-            	rotation = new Rotate3dAnimation(0, 90, centerX, centerY, 310.0f, false);
-            	try {
-        			if(mStationName != null)
-      					mStationName.setText(LastFMApplication.getInstance().player.getStationName());
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    			if(mInfoButton_flip != null)
-    				mInfoButton_flip.setImageResource(R.drawable.info_button);
-    			else
-    				mInfoButton.setImageResource(R.drawable.info_button);
+            	finish();
+            	return true;
             }
-            rotation.setDuration(250);
-            rotation.setFillAfter(true);
-            rotation.setInterpolator(new AccelerateInterpolator());
-            rotation.setAnimationListener(new DisplayNextView());
-            mDetailFlipper.startAnimation(rotation);
-		}
-	};
-
-    private final class DisplayNextView implements Animation.AnimationListener {
-        public void onAnimationStart(Animation animation) {
         }
-
-        public void onAnimationEnd(Animation animation) {
-            final float centerX = mDetailFlipper.getWidth() / 2.0f;
-            final float centerY = mDetailFlipper.getHeight() / 2.0f;
-            Rotate3dAnimation rotation;
-            if(mDetailFlipper.getDisplayedChild() == 0) {
-            	rotation = new Rotate3dAnimation(90, 0, centerX, centerY, 310.0f, false);
-            } else {
-            	rotation = new Rotate3dAnimation(270, 360, centerX, centerY, 310.0f, false);
-            }
-            rotation.setDuration(250);
-            rotation.setFillAfter(true);
-            rotation.setInterpolator(new DecelerateInterpolator());
-        	mDetailFlipper.showNext();
-            mDetailFlipper.startAnimation(rotation);
-        }
-
-        public void onAnimationRepeat(Animation animation) {
-        }
-    }	
+        return false;
+    }
 	
 	private View.OnClickListener mStopListener = new View.OnClickListener()
 	{
@@ -481,8 +435,6 @@ public class Player extends Activity
 				{
 					if(mStationName != null)
 						mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
-					if(mDetailFlipper.getDisplayedChild() != 0)
-						mInfoListener.onClick(mInfoButton);
 				}
 				catch ( RemoteException e )
 				{

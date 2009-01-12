@@ -10,18 +10,18 @@
 	<string name="home_logout">Logout</string>
 	<string name="home_tracksplayed">plays</string>
 	<string name="home_newstation">Start a New Station</string>
-	<string name="home_myrecs">My Recommendations</string>
-	<string name="home_myneighborhood">My Neighbourhood</string>
-	<string name="home_myloved">My Loved Tracks</string>
-	<string name="home_mylibrary">My Library</string>
-	<string name="home_mystations">My Stations</string>
+	<string name="home_myrecs">Recommended by Last.fm</string>
+	<string name="home_myneighborhood">Your Neighbourhood</string>
+	<string name="home_myloved">Your Loved Tracks</string>
+	<string name="home_mylibrary">Your Library</string>
+	<string name="home_mystations">Your Stations</string>
 	<string name="home_recentstations">Recent Stations</string>
 
 	<string name="search">Search</string>
 	<string name="newstation_artist">Artist</string>
 	<string name="newstation_tag">Tag</string>
 	<string name="newstation_user">User</string>
-	<string name="newstation_hint_artist">Type in an artist you like to get started.</string>
+	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
 	<string name="newstation_hint_user">Type in a user name to get started.</string>
 

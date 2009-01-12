@@ -104,8 +104,12 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		}
 
 		holder.label.setText(mList.get(position).text);
-		if(mList.get(position).text_second != null)
+		if(mList.get(position).text_second != null) {
 		    holder.label_second.setText(mList.get(position).text_second);
+		    holder.label_second.setVisibility(View.VISIBLE);
+		} else {
+		    holder.label_second.setVisibility(View.GONE);
+		}
 		if(mList.get(position).icon_id == -1)
 			holder.image.setVisibility(View.GONE);
 		else

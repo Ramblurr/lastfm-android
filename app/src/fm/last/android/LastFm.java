@@ -64,7 +64,6 @@ public class LastFm extends Activity
         mPassField.setOnKeyListener( new View.OnKeyListener()
         {
 
-            @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 switch ( event.getKeyCode() ) {
                 case KeyEvent.KEYCODE_ENTER:
@@ -111,7 +110,6 @@ public class LastFm extends Activity
                     editor.commit();
                     Intent intent = new Intent( LastFm.this, Profile.class );
                     startActivity( intent );
-                    finish();
                 }
                 catch ( WSError e )
                 {

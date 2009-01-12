@@ -26,14 +26,15 @@
 		android:layout_gravity="center_vertical" android:visibility="gone"/>
 	<LinearLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:orientation="vertical"
-		android:layout_gravity="center_vertical" android:layout_marginLeft="10px"
-		android:paddingLeft="16dip" android:layout_weight="1">		
+		android:layout_gravity="center_vertical"
+		android:layout_weight="1">		
 		<TextView android:id="@+id/row_label" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:text="Black Eyed Peas"
 				android:layout_weight="1" android:paddingLeft="16dip"  
 				android:layout_gravity="center" android:gravity="left|center_vertical" android:textSize="16dip" android:textStyle="bold" android:textColor="#000"/>
 		<TextView android:id="@+id/row_label_second"
 				android:layout_width="fill_parent"
+				android:visibility="gone"
 				android:layout_height="wrap_content" android:text=""
 				android:layout_weight="1" android:paddingLeft="16dip"  
 				android:layout_gravity="center" android:gravity="left|center_vertical" android:textSize="10sp" android:textColor="#333"/>

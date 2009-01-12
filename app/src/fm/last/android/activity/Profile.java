@@ -65,7 +65,7 @@ import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
 
-public class Profile extends ListActivity implements TabBarListener,NavBarListener
+public class Profile extends ListActivity implements TabBarListener
 {
 
 	private static int TAB_RADIO = 0;
@@ -87,9 +87,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
     private ListAdapter mProfileAdapter;
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
-    private Worker mProfileImageWorker;
-    private RemoteImageHandler mProfileImageHandler;
-    private RemoteImageView mProfileImage;
     private User mUser;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
@@ -119,8 +116,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
     ListView mFriendsList;
     private ListAdapter mFriendsAdapter;
 	
-	public int test = 5;
-	
     @Override
     public void onCreate( Bundle icicle )
     {
@@ -135,14 +130,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
         if( username == null )
             username = session.getName();
         
-        TextView tv = ( TextView ) findViewById( R.id.home_usersname );
-        if(tv != null)
-        	tv.setText( username );
-        
-        NavBar n = ( NavBar ) findViewById( R.id.NavBar );
-        if(n != null)
-        	n.setListener(this);
-
         Button b = new Button(this);
         b.setOnClickListener( mNewStationListener );
         b.setBackgroundResource( R.drawable.list_station_starter_rest );
@@ -157,19 +144,13 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.setListener(this);
-		mTabBar.addTab("Radio", TAB_RADIO);
-		mTabBar.addTab("Profile", TAB_PROFILE);
+		mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
+		mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
 		mTabBar.setActive(TAB_RADIO);
        
-        mProfileImage = ( RemoteImageView ) findViewById( R.id.home_profileimage );
-
-        mProfileImageWorker = new Worker( "profile image worker" );
-        mProfileImageHandler = new RemoteImageHandler( mProfileImageWorker
-                .getLooper(), mHandler );
-
-        SetupProfile( session );
         mMyRecentAdapter = new LastFMStreamAdapter( this );
 
+        new LoadUserTask().execute((Void)null);
         SetupMyStations( session );
         SetupRecentStations();
         RebuildMainMenu();
@@ -197,39 +178,36 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
     }
     
-	public void tabChanged(int index) {
+    private class LoadUserTask extends UserTask<Void, Void, Boolean> {
+        @Override
+    	public void onPreExecute() {
+        }
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+            
+    		try {
+    	        Session session = ( Session ) LastFMApplication.getInstance().map
+                .get( "lastfm_session" );
+				mUser = mServer.getUserInfo( session.getKey() );
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	/* Set the profile image, maybe? */
+        }
+    }
+
+    public void tabChanged(int index) {
 		//Log.i("Lukasz", "Changed tab to "+text+", index="+index);
 	}
 	
-	public void backClicked(View child) {
-		logout();
-	}
-
-	public void middleClicked(View child, int index) {
-		if(index == 1) { //Now Playing button (portrait)
-			mNowPlayingListener.onClick(child);
-		}
-	}
-
-	public void forwardClicked(View child) {
-	}
-
-	
-    @Override
-    public void onStart()
-    {
-        IntentFilter f = new IntentFilter();
-        f.addAction( RadioPlayerService.STATION_CHANGED );
-        registerReceiver( mStatusListener, f );
-        super.onStart();
-    }
-
-    @Override
-    public void onDestroy() {
-    	unregisterReceiver( mStatusListener );
-    	super.onDestroy();
-    }
-    
     private void RebuildMainMenu() 
     {
         mMainAdapter = new SeparatedListAdapter(this);
@@ -243,94 +221,9 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
     public void onResume() {
     	SetupRecentStations();
     	RebuildMainMenu();
-    	try {
-			if(LastFMApplication.getInstance().player.isPlaying()) {
-				if(mProfileImage != null)
-					mProfileImage.setVisibility(View.GONE);
-				findViewById( R.id.now_playing ).setVisibility(View.VISIBLE);
-		        Button b = (Button)findViewById(R.id.now_playing);
-		        b.setOnClickListener( mNowPlayingListener );
-			} else {
-				if(mProfileImage != null)
-					mProfileImage.setVisibility(View.VISIBLE);
-				findViewById( R.id.now_playing ).setVisibility(View.GONE);
-			}
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
 		super.onResume();
     }
     
-    private BroadcastReceiver mStatusListener = new BroadcastReceiver()
-    {
-
-        @Override
-        public void onReceive( Context context, Intent intent )
-        {
-
-            /*String action = intent.getAction();
-            if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
-            {
-            }
-            if ( action.equals( RadioPlayerService.PLAYBACK_FINISHED ) )
-            {
-            	if(mProfileImage != null)
-            		mProfileImage.setVisibility(View.VISIBLE);
-            	findViewById( R.id.now_playing ).setVisibility(View.GONE);
-            }*/
-        }
-    };
-    
-    
-    private void SetupProfile( final Session session )
-    {
-
-        final Handler uiThreadCallback = new Handler();
-        final Runnable runInUIThread = new Runnable()
-        {
-
-            public void run()
-            {
-
-                FinishSetupProfile();
-            }
-        };
-
-        new Thread()
-        {
-
-            @Override
-            public void run()
-            {
-                try {
-                    String username = getIntent().getStringExtra("lastfm.profile.username");
-                    if( username == null )
-                        mUser = mServer.getUserInfo( session.getKey() );
-                    else
-                        mUser = mServer.getAnyUserInfo( username );
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-                uiThreadCallback.post( runInUIThread );
-            }
-        }.start();
-    }
-
-    private void FinishSetupProfile()
-    {
-        if( mUser == null)
-            return; //TODO HANDLE
-    	ImageUrl[] images = mUser.getImages();
-        if ( images.length > 0 )
-        {
-            mProfileImageHandler
-                    .removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-            mProfileImageHandler
-                    .obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE,
-                            images[0].getUrl() ).sendToTarget();
-        }
-    }
-
     private void SetupRecentStations()
     {
         mMyRecentAdapter.resetList();
@@ -435,7 +328,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
     private OnItemClickListener mProfileClickListener = new OnItemClickListener()
     {
 
-        @Override
         public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                 long id) 
         {
@@ -471,7 +363,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
     
     private class LoadTopArtistsTask extends UserTask<Void, Void, Boolean> {
         
-        @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
             
@@ -809,27 +700,6 @@ public class Profile extends ListActivity implements TabBarListener,NavBarListen
             mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
         }
     }
-    
-    private final Handler mHandler = new Handler()
-    {
-
-        public void handleMessage( Message msg )
-        {
-
-            switch ( msg.what )
-            {
-            case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-            	if(mProfileImage != null) {
-                    mProfileImage.setArtwork( ( Bitmap ) msg.obj );
-                    mProfileImage.invalidate();
-            	}
-                break;
-
-            default:
-                break;
-            }
-        }
-    };
     
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);

@@ -39,16 +39,15 @@
 	<!-- TextInput -->
 	<LinearLayout style="@style/NavBar"
 		android:layout_height="46px" android:layout_width="fill_parent"
-		android:gravity="center_vertical">
+		android:gravity="center_vertical" android:background="@drawable/tab_bar_rest">
 		<EditText android:id="@+id/tag_text_edit"
 			android:layout_width="fill_parent" android:layout_height="40px"
 			android:singleLine="true" android:layout_marginTop="2px"
 			android:layout_marginLeft="8px" android:layout_weight="1"
 			android:layout_marginRight="8px" android:hint="@string/tag_hint" android:textSize="12px"></EditText>
 		<Button android:layout_width="wrap_content" android:id="@+id/tag_add_button"
-			android:text="@string/tag" android:gravity="center_vertical"
-			android:padding="8px" android:textColor="#fff" android:layout_height="30px"
-			android:background="#c5c6c8" android:layout_marginRight="8px"></Button>
+			android:text="@string/tag" android:textColor="#fff" android:layout_height="30px"
+			android:layout_marginRight="8px" android:background="@drawable/logout_button" android:gravity="center"></Button>
 	</LinearLayout>
 
 	<!--
