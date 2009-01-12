@@ -743,7 +743,7 @@ public class Player extends Activity
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((similar.length < 10) ? similar.length : 10); i++){
     				ListEntry entry = new ListEntry(similar[i], 
-    						R.drawable.albumart_mp_unknown, 
+    						R.drawable.artist_icon, 
     						similar[i].getName(), 
     						similar[i].getImages()[0].getUrl(),
     						R.drawable.radio_icon);
@@ -790,7 +790,7 @@ public class Player extends Activity
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((fans.length < 10) ? fans.length : 10); i++){
     				ListEntry entry = new ListEntry(fans[i], 
-    						R.drawable.albumart_mp_unknown, 
+    						R.drawable.profile_unknown, 
     						fans[i].getName(), 
     						fans[i].getImages()[0].getUrl(),
     						R.drawable.arrow);
