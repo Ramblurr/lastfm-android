@@ -8,11 +8,11 @@ import android.widget.TextView;
 import android.widget.ListView;
 
 public class OnListRowSelectedListener implements AdapterView.OnItemSelectedListener {
-    private View previousSelectedView;
-    private ListView mListView;
+    protected View previousSelectedView;
+    protected ListView mListView;
     private Drawable mDisclosureDrawable;
-    private int mHighlightResource = R.drawable.list_item_focus_fullwidth;
-    private int mRestResource = R.drawable.list_item_rest_fullwidth;
+    protected int mHighlightResource = R.drawable.list_item_focus_fullwidth;
+    protected int mRestResource = R.drawable.list_item_rest_fullwidth;
     
     public OnListRowSelectedListener(ListView listView) {
     	mListView = listView;

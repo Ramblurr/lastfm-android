@@ -17,6 +17,7 @@ import fm.last.android.Worker;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.ListAdapter;
+import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.Rotate3dAnimation;
@@ -159,6 +160,8 @@ public class Player extends Activity
 		mFanList = (ListView) findViewById(R.id.listeners_list_view);
 		mFanList.setOnItemSelectedListener(new OnListRowSelectedListener(mFanList));
 		mEventList = (ListView) findViewById(R.id.events_list_view);
+		mEventList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventList));
+        ((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
 
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, TAB_BIO);

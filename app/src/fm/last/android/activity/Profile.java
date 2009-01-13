@@ -38,6 +38,7 @@ import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
+import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
@@ -182,7 +183,8 @@ public class Profile extends ListActivity implements TabBarListener
         mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
         mRecentTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mRecentTracksList));
         mEventsList = (ListView) findViewById(R.id.profileevents_list_view);
-        mEventsList.setOnItemSelectedListener(new OnListRowSelectedListener(mEventsList));
+        mEventsList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventsList));
+        ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
     }
