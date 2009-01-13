@@ -17,10 +17,10 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 		
-	<item android:id="@+id/info_menu_item" android:title="View Info" android:icon="@drawable/list_info"/>
-	<item android:id="@+id/share_menu_item" android:title="Share" android:icon="@drawable/list_share"/>
-	<item android:id="@+id/tag_menu_item" android:title="Tag" android:icon="@drawable/list_tag"/>
-	<item android:id="@+id/playlist_menu_item" android:title="Add to Playlist" android:icon="@drawable/list_add_to_playlist"/>
-	<item android:id="@+id/buy_menu_item" android:title="Buy on Amazon" android:icon="@drawable/list_buy"/>
+	<item android:id="@+id/info_menu_item" android:title="View Info" android:icon="@drawable/info"/>
+	<item android:id="@+id/share_menu_item" android:title="Share" android:icon="@drawable/share"/>
+	<item android:id="@+id/tag_menu_item" android:title="Tag" android:icon="@drawable/tag_menu"/>
+	<item android:id="@+id/playlist_menu_item" android:title="Add to Playlist" android:icon="@drawable/playlist"/>
+	<item android:id="@+id/buy_menu_item" android:title="Buy on Amazon" android:icon="@drawable/shopping_cart"/>
 	
 </menu>

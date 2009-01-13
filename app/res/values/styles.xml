@@ -16,17 +16,14 @@
 		<item name="android:textSize">8pt</item>
 	</style>
 	<style name="playback_info">
-		<item name="android:textSize">6pt</item>
+		<item name="android:textSize">5pt</item>
 		<item name="android:textColor">#fff</item>
 		<item name="android:textStyle">bold</item>
 	</style>
 	<style name="playback_time">
-		<item name="android:textSize">6pt</item>
+		<item name="android:textSize">5pt</item>
+		<item name="android:textColor">#fff</item>
 		<item name="android:textStyle">bold</item>
-		<item name="android:shadowColor">#ff000000</item>
-		<item name="android:shadowDx">0</item>
-		<item name="android:shadowDy">0</item>
-		<item name="android:shadowRadius">3</item>
 	</style>
 	<style name="LastFMButton">
 		<item name="android:background">@+drawable/player_controls</item>

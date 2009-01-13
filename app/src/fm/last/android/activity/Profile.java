@@ -478,7 +478,7 @@ public class Profile extends ListActivity implements TabBarListener
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++){
                     ListEntry entry = new ListEntry(topalbums[i], 
-                            R.drawable.albumart_mp_unknown, 
+                            R.drawable.no_artwork, 
                             topalbums[i].getTitle(),  
                             topalbums[i].getImages()[0].getUrl(),
                             topalbums[i].getArtist());
@@ -784,11 +784,11 @@ public class Profile extends ListActivity implements TabBarListener
         iconifiedEntries.add(entry);
         switch (id) {
         case DIALOG_ALBUM: 
-            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.list_tag, getResources().getString(R.string.dialog_tagalbum));
+            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
             iconifiedEntries.add(entry);
             break;
         case DIALOG_TRACK:
-            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.list_tag, getResources().getString(R.string.dialog_tagtrack));
+            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
             iconifiedEntries.add(entry);
             break;
             default:

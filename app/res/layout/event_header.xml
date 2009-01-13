@@ -19,4 +19,4 @@
 	android:gravity="left|center_vertical"
 	android:text="Header" android:textColor="#fff" android:textSize="14sp"
 	android:textStyle="bold" android:singleLine="false"
-	android:layout_height="30px" android:background="@drawable/event_bg" android:paddingLeft="10px"/>
+	android:layout_height="30px" android:background="@drawable/events_list_header" android:paddingLeft="10px"/>

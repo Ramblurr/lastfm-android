@@ -100,7 +100,6 @@ public class Player extends Activity
 	private final static int TAB_LISTENERS = 4;
 
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
-	//Session mSession = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
 
 	private ImageCache mImageCache;
 	private String mBio;
@@ -162,13 +161,11 @@ public class Player extends Activity
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 
 		mTabBar.setViewFlipper(mViewFlipper);
-		//mTabBar.setListener(this);
 		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, TAB_BIO);
 		mTabBar.addTab("Similar", R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
 		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, TAB_TAGS);
 		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, TAB_EVENTS);
 		mTabBar.addTab("Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
-		//mTabBar.setActive("Bio");
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
@@ -194,7 +191,6 @@ public class Player extends Activity
 			new LoadSimilarTask().execute((Void)null);
 			new LoadListenersTask().execute((Void)null);
 			new LoadTagsTask().execute((Void)null);
-			//new LoadEventsTask().execute((Void)null);
     	}
 		mTabBar.setActive(TAB_BIO);
 		mDetailFlipper.showNext();
@@ -466,15 +462,13 @@ public class Player extends Activity
 		}
 		try
 		{
-			/*
-			 * if (LastFMApplication.getInstance().player.getPath() == null) { finish(); return; }
-			 */// TODO if player is done finish()
 			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
 			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
 			String artUrl = LastFMApplication.getInstance().player.getArtUrl();
 			if ( artUrl != RadioPlayerService.UNKNOWN )
 			{
+				artUrl.replace("/174s/", "/300s/");
 				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
 				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
 				.sendToTarget();
@@ -792,7 +786,7 @@ public class Player extends Activity
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
     				ListEntry entry = new ListEntry(tags[i], 
-    						R.drawable.list_tag,
+    						R.drawable.tag_dark,
     						tags[i].getName(), 
     						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);

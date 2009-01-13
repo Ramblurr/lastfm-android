@@ -110,6 +110,7 @@ public class LastFm extends Activity
                     editor.commit();
                     Intent intent = new Intent( LastFm.this, Profile.class );
                     startActivity( intent );
+                    finish();
                 }
                 catch ( WSError e )
                 {
