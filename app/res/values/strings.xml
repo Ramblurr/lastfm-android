@@ -17,6 +17,18 @@
 	<string name="home_mystations">My Stations</string>
 	<string name="home_recentstations">Recent Stations</string>
 	<string name="home_commonartists">Common Artists</string>
+	
+	
+	<string name="dialog_amazon">Buy on Amazon</string>
+	<string name="dialog_similar">Listen to Similar Artists</string>
+	<string name="dialog_tagalbum">Tag Album</string>
+	<string name="dialog_tagartist">Tag Artist</string>
+	<string name="dialog_tagtrack">Tag Track</string>
+	<string name="dialog_share">Share</string>
+	<string name="dialog_addlibrary">Add to Library</string>
+	<string name="dialog_love">Love</string>
+	<string name="dialog_ban">Ban</string>
+	
 
 	<string name="search">Search</string>
 	<string name="newstation_artist">Artist</string>

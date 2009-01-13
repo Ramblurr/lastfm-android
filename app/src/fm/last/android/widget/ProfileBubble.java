@@ -41,12 +41,13 @@ public class ProfileBubble extends LinearLayout {
         LayoutInflater.from(getContext())
         .inflate(R.layout.profile_bubble, this);
         this.setBackgroundResource(R.drawable.profile_bubble_bg);
+        mSecond = (TextView) findViewById(R.id.profile_geo);
+        mSecond.setText("Loading Profile...");
     }
 
     public void setUser(User user) {
         mUser = user;
         mFirst = (TextView) findViewById(R.id.profile_username);
-        mSecond = (TextView) findViewById(R.id.profile_geo);
         mThird = (TextView) findViewById(R.id.profile_plays);
         mAvatar = (RemoteImageView) findViewById(R.id.profile_avatar);
 

@@ -147,8 +147,13 @@ public class Profile extends ListActivity implements TabBarListener
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.setListener(this);
-		mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
-		mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		if(isAuthenticatedUser) {
+		    mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
+		    mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		} else {
+		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
+            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		}
 		mTabBar.setActive(TAB_RADIO);
        
         mMyRecentAdapter = new LastFMStreamAdapter( this );
@@ -752,17 +757,19 @@ public class Profile extends ListActivity implements TabBarListener
         mDialogAdapter = new ListAdapter(Profile.this, getImageCache());
         ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 
-        ListEntry entry = new ListEntry("Browse in Amazon Store", R.drawable.song_icon, "Browse in Amazon Store"); // TODO need amazon icon
+        ListEntry entry = new ListEntry(R.string.dialog_amazon, R.drawable.song_icon, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
         iconifiedEntries.add(entry);
-        entry = new ListEntry("Listen to Similar Artists", R.drawable.radio_icon, "Listen to Similar Artists");
+        entry = new ListEntry(R.string.dialog_similar, R.drawable.radio_icon, getResources().getString(R.string.dialog_similar));
+        iconifiedEntries.add(entry);
+        entry = new ListEntry(R.string.dialog_share, R.drawable.radio_icon, getResources().getString(R.string.dialog_share));
         iconifiedEntries.add(entry);
         switch (id) {
         case DIALOG_ALBUM: 
-            entry = new ListEntry("Tag Album", R.drawable.list_tag, "Tag Album");
+            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.list_tag, getResources().getString(R.string.dialog_tagalbum));
             iconifiedEntries.add(entry);
             break;
         case DIALOG_TRACK:
-            entry = new ListEntry("Tag Track", R.drawable.list_tag, "Tag Track");
+            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.list_tag, getResources().getString(R.string.dialog_tagtrack));
             iconifiedEntries.add(entry);
             break;
             default:
