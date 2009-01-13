@@ -201,4 +201,30 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public void attendEvent(String event, String status, String sk) throws IOException, WSError;
+	
+	/**
+     * See http://www.lastfm.pl/api/show?service=371
+     * 
+     * @param artist (Required) : The artist name you wish to add 
+     * @throws IOException
+     */
+    public void libraryAddArtist(String artist, String sk) throws IOException;
+    
+    /**
+     * See http://www.lastfm.pl/api/show?service=370
+     * 
+     * @param album (Required) : The album name you wish to add 
+     * @throws IOException
+     */
+    public void libraryAddAlbum(String album, String sk) throws IOException;
+    
+    /**
+     * See http://www.lastfm.pl/api/show?service=372
+     * 
+     * @param track (Required) : The track name you wish to add 
+     * @throws IOException
+     */
+    public void libraryAddTrack(String track, String sk) throws IOException;
+	
+	
 }

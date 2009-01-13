@@ -14,6 +14,7 @@ import fm.last.api.*;
  * An implementation of LastFmServer
  *
  * @author Mike Jennings
+ * @author Casey Link
  */
 final class LastFmServerImpl implements LastFmServer {
 	private String api_key;
@@ -349,5 +350,33 @@ final class LastFmServerImpl implements LastFmServer {
             params.put("limit", String.valueOf(limit));
         }
         return UserFunctions.getUserRecentTracks(baseUrl, params);
+    }
+
+    @Override
+    public void libraryAddAlbum(String album, String sk) throws IOException {
+         Map<String, String> params = createParams("library.addAlbum");
+         params.put("album", album);
+         params.put("sk", sk);
+         signParams(params);
+         LibraryFunctions.addAlbum(baseUrl, params);
+    }
+
+    @Override
+    public void libraryAddArtist(String artist, String sk) throws IOException {
+        Map<String, String> params = createParams("library.addArtist");
+        params.put("artist", artist);
+        params.put("sk", sk);
+        signParams(params);
+        LibraryFunctions.addArtist(baseUrl, params);
+        
+    }
+
+    @Override
+    public void libraryAddTrack(String track, String sk) throws IOException {
+        Map<String, String> params = createParams("library.addTrack");
+        params.put("track", track);
+        params.put("sk", sk);
+        signParams(params);
+        LibraryFunctions.addTrack(baseUrl, params);
     }
 }
