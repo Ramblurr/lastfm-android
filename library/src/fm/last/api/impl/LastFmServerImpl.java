@@ -379,4 +379,16 @@ final class LastFmServerImpl implements LastFmServer {
         signParams(params);
         LibraryFunctions.addTrack(baseUrl, params);
     }
+
+    @Override
+    public Tasteometer tasteometerCompare(String user1, String user2, int limit)throws IOException {
+        Map<String, String> params = createParams("tasteometer.compare");
+        params.put("type1", "user");
+        params.put("type2", "user");
+        params.put("value1", user1);
+        params.put("value2", user2);
+        if( limit > 0 )
+            params.put("limit", String.valueOf(limit));
+        return TasteometerFunctions.compare(baseUrl, params);
+    }
 }

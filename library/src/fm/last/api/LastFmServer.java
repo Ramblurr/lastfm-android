@@ -225,6 +225,17 @@ public interface LastFmServer {
      * @throws IOException
      */
     public void libraryAddTrack(String track, String sk) throws IOException;
+    
+    /**
+     * See http://www.lastfm.pl/api/show?service=258
+     * 
+     * @param user1 (Required) : The first user you wish to compare
+     * @param user2 (Required) : The second user you wish to compare
+     * @param limit (Optional) : The limit on the # of results
+     * @return A Tasteometer object 
+     * @throws IOException
+     */
+    public Tasteometer tasteometerCompare(String user1, String user2, int limit) throws IOException;
 	
 	
 }
