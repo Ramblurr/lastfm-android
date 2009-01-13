@@ -16,13 +16,13 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:orientation="vertical"
-	android:layout_height="fill_parent" android:background="@drawable/list_item_rest"
-	android:layout_marginLeft="10px" android:gravity="left|center_vertical">
+	android:layout_height="fill_parent" android:background="#f0efef"
+	android:paddingLeft="10px" android:paddingBottom="5px" android:gravity="left|center_vertical">
 
 	<TextView android:id="@+id/ExtendedRowBiggerText"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical" android:textSize="14sp"
-		android:textColor="#666666" android:singleLine="true" android:textStyle="bold"></TextView>
+		android:textColor="#333333" android:singleLine="true" android:textStyle="bold" android:layout_marginTop="5px"></TextView>
 	<TextView android:id="@+id/ExtendedRowSmallerText0"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical" android:textSize="14sp"
