@@ -255,8 +255,9 @@ public class Profile extends ListActivity implements TabBarListener
     {
         mMainAdapter = new SeparatedListAdapter(this);
         if(isAuthenticatedUser) {
-            mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );        
-            mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+            mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
+            if(mMyRecentAdapter.getCount() > 0)
+            	mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
             if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
             	mMainAdapter.addSection( "Your Playlists", mMyPlaylistsAdapter);
             }
