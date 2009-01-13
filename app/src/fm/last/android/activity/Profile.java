@@ -3,7 +3,9 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Stack;
+import java.util.WeakHashMap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,7 +15,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -245,37 +246,21 @@ public class Profile extends ListActivity implements TabBarListener
     
     private void SetupRecentStations()
     {
+        if(!isAuthenticatedUser)
+            return;
         mMyRecentAdapter.resetList();
-        SQLiteDatabase db = null;
-        try
+        WeakHashMap<String, String> stations = LastFMApplication.getInstance().getRecentStations();
+
+        Iterator kvp = stations.entrySet().iterator();
+        for (int i = 0; i < stations.size(); i++)
         {
-            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-            Cursor c = db.rawQuery( "SELECT * FROM "
-                    + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null );
-            int urlColumn = c.getColumnIndex( "Url" );
-            int nameColumn = c.getColumnIndex( "Name" );
-            if ( c.getCount() > 0 )
-            {
-                c.moveToFirst();
-                int i = 0;
-                // Loop through all Results
-                do
-                {
-                    i++;
-                    String name = c.getString( nameColumn );
-                    String url = c.getString( urlColumn );
-                    mMyRecentAdapter.putStation( name, url );
-                }
-                while ( c.moveToNext() );
-            }
-            c.close();
-            db.close();
-            mMyRecentAdapter.updateModel();
+            WeakHashMap.Entry<String, String> entry = (WeakHashMap.Entry<String, String>) kvp.next();
+            String name = entry.getKey();
+            String url = entry.getValue();
+            mMyRecentAdapter.putStation( name, url );
         }
-        catch ( Exception e )
-        {
-            System.out.println( e.getMessage() );
-        }
+
+        mMyRecentAdapter.updateModel();
 
     }
 

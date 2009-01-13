@@ -1,5 +1,6 @@
 package fm.last.android;
 
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import fm.last.android.activity.Profile;
@@ -20,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -106,6 +108,41 @@ public class LastFMApplication extends Application
 
 		mCtx = ctx;
 		new TuneRadioTask(showPlayer).execute(new String[] {url});
+	}
+	
+	public WeakHashMap<String, String> getRecentStations()
+	{
+	    WeakHashMap<String, String> results = new WeakHashMap<String, String>();
+	    SQLiteDatabase db = null;
+        try
+        {
+            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
+            Cursor c = db.rawQuery( "SELECT * FROM "
+                    + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null );
+            int urlColumn = c.getColumnIndex( "Url" );
+            int nameColumn = c.getColumnIndex( "Name" );
+            if ( c.getCount() > 0 )
+            {
+                c.moveToFirst();
+                int i = 0;
+                // Loop through all Results
+                do
+                {
+                    i++;
+                    String name = c.getString( nameColumn );
+                    String url = c.getString( urlColumn );
+                    results.put(name, url);
+                }
+                while ( c.moveToNext() );
+            }
+            c.close();
+            db.close();
+        }
+        catch ( Exception e )
+        {
+            System.out.println( e.getMessage() );
+        }
+        return results;
 	}
 	
 	private void appendRecentStation( String url, String name )
