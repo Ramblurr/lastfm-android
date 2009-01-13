@@ -391,4 +391,10 @@ final class LastFmServerImpl implements LastFmServer {
             params.put("limit", String.valueOf(limit));
         return TasteometerFunctions.compare(baseUrl, params);
     }
+    
+    public RadioPlayList[] getUserPlaylists(String username) throws IOException {
+        Map<String, String> params = createParams("user.getPlaylists");
+        params.put("user", username);
+        return UserFunctions.getUserPlaylists(baseUrl, params);
+    }
 }

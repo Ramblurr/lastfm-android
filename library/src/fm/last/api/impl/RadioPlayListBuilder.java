@@ -34,13 +34,20 @@ public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
     String creator = getText("creator");
     String date = getText("date");
     String link = getText("link");
+    String id = getText("id");
+    boolean streamable = true;
+    if(getText("streamable") != null && getText("streamable").contentEquals("0"))
+    	streamable = false;
     Node trackListNode = getChildNode("trackList");
-    List<Node> trackNodes = XMLUtil.findNamedElementNodes(trackListNode, "track");
-    RadioTrack[] tracks = new RadioTrack[trackNodes.size()];
-    int i = 0;
-    for (Node trackNode : trackNodes) {
-      tracks[i++] = trackBuilder.build(trackNode);
+    RadioTrack[] tracks = null;
+    if(trackListNode != null) {
+        List<Node> trackNodes = XMLUtil.findNamedElementNodes(trackListNode, "track");
+        tracks = new RadioTrack[trackNodes.size()];
+        int i = 0;
+        for (Node trackNode : trackNodes) {
+          tracks[i++] = trackBuilder.build(trackNode);
+        }
     }
-    return new RadioPlayList(title, creator, date, link, tracks);
+    return new RadioPlayList(title, creator, date, link, tracks, id, streamable);
   }
 }

@@ -237,5 +237,13 @@ public interface LastFmServer {
      */
     public Tasteometer tasteometerCompare(String user1, String user2, int limit) throws IOException;
 	
-	
+    /**
+     * See http://www.lastfm.pl/api/show?service=313
+     * 
+     * @param username (Required) : The user who's playlists you'd like to fetch
+     * @return An array of RadioPlayList objects
+     * @throws IOException
+     */
+    public RadioPlayList[] getUserPlaylists(String username) throws IOException;
+
 }

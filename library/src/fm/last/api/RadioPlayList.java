@@ -144,15 +144,19 @@ public class RadioPlayList implements Serializable {
   private String creator;
   private String date;
   private String link;
+  private String id;
+  private boolean streamable;
   private RadioTrack[] tracks;
 
   public RadioPlayList(String title, String creator, String date, String link,
-                       RadioTrack[] tracks) {
+                       RadioTrack[] tracks, String id, boolean streamable) {
     this.title = title;
     this.creator = creator;
     this.date = date;
     this.link = link;
     this.tracks = tracks;
+    this.id = id;
+    this.streamable = streamable;
   }
 
   public String getTitle() {
@@ -173,5 +177,13 @@ public class RadioPlayList implements Serializable {
 
   public RadioTrack[] getTracks() {
     return tracks;
+  }
+  
+  public String getId() {
+	  return id;
+  }
+  
+  public boolean isStreamable() {
+	  return streamable;
   }
 }

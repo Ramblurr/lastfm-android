@@ -16,6 +16,7 @@ package fm.last.api.impl;
 
 import fm.last.api.Album;
 import fm.last.api.Event;
+import fm.last.api.RadioPlayList;
 import fm.last.api.Tag;
 import fm.last.api.Artist;
 import fm.last.api.Track;
@@ -152,6 +153,41 @@ public class UserFunctions {
 		    	WSErrorBuilder eb = new WSErrorBuilder();
 		    	throw eb.build(params.get("method"), errorNode);
 	    	}
+	    }
+	}
+
+	public static RadioPlayList[] getUserPlaylists(String baseUrl,
+			Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node playlistsNode = XMLUtil.findNamedElementNode(lfmNode, "playlists");
+			
+			List<Node> playlistNodes = XMLUtil.findNamedElementNodes(playlistsNode, "playlist");
+			RadioPlayListBuilder playlistBuilder = new RadioPlayListBuilder();
+			RadioPlayList[] playlists = new RadioPlayList[playlistNodes.size()];
+			int i = 0;
+			for(Node playlistNode : playlistNodes){
+				playlists[i++] = playlistBuilder.build(playlistNode);
+			}
+	
+			return playlists;
 	    }
 	}
 }
