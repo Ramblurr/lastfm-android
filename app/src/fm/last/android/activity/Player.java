@@ -60,6 +60,7 @@ import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebView;
 import android.widget.AdapterView;
@@ -354,14 +355,6 @@ public class Player extends Activity
 				}
 			};
 			t.start();
-		}
-	};
-
-	private View.OnClickListener mBackListener = new View.OnClickListener()
-	{
-		public void onClick( View v )
-		{
-			finish();
 		}
 	};
 	
@@ -871,6 +864,7 @@ public class Player extends Activity
     	
         @Override
     	public void onPreExecute() {
+        	mOntourButton.setAnimation(null);
         	mOntourButton.setVisibility(View.GONE);
         	
    	        String[] strings = new String[]{"Loading..."};
@@ -900,7 +894,9 @@ public class Player extends Activity
         	if(result) {
         		mEventList.setAdapter(mEventAdapter);
         		mEventList.setOnItemClickListener(mEventOnItemClickListener);
-        		mOntourButton.setVisibility(View.VISIBLE);
+        		mOntourButton.setVisibility(View.INVISIBLE);
+        		Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
+        		mOntourButton.startAnimation(a);
         	} else {
         		mEventList.setOnItemClickListener(null);
     	        String[] strings = new String[]{"No Upcoming Events"};
@@ -910,7 +906,7 @@ public class Player extends Activity
         	}
         }
     }
-    private LoadEventsTask mLoadEventsTask;
+    
     private String mLoadEventsTaskArtist = "";
 	
 	private ImageCache getImageCache(){
