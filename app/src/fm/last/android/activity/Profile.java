@@ -677,7 +677,7 @@ public class Profile extends ListActivity implements TabBarListener
                 if(friends.length == 0 )
                     return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-                for(int i=0; i< ((friends.length < 10) ? friends.length : 10); i++){
+                for(int i=0; i < friends.length; i++){
                     ListEntry entry = new ListEntry(friends[i],
                             R.drawable.profile_unknown,
                             friends[i].getName(), 
