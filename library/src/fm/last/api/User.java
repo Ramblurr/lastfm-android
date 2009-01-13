@@ -15,6 +15,7 @@
 package fm.last.api;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author jennings
@@ -31,10 +32,19 @@ public class User implements Serializable {
     this.gender = gender;
     this.playcount = playcount;
   }
+  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String realname, String joindate) {
+      this(name, url, images, country, age, gender, playcount);
+      this.realname = realname;
+      this.joindate = joindate;
+  }
   
   public String getName() {
     return name;
   }
+  
+  public String getRealName() {
+      return realname;
+    }
 
   public String getUrl() {
     return url;
@@ -59,6 +69,11 @@ public class User implements Serializable {
   public ImageUrl[] getImages() {
     return images;
   }
+  
+  public String getJoinDate()
+  {
+      return joindate;
+  }
 
   private String name;
   private String url;
@@ -67,5 +82,7 @@ public class User implements Serializable {
   private String age;
   private String gender;
   private String playcount;
+  private String realname;
+  private String joindate;
 
 }

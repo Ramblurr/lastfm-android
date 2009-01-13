@@ -16,9 +16,14 @@ package fm.last.api.impl;
 
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
+import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
 import org.w3c.dom.Node;
 
+import java.security.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,13 +63,15 @@ public class UserBuilder extends XMLBuilder<User> {
       String age = getText("age");
       String gender = getText("gender");
       String playcount = getText("playcount");
-      List<Node> imageNodes = getChildNodes("icon");
+      String realname = getText("realname");
+      String date = getText("registered");
+      List<Node> imageNodes = getChildNodes("avatar");
       ImageUrl[] images = new ImageUrl[imageNodes.size()];
       int i = 0;
       for (Node imageNode : imageNodes) {
         images[i++] =imageBuilder.build(imageNode);
       }
 
-      return new User(name, url, images, country, age, gender, playcount);
+      return new User(name, url, images, country, age, gender, playcount, realname, date);
     }
 }
