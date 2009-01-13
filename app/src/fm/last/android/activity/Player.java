@@ -23,6 +23,7 @@ import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.Rotate3dAnimation;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
+import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
@@ -468,14 +469,7 @@ public class Player extends Activity
 			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
 			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
-			String artUrl = LastFMApplication.getInstance().player.getArtUrl();
-			if ( artUrl != RadioPlayerService.UNKNOWN )
-			{
-				artUrl.replace("/174s/", "/300s/");
-				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
-				.sendToTarget();
-			}
+			new LoadAlbumArtTask().execute((Void)null);
 			
 			// fetching artist events (On Tour indicator & Events tab)
 			if(!mLoadEventsTaskArtist.equals(artistName)){
@@ -608,10 +602,55 @@ public class Player extends Activity
 		return sFormatter.format( durationformat, timeArgs ).toString();
 	}
 
+    private class LoadAlbumArtTask extends UserTask<Void, Void, Boolean> {
+    	String artUrl;
+    	
+        @Override
+    	public void onPreExecute() {
+        }
+    	
+	    @Override
+	    public Boolean doInBackground(Void...params) {
+	    	Album album;
+	        boolean success = false;
+	        
+			try {
+				artUrl = LastFMApplication.getInstance().player.getArtUrl();
+				String artistName = LastFMApplication.getInstance().player.getArtistName();
+				String albumName = LastFMApplication.getInstance().player.getAlbumName();
+				if(albumName != null && albumName.length() > 0) {
+					album = mServer.getAlbumInfo(artistName, albumName);
+					if(album != null) {
+						for(ImageUrl image : album.getImages()) {
+							if(image.getSize().contentEquals("extralarge")) {
+								artUrl = image.getUrl();
+								break;
+							}
+						}
+					}
+				}
+				success = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        return success;
+	    }
+	    
+	    @Override
+	    public void onPostExecute(Boolean result) {
+			if ( artUrl != RadioPlayerService.UNKNOWN )
+			{
+				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
+				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
+				.sendToTarget();
+			}
+	    }
+    }
+	
     private class LoadBioTask extends UserTask<Void, Void, Boolean> {
         @Override
     	public void onPreExecute() {
-   			mWebView.loadData("Loading...", "text/html", "utf-8");
+  			mWebView.loadData("Loading...", "text/html", "utf-8");
         }
     	
         @Override
