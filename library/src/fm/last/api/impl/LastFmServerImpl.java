@@ -397,4 +397,13 @@ final class LastFmServerImpl implements LastFmServer {
         params.put("user", username);
         return UserFunctions.getUserPlaylists(baseUrl, params);
     }
+    
+    public Album getAlbumInfo(String artist, String album) throws IOException {
+        Map<String, String> params = createParams("album.getInfo");
+        if(artist != null)
+        	params.put("artist", artist);
+        if(album != null)
+        	params.put("album", album);
+        return AlbumFunctions.getAlbumInfo(baseUrl, params);
+    }
 }

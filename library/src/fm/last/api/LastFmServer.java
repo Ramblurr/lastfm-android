@@ -246,4 +246,14 @@ public interface LastFmServer {
      */
     public RadioPlayList[] getUserPlaylists(String username) throws IOException;
 
+    /**
+     * See http://www.lastfm.pl/api/show?service=290
+     * 
+     * @param artist (Optional) : The artist name in question
+     * @param album (Optional) : The album name in question
+     * @return An Album object
+     * @throws IOException
+     */
+    public Album getAlbumInfo(String artist, String album) throws IOException;
+
 }

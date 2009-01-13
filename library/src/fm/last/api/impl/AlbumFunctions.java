@@ -14,6 +14,7 @@ package fm.last.api.impl;
 
 import fm.last.api.Album;
 import fm.last.api.Event;
+import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
@@ -32,6 +33,31 @@ import org.xml.sax.SAXException;
 *         Date: Jan 9, 2009
 */
 public class AlbumFunctions {
+	public static Album getAlbumInfo(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node albumNode = XMLUtil.findNamedElementNode(lfmNode, "album");
+			AlbumBuilder builder = new AlbumBuilder();
+			return builder.build(albumNode);
+	    }
+	}
 
     public static Album[] getTopAlbums(String baseUrl, Map<String, String> params) throws IOException, WSError {
         String response = UrlUtil.doGet(baseUrl, params);
