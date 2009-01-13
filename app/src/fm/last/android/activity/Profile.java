@@ -52,6 +52,7 @@ import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
+import fm.last.android.widget.ProfileBubble;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
 import fm.last.api.Album;
@@ -86,12 +87,14 @@ public class Profile extends ListActivity implements TabBarListener
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
     private User mUser;
+    private boolean isAuthenticatedUser;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
 	TabBar mTabBar;
 	ViewFlipper mViewFlipper;
 	ViewFlipper mNestedViewFlipper;
 	ListView mProfileList;
+	ProfileBubble mProfileBubble;
     private Stack<Integer> mViewHistory;
 	
 	View previousSelectedView = null;
@@ -123,18 +126,29 @@ public class Profile extends ListActivity implements TabBarListener
         setContentView( R.layout.home );
         Session session = ( Session ) LastFMApplication.getInstance().map
                 .get( "lastfm_session" );
-        
+        if( session == null )
+            logout();
         String username = getIntent().getStringExtra("lastfm.profile.username");
-        if( username == null )
+        if( username == null ) {
             username = session.getName();
+            isAuthenticatedUser = true;
+        } 
+        else 
+            isAuthenticatedUser = false;
         
-        Button b = new Button(this);
-        b.setOnClickListener( mNewStationListener );
-        b.setBackgroundResource( R.drawable.list_station_starter_rest );
-        b.setText(R.string.home_newstation);
-        b.setTextColor(0xffffffff);
-		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
-        getListView().addHeaderView(b);
+        
+        if( isAuthenticatedUser ) {
+            Button b = new Button(this);
+            b.setOnClickListener( mNewStationListener );
+            b.setBackgroundResource( R.drawable.list_station_starter_rest );
+            b.setText(R.string.home_newstation);
+            b.setTextColor(0xffffffff);
+    		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+            getListView().addHeaderView(b);
+        } else {
+            mProfileBubble = new ProfileBubble(this);
+            getListView().addHeaderView(mProfileBubble);
+        }
         
         mViewHistory = new Stack<Integer>();
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
@@ -186,9 +200,15 @@ public class Profile extends ListActivity implements TabBarListener
             boolean success = false;
             
     		try {
-    	        Session session = ( Session ) LastFMApplication.getInstance().map
-                .get( "lastfm_session" );
-				mUser = mServer.getUserInfo( session.getKey() );
+    		    String username = getIntent().getStringExtra("lastfm.profile.username");
+    		    if( username == null) {
+        	        Session session = ( Session ) LastFMApplication.getInstance().map
+                    .get( "lastfm_session" );
+    				mUser = mServer.getUserInfo( session.getKey() );
+    		    } else {
+    		        mUser = mServer.getAnyUserInfo( username );
+    		        
+    		    }
     			success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
@@ -198,7 +218,8 @@ public class Profile extends ListActivity implements TabBarListener
 
         @Override
         public void onPostExecute(Boolean result) {
-        	/* Set the profile image, maybe? */
+            if( !isAuthenticatedUser )
+                Profile.this.mProfileBubble.setUser(Profile.this.mUser);
         }
     }
 
