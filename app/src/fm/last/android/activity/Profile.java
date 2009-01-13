@@ -10,18 +10,11 @@ import java.util.WeakHashMap;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.RemoteException;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -32,7 +25,6 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
@@ -42,15 +34,11 @@ import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
-import fm.last.android.RemoteImageHandler;
-import fm.last.android.RemoteImageView;
-import fm.last.android.Worker;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.SeparatedListAdapter;
-import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
@@ -61,6 +49,7 @@ import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
@@ -88,6 +77,7 @@ public class Profile extends ListActivity implements TabBarListener
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
     private User mUser;
+    private String mUsername; // store this separate so we have access to it before User obj is retrieved
     private boolean isAuthenticatedUser;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
@@ -129,9 +119,9 @@ public class Profile extends ListActivity implements TabBarListener
                 .get( "lastfm_session" );
         if( session == null )
             logout();
-        String username = getIntent().getStringExtra("lastfm.profile.username");
-        if( username == null ) {
-            username = session.getName();
+        mUsername = getIntent().getStringExtra("lastfm.profile.username");
+        if( mUsername == null ) {
+            mUsername = session.getName();
             isAuthenticatedUser = true;
         } 
         else 
@@ -192,6 +182,7 @@ public class Profile extends ListActivity implements TabBarListener
     }
     
     private class LoadUserTask extends UserTask<Void, Void, Boolean> {
+        Tasteometer tasteometer;
         @Override
     	public void onPreExecute() {
         }
@@ -199,15 +190,15 @@ public class Profile extends ListActivity implements TabBarListener
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
-            
+            Session session = ( Session ) LastFMApplication.getInstance().map
+            .get( "lastfm_session" );
     		try {
-    		    String username = getIntent().getStringExtra("lastfm.profile.username");
-    		    if( username == null) {
-        	        Session session = ( Session ) LastFMApplication.getInstance().map
-                    .get( "lastfm_session" );
+    		    if( mUsername == null) {
+        	        
     				mUser = mServer.getUserInfo( session.getKey() );
     		    } else {
-    		        mUser = mServer.getAnyUserInfo( username );
+    		        mUser = mServer.getAnyUserInfo( mUsername );
+    		        tasteometer = mServer.tasteometerCompare(mUsername, session.getName(), 8);
     		        
     		    }
     			success = true;
@@ -219,9 +210,24 @@ public class Profile extends ListActivity implements TabBarListener
 
         @Override
         public void onPostExecute(Boolean result) {
-            if( !isAuthenticatedUser )
-                Profile.this.mProfileBubble.setUser(Profile.this.mUser);
+            if( !isAuthenticatedUser ) {
+                mProfileBubble.setUser(Profile.this.mUser);
+                SetupCommonArtists(tasteometer);
+            }
         }
+    }
+    
+    void SetupCommonArtists(Tasteometer ts)
+    {
+        mMyRecentAdapter.resetList();
+
+        for (String name : ts.getResults())
+        {
+            String url = "lastfm://artist/"+Uri.encode(name)+"/similarartists";
+            mMyRecentAdapter.putStation( name, url );
+        }
+
+        mMyRecentAdapter.updateModel();
     }
 
     public void tabChanged(int index) {
@@ -231,8 +237,13 @@ public class Profile extends ListActivity implements TabBarListener
     private void RebuildMainMenu() 
     {
         mMainAdapter = new SeparatedListAdapter(this);
-        mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
-        mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+        if(isAuthenticatedUser) {
+            mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );        
+            mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+        } else {
+            mMainAdapter.addSection( mUsername + "'s Stations", mMyStationsAdapter );        
+            mMainAdapter.addSection( getString(R.string.home_commonartists), mMyRecentAdapter );
+        }
         setListAdapter( mMainAdapter );
         mMainAdapter.notifyDataSetChanged();
     }
@@ -244,6 +255,7 @@ public class Profile extends ListActivity implements TabBarListener
 		super.onResume();
     }
     
+    @SuppressWarnings("unchecked")
     private void SetupRecentStations()
     {
         if(!isAuthenticatedUser)
@@ -268,13 +280,13 @@ public class Profile extends ListActivity implements TabBarListener
     {
         mMyStationsAdapter = new LastFMStreamAdapter( this );
         mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
-        		"lastfm://user/" + Uri.encode( session.getName() ) + "/personal" );
+        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
         mMyStationsAdapter.putStation( getString(R.string.home_myloved), 
-        		"lastfm://user/" + Uri.encode( session.getName() ) + "/loved" );
+        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
         mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
-        		"lastfm://user/" + Uri.encode( session.getName() ) + "/recommended" );
+        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
         mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
-        		"lastfm://user/" + Uri.encode( session.getName() ) + "/neighbours" );
+        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         mMyStationsAdapter.updateModel();
     }
 
@@ -686,6 +698,7 @@ public class Profile extends ListActivity implements TabBarListener
 
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
+                    mFriendsAdapter.enableLoadBar(position);
                     User user = (User) mFriendsAdapter.getItem(position);
                     Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
                     profileIntent.putExtra("lastfm.profile.username", user.getName());

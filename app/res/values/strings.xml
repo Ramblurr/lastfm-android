@@ -11,11 +11,12 @@
 	<string name="home_tracksplayed">plays</string>
 	<string name="home_newstation">Start a New Station</string>
 	<string name="home_myrecs">Recommended by Last.fm</string>
-	<string name="home_myneighborhood">Your Neighbourhood</string>
-	<string name="home_myloved">Your Loved Tracks</string>
-	<string name="home_mylibrary">Your Library</string>
-	<string name="home_mystations">Your Stations</string>
+	<string name="home_myneighborhood">My Neighborhood</string>
+	<string name="home_myloved">My Loved Tracks</string>
+	<string name="home_mylibrary">My Library</string>
+	<string name="home_mystations">My Stations</string>
 	<string name="home_recentstations">Recent Stations</string>
+	<string name="home_commonartists">Common Artists</string>
 
 	<string name="search">Search</string>
 	<string name="newstation_artist">Artist</string>
