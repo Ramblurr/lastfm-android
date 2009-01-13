@@ -41,8 +41,6 @@ public class AuthFunctions {
   public static Session getMobileSession(String baseUrl, Map<String, String> params) throws IOException, WSError {
     String response = UrlUtil.doGet(baseUrl, params);
 
-    System.out.print(response);
-    
     Document responseXML = null;
     try {
       responseXML = XMLUtil.stringToDocument(response);
