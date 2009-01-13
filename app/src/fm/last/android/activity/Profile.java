@@ -48,6 +48,7 @@ import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.LastFmServer;
+import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
 import fm.last.api.Tasteometer;
 import fm.last.api.Track;
@@ -76,6 +77,7 @@ public class Profile extends ListActivity implements TabBarListener
     private ListAdapter mProfileAdapter;
     private LastFMStreamAdapter mMyStationsAdapter;
     private LastFMStreamAdapter mMyRecentAdapter;
+    private LastFMStreamAdapter mMyPlaylistsAdapter;
     private User mUser;
     private String mUsername; // store this separate so we have access to it before User obj is retrieved
     private boolean isAuthenticatedUser;
@@ -190,21 +192,30 @@ public class Profile extends ListActivity implements TabBarListener
         Tasteometer tasteometer;
         @Override
     	public void onPreExecute() {
+        	mMyPlaylistsAdapter = null;
         }
     	
         @Override
         public Boolean doInBackground(Void...params) {
+        	RadioPlayList[] playlists;
             boolean success = false;
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
     		try {
     		    if( mUsername == null) {
-        	        
     				mUser = mServer.getUserInfo( session.getKey() );
+    				playlists = mServer.getUserPlaylists( session.getName() );
     		    } else {
     		        mUser = mServer.getAnyUserInfo( mUsername );
     		        tasteometer = mServer.tasteometerCompare(mUsername, session.getName(), 8);
-    		        
+    		        playlists = mServer.getUserPlaylists( mUsername );
+    		    }
+    		    if(playlists.length > 0) {
+    		    	mMyPlaylistsAdapter = new LastFMStreamAdapter(Profile.this);
+    		    	for(RadioPlayList playlist : playlists) {
+    		    		if(playlist.isStreamable())
+    		    			mMyPlaylistsAdapter.putStation(playlist.getTitle(), "lastfm://playlist/" + playlist.getId() + "/shuffle");
+    		    	}
     		    }
     			success = true;
     		} catch (IOException e) {
@@ -219,6 +230,7 @@ public class Profile extends ListActivity implements TabBarListener
                 mProfileBubble.setUser(Profile.this.mUser);
                 SetupCommonArtists(tasteometer);
             }
+            RebuildMainMenu();
         }
     }
     
@@ -245,9 +257,15 @@ public class Profile extends ListActivity implements TabBarListener
         if(isAuthenticatedUser) {
             mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );        
             mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+            if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
+            	mMainAdapter.addSection( "Your Playlists", mMyPlaylistsAdapter);
+            }
         } else {
             mMainAdapter.addSection( mUsername + "'s Stations", mMyStationsAdapter );        
             mMainAdapter.addSection( getString(R.string.home_commonartists), mMyRecentAdapter );
+            if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
+            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
+            }
         }
         setListAdapter( mMainAdapter );
         mMainAdapter.notifyDataSetChanged();
