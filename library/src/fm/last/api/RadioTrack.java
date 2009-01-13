@@ -48,9 +48,10 @@ public class RadioTrack implements Serializable {
   private String creator;
   private String duration;
   private String imageUrl;
+  private String trackAuth;
 
   public RadioTrack(String locationUrl, String title, String identifier,
-                    String album, String creator, String duration, String imageUrl) {
+                    String album, String creator, String duration, String imageUrl, String trackAuth) {
     this.locationUrl = locationUrl;
     this.title = title;
     this.identifier = identifier;
@@ -58,6 +59,7 @@ public class RadioTrack implements Serializable {
     this.creator = creator;
     this.duration = duration;
     this.imageUrl = imageUrl;
+    this.trackAuth = trackAuth;
   }
   
   public String getLocationUrl() {
@@ -88,4 +90,7 @@ public class RadioTrack implements Serializable {
     return imageUrl;
   }
 
+  public String getTrackAuth() {
+	  return trackAuth;
+  }
 }

@@ -34,6 +34,7 @@ public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
     String creator = getText("creator");
     String duration = getText("duration");
     String image = getText("image");
-    return new RadioTrack(location, title, identifier, album, creator, duration, image);
+    String auth = getText("trackauth");
+    return new RadioTrack(location, title, identifier, album, creator, duration, image, auth);
   }
 }
