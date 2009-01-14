@@ -521,6 +521,7 @@ public class Player extends Activity
 				mProgress.setProgress( 0 );
 				if(mProgressDialog == null) {
 					mProgressDialog = ProgressDialog.show(this, "", "Buffering", true, false);
+					mProgressDialog.setCancelable(true);
 				}
 			}
 			// return the number of milliseconds until the next full second, so
