@@ -25,6 +25,8 @@ interface IRadioPlayer {
 	boolean isPlaying();
 	String getStationName();
 	String getStationUrl();
+	Bitmap getAlbumArt();
+	void setAlbumArt(in Bitmap art);
 	
 	WSError getError();
 } 

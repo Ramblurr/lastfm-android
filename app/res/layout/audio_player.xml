@@ -62,7 +62,7 @@
 
 					<TextView android:id="@+id/track_artist" style="@style/playback_info"
 						android:layout_height="wrap_content" android:layout_width="fill_parent"
-						android:layout_gravity="center" android:gravity="center" android:text="Artist" android:maxWidth="300dip"/>
+						android:layout_gravity="center" android:gravity="center" android:maxWidth="300dip"/>
 				</TableRow>
 
 				<TableRow android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
 
 					<TextView android:id="@+id/track_title" style="@style/playback_info"
 						android:layout_height="wrap_content" android:layout_width="fill_parent"
-						android:layout_gravity="center" android:gravity="center" android:text="Track Title" android:maxWidth="300dip"/>
+						android:layout_gravity="center" android:gravity="center" android:maxWidth="300dip"/>
 				</TableRow>
 
 				<TableRow android:layout_width="fill_parent"

@@ -207,10 +207,14 @@ public class Player extends Activity
 			showMetadata();
 			break;
 		case R.id.buy_menu_item:
-            Intent intent = new Intent( Intent.ACTION_SEARCH );
-            intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
-            intent.putExtra(SearchManager.QUERY, "test");
-            startActivity( intent );
+			try {
+	            Intent intent = new Intent( Intent.ACTION_SEARCH );
+	            intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
+	            intent.putExtra(SearchManager.QUERY, LastFMApplication.getInstance().player.getAlbumName());
+	            startActivity( intent );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
             break;
 		case R.id.tag_menu_item:
 			fireTagActivity();
@@ -251,7 +255,6 @@ public class Player extends Activity
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		updateTrackInfo();
 		long next = refreshNow();
 		queueNextRefresh( next );
 	}
@@ -285,8 +288,19 @@ public class Player extends Activity
 	public void onResume()
 	{
 		registerReceiver( mStatusListener, mIntentFilter );
+		try {
+			mDuration = LastFMApplication.getInstance().player.getDuration();
+			long pos = LastFMApplication.getInstance().player.getPosition();
+			long remaining = 1000 - ( pos % 1000 );
+			if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
+			{
+				updateTrackInfo();
+			}
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		super.onResume();
-		updateTrackInfo();
 	}
 
 	@Override
@@ -469,7 +483,13 @@ public class Player extends Activity
 			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
 			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
-			new LoadAlbumArtTask().execute((Void)null);
+			Bitmap art = LastFMApplication.getInstance().player.getAlbumArt();
+			if(art != null) {
+				mAlbum.setArtwork(art);
+				mAlbum.invalidate();
+			} else {
+				new LoadAlbumArtTask().execute((Void)null);
+			}
 			
 			// fetching artist events (On Tour indicator & Events tab)
 			if(!mLoadEventsTaskArtist.equals(artistName)){
@@ -545,6 +565,12 @@ public class Player extends Activity
 			case RemoteImageHandler.REMOTE_IMAGE_DECODED:
 				mAlbum.setArtwork( ( Bitmap ) msg.obj );
 				mAlbum.invalidate();
+				try {
+						LastFMApplication.getInstance().player.setAlbumArt((Bitmap)msg.obj);
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				break;
 
 			case REFRESH:

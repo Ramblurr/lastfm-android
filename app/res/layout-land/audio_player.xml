@@ -66,7 +66,7 @@
 					<TextView android:id="@+id/track_title"
 						style="@style/playback_info"
 						android:layout_height="wrap_content"
-						android:gravity="center" android:layout_gravity="left" android:textStyle="bold" android:textSize="8pt" android:maxWidth="240dip" android:text="Title"/>
+						android:gravity="center" android:layout_gravity="left" android:textStyle="bold" android:textSize="8pt" android:maxWidth="240dip"/>
 				</TableRow>
 				
 				<TableRow 
@@ -78,7 +78,7 @@
 						style="@style/playback_info"
 						android:layout_height="wrap_content"
 						android:layout_width="fill_parent"
-						android:gravity="center" android:text="Artist" android:layout_gravity="left" android:textStyle="bold" android:textSize="8pt" android:maxWidth="240dip"/>
+						android:gravity="center" android:layout_gravity="left" android:textStyle="bold" android:textSize="8pt" android:maxWidth="240dip"/>
 				</TableRow>
 				
 				<TableRow 
@@ -93,7 +93,7 @@
 						<TextView android:id="@+id/currenttime"
 							style="@style/playback_time"
 							android:layout_height="wrap_content"
-							android:text="00:00" android:gravity="left" android:textStyle="bold" android:layout_gravity="bottom" android:layout_width="wrap_content"/>
+							android:gravity="left" android:textStyle="bold" android:layout_gravity="bottom" android:layout_width="wrap_content" android:text="--:--"/>
 							
 						<ProgressBar android:id="@android:id/progress"
 							android:background="#000"
@@ -110,7 +110,7 @@
 							style="@style/playback_time"
 							android:layout_gravity="bottom"
 							android:layout_height="wrap_content"
-							android:text="00:00" android:textStyle="bold" android:gravity="right" android:layout_width="wrap_content"/>
+							android:textStyle="bold" android:gravity="right" android:layout_width="wrap_content" android:text="--:--"/>
 			
 					</LinearLayout>
 				</TableRow>

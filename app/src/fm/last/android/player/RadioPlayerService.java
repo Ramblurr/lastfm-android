@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.IBinder;
@@ -68,6 +69,8 @@ public class RadioPlayerService extends Service
     public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
     public static final String UNKNOWN = "fm.last.android.unknown";
 
+    private Bitmap mAlbumArt;
+    
     @Override
     public void onCreate()
     {
@@ -123,6 +126,7 @@ public class RadioPlayerService extends Service
         try
         {
             currentTrack = track;
+            mAlbumArt = null;
             System.out.printf("Streaming: %s\n", track.getLocationUrl());
             mp.reset();
             mp.setDataSource( track.getLocationUrl() );
@@ -146,12 +150,17 @@ public class RadioPlayerService extends Service
                 }
             } );
 
-            mp.prepare();
-            mp.start();
+            mp.setOnPreparedListener(new OnPreparedListener() {
+
+				public void onPrepared(MediaPlayer mp) {
+		            mp.start();
+				}
+            });
             currentStartTime = System.currentTimeMillis() / 1000;
             mPlaying = true;
             mDeferredStopHandler.cancelStopSelf();
             playingNotify();
+            mp.prepareAsync();
         }
         catch ( IOException e )
         {
@@ -479,7 +488,13 @@ public class RadioPlayerService extends Service
 			mError = null;
 			return error;
 		}
-
+		public Bitmap getAlbumArt() throws RemoteException {
+			return mAlbumArt;
+		}
+		
+		public void setAlbumArt(Bitmap art) throws RemoteException {
+			mAlbumArt = art;
+		}
     };
 
     @Override
