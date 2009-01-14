@@ -65,6 +65,8 @@ public class LastFm extends Activity
         mUserField = ( EditText ) findViewById( R.id.username );
         mLoginButton = ( Button ) findViewById( R.id.sign_in_button );
         mSignupButton = ( Button ) findViewById( R.id.sign_up_button );
+        mUserField.setNextFocusDownId( R.id.password );
+        
         mPassField.setOnKeyListener( new View.OnKeyListener()
         {
 
