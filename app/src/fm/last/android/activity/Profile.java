@@ -10,6 +10,8 @@ import java.util.WeakHashMap;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -821,21 +823,47 @@ public class Profile extends ListActivity implements TabBarListener
             {
                switch (position)
                {
-                   case 0: // Amazon
-                       break;
-                   case 1: // Similar
+                   case 0: // Similar
                        mDialogAdapter.enableLoadBar(position);
                        playSimilar(dialogId);
                        break;
-                   case 2: // Share
-                   case 3: // Tag
-                       tagItem(dialogId);
+                   case 1: // Share
+                   case 2: // Tag or amazon
+                       mDialogAdapter.enableLoadBar(position);
+                       if( dialogId == DIALOG_TRACK)
+                           tagItem(dialogId);
+                       else 
+                           buyAmazon(dialogId);
                        break;
                }
                
             }
             });
         return new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+    }
+    
+    void buyAmazon(int type)
+    {
+        String query = null;
+        if (type == DIALOG_ALBUM)
+        {
+            query = mAlbumInfo.getTitle();
+                        
+        } 
+        else if( type == DIALOG_TRACK) 
+        {
+            query = mTrackInfo.getName();
+        }
+        if( query != null ) {
+            try {
+                Intent intent = new Intent( Intent.ACTION_SEARCH );
+                intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
+                intent.putExtra(SearchManager.QUERY, query);
+                startActivity( intent );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     void tagItem(int type)
@@ -884,20 +912,20 @@ public class Profile extends ListActivity implements TabBarListener
     
     ArrayList<ListEntry> prepareProfileActions(int type)
     {
-        ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-
-        ListEntry entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
-        iconifiedEntries.add(entry);
+        ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>(); 
         
-        entry = new ListEntry(R.string.dialog_similar, R.drawable.radio, getResources().getString(R.string.dialog_similar));
+        ListEntry entry = new ListEntry(R.string.dialog_similar, R.drawable.radio, getResources().getString(R.string.dialog_similar));
         iconifiedEntries.add(entry);
         
         entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
         iconifiedEntries.add(entry);
         
         if( type == DIALOG_ALBUM) {
-            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
+            entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
             iconifiedEntries.add(entry);
+            
+//            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
+//            iconifiedEntries.add(entry);
         }
         if( type == DIALOG_TRACK) {
             entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
