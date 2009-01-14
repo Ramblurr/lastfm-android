@@ -110,6 +110,9 @@ public class Profile extends ListActivity implements TabBarListener
     private EventListAdapter mEventsAdapter;
     ListView mFriendsList;
     private ListAdapter mFriendsAdapter;
+    
+    private Track mTrackInfo; // For the profile actions' dialog
+    private Album mAlbumInfo; // Ditto
 	
     @Override
     public void onCreate( Bundle icicle )
@@ -466,8 +469,8 @@ public class Profile extends ListActivity implements TabBarListener
 
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
-//                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
-                    showDialog(DIALOG_ALBUM);
+                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
+                    showAlbumDialog(album);
                 }
                 
             });
@@ -520,7 +523,7 @@ public class Profile extends ListActivity implements TabBarListener
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
                     Track track = (Track) mTopTracksAdapter.getItem(position);
-                    showDialog(DIALOG_TRACK);
+                    showTrackDialog(track);
                 }
 
             });
@@ -572,8 +575,8 @@ public class Profile extends ListActivity implements TabBarListener
 
                 public void onItemClick(AdapterView<?> l, View v,
                         int position, long id) {
-//                    Track track = (Track) mRecentTracksAdapter.getItem(position);
-                    showDialog(DIALOG_TRACK);
+                    Track track = (Track) mRecentTracksAdapter.getItem(position);
+                    showTrackDialog(track);
                 }
 
             });
@@ -769,33 +772,26 @@ public class Profile extends ListActivity implements TabBarListener
         return false;
     }
     
+    private void showTrackDialog(Track track)
+    {
+        mTrackInfo = track;
+        showDialog(DIALOG_TRACK);
+    }
+    private void showAlbumDialog(Album album)
+    {
+        mAlbumInfo = album;
+        showDialog(DIALOG_ALBUM);
+    }
+    
     protected Dialog onCreateDialog(int id) 
     {
         final int dialogId = id;
         if( mDialogList == null )
             mDialogList = new ListView(Profile.this);
         mDialogAdapter = new ListAdapter(Profile.this, getImageCache());
-        ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 
-        ListEntry entry = new ListEntry(R.string.dialog_amazon, R.drawable.song_icon, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
-        iconifiedEntries.add(entry);
-        entry = new ListEntry(R.string.dialog_similar, R.drawable.radio_icon, getResources().getString(R.string.dialog_similar));
-        iconifiedEntries.add(entry);
-        entry = new ListEntry(R.string.dialog_share, R.drawable.radio_icon, getResources().getString(R.string.dialog_share));
-        iconifiedEntries.add(entry);
-        switch (id) {
-        case DIALOG_ALBUM: 
-            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
-            iconifiedEntries.add(entry);
-            break;
-        case DIALOG_TRACK:
-            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
-            iconifiedEntries.add(entry);
-            break;
-            default:
-                break;
-        }
-        mDialogAdapter.setSourceIconified(iconifiedEntries);
+        ArrayList<ListEntry> entries = prepareProfileActions(id);
+        mDialogAdapter.setSourceIconified(entries);
         mDialogList.setAdapter(mDialogAdapter);
         mDialogList.setOnScrollListener(mDialogAdapter.getOnScrollListener());
         mDialogList.setOnItemClickListener(new OnItemClickListener() {
@@ -805,16 +801,61 @@ public class Profile extends ListActivity implements TabBarListener
                {
                    case 0: // Amazon
                        break;
-                   case 1: // Play
-                       
+                   case 1: // Similar
+                       mDialogAdapter.enableLoadBar(position);
+                       playSimilar(dialogId);
                        break;
-                   case 2: // Tag
+                   case 2: // Share
+                   case 3: // Tag
                        break;
                }
-               dismissDialog(dialogId);
+               
             }
             });
         return new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+    }
+    
+    void playSimilar(int type)
+    {
+        String artist = null;
+        if (type == DIALOG_ALBUM)
+        {
+            artist = mAlbumInfo.getArtist();
+                        
+        } 
+        else if( type == DIALOG_TRACK) 
+        {
+            artist = mTrackInfo.getArtist().getName();
+        }
+        
+        if( artist != null)
+            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist)+"/similarartists");
+//        dismissDialog(type);
+        
+    }
+    
+    ArrayList<ListEntry> prepareProfileActions(int type)
+    {
+        ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+
+        ListEntry entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
+        iconifiedEntries.add(entry);
+        
+        entry = new ListEntry(R.string.dialog_similar, R.drawable.radio, getResources().getString(R.string.dialog_similar));
+        iconifiedEntries.add(entry);
+        
+        entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
+        iconifiedEntries.add(entry);
+        
+        if( type == DIALOG_ALBUM) {
+            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
+            iconifiedEntries.add(entry);
+        }
+        if( type == DIALOG_TRACK) {
+            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
+            iconifiedEntries.add(entry);
+        }
+        return iconifiedEntries;        
     }
     
     private void logout()
