@@ -4,8 +4,8 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class OnListRowSelectedListener implements AdapterView.OnItemSelectedListener {
     protected View previousSelectedView;
@@ -21,9 +21,13 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 	    	public void onFocusChange(View v, boolean hasFocus) {
 	    		if(v == mListView) {
 	    			if(hasFocus)
+	    			{
 	    				mListView.getOnItemSelectedListener().onItemSelected(mListView, mListView.getSelectedView(), mListView.getSelectedItemPosition(), mListView.getSelectedItemId());
+	    			}
 	    			else
+	    			{
 	    				mListView.getOnItemSelectedListener().onNothingSelected(null);
+	    			}
 	    		}
 	    	}
     	});
@@ -43,7 +47,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			((ImageView)previousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageDrawable(mDisclosureDrawable);
 			((TextView)previousSelectedView.findViewById(R.id.row_label)).setTextColor(0xFF000000);
 		}
-		if(position >= 0 && mListView.isFocused() && mListView.getAdapter().isEnabled(position) && view != null && view.findViewById(R.id.row_disclosure_icon) != null) {
+		if(position >= 0 && mListView.getAdapter().isEnabled(position) && view != null && view.findViewById(R.id.row_disclosure_icon) != null) {
 			if(view.getTag() == "bottom")
 				view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
 			else
@@ -53,6 +57,18 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			((TextView)view.findViewById(R.id.row_label)).setTextColor(0xFFFFFFFF);
 			previousSelectedView = view;
 		}
+		else
+		{
+			//Reached top of list - flick focus to header
+			//This is a bit hacky as it's a) presuming there is a header
+			//						 and  b) presuming the header is at child index 0
+			View focusView = mListView.getChildAt( 0 );
+			if( focusView != null )
+			{
+				focusView.requestFocus();
+			}
+		}
+		
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {
@@ -64,6 +80,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			((ImageView)previousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageDrawable(mDisclosureDrawable);
 			((TextView)previousSelectedView.findViewById(R.id.row_label)).setTextColor(0xFF000000);
 		}
+		
 		previousSelectedView = null;
 	}
 }

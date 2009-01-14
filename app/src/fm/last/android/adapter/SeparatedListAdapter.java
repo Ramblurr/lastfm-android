@@ -114,7 +114,7 @@ public class SeparatedListAdapter extends BaseAdapter
         return -1;
     }
 
-    public boolean areAllItemsSelectable() {
+    public boolean areAllItemsEnabled() {
         return false;
     }
 

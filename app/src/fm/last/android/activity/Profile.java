@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -136,15 +138,21 @@ public class Profile extends ListActivity implements TabBarListener
         if( isAuthenticatedUser ) {
             Button b = new Button(this);
             b.setOnClickListener( mNewStationListener );
+            b.setOnFocusChangeListener( mNewStationFocusChangeListener );
+            
+            //Note: The focus and rest drawable resources are also
+            // 		hardcoded into the mNewStationFocusChangeListener.
             b.setBackgroundResource( R.drawable.list_station_starter_rest );
             b.setText(R.string.home_newstation);
             b.setTextColor(0xffffffff);
     		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
-            getListView().addHeaderView(b);
+    		b.setFocusable( true );
+    		getListView().addHeaderView(b, null, true);
         } else {
             mProfileBubble = new ProfileBubble(this);
             getListView().addHeaderView(mProfileBubble);
         }
+        
         
         mViewHistory = new Stack<Integer>();
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
@@ -320,6 +328,8 @@ public class Profile extends ListActivity implements TabBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
+        if( !mMainAdapter.isEnabled( position ))
+        	return;
         
     	l.setEnabled(false);
     	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
@@ -337,6 +347,22 @@ public class Profile extends ListActivity implements TabBarListener
             Intent intent = new Intent( Profile.this, NewStation.class );
             startActivity( intent );
         }
+    };
+    
+    private OnFocusChangeListener mNewStationFocusChangeListener = new OnFocusChangeListener()
+    {
+    	public void onFocusChange( View v, boolean hasFocus )
+    	{
+    		if( v.hasFocus() )
+    		{
+    			v.setBackgroundResource( R.drawable.list_station_starter_focus );
+    		}
+    		else
+    		{
+    			v.setBackgroundResource( R.drawable.list_station_starter_rest );
+    		}
+    		
+    	}
     };
 
     private OnClickListener mNowPlayingListener = new OnClickListener()
