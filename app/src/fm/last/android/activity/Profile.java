@@ -287,7 +287,6 @@ public class Profile extends ListActivity implements TabBarListener
     
     @Override
     public void onResume() {
-    	SetupMyStations();
     	SetupRecentStations();
     	RebuildMainMenu();
 		super.onResume();
@@ -362,11 +361,27 @@ public class Profile extends ListActivity implements TabBarListener
         if( !mMainAdapter.isEnabled( position ))
         	return;
         
-    	l.setEnabled(false);
-    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
-    	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
-    	switcher.showNext();
-    	LastFMApplication.getInstance().playRadioStation(this, mMainAdapter.getStation(position-1));
+        try
+        {
+	        String adapter_station = mMainAdapter.getStation(position-1);
+	        String current_station = LastFMApplication.getInstance().player.getStationUrl();
+	
+	        if( adapter_station.equals( current_station ) ) {
+	            Intent intent = new Intent( Profile.this, Player.class );
+	            startActivity( intent );
+	            return;
+	        }
+	        
+	    	l.setEnabled(false);
+	    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
+	    	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
+	    	switcher.showNext();
+	    	LastFMApplication.getInstance().playRadioStation(this, adapter_station);
+	    }
+	    catch (RemoteException e)
+	    {
+	    	Log.e( "Last.fm", e.getMessage() );
+	    }
     }
 
     private OnClickListener mNewStationListener = new OnClickListener()
