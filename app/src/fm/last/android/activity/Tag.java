@@ -98,8 +98,8 @@ public class Tag extends Activity implements TabBarListener {
 		
 		// configure the tabs
 		mTabBar.setListener(this);
-		mTabBar.addTab("Top Tags", TAB_TOPTAGS);
-		mTabBar.addTab("My Tags", TAB_MYTAGS);
+		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, TAB_TOPTAGS);
+		mTabBar.addTab("Your Tags", R.drawable.profile, R.drawable.profile, TAB_MYTAGS);
 		mTabBar.setActive(TAB_TOPTAGS);
 		
 		// restoring or creatingData
@@ -177,7 +177,6 @@ public class Tag extends Activity implements TabBarListener {
 				userTags = mServer.getUserTopTags(mSession.getName(), 50);
 				oldTags = mServer.getTrackTags(mArtist, mTrack, mSession.getKey());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			

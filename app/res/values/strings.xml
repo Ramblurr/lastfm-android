@@ -49,6 +49,7 @@
 	<string name="logout">Logout</string>
 	<string name="cancel">Cancel</string>
 	<string name="ok">OK</string>
+	<string name="add">Add</string>
 	<string name="done">Done</string>
 	<string name="tag">Tag</string>
 	<string name="tag_hint">Type tags here, or choose from below</string>
