@@ -276,18 +276,19 @@ public class Profile extends ListActivity implements TabBarListener
 	
     private void RebuildMainMenu() 
     {
+        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMainAdapter = new SeparatedListAdapter(this);
         if(isAuthenticatedUser) {
             mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
             if(mMyRecentAdapter.getCount() > 0)
             	mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
-            if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
+            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
             	mMainAdapter.addSection( "Your Playlists", mMyPlaylistsAdapter);
             }
         } else {
             mMainAdapter.addSection( mUsername + "'s Stations", mMyStationsAdapter );        
             mMainAdapter.addSection( getString(R.string.home_commonartists), mMyRecentAdapter );
-            if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
+            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
             	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
             }
         }
@@ -347,15 +348,29 @@ public class Profile extends ListActivity implements TabBarListener
 
     private void SetupMyStations()
     {
+        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMyStationsAdapter = new LastFMStreamAdapter( this );
-        mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
-        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
-        mMyStationsAdapter.putStation( getString(R.string.home_myloved), 
-        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
-        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
-        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
-        mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
-        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
+        if(isAuthenticatedUser) {
+	        mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
+	        if(session.getSubscriber().equals("1"))
+	        	mMyStationsAdapter.putStation( getString(R.string.home_myloved), 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
+	        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
+	        mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
+        } else {
+	        mMyStationsAdapter.putStation( mUsername + "'s Library", 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
+	        if(session.getSubscriber().equals("1"))
+	        	mMyStationsAdapter.putStation( mUsername + "'s Loved Tracks", 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
+	        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
+	        mMyStationsAdapter.putStation( mUsername + "'s Neighbourhood", 
+	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
+        }
         
 /*
  * we were going to do this (see issue 26) but it didn't look so good
