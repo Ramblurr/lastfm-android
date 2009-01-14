@@ -807,12 +807,38 @@ public class Profile extends ListActivity implements TabBarListener
                        break;
                    case 2: // Share
                    case 3: // Tag
+                       tagItem(dialogId);
                        break;
                }
                
             }
             });
         return new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+    }
+    
+    void tagItem(int type)
+    {
+        if( type != DIALOG_TRACK)
+            return; //temporary until the Tag activity supports albums.
+        String artist = null;
+        String track = null;
+        if (type == DIALOG_ALBUM)
+        {
+            artist = mAlbumInfo.getArtist();
+                        
+        } 
+        else if( type == DIALOG_TRACK) 
+        {
+            artist = mTrackInfo.getArtist().getName();
+            track = mTrackInfo.getName();
+        }
+        if( artist != null )
+        {
+            Intent myIntent = new Intent(this, fm.last.android.activity.Tag.class);
+            myIntent.putExtra("lastfm.artist", artist);
+            myIntent.putExtra("lastfm.track", track);
+            startActivity(myIntent);
+        }
     }
     
     void playSimilar(int type)
