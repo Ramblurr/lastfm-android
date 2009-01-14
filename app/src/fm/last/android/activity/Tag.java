@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
-import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.TagListAdapter;
+import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
 import fm.last.android.widget.TagLayout;
@@ -16,10 +16,10 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,7 +30,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
@@ -69,6 +68,9 @@ public class Tag extends Activity implements TabBarListener {
 	TagLayout mTagLayout;
 	TabBar mTabBar;
 	ListView mTagList;
+	
+	ProgressDialog mLoadDialog;
+	ProgressDialog mSaveDialog;
 	// --------------------------------
 	// XML LAYOUT start
 	// --------------------------------
@@ -170,62 +172,44 @@ public class Tag extends Activity implements TabBarListener {
 			fillData();
 		}  
 		else {
-			fm.last.api.Tag topTags[] = null;
-			fm.last.api.Tag userTags[] = null;
-			fm.last.api.Tag oldTags[] = null;
-			try {
-				topTags = mServer.getTrackTopTags(mArtist, mTrack, null);
-				userTags = mServer.getUserTopTags(mSession.getName(), 50);
-				oldTags = mServer.getTrackTags(mArtist, mTrack, mSession.getKey());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			mTopTags = new ArrayList<String>();
-			if(topTags != null){
-				for(int i=0; i < topTags.length; i++){
-					mTopTags.add(topTags[i].getName());
-				}
-			}
-			
-			mUserTags = new ArrayList<String>();
-			if(userTags != null){
-				for(int i=0; i < userTags.length; i++){
-					mUserTags.add(userTags[i].getName());
-				}
-			}
-			
-			mTrackOldTags = new ArrayList<String>();
-			if(oldTags != null){
-				for(int i=0; i < oldTags.length; i++){
-					mTrackOldTags.add(oldTags[i].getName());
-				}
-			}
-			
-			mTrackNewTags = new ArrayList<String>(mTrackOldTags);
-			
-			fillData();
-			
-//			new UserTask<Object, Integer, Object>(){
-//
-//				@Override
-//				public Object doInBackground(Object... params) {
-//					mTopBar.showCircularBar();
-//					mTopTags = new ArrayList<String>(Track.getTopTags(mArtist, mTrack, Login.key));
-//					mUserTags = new ArrayList<String>(User.getTopTags(mLogin.getUsername(), Login.key));
-//					mTrackOldTags = new ArrayList<String>(Track.getTags(mArtist, mTrack, mLogin.getSession()));
-//					mTrackNewTags = new ArrayList<String>(mTrackOldTags);
-//					return null;
-//				}
-//
-//				@Override
-//				public void onPostExecute(Object result) {
-//					fillData();
-//					mTopBar.showActionButton();
-//				}
-//				
-//			}.execute((Object)null);
+			new LoadTagTask().execute((Object)null);
 		}
+	}
+	
+	private void fetchDataFromServer(){
+		fm.last.api.Tag topTags[] = null;
+		fm.last.api.Tag userTags[] = null;
+		fm.last.api.Tag oldTags[] = null;
+		try {
+			topTags = mServer.getTrackTopTags(mArtist, mTrack, null);
+			userTags = mServer.getUserTopTags(mSession.getName(), 50);
+			oldTags = mServer.getTrackTags(mArtist, mTrack, mSession.getKey());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		mTopTags = new ArrayList<String>();
+		if(topTags != null){
+			for(int i=0; i < topTags.length; i++){
+				mTopTags.add(topTags[i].getName());
+			}
+		}
+		
+		mUserTags = new ArrayList<String>();
+		if(userTags != null){
+			for(int i=0; i < userTags.length; i++){
+				mUserTags.add(userTags[i].getName());
+			}
+		}
+		
+		mTrackOldTags = new ArrayList<String>();
+		if(oldTags != null){
+			for(int i=0; i < oldTags.length; i++){
+				mTrackOldTags.add(oldTags[i].getName());
+			}
+		}
+		
+		mTrackNewTags = new ArrayList<String>(mTrackOldTags);
 	}
 	
 	/**
@@ -298,9 +282,7 @@ public class Tag extends Activity implements TabBarListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//		for(int i=0; i<addTags.size(); i++){
-//			Track.addTags(mArtist, mTrack, addTags.get(i), mLogin.getSession());
-//		}
+
 		for(int i=0; i<removeTags.size(); i++){
 			try {
 				Log.i("Lukasz", "removing tag "+removeTags.get(i));
@@ -333,8 +315,7 @@ public class Tag extends Activity implements TabBarListener {
 			finish();
 			break;
 		case 1:
-			commit();
-			finish();
+			new SaveTagTask().execute((Object)null);
 			break;
 		default:
 			break;
@@ -384,5 +365,68 @@ public class Tag extends Activity implements TabBarListener {
 		}
 		mTopTagListAdapter.tagUnadded(tag);
 		mUserTagListAdapter.tagUnadded(tag);
+	}
+	
+	/**
+	 * Fetches tags from the server
+	 * 
+	 * @author Lukasz Wisniewski
+	 */
+	private class LoadTagTask extends UserTask<Object, Integer, Object>{
+
+		@Override
+		public void onPreExecute() {
+			if(mLoadDialog == null){
+				mLoadDialog = ProgressDialog.show(Tag.this, "", "Loading tags", true, false);
+				mLoadDialog.setCancelable(true);
+			}
+		}
+
+		@Override
+		public Object doInBackground(Object... params) {
+			fetchDataFromServer();
+			return null;
+		}
+
+		@Override
+		public void onPostExecute(Object result) {
+			fillData();
+			if(mLoadDialog != null){
+				mLoadDialog.dismiss();
+				mLoadDialog = null;
+			}
+		}	
+	}
+	
+	/**
+	 * Saves tags to the server
+	 * 
+	 * @author Lukasz Wisniewski
+	 */
+	private class SaveTagTask extends UserTask<Object, Integer, Object>{
+
+		@Override
+		public void onPreExecute() {
+			if(mSaveDialog == null){
+				mSaveDialog = ProgressDialog.show(Tag.this, "", "Saving tags", true, false);
+				mSaveDialog.setCancelable(true);
+			}
+		}
+
+		@Override
+		public Object doInBackground(Object... params) {
+			commit();
+			return null;
+		}
+
+		@Override
+		public void onPostExecute(Object result) {
+			if(mSaveDialog != null){
+				mSaveDialog.dismiss();
+				mSaveDialog = null;
+			}
+			finish();
+		}
+		
 	}
 }
