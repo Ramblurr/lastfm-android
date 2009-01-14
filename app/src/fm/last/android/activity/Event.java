@@ -12,7 +12,9 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.WSError;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -85,6 +87,27 @@ public class Event extends Activity {
 			public void onClick(View v) {
 				finish();
 			}
+        });
+        
+        findViewById(R.id.showmap).setOnClickListener(new OnClickListener() {
+        	public void onClick(View v) {
+        		String query = "";
+        		String street = getIntent().getStringExtra("lastfm.event.street");
+        		String city = getIntent().getStringExtra("lastfm.event.city");
+        		String postalcode = getIntent().getStringExtra("lastfm.event.postalcode");
+        		String country = getIntent().getStringExtra("lastfm.event.country");
+        		
+        		if(street != null && street.length() > 0)
+        			query += street + ",";
+        		if(city != null && city.length() > 0)
+        			query += " " + city + ",";
+        		if(postalcode != null && postalcode.length() > 0)
+        			query += " " + postalcode;
+        		if(country != null && country.length() > 0)
+        			query += " " + country;
+            	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/?f=q&q=" + query + "&ie=UTF8&om=1&iwloc=addr")); 
+                startActivity(myIntent);
+        	}
         });
         
         findViewById(R.id.ok).setOnClickListener(new OnClickListener() {

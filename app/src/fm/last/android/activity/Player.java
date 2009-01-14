@@ -901,6 +901,9 @@ public class Player extends Activity
             intent.putExtra("lastfm.event.artists", artists);
             intent.putExtra("lastfm.event.venue", event.getVenue().getName());
             intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+            intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
+            intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
+            intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
             intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
             intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
             try {
