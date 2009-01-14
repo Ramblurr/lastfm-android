@@ -8,12 +8,14 @@ import fm.last.api.Session;
 import fm.last.api.WSError;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +30,7 @@ public class LastFm extends Activity
     private EditText mPassField;
     private EditText mUserField;
     private Button mLoginButton;
+    private Button mSignupButton;
 
     String authInfo;
 
@@ -61,6 +64,7 @@ public class LastFm extends Activity
         mPassField = ( EditText ) findViewById( R.id.password );
         mUserField = ( EditText ) findViewById( R.id.username );
         mLoginButton = ( Button ) findViewById( R.id.sign_in_button );
+        mSignupButton = ( Button ) findViewById( R.id.sign_up_button );
         mPassField.setOnKeyListener( new View.OnKeyListener()
         {
 
@@ -129,6 +133,13 @@ public class LastFm extends Activity
                 }
             }
         } );
+        mSignupButton.setOnClickListener( new OnClickListener() {
+
+			public void onClick(View v) {
+				startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse("https://m.last.fm/join/")));
+			}
+        	
+        });
     }
 
     @Override
