@@ -14,10 +14,13 @@ package fm.last.api.impl;
 
 import org.w3c.dom.Node;
 
+import android.util.Log;
+
 import fm.last.api.Artist;
 import fm.last.api.Track;
 import fm.last.api.Album;
 import fm.last.api.RadioTrack;
+import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
 
 /**
@@ -34,7 +37,12 @@ public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
     String creator = getText("creator");
     String duration = getText("duration");
     String image = getText("image");
-    String auth = getText("trackauth");
+    String auth = "";
+    Node extensionNode = XMLUtil.findNamedElementNode(node, "extension");
+    if(extensionNode != null) {
+    	Node authNode = XMLUtil.findNamedElementNode(extensionNode, "trackauth");
+    	auth = authNode.getFirstChild().getNodeValue();
+    }
     return new RadioTrack(location, title, identifier, album, creator, duration, image, auth);
   }
 }

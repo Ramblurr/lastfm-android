@@ -347,7 +347,6 @@ final class LastFmServerImpl implements LastFmServer {
         return UserFunctions.getUserRecentTracks(baseUrl, params);
     }
 
-    @Override
     public void libraryAddAlbum(String album, String sk) throws IOException {
          Map<String, String> params = createParams("library.addAlbum");
          params.put("album", album);
@@ -356,7 +355,6 @@ final class LastFmServerImpl implements LastFmServer {
          LibraryFunctions.addAlbum(baseUrl, params);
     }
 
-    @Override
     public void libraryAddArtist(String artist, String sk) throws IOException {
         Map<String, String> params = createParams("library.addArtist");
         params.put("artist", artist);
@@ -366,7 +364,6 @@ final class LastFmServerImpl implements LastFmServer {
         
     }
 
-    @Override
     public void libraryAddTrack(String track, String sk) throws IOException {
         Map<String, String> params = createParams("library.addTrack");
         params.put("track", track);
@@ -375,7 +372,6 @@ final class LastFmServerImpl implements LastFmServer {
         LibraryFunctions.addTrack(baseUrl, params);
     }
 
-    @Override
     public Tasteometer tasteometerCompare(String user1, String user2, int limit)throws IOException {
         Map<String, String> params = createParams("tasteometer.compare");
         params.put("type1", "user");
@@ -405,4 +401,23 @@ final class LastFmServerImpl implements LastFmServer {
 	public AudioscrobblerService createAudioscrobbler(Session session) {
 		return new AudioscrobblerService( session, api_key, shared_secret );
 	}
+
+    public void loveTrack(String artist, String track, String sk) throws IOException {
+        Map<String, String> params = createParams("track.love");
+        params.put("artist", artist);
+        params.put("track", track);
+        params.put("sk", sk);
+        signParams(params);
+        TrackFunctions.loveTrack(baseUrl, params);
+    }
+
+    public void banTrack(String artist, String track, String sk) throws IOException {
+        Map<String, String> params = createParams("track.ban");
+        params.put("artist", artist);
+        params.put("track", track);
+        params.put("sk", sk);
+        signParams(params);
+        TrackFunctions.banTrack(baseUrl, params);
+    }
+
 }
