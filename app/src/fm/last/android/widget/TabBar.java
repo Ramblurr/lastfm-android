@@ -266,7 +266,7 @@ public class TabBar extends LinearLayout {
 			{
 				if( event.getAction() == MotionEvent.ACTION_DOWN )
 					setFocused(childIndex);
-				else
+				else if( event.getAction() == MotionEvent.ACTION_UP )
 					setUnFocused( childIndex );
 				return false;
 			}
