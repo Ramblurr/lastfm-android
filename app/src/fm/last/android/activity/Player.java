@@ -764,6 +764,17 @@ public class Player extends Activity
             boolean success = false;
             
 			mFanAdapter = new ListAdapter(Player.this, getImageCache());
+			mFanList.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> l, View v,
+						int position, long id) {
+					User user = (User)mFanAdapter.getItem(position);
+                    Intent profileIntent = new Intent(Player.this, fm.last.android.activity.Profile.class);
+                    profileIntent.putExtra("lastfm.profile.username", user.getName());
+                    startActivity(profileIntent);
+				}
+				
+			});
 
     		try {
     			User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
