@@ -288,6 +288,7 @@ public class Profile extends ListActivity implements TabBarListener
     
     @Override
     public void onResume() {
+    	SetupMyStations();
     	SetupRecentStations();
     	RebuildMainMenu();
 		super.onResume();
