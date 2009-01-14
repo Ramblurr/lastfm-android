@@ -10,23 +10,23 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Profile" android:label="LastFM: Profile" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.Profile" android:label="Last.fm: Profile" android:configChanges="keyboardHidden">
 			<intent-filter>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.NewStation" android:label="LastFM: Create a New Station" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.NewStation" android:label="Last.fm: Create a New Station" android:configChanges="keyboardHidden">
 			<intent-filter>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Player" android:label="LastFM: Player" android:configChanges="keyboardHidden" android:launchMode="singleTop">
+		<activity android:name=".activity.Player" android:label="Last.fm: Player" android:configChanges="keyboardHidden" android:launchMode="singleTop">
 			<intent-filter>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Event" android:label="LastFM: Event" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.Event" android:label="Last.fm: Event" android:configChanges="keyboardHidden">
 			<intent-filter>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Tag" android:label="LastFM: Tag" android:theme="@android:style/Theme.NoTitleBar">
+		<activity android:name=".activity.Tag" android:label="Last.fm: Tag" android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />

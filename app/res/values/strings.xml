@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-	<string name="app_name">LastFM</string>
+	<string name="app_name">Last.fm</string>
 	<string name="main_cancel">Cancel</string>
 	<string name="main_login">Log in</string>
 	<string name="main_setup">Setup</string>
