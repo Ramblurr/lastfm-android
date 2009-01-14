@@ -11,8 +11,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -45,6 +48,7 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.adapter.SeparatedListAdapter;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
@@ -60,6 +64,7 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
+import fm.last.api.WSError;
 
 public class Profile extends ListActivity implements TabBarListener
 {
@@ -118,6 +123,8 @@ public class Profile extends ListActivity implements TabBarListener
     private Track mTrackInfo; // For the profile actions' dialog
     private Album mAlbumInfo; // Ditto
 	
+	private IntentFilter mIntentFilter;
+    
     @Override
     public void onCreate( Bundle icicle )
     {
@@ -200,6 +207,9 @@ public class Profile extends ListActivity implements TabBarListener
         ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
+
+		mIntentFilter = new IntentFilter();
+		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
     }
     
     private class LoadUserTask extends UserTask<Void, Void, Boolean> {
@@ -287,12 +297,34 @@ public class Profile extends ListActivity implements TabBarListener
     
     @Override
     public void onResume() {
+		registerReceiver( mStatusListener, mIntentFilter );
     	SetupRecentStations();
     	RebuildMainMenu();
 		super.onResume();
     }
     
-    @SuppressWarnings("unchecked")
+	@Override
+	protected void onPause() {
+		unregisterReceiver( mStatusListener );
+		super.onPause();
+	}
+
+	private BroadcastReceiver mStatusListener = new BroadcastReceiver()
+	{
+
+		@Override
+		public void onReceive( Context context, Intent intent )
+		{
+
+			String action = intent.getAction();
+			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
+			{
+				RebuildMainMenu();
+			}
+		}
+	};
+	
+	@SuppressWarnings("unchecked")
     private void SetupRecentStations()
     {
         if(!isAuthenticatedUser)

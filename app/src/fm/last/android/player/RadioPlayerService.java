@@ -461,6 +461,7 @@ public class RadioPlayerService extends Service
 			} catch (WSError e) {
 				mError = e;
 			}
+			notifyChange(RadioPlayerService.PLAYBACK_ERROR);
 			return false;
         }
 
