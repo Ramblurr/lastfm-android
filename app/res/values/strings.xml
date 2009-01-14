@@ -53,6 +53,7 @@
 	<string name="done">Done</string>
 	<string name="tag">Tag</string>
 	<string name="tag_hint">Type tags here, or choose from below</string>
+	<string name="tagarea_hint">Enter a tag above, or choose from below</string>
 	
 	<string name="home_mytags">My Tags</string>
 

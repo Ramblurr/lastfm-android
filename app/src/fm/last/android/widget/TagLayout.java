@@ -7,13 +7,16 @@ import java.util.TreeMap;
 import fm.last.android.R;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
+import android.widget.TextView;
 
 /**
  * Layout/container for TagButtons
@@ -27,6 +30,7 @@ public class TagLayout extends ViewGroup {
 	TagLayoutListener mListener;
 
 	Map<String, TagButton> mTagButtons;
+	TextView mAreaHint;
 	
 	/**
 	 * Padding between buttons
@@ -49,20 +53,27 @@ public class TagLayout extends ViewGroup {
 	 */
 	ArrayList<Animation> mAnimations;
 
+	/**
+	 * Area hint resource
+	 */
+	private int mAreaTextId = 0;
+
 	public TagLayout(Context context) {
 		super(context);
-		init();
+		init(context);
 	}
 
 	public TagLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
+		init(context);
 	}
 
 	/**
 	 * Sharable code between constructors
+	 * 
+	 * @param context
 	 */
-	private void init(){
+	private void init(Context context){
 		mTagButtons = new TreeMap<String, TagButton>();
 		mPadding = 5; // TODO get from xml layout
 		mAnimationEnabled = false;
@@ -70,6 +81,16 @@ public class TagLayout extends ViewGroup {
 
 		mAnimations = new ArrayList<Animation>();
 		this.setFocusable(true);
+		
+		// Creating area hint
+		mAreaHint = new TextView(context);
+		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		mAreaHint.setVisibility(View.GONE);
+		mAreaHint.setTextColor(0xff373838);
+		mAreaHint.setGravity(Gravity.CENTER);
+		mAreaHint.setTextSize(16);
+		mAreaHint.setTypeface(mAreaHint.getTypeface(), Typeface.BOLD);
+		this.addView(mAreaHint, params);
 	}
 
 	/**
@@ -154,6 +175,14 @@ public class TagLayout extends ViewGroup {
 		int selfh = getMeasuredHeight();
 
 		int count = getChildCount();
+		
+		// Area hint (on when count equals 1)
+		if(count == 1 && mAreaTextId > 0){
+			mAreaHint.setVisibility(View.VISIBLE);
+		} else {
+			mAreaHint.setVisibility(View.GONE);
+		}
+		
 		for (int i = 0; i < count; i++) {
 			View child = getChildAt(i);
 			if (child.getVisibility() != GONE) {
@@ -173,7 +202,7 @@ public class TagLayout extends ViewGroup {
 		}
 
 		int selfw = getMeasuredWidth();
-		//int selfh = getMeasuredHeight();
+		int selfh = getMeasuredHeight();
 
 		int x = mPadding;
 		int y = mPadding;
@@ -202,6 +231,13 @@ public class TagLayout extends ViewGroup {
 
 			x = x + cw + mPadding;
 		}
+		
+		// positioning AreaHint
+		if(mAreaHint.getVisibility() == View.VISIBLE){
+			int cw = mAreaHint.getMeasuredWidth();
+			int ch = mAreaHint.getMeasuredHeight();
+			mAreaHint.layout((selfw-cw)/2, (selfh-ch)/2, (selfw+cw)/2, (selfh+ch)/2);
+		}
 
 	}
 
@@ -216,6 +252,17 @@ public class TagLayout extends ViewGroup {
 	 */
 	public void setAnimationsEnabled(boolean value){
 		this.mAnimationEnabled = value;
+	}
+	
+	/**
+	 * Sets informative text which is displayed in the middle of TagLayout area
+	 * before any TagButton has been added
+	 * 
+	 * @param resid resource Id
+	 */
+	public void setAreaHint(int resid){
+		mAreaTextId = resid;
+		mAreaHint.setText(resid);
 	}
 
 }

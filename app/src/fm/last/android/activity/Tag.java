@@ -120,6 +120,7 @@ public class Tag extends Activity implements TabBarListener {
 			}
 			
 		});
+		mTagLayout.setAreaHint(R.string.tagarea_hint);
 
 		mTagList.setOnItemClickListener(new OnItemClickListener(){
 
