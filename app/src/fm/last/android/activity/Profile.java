@@ -18,6 +18,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.os.RemoteException;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -174,7 +175,7 @@ public class Profile extends ListActivity implements TabBarListener
         mMyRecentAdapter = new LastFMStreamAdapter( this );
 
         new LoadUserTask().execute((Void)null);
-        SetupMyStations( session );
+        SetupMyStations();
         SetupRecentStations();
         RebuildMainMenu();
         
@@ -313,7 +314,7 @@ public class Profile extends ListActivity implements TabBarListener
 
     }
 
-    private void SetupMyStations( final Session session )
+    private void SetupMyStations()
     {
         mMyStationsAdapter = new LastFMStreamAdapter( this );
         mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
@@ -324,6 +325,35 @@ public class Profile extends ListActivity implements TabBarListener
         		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
         mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
         		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
+        
+/*
+ * we were going to do this (see issue 26) but it didn't look so good
+ *     
+        // if we're tuned to something, 
+        // and it isn't one of the above, 
+        // then we want to add it in at the top!
+    	String currentStationUrl = null;
+    	String currentStationName = null; 
+    	try {
+	    	currentStationUrl = LastFMApplication.getInstance().player.getStationUrl();
+	    	currentStationName = LastFMApplication.getInstance().player.getStationName();
+		} catch (RemoteException e) {
+		}
+        if (currentStationUrl != null) {
+    		if (currentStationName == null) {
+    			currentStationName = "fixme please";
+    		}
+            boolean playing = false;
+            for(int i = 0; !playing && i < mMyStationsAdapter.getCount(); i++) {
+    			if (mMyStationsAdapter.getStation(i).equals(currentStationUrl)) {
+    				playing = true;
+    			}
+    		}
+            if (!playing) {
+        		mMyStationsAdapter.putStationAtFront(currentStationName, currentStationUrl);
+            }
+        }
+*/        
         mMyStationsAdapter.updateModel();
     }
 

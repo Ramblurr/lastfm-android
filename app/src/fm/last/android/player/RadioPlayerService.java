@@ -485,8 +485,9 @@ public class RadioPlayerService extends Service
 
         public String getStationName() throws RemoteException
         {
-
-            return currentStation.getName();
+            if ( currentStation != null )
+            	return currentStation.getName();
+            return null;
         }
 
         public void setSession( Session session ) throws RemoteException
