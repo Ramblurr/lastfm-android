@@ -165,11 +165,11 @@ public class Player extends Activity
         ((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
 
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, TAB_BIO);
-		mTabBar.addTab("Similar", R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
-		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, TAB_TAGS);
-		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, TAB_EVENTS);
-		mTabBar.addTab("Listeners", R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
+		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, R.drawable.bio, TAB_BIO);
+		mTabBar.addTab("Similar", R.drawable.similar_artists, R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
+		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, R.drawable.tags, TAB_TAGS);
+		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, R.drawable.events, TAB_EVENTS);
+		mTabBar.addTab("Listeners", R.drawable.top_listeners, R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );

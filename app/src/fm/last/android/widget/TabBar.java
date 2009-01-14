@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -30,6 +31,7 @@ public class TabBar extends LinearLayout {
 	 */
 	private interface Tab {
 		void setActive();
+		void setFocused();
 		void setInactive();
 		View getView();
 	}
@@ -69,6 +71,10 @@ public class TabBar extends LinearLayout {
 		public void setInactive() {
 			setBackgroundResource(R.drawable.tab_back);
 		}
+		
+		public void setFocused() {
+			setBackgroundResource(R.drawable.tab_front_focused);
+		}
 
 		public View getView() {
 			return this;
@@ -88,6 +94,7 @@ public class TabBar extends LinearLayout {
 		
 		private int mActiveId;
 		private int mInactiveId;
+		private int mFocusId;
 
 		private void init(){
 			LayoutInflater.from(getContext()).inflate(R.layout.tab_image, this);
@@ -105,10 +112,11 @@ public class TabBar extends LinearLayout {
 			init();
 		}
 
-		public void setData(String text, int active, int inactive){
+		public void setData(String text, int active, int inactive, int focus){
 			mTextView.setText(text);
 			mActiveId = active;
 			mInactiveId = inactive;
+			mFocusId = focus;
 			//requestLayout();
 		}
 
@@ -122,8 +130,20 @@ public class TabBar extends LinearLayout {
 			mImageButton.setImageResource(mInactiveId);
 		}
 		
+		public void setFocused() {
+			setBackgroundResource( R.drawable.tab_front_focused );
+			mImageButton.setImageResource(mFocusId);
+		}
+		
 		public View getView() {
 			return this;
+		}
+		
+		@Override
+		public void setOnTouchListener( OnTouchListener l) {
+			mTextView.setOnTouchListener(l);
+			mImageButton.setOnTouchListener(l);
+			super.setOnTouchListener(l);
 		}
 
 		@Override
@@ -131,6 +151,13 @@ public class TabBar extends LinearLayout {
 			mTextView.setOnClickListener(l);
 			mImageButton.setOnClickListener(l);
 			super.setOnClickListener(l);
+		}
+		
+		@Override
+		public void setOnFocusChangeListener(OnFocusChangeListener l) {
+			mTextView.setOnFocusChangeListener(l);
+			mImageButton.setOnFocusChangeListener(l);
+			super.setOnFocusChangeListener(l);
 		}
 		
 	}
@@ -201,11 +228,12 @@ public class TabBar extends LinearLayout {
 	 * @param text Text to be displayed on tab
 	 * @param active Image resId that will be displayed when tab is active
 	 * @param inactive Image resId that will be displayed when tab is inactive
+	 * @param focus Image resId that will be displayed when tab is focused
 	 * @param childIndex Child to which ViewFillper should switch when pressed
 	 */
-	public void addTab(String text, int active, int inactive, int childIndex){
+	public void addTab(String text, int active, int inactive, int focus, int childIndex){
 		TabImage ti = new TabImage(getContext());
-		ti.setData(text, active, inactive);
+		ti.setData(text, active, inactive, focus );
 		ti.setInactive();
 		configureTab(ti, text, childIndex);
 	}
@@ -224,6 +252,24 @@ public class TabBar extends LinearLayout {
 				setActive(childIndex);
 			}
 
+		});
+		v.getView().setOnFocusChangeListener( new OnFocusChangeListener(){
+			public void onFocusChange( View v, boolean hasFocus ) {
+				if( hasFocus )
+					setFocused(childIndex);
+				else
+					setUnFocused(childIndex);
+			}
+		});
+		v.getView().setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch( View v, MotionEvent event )
+			{
+				if( event.getAction() == MotionEvent.ACTION_DOWN )
+					setFocused(childIndex);
+				else
+					setUnFocused( childIndex );
+				return false;
+			}
 		});
 		getTabs().put(childIndex, v);
 		
@@ -260,6 +306,23 @@ public class TabBar extends LinearLayout {
 		}
 		if(mListener != null){
 			mListener.tabChanged(childIndex);
+		}
+	}
+	
+	public void setFocused( int childIndex ) {
+		Tab tab = getTab(childIndex);
+		if( tab != null )
+			tab.setFocused();
+	}
+	
+	public void setUnFocused( int childIndex ) {
+		Tab tab = getTab(childIndex);
+		if( tab != null )
+		{
+			if( mActiveTab == childIndex )
+				tab.setActive();
+			else
+				tab.setInactive();
 		}
 	}
 	

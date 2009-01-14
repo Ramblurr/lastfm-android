@@ -98,8 +98,8 @@ public class Tag extends Activity implements TabBarListener {
 		
 		// configure the tabs
 		mTabBar.setListener(this);
-		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, TAB_TOPTAGS);
-		mTabBar.addTab("Your Tags", R.drawable.profile, R.drawable.profile, TAB_MYTAGS);
+		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, TAB_TOPTAGS);
+		mTabBar.addTab("Your Tags", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_MYTAGS);
 		mTabBar.setActive(TAB_TOPTAGS);
 		
 		// restoring or creatingData

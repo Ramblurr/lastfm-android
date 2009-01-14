@@ -161,11 +161,11 @@ public class Profile extends ListActivity implements TabBarListener
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.setListener(this);
 		if(isAuthenticatedUser) {
-		    mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
-		    mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		    mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, R.drawable.radio, TAB_RADIO);
+		    mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_PROFILE);
 		} else {
-		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio, R.drawable.radio, TAB_RADIO);
-            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio, R.drawable.radio, R.drawable.radio, TAB_RADIO);
+            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_PROFILE);
 		}
 		mTabBar.setActive(TAB_RADIO);
        
@@ -181,7 +181,7 @@ public class Profile extends ListActivity implements TabBarListener
         mProfileAdapter = new ListAdapter(Profile.this, mStrings);
         mProfileList.setAdapter(mProfileAdapter); 
         mProfileList.setOnItemClickListener(mProfileClickListener);
-        
+               
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
 		((OnListRowSelectedListener)getListView().getOnItemSelectedListener()).setResources(R.drawable.list_item_rest, R.drawable.list_item_focus);
 		
