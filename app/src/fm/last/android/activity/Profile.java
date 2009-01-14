@@ -779,8 +779,6 @@ public class Profile extends ListActivity implements TabBarListener
         // group -- Not used here.
         // id -- Used only when you want to handle and identify the click yourself.
         // title
-        MenuItem profile = menu.add(Menu.NONE, 1, Menu.NONE, "Profile");
-        profile.setIcon(R.drawable.profile_unknown);
         MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
         logout.setIcon(R.drawable.logout);
         return true;
