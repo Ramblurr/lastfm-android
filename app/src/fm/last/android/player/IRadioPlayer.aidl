@@ -12,6 +12,8 @@ interface IRadioPlayer {
 	void skipForward();
 	void startRadio();
 
+	void love();
+	void ban();
 	void skip(); 
 	
 	String getArtistName();

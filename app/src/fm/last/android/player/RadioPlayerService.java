@@ -16,12 +16,14 @@ import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
 import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -30,12 +32,14 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 
 import fm.last.android.R;
 import fm.last.android.activity.Player;
+import fm.last.android.utils.UserTask;
 
 public class RadioPlayerService extends Service
 {
@@ -72,6 +76,7 @@ public class RadioPlayerService extends Service
     public static final String UNKNOWN = "fm.last.android.unknown";
 
     private Bitmap mAlbumArt;
+    private boolean isLoved;
     
     @Override
     public void onCreate()
@@ -121,16 +126,7 @@ public class RadioPlayerService extends Service
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         nm.notify( NOTIFY_ID, notification );
-        
-        if (scrobbler != null) {
-        	try {
-        		scrobbler.nowPlaying( currentTrack );
-        	}
-        	catch (IOException e)
-        	{
-        		Log.e( "Last.fm", e.getMessage() );
-        	}
-        }
+        new NowPlayingTask(currentTrack).execute((Void)null);
     }
 
     private void playTrack( RadioTrack track )
@@ -147,7 +143,11 @@ public class RadioPlayerService extends Service
 
                 public void onCompletion( MediaPlayer mp )
                 {
-
+                	if(isLoved) {
+                    	new SubmitTrackTask(currentTrack, currentStartTime, "L").execute((Void)null);
+                	} else {
+                    	new SubmitTrackTask(currentTrack, currentStartTime, "").execute((Void)null);
+                	}
                     RadioPlayerService.this.nextSong();
                 }
             } );
@@ -182,17 +182,6 @@ public class RadioPlayerService extends Service
 
     private void nextSong()
     {
-    	// sam to fix
-    	if (false)
-    	{
-    		try
-    		{
-    			scrobbler.submit( currentTrack, currentStartTime );
-    		}
-    		catch (IOException e)
-    		{}
-    	}
-
         // Check if we're running low on tracks
         if ( currentQueue.size() < 2 )
         {
@@ -327,6 +316,69 @@ public class RadioPlayerService extends Service
 		}
     }
 
+    private class NowPlayingTask extends UserTask<Void, Void, Boolean> {
+    	RadioTrack mTrack;
+    	
+    	public NowPlayingTask(RadioTrack track) {
+    		mTrack = track;
+    	}
+    	
+        public Boolean doInBackground(Void... urls) {
+            boolean success = false;
+    		try
+    		{
+    			scrobbler.nowPlaying(mTrack);
+    			success = true;
+    		}
+    		catch ( Exception e )
+    		{
+    			success = false;
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        }
+    }
+	
+    private class SubmitTrackTask extends UserTask<Void, Void, Boolean> {
+    	RadioTrack mTrack;
+    	String mRating;
+    	long mTime;
+    	
+    	public SubmitTrackTask(RadioTrack track, long time, String rating) {
+    		mTrack = track;
+    		mRating = rating;
+    		mTime = time;
+    	}
+    	
+        public Boolean doInBackground(Void... urls) {
+            boolean success = false;
+    		try
+    		{
+    	        LastFmServer server = AndroidLastFmServerFactory.getServer();
+    			if(mRating.equals("L")) {
+    				server.loveTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
+    			}
+    			if(mRating.equals("B")) {
+    				server.banTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
+    			}
+    			scrobbler.submit(mTrack, mTime, mRating);
+    			success = true;
+    		}
+    		catch ( Exception e )
+    		{
+    			success = false;
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        }
+    }
+	
     /**
      * Deferred stop implementation from the five music player for android:
      * http://code.google.com/p/five/ (C) 2008 jasta00
@@ -414,13 +466,29 @@ public class RadioPlayerService extends Service
 
         public void startRadio() throws RemoteException
         {
+        	if(Looper.myLooper() == null)
+        		Looper.prepare();
            	nextSong();            		
         }
 
         public void skip() throws RemoteException
         {
+        	if(Looper.myLooper() == null)
+        		Looper.prepare();
+           	new SubmitTrackTask(currentTrack, currentStartTime, "S").execute((Void)null);
+            nextSong();
+        }
 
-            //currentRating = Rating.SKIP;
+        public void love() throws RemoteException
+        {
+        	isLoved = true;
+        }
+
+        public void ban() throws RemoteException
+        {
+        	if(Looper.myLooper() == null)
+        		Looper.prepare();
+           	new SubmitTrackTask(currentTrack, currentStartTime, "B").execute((Void)null);
             nextSong();
         }
 

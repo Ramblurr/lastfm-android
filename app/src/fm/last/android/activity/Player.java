@@ -78,6 +78,8 @@ import android.widget.AdapterView.OnItemClickListener;
 public class Player extends Activity
 {
 
+	private ImageButton mLoveButton;
+	private ImageButton mBanButton;
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
 	private ImageButton mOntourButton;
@@ -142,6 +144,10 @@ public class Player extends Activity
 		mArtistName = ( TextView ) findViewById( R.id.track_artist );
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
 		
+		mLoveButton = ( ImageButton ) findViewById( R.id.love );
+		mLoveButton.setOnClickListener( mLoveListener );
+		mBanButton = ( ImageButton ) findViewById( R.id.ban );
+		mBanButton.setOnClickListener( mBanListener );
 		mStopButton = ( ImageButton ) findViewById( R.id.stop );
 		mStopButton.requestFocus();
 		mStopButton.setOnClickListener( mStopListener );
@@ -310,7 +316,7 @@ public class Player extends Activity
 		super.onDestroy();
 	}
 
-	/*private View.OnClickListener mLoveListener = new View.OnClickListener()
+	private View.OnClickListener mLoveListener = new View.OnClickListener()
     {
 
         public void onClick( View v )
@@ -327,9 +333,9 @@ public class Player extends Activity
                 System.out.println( ex.getMessage() );
             }
         }
-    };*/
+    };
 
-	/*private View.OnClickListener mBanListener = new View.OnClickListener()
+	private View.OnClickListener mBanListener = new View.OnClickListener()
     {
 
         public void onClick( View v )
@@ -346,7 +352,7 @@ public class Player extends Activity
                 System.out.println( ex.getMessage() );
             }
         }
-    };*/
+    };
 
 	private View.OnClickListener mNextListener = new View.OnClickListener()
 	{
