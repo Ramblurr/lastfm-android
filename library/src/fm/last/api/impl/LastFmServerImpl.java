@@ -18,13 +18,13 @@ import fm.last.api.*;
  */
 final class LastFmServerImpl implements LastFmServer {
 	private String api_key;
-	private String api_sig;
+	private String shared_secret;
 	private String baseUrl;
 
-	LastFmServerImpl(String baseUrl, String api_key, String api_sig) {
+	LastFmServerImpl(String baseUrl, String api_key, String shared_secret) {
 		this.baseUrl = baseUrl;
 		this.api_key = api_key;
-		this.api_sig = api_sig;
+		this.shared_secret = shared_secret;
 	}
 
 	private Map<String, String> createParams(String method) {
@@ -32,14 +32,6 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("method", method);
 		params.put("api_key", api_key);
 		return params;    
-	}
-
-	private Map<String, String> createParamsWithSig(String method) {
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("method", method);
-		params.put("api_key", api_key);
-		params.put("api_sig", api_sig);
-		return params;
 	}
 
 	/**
@@ -55,7 +47,7 @@ final class LastFmServerImpl implements LastFmServer {
 		for (String key : keySet) {
 			sb.append(key).append(params.get(key));
 		}
-		sb.append(api_sig);
+		sb.append( shared_secret );
 		String signature = sb.toString();
 		String api_sig = MD5.getInstance().hash(signature);
 		// now we pad to 32 chars if we need to:
@@ -128,13 +120,16 @@ final class LastFmServerImpl implements LastFmServer {
 	}
 
 	public Session getMobileSession(String username, String authToken) throws IOException, WSError {
-		Map<String, String> params = createParamsWithSig("auth.getMobileSession");
+		Map<String, String> params = new HashMap<String, String>();
 		if (username != null) {
 			params.put("username", username);
 		}
 		if (authToken != null) {
 			params.put("authToken", authToken);
 		}
+		params.put("method", "auth.getMobileSession");
+		params.put("api_key", api_key);
+		signParams(params); //apparently unrequired
 		return AuthFunctions.getMobileSession(baseUrl, params);
 	}
 
@@ -406,4 +401,8 @@ final class LastFmServerImpl implements LastFmServer {
         	params.put("album", album);
         return AlbumFunctions.getAlbumInfo(baseUrl, params);
     }
+
+	public AudioscrobblerService createAudioscrobbler(Session session) {
+		return new AudioscrobblerService( session, api_key, shared_secret );
+	}
 }

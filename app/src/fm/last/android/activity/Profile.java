@@ -211,8 +211,7 @@ public class Profile extends ListActivity implements TabBarListener
         public Boolean doInBackground(Void...params) {
         	RadioPlayList[] playlists;
             boolean success = false;
-            Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
+            Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
     		try {
     		    if( mUsername == null) {
     				mUser = mServer.getUserInfo( session.getKey() );
@@ -340,7 +339,6 @@ public class Profile extends ListActivity implements TabBarListener
 
     private OnClickListener mNewStationListener = new OnClickListener()
     {
-
         public void onClick( View v )
         {
 

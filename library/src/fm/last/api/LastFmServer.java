@@ -256,4 +256,6 @@ public interface LastFmServer {
      */
     public Album getAlbumInfo(String artist, String album) throws IOException;
 
+    /** if this isn't self explanatory you fail */
+    public AudioscrobblerService createAudioscrobbler( Session session );
 }

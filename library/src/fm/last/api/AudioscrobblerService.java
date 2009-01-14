@@ -1,19 +1,17 @@
-package fm.last.android.scrobbler;
+package fm.last.api;
 
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import fm.last.api.MD5;
-import fm.last.api.RadioTrack;
-import fm.last.api.Session;
 import fm.last.util.UrlUtil;
 
 
 /** This is super basic, we know, we'll improve as necessary
   * Also it is syncronous, which can be painful for sure, but generally, will not hang the GUI
   * So it'll do until 1.0.1...
+  * I'm sorry it is named service but isn't an android service.
   * @author <max@last.fm> 
   */
 public class AudioscrobblerService extends Object 
@@ -21,7 +19,7 @@ public class AudioscrobblerService extends Object
 	/** would be more useful at fm.last package level */
 	private static class Log 
 	{
-		final private static String TAG = "Last.fm";
+		final private static String TAG = "AudioscrobblerService";
 
 		public static void d( String s )
 		{
@@ -55,7 +53,7 @@ public class AudioscrobblerService extends Object
 	private URL mNpUrl;
 	private URL mSubsUrl;
 	
-	public void init( Session session, String api_key, String shared_secret )
+	public AudioscrobblerService( Session session, String api_key, String shared_secret )
 	{
 		mUsername = session.getName();
 		mSessionKey = session.getKey();
@@ -70,7 +68,7 @@ public class AudioscrobblerService extends Object
 	
     private void handshake() throws IOException
     {
-    	mSessionId = "";
+    	mSessionId = null;
     	
     	String timestamp = timestamp();
     	
@@ -86,9 +84,11 @@ public class AudioscrobblerService extends Object
     	params.put( "sk", mSessionKey );
 
 		URL url = new URL( "http://post.audioscrobbler.com/?" + UrlUtil.buildQuery( params ) );
-		
-		String lines[] = UrlUtil.doGet( url ).split( "\n" );
-		
+				
+		String response = UrlUtil.doGet( url );
+		Log.d( "handshake response: " + response );
+
+		String lines[] = response.split( "\n" );
 		if (lines.length < 4) throw new IOException();
 		
 		mSessionId = lines[1];
@@ -97,19 +97,19 @@ public class AudioscrobblerService extends Object
     }
     
     public void nowPlaying( RadioTrack t ) throws IOException
-    {
-    	if (mSessionId.length() == 0) handshake();
+    {   	
+    	if (mSessionId == null) handshake();
     	
 		Map<String, String> params = new HashMap<String, String>();
-		params.put( "s", mSessionKey );
+		params.put( "s", mSessionId );
 		params.put( "a", t.getCreator() );
 		params.put( "t", t.getTitle() );
 		params.put( "b", t.getAlbum() );
-		params.put( "l", t.getDuration() );
+		params.put( "l", new Integer(t.getDuration()).toString() );
  							  
     	String response = UrlUtil.doPost( mNpUrl, UrlUtil.buildQuery( params ) );
     	
-    	Log.i( response );
+    	Log.i( "np response: " + response );
     	
     	if (!response.trim().equals( "OK" ))
     		handshake();
@@ -125,21 +125,21 @@ public class AudioscrobblerService extends Object
       */
     public void submit( RadioTrack t, long timestamp, String ratingCharacter ) throws IOException
     {
-    	if (mSessionId.length() == 0) handshake();
+    	if (mSessionId == null) handshake();
     	
 		Map<String, String> params = new HashMap<String, String>();
-		params.put( "s", mSessionKey );
+		params.put( "s", mSessionId );
 		params.put( "a[0]", t.getCreator() );
 		params.put( "t[0]", t.getTitle() );
 		params.put( "b[0]", t.getAlbum() );
-		params.put( "l[0]", t.getDuration() );
-		params.put( "i[0]", timestamp() );
+		params.put( "l[0]", new Integer(t.getDuration()).toString() );
+		params.put( "i[0]", new Long(timestamp).toString() );
 		params.put( "o[0]", "L" + t.getTrackAuth() );
 		params.put( "r[0]", ratingCharacter );
 		
 		String response = UrlUtil.doPost( mNpUrl, UrlUtil.buildQuery( params ) );
 		
-		Log.i( response );
+		Log.i( "submit response: " + response );
 
     	if (!response.trim().equals( "OK" ))
     		handshake();    

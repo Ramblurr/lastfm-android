@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -52,7 +53,8 @@ public class RadioPlayerService extends Service
     private int bufferPercent;
     private WSError mError = null;
     private String currentStationURL = null;
-
+    private AudioscrobblerService scrobbler;
+    
     /**
      * Tracks whether there are activities currently bound to the service so
      * that we can determine when it would be safe to call stopSelf().
@@ -119,6 +121,16 @@ public class RadioPlayerService extends Service
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
         nm.notify( NOTIFY_ID, notification );
+        
+        if (scrobbler != null) {
+        	try {
+        		scrobbler.nowPlaying( currentTrack );
+        	}
+        	catch (IOException e)
+        	{
+        		Log.e( "Last.fm", e.getMessage() );
+        	}
+        }
     }
 
     private void playTrack( RadioTrack track )
@@ -170,6 +182,16 @@ public class RadioPlayerService extends Service
 
     private void nextSong()
     {
+    	// sam to fix
+    	if (false)
+    	{
+    		try
+    		{
+    			scrobbler.submit( currentTrack, currentStartTime );
+    		}
+    		catch (IOException e)
+    		{}
+    	}
 
         // Check if we're running low on tracks
         if ( currentQueue.size() < 2 )
@@ -298,6 +320,10 @@ public class RadioPlayerService extends Service
 			refreshPlaylist();
 			currentStationURL = url;
 	        notifyChange( STATION_CHANGED );
+		}
+		
+		if (scrobbler == null) {
+			scrobbler = server.createAudioscrobbler( currentSession );
 		}
     }
 

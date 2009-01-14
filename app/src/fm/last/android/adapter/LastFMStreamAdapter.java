@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
 
+/** WHAT IS THIS?!?!?!? */
 public class LastFMStreamAdapter extends BaseAdapter
 {
 	ArrayList<String> mLabels;

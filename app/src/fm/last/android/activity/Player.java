@@ -602,31 +602,14 @@ public class Player extends Activity
 	 * new Formatter every time you call it, which is very inefficient. Reusing
 	 * an existing Formatter more than tripled the speed of makeTimeString().
 	 * This Formatter/StringBuilder are also used by makeAlbumSongsLabel()
+	 * 
+	 * Hi I changed this due to a bug I managed to make at time zero.
+	 * But honestly, this kind of optimisation is a bit much. --mxcl
 	 */
-	private static StringBuilder sFormatBuilder = new StringBuilder();
-	private static Formatter sFormatter = new Formatter( sFormatBuilder, Locale
-			.getDefault() );
-	private static final Object[] sTimeArgs = new Object[5];
 
 	public static String makeTimeString( Context context, long secs )
 	{
-
-		String durationformat = context.getString( R.string.durationformat );
-
-		/*
-		 * Provide multiple arguments so the format can be changed easily by
-		 * modifying the xml.
-		 */
-		sFormatBuilder.setLength( 0 );
-
-		final Object[] timeArgs = sTimeArgs;
-		timeArgs[0] = secs / 3600;
-		timeArgs[1] = secs / 60;
-		timeArgs[2] = ( secs / 60 ) % 60;
-		timeArgs[3] = secs;
-		timeArgs[4] = secs % 60;
-
-		return sFormatter.format( durationformat, timeArgs ).toString();
+		return new Formatter().format( "%02d:%02d", secs / 60, secs % 60 ).toString();
 	}
 
     private class LoadAlbumArtTask extends UserTask<Void, Void, Boolean> {
@@ -792,7 +775,7 @@ public class Player extends Activity
             
 			mFanAdapter = new ListAdapter(Player.this, getImageCache());
 			mFanList.setOnItemClickListener(new OnItemClickListener() {
-
+				 
 				public void onItemClick(AdapterView<?> l, View v,
 						int position, long id) {
 					User user = (User)mFanAdapter.getItem(position);
@@ -802,7 +785,7 @@ public class Player extends Activity
 				}
 				
 			});
-
+			
     		try {
     			User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
