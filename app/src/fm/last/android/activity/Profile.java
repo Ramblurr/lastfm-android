@@ -63,7 +63,6 @@ import fm.last.api.ImageUrl;
 
 public class Profile extends ListActivity implements TabBarListener
 {
-
 	private static int TAB_RADIO = 0;
 	private static int TAB_PROFILE = 1;
 	
