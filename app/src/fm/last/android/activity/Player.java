@@ -128,6 +128,9 @@ public class Player extends Activity
 	private RemoteImageHandler mAlbumArtHandler;
 	private IntentFilter mIntentFilter;
 
+	private String mLastArtist = "";
+	private String mLastTrack = "";
+	
 	@Override
 	public void onCreate( Bundle icicle )
 	{
@@ -295,18 +298,7 @@ public class Player extends Activity
 	public void onResume()
 	{
 		registerReceiver( mStatusListener, mIntentFilter );
-		try {
-			mDuration = LastFMApplication.getInstance().player.getDuration();
-			long pos = LastFMApplication.getInstance().player.getPosition();
-			long remaining = 1000 - ( pos % 1000 );
-			if ( ( pos >= 0 ) && ( mDuration > 0 )  && ( pos <= mDuration ))
-			{
-				updateTrackInfo();
-			}
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		updateTrackInfo();
 		super.onResume();
 	}
 
@@ -479,14 +471,15 @@ public class Player extends Activity
 
 	private void updateTrackInfo()
 	{
-
-		System.out.println( "Updating track info" );
-		if ( LastFMApplication.getInstance().player == null )
-		{
-			return;
-		}
 		try
 		{
+			if ( LastFMApplication.getInstance().player == null ||
+					(mLastArtist.equals(LastFMApplication.getInstance().player.getArtistName()) &&
+							mLastTrack.equals(LastFMApplication.getInstance().player.getTrackName()))
+					)
+				return;
+			mLastArtist = LastFMApplication.getInstance().player.getArtistName();
+			mLastTrack = LastFMApplication.getInstance().player.getTrackName();
 			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
 			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
