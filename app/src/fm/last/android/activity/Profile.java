@@ -60,6 +60,7 @@ import fm.last.api.Event;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
+import fm.last.api.Tag;
 import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
@@ -79,6 +80,7 @@ public class Profile extends ListActivity implements TabBarListener
 	private static final int PROFILE_RECENTLYPLAYED = 3;
 	private static final int PROFILE_EVENTS = 4;
 	private static final int PROFILE_FRIENDS = 5;
+	private static final int PROFILE_TAGS = 6;
 	
 	private static final int DIALOG_ALBUM = 0 ;
 	private static final int DIALOG_TRACK = 1;
@@ -119,6 +121,8 @@ public class Profile extends ListActivity implements TabBarListener
     private EventListAdapter mEventsAdapter;
     ListView mFriendsList;
     private ListAdapter mFriendsAdapter;
+    ListView mTagsList;
+    private ListAdapter mTagsAdapter;
     
     private Track mTrackInfo; // For the profile actions' dialog
     private Album mAlbumInfo; // Ditto
@@ -186,7 +190,7 @@ public class Profile extends ListActivity implements TabBarListener
         RebuildMainMenu();
         
         mProfileList = (ListView)findViewById(R.id.profile_list_view);
-        String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends"}; // this order must match the ProfileActions enum
+    	String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends", "Tags"}; // this order must match the ProfileActions enum
         mProfileAdapter = new ListAdapter(Profile.this, mStrings);
         mProfileList.setAdapter(mProfileAdapter); 
         mProfileList.setOnItemClickListener(mProfileClickListener);
@@ -214,7 +218,9 @@ public class Profile extends ListActivity implements TabBarListener
         ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
-
+        mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
+        mTagsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagsList));
+        
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
     }
@@ -308,6 +314,10 @@ public class Profile extends ListActivity implements TabBarListener
 		registerReceiver( mStatusListener, mIntentFilter );
     	SetupRecentStations();
     	RebuildMainMenu();
+    	if(mTopArtistsAdapter != null)
+    		mTopArtistsAdapter.disableLoadBar();
+    	if(mTagsAdapter != null)
+    		mTagsAdapter.disableLoadBar();
 		super.onResume();
     }
     
@@ -328,6 +338,10 @@ public class Profile extends ListActivity implements TabBarListener
 			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
 			{
 				RebuildMainMenu();
+		    	if(mTopArtistsAdapter != null)
+		    		mTopArtistsAdapter.disableLoadBar();
+		    	if(mTagsAdapter != null)
+		    		mTagsAdapter.disableLoadBar();
 			}
 		}
 	};
@@ -522,6 +536,9 @@ public class Profile extends ListActivity implements TabBarListener
                 break;
             case PROFILE_FRIENDS: //"Friends"
                 new LoadFriendsTask().execute((Void)null);
+                break;
+            case PROFILE_TAGS: //"Tags"
+                new LoadTagsTask().execute((Void)null);
                 break;
             default: 
                 break;
@@ -823,6 +840,61 @@ public class Profile extends ListActivity implements TabBarListener
 
     };
     
+    private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+			mTagsAdapter = new ListAdapter(Profile.this, getImageCache());
+			mTagsList.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> l, View v,
+						int position, long id) {
+			        Session session = ( Session ) LastFMApplication.getInstance().map
+	                .get( "lastfm_session" );
+					Tag tag = (Tag)mTagsAdapter.getItem(position);
+					mTagsAdapter.enableLoadBar(position);
+					if(session.getSubscriber().equals("1"))
+						LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
+					else
+						LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+				}
+				
+			});
+
+    		try {
+    			Tag[] tags = mServer.getUserTopTags(mUsername, 10);
+    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
+    				ListEntry entry = new ListEntry(tags[i], 
+    						-1,
+    						tags[i].getName(), 
+    						R.drawable.radio_icon);
+    				iconifiedEntries.add(entry);
+    			}
+    			mTagsAdapter.setSourceIconified(iconifiedEntries);
+    			success = true;
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		mTagsList.setAdapter(mTagsAdapter);
+                mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+                mNestedViewFlipper.setDisplayedChild(PROFILE_TAGS + 1);
+        	} else {
+    	        String[] strings = new String[]{"No Tags"};
+    	        mTagsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
+    	                R.layout.list_row, R.id.row_label, strings)); 
+        	}
+        }
+    }
+
     private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
 
         @Override
