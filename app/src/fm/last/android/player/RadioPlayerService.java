@@ -30,11 +30,13 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -61,6 +63,8 @@ public class RadioPlayerService extends Service
 	private WSError mError = null;
 	private String currentStationURL = null;
 	private AudioscrobblerService scrobbler;
+	private PowerManager.WakeLock wakeLock;
+	private WifiManager.WifiLock wifiLock;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -102,6 +106,12 @@ public class RadioPlayerService extends Service
 		// playing
 		currentQueue = new ArrayBlockingQueue<RadioTrack>(20);
 
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Last.fm Player");
+		
+		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		wifiLock = wm.createWifiLock("Last.fm Player");
+		
 		mTelephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
 		mTelephonyManager.listen(new PhoneStateListener(){
 
@@ -162,7 +172,7 @@ public class RadioPlayerService extends Service
 		{
 			currentTrack = track;
 			mAlbumArt = null;
-			System.out.printf("Streaming: %s\n", track.getLocationUrl());
+			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
 			mp.reset();
 			mp.setDataSource( track.getLocationUrl() );
 			mp.setOnCompletionListener( new OnCompletionListener()
@@ -225,6 +235,8 @@ public class RadioPlayerService extends Service
 			// radio finished
 			notifyChange( PLAYBACK_FINISHED );
 			nm.cancel( NOTIFY_ID );
+			wakeLock.release();
+			wifiLock.release();
 		}
 	}
 
@@ -295,7 +307,7 @@ public class RadioPlayerService extends Service
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(e.getMessage().contains("code 503")) {
-				System.out.print("Server unavailable, retrying...");
+				Log.i("Last.fm", "Playlist service unavailable, retrying...");
 				refreshPlaylist();
 			}
 		} catch (WSError e) {
@@ -322,7 +334,9 @@ public class RadioPlayerService extends Service
 
 	private void tune(String url, Session session) throws IOException, WSError
 	{
-		System.out.printf("Tuning to station: %s\n", url);
+		wakeLock.acquire();
+		wifiLock.acquire();
+		Log.i("Last.fm","Tuning to station: " + url);
 		if(mp.isPlaying()) {
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
@@ -332,10 +346,13 @@ public class RadioPlayerService extends Service
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		currentStation = server.tuneToStation(url, session.getKey());
 		if(currentStation != null) {
-			System.out.printf("Station name: %s\n", currentStation.getName());
+			Log.i("Last.fm","Station name: " + currentStation.getName());
 			refreshPlaylist();
 			currentStationURL = url;
 			notifyChange( STATION_CHANGED );
+		} else {
+			wakeLock.release();
+			wifiLock.release();
 		}
 
 		if (scrobbler == null) {
@@ -473,6 +490,8 @@ public class RadioPlayerService extends Service
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
 			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
+			wakeLock.release();
+			wifiLock.release();
 		}
 
 		public boolean tune( String url, Session session ) throws DeadObjectException, WSError

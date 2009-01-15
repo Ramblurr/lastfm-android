@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	android:versionCode="1" android:versionName="1.0.0" package="fm.last.android">
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:name="LastFMApplication">
 		<activity android:name=".LastFm" android:label="@string/app_name" android:configChanges="keyboardHidden">
