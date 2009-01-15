@@ -144,8 +144,14 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 			} else {
 				holder.image.setImageResource(mList.get(position).icon_id);
 			}
-		} else {
+		} else if( mList.get(position).icon_id >= 0 ) {
+			
 			holder.image.setImageResource(mList.get(position).icon_id);
+			
+		} else if( mList.get(position).disclosure_id >= 0 ) {
+			
+			holder.image.setImageResource(mList.get(position).disclosure_id);
+			
 		}
 
 		return row;

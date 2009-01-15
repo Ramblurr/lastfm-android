@@ -11,9 +11,11 @@ import android.widget.TextView;
 public class OnListRowSelectedListener implements AdapterView.OnItemSelectedListener {
     protected View mPreviousSelectedView;
     protected ListView mListView;
-    private Drawable mDisclosureDrawable;
     protected int mHighlightResource = R.drawable.list_item_focus_fullwidth;
     protected int mRestResource = R.drawable.list_item_rest_fullwidth;
+    
+    protected int mHighlightIconResource = R.drawable.list_radio_icon_focus;
+    protected int mRestIconResource = R.drawable.list_radio_icon_rest;
     
     public OnListRowSelectedListener(ListView listView) {
     	mListView = listView;
@@ -38,6 +40,11 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
     	mRestResource = rest;
     	mHighlightResource = highlight;
     }
+    
+    public void setIconResources( int rest, int highlight ) {
+    	mRestIconResource = rest;
+    	mHighlightIconResource = highlight;
+    }
             
 	public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
 		if(mPreviousSelectedView != null) {
@@ -45,7 +52,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 				mPreviousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
 			else
 				mPreviousSelectedView.setBackgroundResource(mRestResource);
-			((ImageView)mPreviousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageDrawable(mDisclosureDrawable);
+			((ImageView)mPreviousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageResource( mRestIconResource );
 			((TextView)mPreviousSelectedView.findViewById(R.id.row_label)).setTextColor(0xFF000000);
 		}
 
@@ -54,7 +61,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			view != null && 
 			view.findViewById(R.id.row_disclosure_icon) != null)
 		{
-			int iconResource = R.drawable.list_radio_icon_focus;
+			int iconResource = mHighlightIconResource;
 			Object o = adapter.getItemAtPosition(position);
 			if (o instanceof LastFMStreamAdapter.Stream) {
 				iconResource = ((LastFMStreamAdapter.Stream) o).radioIcon( true );
@@ -64,7 +71,6 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 				view.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
 			else
 				view.setBackgroundResource(mHighlightResource);
-			mDisclosureDrawable = ((ImageView)view.findViewById(R.id.row_disclosure_icon)).getDrawable();
 			((ImageView)view.findViewById(R.id.row_disclosure_icon)).setImageResource( iconResource );
 			((TextView)view.findViewById(R.id.row_label)).setTextColor(0xFFFFFFFF);
 			mPreviousSelectedView = view;
@@ -74,10 +80,13 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			//Reached top of list - flick focus to header
 			//This is a bit hacky as it's a) presuming there is a header
 			//						 and  b) presuming the header is at child index 0
-			View focusView = mListView.getChildAt( 0 );
-			if( focusView != null )
+			if( mListView.getHeaderViewsCount() > 0 )
 			{
-				focusView.requestFocus();
+				View focusView = mListView.getChildAt( 0 );
+				if( focusView != null )
+				{
+					focusView.requestFocus();
+				}
 			}
 		}
 		
@@ -88,8 +97,8 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 			if(mPreviousSelectedView.getTag() == "bottom")
 				mPreviousSelectedView.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
 			else
-				mPreviousSelectedView.setBackgroundResource(R.drawable.list_item_rest);
-			((ImageView)mPreviousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageDrawable(mDisclosureDrawable);
+				mPreviousSelectedView.setBackgroundResource(mRestResource);
+			((ImageView)mPreviousSelectedView.findViewById(R.id.row_disclosure_icon)).setImageResource( mRestIconResource );
 			((TextView)mPreviousSelectedView.findViewById(R.id.row_label)).setTextColor(0xFF000000);
 		}
 		mPreviousSelectedView = null;

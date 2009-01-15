@@ -31,7 +31,7 @@ public class ListEntry{
 	/**
 	 * Resource image that will be displayed left to the text
 	 */
-	int icon_id;
+	int icon_id = -1;
 	
 	/**
 	 * Resource image that will be displayed right to the text

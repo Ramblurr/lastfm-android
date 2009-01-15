@@ -32,7 +32,8 @@
 			<!-- Profile tab -->
 			<ListView android:id="@+id/profile_list_view"
 			android:dividerHeight="2dip" android:divider="@drawable/black_divider"
-			android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:listSelector="#00000000"></ListView>
 			<!-- Top Artists list -->
 			<ListView android:id="@+id/topartists_list_view"
 				android:background="#fff"
