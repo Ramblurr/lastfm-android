@@ -64,6 +64,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Animation.AnimationListener;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -962,6 +963,22 @@ public class Player extends Activity
         		mEventList.setOnItemClickListener(mEventOnItemClickListener);
         		mOntourButton.setVisibility(View.INVISIBLE);
         		Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
+        		a.setAnimationListener(new AnimationListener(){
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						mOntourButton.setVisibility(View.VISIBLE);
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+					}
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+					}
+        			
+        		});
         		mOntourButton.startAnimation(a);
         	} else {
         		mEventList.setOnItemClickListener(null);
