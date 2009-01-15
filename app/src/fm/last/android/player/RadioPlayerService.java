@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import fm.last.api.AudioscrobblerService;
@@ -108,26 +110,46 @@ public class RadioPlayerService extends Service
 
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Last.fm Player");
-		
+
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
-		
+
 		mTelephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
 		mTelephonyManager.listen(new PhoneStateListener(){
-			
+
 			private boolean mPausedOnCall = false;
 
 			@Override
 			public void onCallStateChanged(int state, String incomingNumber) {
 				if(state == TelephonyManager.CALL_STATE_RINGING){
 					if(mPlaying){
-						RadioPlayerService.this.pause();
-						mPausedOnCall = true;
+						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 5000, 10){
+
+							@Override
+							public void onPreExecute() {
+							}
+
+							@Override
+							public void onPostExecute() {
+								RadioPlayerService.this.pause();
+								mPausedOnCall = true;
+							}
+						};
 					}
 				}
 				if(state == TelephonyManager.CALL_STATE_IDLE && mPausedOnCall && !mPlaying){
-					RadioPlayerService.this.pause();
-					mPausedOnCall = false;
+					new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000, 10){
+
+						@Override
+						public void onPreExecute() {
+							RadioPlayerService.this.pause();
+							mPausedOnCall = false;
+						}
+
+						@Override
+						public void onPostExecute() {
+						}
+					};
 				}
 				super.onCallStateChanged(state, incomingNumber);
 			}
@@ -672,6 +694,68 @@ public class RadioPlayerService extends Service
 
 		mDeferredStopHandler.deferredStopSelf();
 		return true;
+	}
+
+	/**
+	 * Class responsible for fading in/out volume,
+	 * for instance when a phone call arrives 
+	 * 
+	 * @author Lukasz Wisniewski
+	 */
+	private abstract class FadeVolumeTask extends TimerTask {
+
+		public static final int FADE_IN = 0;
+		public static final int FADE_OUT = 1;
+
+		private int mCurrentStep = 0;
+		private int mSteps;
+		private int mMode;
+
+		/**
+		 * Constructor, launches timer immediately
+		 * 
+		 * @param mode Volume fade mode <code>FADE_IN</code> or <code>FADE_OUT</code>
+		 * @param millis Time the fade process should take
+		 * @param steps Number of volume gradations within given fade time
+		 */
+		public FadeVolumeTask(int mode, long millis, int steps){
+			this.mMode = mode;
+			this.mSteps = steps;
+			this.onPreExecute();
+			new Timer().scheduleAtFixedRate(this, 0, millis/steps);
+		}
+
+		@Override
+		public void run() {
+
+			float volumeValue = 1.0f;
+
+			if(mMode == FADE_OUT){
+				volumeValue *= (float)(mSteps-mCurrentStep)/(float)mSteps;
+			}
+			else{
+				volumeValue *= (float)(mCurrentStep)/(float)mSteps;
+			}
+
+			mp.setVolume(volumeValue, volumeValue);
+
+			if(mCurrentStep >= mSteps){
+				this.onPostExecute();
+				this.cancel();
+			}
+
+			mCurrentStep++;
+		}
+
+		/**
+		 * Task executed before launching timer
+		 */
+		public abstract void onPreExecute();
+
+		/**
+		 * Task executer after timer finished working
+		 */
+		public abstract void onPostExecute();
 	}
 
 }
