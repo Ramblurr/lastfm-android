@@ -468,7 +468,7 @@ public class Profile extends ListActivity implements TabBarListener
     {
     	public void onFocusChange( View v, boolean hasFocus )
     	{
-    		if( v.hasFocus() )
+    		if( hasFocus )
     		{
     			v.setBackgroundResource( R.drawable.list_station_starter_focus );
     		}
@@ -479,6 +479,8 @@ public class Profile extends ListActivity implements TabBarListener
     		
     	}
     };
+    
+    
 
     private OnClickListener mNowPlayingListener = new OnClickListener()
     {

@@ -41,7 +41,7 @@ public class LastFMStreamAdapter extends BaseAdapter
 			}
 			if (hasFocus)
 				return R.drawable.list_radio_icon_focus;
-			return R.drawable.radio_icon;
+			return R.drawable.list_radio_icon_rest;
 	    }
 		
 		public String mLabel;
