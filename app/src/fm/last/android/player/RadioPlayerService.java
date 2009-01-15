@@ -114,15 +114,20 @@ public class RadioPlayerService extends Service
 		
 		mTelephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
 		mTelephonyManager.listen(new PhoneStateListener(){
+			
+			private boolean mPausedOnCall = false;
 
 			@Override
 			public void onCallStateChanged(int state, String incomingNumber) {
-				if(mPlaying){
-					try {
-						mBinder.stop();
-					} catch (RemoteException e) {
-						e.printStackTrace();
+				if(state == TelephonyManager.CALL_STATE_RINGING){
+					if(mPlaying){
+						RadioPlayerService.this.pause();
+						mPausedOnCall = true;
 					}
+				}
+				if(state == TelephonyManager.CALL_STATE_IDLE && mPausedOnCall && !mPlaying){
+					RadioPlayerService.this.pause();
+					mPausedOnCall = false;
 				}
 				super.onCallStateChanged(state, incomingNumber);
 			}
