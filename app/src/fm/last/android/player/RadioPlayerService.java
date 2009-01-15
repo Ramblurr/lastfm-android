@@ -22,6 +22,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -35,6 +36,8 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import fm.last.android.R;
@@ -78,11 +81,17 @@ public class RadioPlayerService extends Service
     private Bitmap mAlbumArt;
     private boolean isLoved;
     
+    /**
+	 * Used for pausing on incoming call
+	 */
+	private TelephonyManager mTelephonyManager;
+    
     @Override
     public void onCreate()
     {
 
         super.onCreate();
+		        
         nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
         failCounter = 0;
         handshaked = false;
@@ -92,6 +101,18 @@ public class RadioPlayerService extends Service
         mp.setScreenOnWhilePlaying( true ); // we dont want to sleep while we're
         // playing
         currentQueue = new ArrayBlockingQueue<RadioTrack>(20);
+        
+        mTelephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
+//		mTelephonyManager.listen(new PhoneStateListener(){
+//
+//			@Override
+//			public void onCallStateChanged(int state, String incomingNumber) {
+//				RadioPlayerService.this.pause();
+//				super.onCallStateChanged(state, incomingNumber);
+//			}
+//
+//		}, PhoneStateListener.LISTEN_CALL_STATE);
+
     }
 
     @Override
