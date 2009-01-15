@@ -965,16 +965,13 @@ public class Player extends Activity
         		Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
         		a.setAnimationListener(new AnimationListener(){
 
-					@Override
 					public void onAnimationEnd(Animation animation) {
 						mOntourButton.setVisibility(View.VISIBLE);
 					}
 
-					@Override
 					public void onAnimationRepeat(Animation animation) {
 					}
 
-					@Override
 					public void onAnimationStart(Animation animation) {
 					}
         			
