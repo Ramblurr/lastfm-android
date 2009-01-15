@@ -107,6 +107,7 @@ public class Event extends Activity {
         			query += " " + country;
             	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/?f=q&q=" + query + "&ie=UTF8&om=1&iwloc=addr")); 
                 startActivity(myIntent);
+                finish();
         	}
         });
         
