@@ -856,7 +856,7 @@ public class Player extends Activity
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
     				ListEntry entry = new ListEntry(tags[i], 
-    						R.drawable.tag_dark,
+    						-1,
     						tags[i].getName(), 
     						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);
