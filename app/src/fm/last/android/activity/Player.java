@@ -190,12 +190,28 @@ public class Player extends Activity
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_STATE_CHANGED );
 		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
 	}
-
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)  {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.player, menu);
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)  {
+		//Toggle the View Info / View Artwork Menu item
+		MenuItem changeView = menu.findItem( R.id.info_menu_item );
+		if( mDetailFlipper.getDisplayedChild() == 1 ) {
+			changeView.setTitle( "View Artwork" );
+			changeView.setIcon( R.drawable.view_artwork );		
+		}
+		else
+		{
+			changeView.setTitle( "View Info" );
+			changeView.setIcon( R.drawable.info );
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	public void showMetadata() {
