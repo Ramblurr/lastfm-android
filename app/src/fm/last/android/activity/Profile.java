@@ -405,7 +405,9 @@ public class Profile extends ListActivity implements TabBarListener
 
     public void onListItemClick( ListView l, View v, int position, long id )
     {
-        if( !mMainAdapter.isEnabled( position ))
+    	// mMainAdapter seems to want position-1 :-/
+
+        if( !mMainAdapter.isEnabled( position-1 ))
         	return;
         
         try
