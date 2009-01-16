@@ -86,7 +86,7 @@ public class TagLayout extends ViewGroup {
 		mAreaHint = new TextView(context);
 		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		mAreaHint.setVisibility(View.GONE);
-		mAreaHint.setTextColor(0xff373838);
+		mAreaHint.setTextColor(0xff666666);
 		mAreaHint.setGravity(Gravity.CENTER);
 		mAreaHint.setTextSize(16);
 		mAreaHint.setTypeface(mAreaHint.getTypeface(), Typeface.BOLD);

@@ -18,40 +18,42 @@
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 
-	<LinearLayout android:layout_height="wrap_content"
-		android:layout_width="fill_parent" android:gravity="center_vertical"
-		android:background="@drawable/title_bar">
-		<EditText android:id="@+id/tag_text_edit"
-			android:layout_height="wrap_content"
-			android:layout_width="fill_parent"
-			android:textSize="18sp"
-			android:layout_alignParentLeft="true"
-			android:layout_marginLeft="4dip" android:layout_marginTop="2dip"
-			android:layout_weight="1" android:singleLine="true" android:ellipsize="end" 
-			android:nextFocusDown="@+id/tag_add_button" />
-			<!-- android:hint="@string/tag_hint"  --> 
-		<Button android:id="@+id/tag_add_button"
-			android:text="@string/add"
-			android:textColor="#fff" android:gravity="center"
-			android:layout_height="36dip" android:layout_width="wrap_content"
-			android:layout_marginLeft="4dip"
-			android:layout_marginRight="4dip" 
-			android:background="@drawable/logout_button"/>
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:background="@drawable/tagareabg">
+
+		<LinearLayout android:layout_height="wrap_content"
+			android:layout_width="fill_parent" android:gravity="center_vertical"
+			android:background="@drawable/title_bar">
+			<EditText android:id="@+id/tag_text_edit"
+				android:layout_height="wrap_content" android:layout_width="fill_parent"
+				android:textSize="18sp" android:layout_alignParentLeft="true"
+				android:layout_marginLeft="4dip" android:layout_marginTop="2dip"
+				android:layout_weight="1" android:singleLine="true"
+				android:ellipsize="end" android:nextFocusDown="@+id/tag_add_button" />
+			<!-- android:hint="@string/tag_hint"  -->
+			<Button android:id="@+id/tag_add_button" android:text="@string/add"
+				android:textColor="#fff" android:gravity="center"
+				android:layout_height="36dip" android:layout_width="wrap_content"
+				android:layout_marginLeft="4dip" android:layout_marginRight="4dip"
+				android:background="@drawable/logout_button" />
+		</LinearLayout>
+
+		<fm.last.android.widget.TagLayout
+			android:id="@+id/TagLayout" android:layout_width="fill_parent"
+			android:layout_height="170dip">
+		</fm.last.android.widget.TagLayout>
+
+		<fm.last.android.widget.TabBar
+			android:id="@+id/TabBar" android:layout_width="fill_parent"
+			android:layout_height="60dip" android:layout_marginTop="4dip"
+			android:background="@null" />
+		<LinearLayout android:id="@+id/TabBarSpacer"
+			android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
+			android:layout_height="5dip" android:layout_below="@id/TabBar"
+			android:layout_marginBottom="1px" />
+
 	</LinearLayout>
-
-	<fm.last.android.widget.TagLayout
-		android:id="@+id/TagLayout" android:layout_width="fill_parent"
-		android:layout_height="175px" android:background="#0f0f0f">
-	</fm.last.android.widget.TagLayout>
-
-	<fm.last.android.widget.TabBar
-		android:id="@+id/TabBar" android:layout_width="fill_parent"
-		android:layout_height="60dip" android:layout_marginTop="4dip" />
-	<LinearLayout android:id="@+id/TabBarSpacer"
-		android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
-		android:layout_height="5dip"
-		android:layout_below="@id/TabBar"
-		android:layout_marginBottom="1px"/>
 
 	<ListView android:id="@+id/TagList" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:background="#ffffff">
