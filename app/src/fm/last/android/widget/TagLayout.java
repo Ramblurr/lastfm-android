@@ -80,7 +80,7 @@ public class TagLayout extends ViewGroup {
 		mAnimating = false;
 
 		mAnimations = new ArrayList<Animation>();
-		this.setFocusable(true);
+		//this.setFocusable(true);
 		
 		// Creating area hint
 		mAreaHint = new TextView(context);
@@ -99,7 +99,7 @@ public class TagLayout extends ViewGroup {
 	 * @param tag
 	 */
 	public void addTag(final String tag){
-		TagButton tagButton = new TagButton(this.getContext());
+		final TagButton tagButton = new TagButton(this.getContext());
 		LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 		tagButton.setText(tag);
 
@@ -117,6 +117,22 @@ public class TagLayout extends ViewGroup {
 
 		if(mAnimationEnabled){
 			Animation a = AnimationUtils.loadAnimation(this.getContext(), R.anim.tag_fadein);
+			a.setAnimationListener(new AnimationListener(){
+
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					tagButton.setVisibility(View.VISIBLE);
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+				}
+				
+			});
 			tagButton.startAnimation(a);
 		}
 	}
