@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.R.id;
 import fm.last.android.adapter.TagListAdapter;
@@ -95,6 +96,7 @@ public class Tag extends Activity implements TabBarListener {
 		mTagButton = (Button) findViewById(R.id.tag_add_button);
 		mTagLayout = (TagLayout)findViewById(R.id.TagLayout);
 		mTagList = (ListView)findViewById(R.id.TagList);
+		mTagList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagList));
 		mTabBar = (TabBar)findViewById(R.id.TabBar);
 
 		// loading & setting animations

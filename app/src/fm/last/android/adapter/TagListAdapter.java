@@ -97,6 +97,9 @@ public class TagListAdapter extends ListAdapter {
 		return position;
 	}
 	
+	public boolean isEnabled(int position) {
+        return !mList.get(position).added;
+    }
 	
 	/**
 	 * Holder pattern implementation, performance boost
