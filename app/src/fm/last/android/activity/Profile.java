@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,10 +34,13 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout.LayoutParams;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -147,7 +151,6 @@ public class Profile extends ListActivity implements TabBarListener
         else 
             isAuthenticatedUser = false;
         
-        
         if( isAuthenticatedUser ) {
             Button b = new Button(this);
             b.setOnClickListener( mNewStationListener );
@@ -156,10 +159,13 @@ public class Profile extends ListActivity implements TabBarListener
             //Note: The focus and rest drawable resources are also
             // 		hardcoded into the mNewStationFocusChangeListener.
             b.setBackgroundResource( R.drawable.list_station_starter_rest );
-            b.setText(R.string.home_newstation);
             b.setTextColor(0xffffffff);
-    		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 8);
+    		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 7);
     		b.setFocusable( true );
+    		b.setGravity( 3 | 16 ); //sorry not to use constants, I got lame and couldn't figure it out
+    		b.setTypeface( Typeface.create( Typeface.DEFAULT, Typeface.BOLD ) );
+    		b.setText(R.string.home_newstation);
+
     		getListView().addHeaderView(b, null, true);
         } else {
             mProfileBubble = new ProfileBubble(this);

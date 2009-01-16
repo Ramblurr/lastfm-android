@@ -8,12 +8,12 @@
 	<fm.last.android.widget.TabBar
 		android:id="@+id/TabBar" android:layout_width="fill_parent"
 		android:layout_height="60dip" 
-		android:layout_marginTop="6dip"/>
+		android:layout_marginTop="5px"
+		android:layout_marginRight="11px"/>
 	<LinearLayout android:id="@+id/TabBarSpacer"
 		android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
 		android:layout_height="5dip"
-		android:layout_below="@id/TabBar"
-		android:layout_marginBottom="4dip"/>
+		android:layout_below="@id/TabBar"/>
 	<ViewFlipper android:id="@+id/ViewFlipper"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
 		android:layout_below="@+id/TabBarSpacer">

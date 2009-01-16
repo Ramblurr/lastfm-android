@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -87,7 +88,7 @@ public class TabBar extends LinearLayout {
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class TabImage extends LinearLayout implements Tab{
+	private class TabImage extends LinearLayout implements Tab {
 		
 		private ImageButton mImageButton;
 		private TextView mTextView;
@@ -275,8 +276,10 @@ public class TabBar extends LinearLayout {
 		
 		LayoutParams params = new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 		params.weight = 1;
-		params.setMargins(mPadding/2, 0, mPadding/2, 0);
+		params.setMargins(mPadding, 0, 0, 0);
 		addViewInLayout(v.getView(), -1, params);
+		
+		if (mPadding == 4) mPadding = 6; //mattb aesthetics, second tab and onwards have more spacing
 	}
 
 	/**

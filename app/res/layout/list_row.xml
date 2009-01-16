@@ -17,38 +17,57 @@
 
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_width="fill_parent" android:layout_height="wrap_content"
-	android:orientation="horizontal" android:id="@+id/station_row" android:background="@drawable/list_item_rest_fullwidth"
-	>
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:id="@+id/station_row"
+	android:background="@drawable/list_item_rest_fullwidth"
+	android:paddingLeft="20px">
 	<ImageView android:id="@+id/row_icon"
-		android:adjustViewBounds="true" android:layout_height="wrap_content"
-		android:layout_width="45px" android:maxHeight="45px" android:maxWidth="45px"
-		android:layout_gravity="center_vertical" android:visibility="gone"/>
+		android:adjustViewBounds="true"
+		android:layout_height="wrap_content"
+		android:layout_width="34px" 
+		android:maxHeight="26px" 
+		android:maxWidth="34px"
+		android:layout_gravity="center_vertical"
+		android:visibility="gone"/>
 	<LinearLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:orientation="vertical"
 		android:layout_gravity="center_vertical"
 		android:layout_weight="1">		
 		<TextView android:id="@+id/row_label" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:text="Black Eyed Peas"
-				android:layout_weight="1" android:paddingLeft="16dip"  
-				android:layout_gravity="center" android:gravity="left|center_vertical" android:textSize="16dip" android:textStyle="bold" android:textColor="#000"/>
+				android:layout_height="wrap_content" 
+				android:text="Black Eyed Peas"
+				android:layout_weight="1"
+				android:layout_gravity="center"
+				android:gravity="left|center_vertical"
+				android:textSize="7pt"
+				android:textStyle="bold"
+				android:textColor="#000"/>
 		<TextView android:id="@+id/row_label_second"
 				android:layout_width="fill_parent"
 				android:visibility="gone"
-				android:layout_height="wrap_content" android:text=""
-				android:layout_weight="1" android:paddingLeft="16dip"  
-				android:layout_gravity="center" android:gravity="left|center_vertical" android:textSize="10sp" android:textColor="#333"/>
+				android:layout_height="wrap_content"
+				android:text=""
+				android:layout_weight="1"
+				android:layout_gravity="center"
+				android:gravity="left|center_vertical"
+				android:textSize="10sp"
+				android:textColor="#333"/>
 	</LinearLayout>
 	<ViewSwitcher android:id="@+id/row_view_switcher"
 		android:layout_width="wrap_content" android:layout_gravity="center"
 		android:layout_height="wrap_content" android:visibility="gone">
-		<ImageView android:id="@+id/row_disclosure_icon" android:paddingLeft="16dip" android:paddingRight="16dip"
+		<ImageView android:id="@+id/row_disclosure_icon" 
+		    android:paddingLeft="20px" 
 			android:src="@drawable/arrow"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
 		<ProgressBar android:layout_width="30px"
-			android:layout_height="30px" android:indeterminate="true"
+			android:layout_height="30px"
+			android:indeterminate="true"
+			android:layout_marginRight="2px"
 			android:indeterminateDrawable="@+drawable/spinner_small"
-			android:layout_gravity="center_vertical|center_horizontal"/>
+			android:layout_gravity="center_vertical|right"/>
 	</ViewSwitcher>
 </LinearLayout>
