@@ -236,10 +236,12 @@ public class Player extends Activity
 			try {
 	            Intent intent = new Intent( Intent.ACTION_SEARCH );
 	            intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
-	            intent.putExtra(SearchManager.QUERY, LastFMApplication.getInstance().player.getAlbumName());
+	            intent.putExtra("actionSearchString", LastFMApplication.getInstance().player.getArtistName() + " "
+	            		+ LastFMApplication.getInstance().player.getTrackName());
+	            intent.putExtra("actionSearchType", 0);
 	            startActivity( intent );
 			} catch (Exception e) {
-				e.printStackTrace();
+				LastFMApplication.getInstance().presentError(Player.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
 			}
             break;
 		case R.id.tag_menu_item:

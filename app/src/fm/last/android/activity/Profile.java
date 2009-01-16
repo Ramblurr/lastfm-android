@@ -988,8 +988,7 @@ public class Profile extends ListActivity implements TabBarListener
     protected Dialog onCreateDialog(int id) 
     {
         final int dialogId = id;
-        if( mDialogList == null )
-            mDialogList = new ListView(Profile.this);
+        mDialogList = new ListView(Profile.this);
         mDialogAdapter = new ListAdapter(Profile.this, getImageCache());
 
         ArrayList<ListEntry> entries = prepareProfileActions(id);
@@ -1013,6 +1012,9 @@ public class Profile extends ListActivity implements TabBarListener
                        else 
                            buyAmazon(dialogId);
                        break;
+                   case 3:
+                	   buyAmazon(dialogId);
+                	   break;
                }
                
             }
@@ -1023,23 +1025,26 @@ public class Profile extends ListActivity implements TabBarListener
     void buyAmazon(int type)
     {
         String query = null;
+        int searchType = 0;
         if (type == DIALOG_ALBUM)
         {
-            query = mAlbumInfo.getTitle();
-                        
+            query = mAlbumInfo.getArtist() + " " + mAlbumInfo.getTitle();
+            searchType = 1;
         } 
         else if( type == DIALOG_TRACK) 
         {
-            query = mTrackInfo.getName();
+            query = mTrackInfo.getArtist().getName() + " " + mTrackInfo.getName();
+            searchType = 0;
         }
         if( query != null ) {
             try {
                 Intent intent = new Intent( Intent.ACTION_SEARCH );
                 intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
-                intent.putExtra(SearchManager.QUERY, query);
+                intent.putExtra("actionSearchString", query);
+                intent.putExtra("actionSearchType", searchType);
                 startActivity( intent );
             } catch (Exception e) {
-                e.printStackTrace();
+				LastFMApplication.getInstance().presentError(Profile.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
             }
         }
     }
@@ -1098,17 +1103,16 @@ public class Profile extends ListActivity implements TabBarListener
         entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
         iconifiedEntries.add(entry);
         
-        if( type == DIALOG_ALBUM) {
-            entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
-            iconifiedEntries.add(entry);
-            
 //            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
 //            iconifiedEntries.add(entry);
-        }
         if( type == DIALOG_TRACK) {
             entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
             iconifiedEntries.add(entry);
         }
+
+        entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
+        iconifiedEntries.add(entry);
+            
         return iconifiedEntries;        
     }
     
