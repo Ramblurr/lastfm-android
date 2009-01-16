@@ -116,7 +116,6 @@ public class Tag extends Activity implements TabBarListener {
 		// add callback listeners
 		mTagEditText.setOnKeyListener( new View.OnKeyListener() {
 
-			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				switch( event.getKeyCode() )
 				{

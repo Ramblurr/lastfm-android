@@ -119,16 +119,13 @@ public class TagLayout extends ViewGroup {
 			Animation a = AnimationUtils.loadAnimation(this.getContext(), R.anim.tag_fadein);
 			a.setAnimationListener(new AnimationListener(){
 
-				@Override
 				public void onAnimationEnd(Animation animation) {
 					tagButton.setVisibility(View.VISIBLE);
 				}
 
-				@Override
 				public void onAnimationRepeat(Animation animation) {
 				}
 
-				@Override
 				public void onAnimationStart(Animation animation) {
 				}
 				

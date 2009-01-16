@@ -116,7 +116,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 			holder.image.setVisibility(View.VISIBLE);
 
 		// set disclosure image (if set)
-		if(mList.get(position).disclosure_id != -1){
+		if(mList.get(position).disclosure_id != -1 || mLoadingBar == position){
 			holder.vs.setVisibility(View.VISIBLE);
 			holder.disclosure.setImageResource(mList.get(position).disclosure_id);
 		} else {

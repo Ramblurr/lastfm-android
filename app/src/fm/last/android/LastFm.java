@@ -2,6 +2,7 @@ package fm.last.android;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.activity.Profile;
+import fm.last.android.activity.Share;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;

@@ -215,7 +215,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No tags found", Toast.LENGTH_SHORT);
+        		Toast.makeText(NewStation.this, "No tags found", Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
@@ -281,7 +281,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No artists found", Toast.LENGTH_SHORT);
+        		Toast.makeText(NewStation.this, "No artists found", Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
@@ -345,7 +345,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No users found", Toast.LENGTH_SHORT);
+        		Toast.makeText(NewStation.this, "No users found", Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}

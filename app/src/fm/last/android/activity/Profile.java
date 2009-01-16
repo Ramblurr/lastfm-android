@@ -998,25 +998,36 @@ public class Profile extends ListActivity implements TabBarListener
         mDialogList.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> l, View v, int position, long id) 
             {
-               switch (position)
-               {
-                   case 0: // Similar
-                       mDialogAdapter.enableLoadBar(position);
-                       playSimilar(dialogId);
-                       break;
-                   case 1: // Share
-                   case 2: // Tag or amazon
-                       mDialogAdapter.enableLoadBar(position);
-                       if( dialogId == DIALOG_TRACK)
-                           tagItem(dialogId);
-                       else 
-                           buyAmazon(dialogId);
-                       break;
-                   case 3:
-                	   buyAmazon(dialogId);
-                	   break;
-               }
-               
+            	if(dialogId == DIALOG_TRACK) {
+                    switch (position)
+                    {
+                        case 0: // Similar
+                            mDialogAdapter.enableLoadBar(position);
+                            playSimilar(dialogId);
+                            break;
+                        case 1: // Share
+                     	   shareItem();
+                     	   break;
+                        case 2: // Tag
+                            tagItem(dialogId);
+                            break;
+                        case 3:
+                     	   buyAmazon(dialogId);
+                     	   break;
+                    }
+            	}
+            	if(dialogId == DIALOG_ALBUM) {
+                    switch (position)
+                    {
+                        case 0: // Similar
+                            mDialogAdapter.enableLoadBar(position);
+                            playSimilar(dialogId);
+                            break;
+                        case 1: // Amazon
+                            buyAmazon(dialogId);
+                            break;
+                    }
+            	}
             }
             });
         return new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
@@ -1047,6 +1058,13 @@ public class Profile extends ListActivity implements TabBarListener
 				LastFMApplication.getInstance().presentError(Profile.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
             }
         }
+    }
+    
+    void shareItem() {
+        Intent intent = new Intent( this, Share.class );
+        intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
+        intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
+        startActivity( intent );
     }
     
     void tagItem(int type)
@@ -1099,13 +1117,11 @@ public class Profile extends ListActivity implements TabBarListener
         
         ListEntry entry = new ListEntry(R.string.dialog_similar, R.drawable.radio, getResources().getString(R.string.dialog_similar));
         iconifiedEntries.add(entry);
-        
-        entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
-        iconifiedEntries.add(entry);
-        
-//            entry = new ListEntry(R.string.dialog_tagalbum, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagalbum));
-//            iconifiedEntries.add(entry);
+
         if( type == DIALOG_TRACK) {
+            entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
+            iconifiedEntries.add(entry);
+
             entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
             iconifiedEntries.add(entry);
         }

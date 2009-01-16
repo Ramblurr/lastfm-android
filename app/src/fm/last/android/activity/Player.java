@@ -245,6 +245,16 @@ public class Player extends Activity
 				LastFMApplication.getInstance().presentError(Player.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
 			}
             break;
+		case R.id.share_menu_item:
+			try {
+		        Intent intent = new Intent( this, Share.class );
+		        intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
+		        intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
+		        startActivity( intent );
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
 		case R.id.tag_menu_item:
 			fireTagActivity();
 			break;
