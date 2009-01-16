@@ -69,19 +69,12 @@ public class TagListAdapter extends ListAdapter {
 		} else {
 			holder = (ViewHolder)row.getTag();
 		}
-
-		/*if(mResId != 0){
-			holder.iv.setImageResource(mResId);
-		}
-		else {
-			holder.iv.setVisibility(View.GONE);
-		}*/
 		
 		// TODO remove hardcoded colors
 		if(mList.get(position).added){
 			holder.label.setTextColor(0x337a7a7a);
 		} else {
-			holder.label.setTextColor(0xff7a7a7a);
+			holder.label.setTextColor(0xff000000);
 		}
 		
 		holder.label.setText(mList.get(position).text);
