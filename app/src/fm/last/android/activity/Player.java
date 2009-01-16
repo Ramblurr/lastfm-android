@@ -702,12 +702,17 @@ public class Player extends Activity
 					"<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>" + mArtistName.getText() + "</span><br/>" +
 					"<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + artist.getListeners() + " listeners<br/>" +
 					artist.getPlaycount() + " plays</span></div>" +
-					"<br style='clear:both;'/>" + artist.getBio().getContent() + "</div></body></html>";
+					"<br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
     			success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
     		}
             return success;
+        }
+        
+        private String formatBio(String wikiText) {
+        	// last.fm api returns the wiki text without para formatting, correct that:
+        	return wikiText.replaceAll("\\n+", "<br>"); 
         }
 
         @Override
