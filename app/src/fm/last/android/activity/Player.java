@@ -1,6 +1,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
@@ -695,14 +696,35 @@ public class Player extends Activity
     					break;
     				}
     			}
-    			mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>" +
-					"<div style='padding:17px; margin:0; top:0px; left:0px; width:286; position:absolute;'>" +
-					"<img src='" + imageURL + "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; height:64px; border:1px solid gray; padding: 1px;'/>" +
-					"<div style='float:right; width: 180px; padding:0px; margin:0px; margin-top:1px; margin-left:3px;'>" +
-					"<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>" + mArtistName.getText() + "</span><br/>" +
-					"<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + artist.getListeners() + " listeners<br/>" +
-					artist.getPlaycount() + " plays</span></div>" +
-					"<br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
+    			
+				String listeners = "";
+				String plays = "";
+				try {
+					NumberFormat nf = NumberFormat.getInstance();
+					listeners = nf.format(Integer.parseInt(artist
+							.getListeners()));
+					plays = nf.format(Integer.parseInt(artist.getPlaycount()));
+				} catch (NumberFormatException e) {
+				}
+
+				mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>"
+						+ "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>"
+						+ "<img src='"
+						+ imageURL
+						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
+						+ "<div style='margin-left:84px; margin-top:3px'>"
+						+ "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
+						+ mArtistName.getText()
+						+ "</span><br/>"
+						+ "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
+						+ listeners
+						+ " listeners<br/>"
+						+ plays
+						+ " plays</span></div>"
+						+ "<br style='clear:both;'/>"
+						+ formatBio(artist.getBio().getContent())
+						+ "</div></body></html>";
+    			
     			success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
