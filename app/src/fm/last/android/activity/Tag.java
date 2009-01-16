@@ -20,6 +20,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -295,26 +296,18 @@ public class Tag extends Activity implements TabBarListener {
 	}
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        
-        // Parameters for menu.add are:
-        // group -- Not used here.
-        // id -- Used only when you want to handle and identify the click yourself.
-        // title
-        MenuItem save = menu.add(Menu.NONE, 1, Menu.NONE, "Save");
-        save.setIcon(android.R.drawable.ic_menu_save);
-        MenuItem cancel = menu.add(Menu.NONE, 0, Menu.NONE, "Cancel");
-        cancel.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-        return true;
+    	MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.tag, menu);
+		return super.onCreateOptionsMenu(menu);
     }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case 0:
+		case R.id.cancel_menu_item:
 			finish();
 			break;
-		case 1:
+		case R.id.save_menu_item:
 			new SaveTagTask().execute((Object)null);
 			break;
 		default:
