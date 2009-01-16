@@ -65,22 +65,6 @@ public class LastFMApplication extends Application
 		}
     }
     
-    private BroadcastReceiver mStatusListener = new BroadcastReceiver()
-    {
-
-        @Override
-        public void onReceive( Context context, Intent intent )
-        {
-            String action = intent.getAction();
-            if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
-            {
-       			Intent i = new Intent( mCtx, Player.class );
-       			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-       			startActivity( i );
-            }
-        }
-    };
-
 	private ServiceConnection mConnection = new ServiceConnection()
 	{
 
@@ -256,6 +240,22 @@ public class LastFMApplication extends Application
     		this.showPlayer = showPlayer;
     	}
     	
+    	
+        private BroadcastReceiver mStatusListener = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive( Context context, Intent intent )
+            {
+                String action = intent.getAction();
+                if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
+                {
+           			Intent i = new Intent( mCtx, Player.class );
+           			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+           			startActivity( i );
+                }
+            }
+        };
+    	
     	public void onPreExecute() {
     		if(showPlayer) {
                 IntentFilter f = new IntentFilter();
@@ -274,15 +274,12 @@ public class LastFMApplication extends Application
     				LastFMApplication.getInstance().player.startRadio();
         			appendRecentStation( LastFMApplication.getInstance().player.getStationUrl(), LastFMApplication.getInstance().player.getStationName() );
         			success = true;
-    			} else {
-    				success = false;
-    			}
+    			} 
     		}
     		catch ( Exception e )
     		{
     			Log.d( "LastFMPlayer", "couldn't start playback: " + e );
 				e.printStackTrace();
-    			success = false;
     		}
             return success;
         }
