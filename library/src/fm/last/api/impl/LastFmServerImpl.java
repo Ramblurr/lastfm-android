@@ -420,4 +420,13 @@ final class LastFmServerImpl implements LastFmServer {
         TrackFunctions.banTrack(baseUrl, params);
     }
 
+    public void shareTrack(String artist, String track, String recipient, String sk) throws IOException {
+        Map<String, String> params = createParams("track.share");
+        params.put("artist", artist);
+        params.put("track", track);
+        params.put("recipient", recipient);
+        params.put("sk", sk);
+        signParams(params);
+        TrackFunctions.shareTrack(baseUrl, params);
+    }
 }

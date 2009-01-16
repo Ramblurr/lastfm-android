@@ -260,4 +260,5 @@ public interface LastFmServer {
     public AudioscrobblerService createAudioscrobbler( Session session );
     public void loveTrack(String artist, String track, String sk) throws IOException;
     public void banTrack(String artist, String track, String sk) throws IOException;
+    public void shareTrack(String artist, String track, String recipient, String sk) throws IOException;
 }
