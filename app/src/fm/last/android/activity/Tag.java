@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.R.id;
 import fm.last.android.adapter.TagListAdapter;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
@@ -19,6 +20,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -108,6 +110,25 @@ public class Tag extends Activity implements TabBarListener {
 		// restoring or creatingData
 		restoreMe();
 		
+		
+		// add callback listeners
+		mTagEditText.setOnKeyListener( new View.OnKeyListener() {
+
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				switch( event.getKeyCode() )
+				{
+					case KeyEvent.KEYCODE_ENTER:
+						mTagButton.performClick();
+						mTagEditText.setText( "" );
+						return true;
+					default:
+						return false;
+				}
+			}
+			
+		});
+		
 		mTagButton.setOnClickListener(new OnClickListener(){
 
 			public void onClick(View v) {
@@ -147,7 +168,7 @@ public class Tag extends Activity implements TabBarListener {
 							}
 
 						});
-						view.startAnimation(mFadeOutAnimation);
+						view.findViewById(R.id.row_label).startAnimation(mFadeOutAnimation);
 					}
 				}
 
@@ -334,6 +355,9 @@ public class Tag extends Activity implements TabBarListener {
 	 * @return true if successful
 	 */
 	private boolean addTag(String tag){
+		if( !isValidTag( tag ))
+			return false;
+		
 		for(int i=0; i<mTrackNewTags.size(); i++){
 			if(mTrackNewTags.get(i).equals(tag)){
 				// tag already exists, abort
@@ -342,6 +366,21 @@ public class Tag extends Activity implements TabBarListener {
 		}
 		mTrackNewTags.add(tag);
 		mTagLayout.addTag(tag);
+		return true;
+	}
+	
+
+	/**
+	 * Validates a tag
+	 * 
+	 * @param tag
+	 * @return true if tag is valid
+	 */
+	private boolean isValidTag( String tag )
+	{
+		if( tag.trim().length() == 0 )
+			return false;
+		
 		return true;
 	}
 
