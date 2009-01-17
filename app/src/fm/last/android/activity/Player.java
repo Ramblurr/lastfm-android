@@ -5,11 +5,9 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.Locale;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.LastFm;
 import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
@@ -18,10 +16,10 @@ import fm.last.android.Worker;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.ListAdapter;
+import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
-import fm.last.android.utils.Rotate3dAnimation;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
@@ -36,23 +34,17 @@ import fm.last.api.WSError;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -60,21 +52,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Animation.AnimationListener;
 import android.webkit.WebView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
-import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class Player extends Activity
@@ -761,10 +748,8 @@ public class Player extends Activity
     	
         @Override
     	public void onPreExecute() {
-	        String[] strings = new String[]{"Loading..."};
 	        mSimilarList.setOnItemClickListener(null);
-	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
-	                R.layout.list_row, R.id.row_label, strings)); 
+	        mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading...")); 
         }
     	
         @Override
@@ -808,9 +793,7 @@ public class Player extends Activity
         		mSimilarList.setAdapter(mSimilarAdapter);
         		mSimilarList.setOnScrollListener(mSimilarAdapter.getOnScrollListener());
         	} else {
-    	        String[] strings = new String[]{"No Similar Artists"};
-    	        mSimilarList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.list_row, R.id.row_label, strings)); 
+        		mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
         	}
         }
     }
@@ -819,9 +802,8 @@ public class Player extends Activity
     	
         @Override
     	public void onPreExecute() {
-   	        String[] strings = new String[]{"Loading..."};
-   	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.list_row, R.id.row_label, strings)); 
+        	mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+        	mFanList.setOnItemClickListener(null);
         }
     	
         @Override
@@ -866,9 +848,7 @@ public class Player extends Activity
         		mFanList.setAdapter(mFanAdapter);
         		mFanList.setOnScrollListener(mFanAdapter.getOnScrollListener());
         	} else {
-    	        String[] strings = new String[]{"No Top Listeners"};
-    	        mFanList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.list_row, R.id.row_label, strings)); 
+        		mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
         	}
         }
     }
@@ -877,9 +857,7 @@ public class Player extends Activity
     	
         @Override
     	public void onPreExecute() {
-   	        String[] strings = new String[]{"Loading..."};
-   	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.list_row, R.id.row_label, strings));
+        	mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
    	        mTagList.setOnItemClickListener(null);
         }
     	
@@ -922,9 +900,7 @@ public class Player extends Activity
         	if(result) {
         		mTagList.setAdapter(mTagAdapter);
         	} else {
-    	        String[] strings = new String[]{"No Tags"};
-    	        mTagList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.list_row, R.id.row_label, strings)); 
+        		mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Tags"));
         	}
         }
     }
@@ -982,9 +958,8 @@ public class Player extends Activity
         	mOntourButton.setAnimation(null);
         	mOntourButton.setVisibility(View.GONE);
         	
-   	        String[] strings = new String[]{"Loading..."};
-   	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
-   	                R.layout.list_row, R.id.row_label, strings)); 
+        	mEventList.setOnItemClickListener(null);
+        	mEventList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
         }
     	
         @Override
@@ -1027,9 +1002,7 @@ public class Player extends Activity
         		mOntourButton.startAnimation(a);
         	} else {
         		mEventList.setOnItemClickListener(null);
-    	        String[] strings = new String[]{"No Upcoming Events"};
-    	        mEventList.setAdapter(new ArrayAdapter<String>(Player.this, 
-    	                R.layout.list_row, R.id.row_label, strings));
+        		mEventList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Upcoming Events"));
     	        mOntourButton.setVisibility(View.GONE);
         	}
         }

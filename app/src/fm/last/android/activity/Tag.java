@@ -7,7 +7,6 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
-import fm.last.android.R.id;
 import fm.last.android.adapter.TagListAdapter;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
