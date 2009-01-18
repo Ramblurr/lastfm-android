@@ -6,48 +6,27 @@
 package fm.last.android.activity;
 
 import android.app.ListActivity;
-import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.RadioGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
-import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
-import fm.last.android.R.id;
-import fm.last.android.R.layout;
-import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.utils.ImageCache;
@@ -55,7 +34,6 @@ import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
 import fm.last.android.widget.TabBarListener;
 import fm.last.api.LastFmServer;
-import fm.last.api.Session;
 import fm.last.api.Artist;
 import fm.last.api.Tag;
 import fm.last.api.User;
@@ -74,7 +52,7 @@ public class NewStation extends ListActivity implements TabBarListener
     private SearchType searching;
     private EditText searchBar;
     private ListAdapter mAdapter;
-    private boolean mDoingSearch;
+    private Button mSearchButton;
     private TabBar mTabBar;
 	private ImageCache mImageCache;
 	private TextView mHint;
@@ -92,7 +70,23 @@ public class NewStation extends ListActivity implements TabBarListener
         setContentView( R.layout.newstation );
 
         searchBar = ( EditText ) findViewById( R.id.station_editbox );
-        findViewById( R.id.search ).setOnClickListener( mNewStation );
+        searchBar.setOnKeyListener( new View.OnKeyListener() {
+
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				switch( event.getKeyCode() )
+				{
+					case KeyEvent.KEYCODE_ENTER:
+						mSearchButton.performClick();
+						return true;
+					default:
+						return false;
+				}
+			}
+			
+		});
+
+		mSearchButton = (Button)findViewById(R.id.search);
+        mSearchButton.setOnClickListener( mNewStation );
         
         mHint = (TextView)findViewById(R.id.search_hint);
 
@@ -110,7 +104,6 @@ public class NewStation extends ListActivity implements TabBarListener
         mImageCache = new ImageCache();
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
-        mDoingSearch = false;
     }
 
     @Override
@@ -165,7 +158,7 @@ public class NewStation extends ListActivity implements TabBarListener
     	
         @Override
     	public void onPreExecute() {
-            mDoingSearch = true;
+        	searchBar.setEnabled(false);
             Toast.makeText( NewStation.this, "Searching...",
                     Toast.LENGTH_LONG ).show();
         }
@@ -174,8 +167,6 @@ public class NewStation extends ListActivity implements TabBarListener
         public Boolean doInBackground(Void...params) {
 	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
             	.getText().toString();
-	        final Session session = ( Session ) LastFMApplication
-            	.getInstance().map.get( "lastfm_session" );
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mAdapter = new ListAdapter(NewStation.this, mImageCache);
@@ -219,6 +210,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
+        	searchBar.setEnabled(true);
         }
     }
 
@@ -226,7 +218,7 @@ public class NewStation extends ListActivity implements TabBarListener
     	
         @Override
     	public void onPreExecute() {
-            mDoingSearch = true;
+        	searchBar.setEnabled(false);
             Toast.makeText( NewStation.this, "Searching...",
                     Toast.LENGTH_LONG ).show();
         }
@@ -235,8 +227,6 @@ public class NewStation extends ListActivity implements TabBarListener
         public Boolean doInBackground(Void...params) {
 	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
             	.getText().toString();
-	        final Session session = ( Session ) LastFMApplication
-            	.getInstance().map.get( "lastfm_session" );
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mAdapter = new ListAdapter(NewStation.this, mImageCache);
@@ -285,6 +275,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
+        	searchBar.setEnabled(true);
         }
     }
 
@@ -292,7 +283,7 @@ public class NewStation extends ListActivity implements TabBarListener
     	
         @Override
     	public void onPreExecute() {
-            mDoingSearch = true;
+        	searchBar.setEnabled(false);
             Toast.makeText( NewStation.this, "Searching...",
                     Toast.LENGTH_LONG ).show();
         }
@@ -301,8 +292,6 @@ public class NewStation extends ListActivity implements TabBarListener
         public Boolean doInBackground(Void...params) {
 	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
             	.getText().toString();
-	        final Session session = ( Session ) LastFMApplication
-            	.getInstance().map.get( "lastfm_session" );
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mAdapter = new ListAdapter(NewStation.this, mImageCache);
@@ -349,6 +338,7 @@ public class NewStation extends ListActivity implements TabBarListener
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
+        	searchBar.setEnabled(true);
         }
     }
 

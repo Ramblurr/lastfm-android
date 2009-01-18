@@ -32,6 +32,10 @@
 			<intent-filter>
 			</intent-filter>
 		</activity>
+		<activity android:name=".activity.AddToPlaylist" android:label="Last.fm: Add To Playlist" android:configChanges="keyboardHidden">
+			<intent-filter>
+			</intent-filter>
+		</activity>
 		<activity android:name=".activity.Tag" android:label="Last.fm: Tag" android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />

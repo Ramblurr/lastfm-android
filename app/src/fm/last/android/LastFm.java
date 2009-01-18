@@ -2,7 +2,6 @@ package fm.last.android;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.activity.Profile;
-import fm.last.android.activity.Share;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
@@ -17,7 +16,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
@@ -53,6 +51,7 @@ public class LastFm extends Activity
                 Intent intent = new Intent( LastFm.this, Profile.class );
                 startActivity( intent );
                 finish();
+                return;
             }
             catch ( Exception e )
             { // login failed

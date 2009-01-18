@@ -26,6 +26,7 @@
 	<string name="dialog_tagtrack">Tag Track</string>
 	<string name="dialog_share">Share</string>
 	<string name="dialog_addlibrary">Add to Library</string>
+	<string name="dialog_addplaylist">Add to Playlist</string>
 	<string name="dialog_love">Love</string>
 	<string name="dialog_ban">Ban</string>
 	

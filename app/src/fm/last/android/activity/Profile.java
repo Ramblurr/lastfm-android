@@ -10,7 +10,6 @@ import java.util.WeakHashMap;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
-import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -34,13 +33,10 @@ import android.view.View.OnFocusChangeListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout.LayoutParams;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -69,7 +65,6 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
-import fm.last.api.WSError;
 
 public class Profile extends ListActivity implements TabBarListener
 {
@@ -320,8 +315,17 @@ public class Profile extends ListActivity implements TabBarListener
 		registerReceiver( mStatusListener, mIntentFilter );
     	SetupRecentStations();
     	RebuildMainMenu();
+
     	if(mTopArtistsAdapter != null)
     		mTopArtistsAdapter.disableLoadBar();
+    	if(mTopAlbumsAdapter != null)
+    		mTopAlbumsAdapter.disableLoadBar();
+    	if(mTopTracksAdapter != null)
+    		mTopTracksAdapter.disableLoadBar();
+    	if(mRecentTracksAdapter != null)
+    		mRecentTracksAdapter.disableLoadBar();
+    	if(mFriendsAdapter != null)
+    		mFriendsAdapter.disableLoadBar();
     	if(mTagsAdapter != null)
     		mTagsAdapter.disableLoadBar();
 		super.onResume();
@@ -484,19 +488,6 @@ public class Profile extends ListActivity implements TabBarListener
     		}
     		
     	}
-    };
-    
-    
-
-    private OnClickListener mNowPlayingListener = new OnClickListener()
-    {
-
-        public void onClick( View v )
-        {
-
-            Intent intent = new Intent( Profile.this, Player.class );
-            startActivity( intent );
-        }
     };
     
     public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -1017,7 +1008,10 @@ public class Profile extends ListActivity implements TabBarListener
                         case 2: // Tag
                             tagItem(dialogId);
                             break;
-                        case 3:
+                        case 3: // Add to Playlist
+                      	   addItemToPlaylist();
+                      	   break;
+                        case 4: // Buy on Amazon
                      	   buyAmazon(dialogId);
                      	   break;
                     }
@@ -1068,6 +1062,13 @@ public class Profile extends ListActivity implements TabBarListener
     
     void shareItem() {
         Intent intent = new Intent( this, Share.class );
+        intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
+        intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
+        startActivity( intent );
+    }
+    
+    void addItemToPlaylist() {
+        Intent intent = new Intent( this, AddToPlaylist.class );
         intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
         intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
         startActivity( intent );
@@ -1129,6 +1130,9 @@ public class Profile extends ListActivity implements TabBarListener
             iconifiedEntries.add(entry);
 
             entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
+            iconifiedEntries.add(entry);
+
+            entry = new ListEntry(R.string.dialog_addplaylist, R.drawable.playlist_dark, getResources().getString(R.string.dialog_addplaylist));
             iconifiedEntries.add(entry);
         }
 

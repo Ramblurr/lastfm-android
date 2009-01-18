@@ -55,17 +55,14 @@ public class NotificationAdapter extends BaseAdapter {
 		this.mMode = mode;
 	}
 
-	@Override
 	public int getCount() {
 		return 1;
 	}
 
-	@Override
 	public Object getItem(int arg0) {
 		return null;
 	}
 
-	@Override
 	public long getItemId(int position) {
 		return 0;
 	}
@@ -74,7 +71,6 @@ public class NotificationAdapter extends BaseAdapter {
         return false;
     }
 
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View row = convertView;
 		

@@ -9,6 +9,7 @@ import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
+import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
@@ -175,9 +176,8 @@ public class Share extends Activity {
     private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
     	@Override
     	public void onPreExecute() {
-            String[] strings = new String[]{"Loading"};
-            mFriendsList.setAdapter(new ArrayAdapter<String>(Share.this,
-                    R.layout.list_row, R.id.row_label, strings));
+        	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+        	mFriendsList.setOnItemClickListener(null);
     	}
     	
         @Override
@@ -224,9 +224,7 @@ public class Share extends Activity {
                 mFriendsList.setAdapter(mFriendsAdapter);
                 mFriendsList.setOnScrollListener(mFriendsAdapter.getOnScrollListener());
             } else {
-                String[] strings = new String[]{"No Friends Retrieved"};
-                mFriendsList.setAdapter(new ArrayAdapter<String>(Share.this,
-                        R.layout.list_row, R.id.row_label, strings));
+            	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.INFO_MODE, "No Friends :(")); 
             }
         }
     }
