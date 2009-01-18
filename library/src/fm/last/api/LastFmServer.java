@@ -261,4 +261,6 @@ public interface LastFmServer {
     public void loveTrack(String artist, String track, String sk) throws IOException;
     public void banTrack(String artist, String track, String sk) throws IOException;
     public void shareTrack(String artist, String track, String recipient, String sk) throws IOException;
+    public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException;
+    public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException;
 }

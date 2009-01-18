@@ -429,4 +429,25 @@ final class LastFmServerImpl implements LastFmServer {
         signParams(params);
         TrackFunctions.shareTrack(baseUrl, params);
     }
+
+    public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException {
+        Map<String, String> params = createParams("playlist.addTrack");
+        params.put("artist", artist);
+        params.put("track", track);
+        params.put("playlistID", playlistId);
+        params.put("sk", sk);
+        signParams(params);
+        TrackFunctions.shareTrack(baseUrl, params);
+    }
+
+    public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException {
+        Map<String, String> params = createParams("playlist.create");
+        params.put("title", title);
+        params.put("description", description);
+        params.put("sk", sk);
+        signParams(params);
+        //This returns the same XML response as user.getPlaylists
+        return UserFunctions.getUserPlaylists(baseUrl, params);
+    }
+
 }

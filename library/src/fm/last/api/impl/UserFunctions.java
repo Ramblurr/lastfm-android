@@ -158,7 +158,7 @@ public class UserFunctions {
 
 	public static RadioPlayList[] getUserPlaylists(String baseUrl,
 			Map<String, String> params) throws IOException, WSError {
-		String response = UrlUtil.doGet(baseUrl, params);
+		String response = UrlUtil.doPost(baseUrl, params);
 
 		Document responseXML = null;
 		try {
