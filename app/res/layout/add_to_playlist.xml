@@ -4,7 +4,7 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:background="#000" android:id="@+id/add_to_playlist">
 <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:background="@drawable/tab_bar_rest"><EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginLeft="4dip" android:layout_marginRight="4dip" android:hint="New Playlist" android:id="@+id/new_playlist" android:singleLine="true"></EditText>
-<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/logout_button" android:layout_marginRight="4dip" android:text="Create" android:textColor="#fff" android:id="@+id/create_button"></Button>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:background="@drawable/black_button" android:layout_marginRight="4dip" android:text="Create" android:textColor="#fff" android:id="@+id/create_button"></Button>
 </LinearLayout>
 		<ListView android:id="@+id/playlists"
 			android:background="#fff"

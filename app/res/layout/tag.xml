@@ -36,7 +36,7 @@
 				android:textColor="#fff" android:gravity="center"
 				android:layout_height="36dip" android:layout_width="wrap_content"
 				android:layout_marginLeft="4dip" android:layout_marginRight="4dip"
-				android:background="@drawable/logout_button" />
+				android:background="@drawable/black_button" />
 		</LinearLayout>
 
 		<fm.last.android.widget.TagLayout

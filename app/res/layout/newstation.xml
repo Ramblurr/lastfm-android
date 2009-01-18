@@ -23,7 +23,7 @@
 		android:layout_height="36dip" android:layout_width="56dip"
 		android:layout_marginLeft="4dip"
 		android:layout_marginRight="4dip"
-		android:background="@drawable/logout_button"/>
+		android:background="@drawable/black_button"/>
 	</LinearLayout>
 	
 	<LinearLayout android:layout_below="@id/SearchBar" android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical" android:background="#ebebeb"><ImageView android:layout_width="wrap_content" android:layout_height="wrap_content" android:src="@drawable/station_starter_logo" android:layout_gravity="center" android:layout_marginTop="80dip"></ImageView><TextView android:id="@+id/search_hint" android:layout_height="fill_parent" android:gravity="center" android:text="@string/newstation_hint_artist" android:textSize="8pt" android:textStyle="bold" android:layout_width="fill_parent" android:layout_marginTop="32dip"></TextView>
