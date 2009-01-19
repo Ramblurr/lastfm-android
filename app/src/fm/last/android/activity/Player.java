@@ -736,7 +736,7 @@ public class Player extends Activity
 					+ "<br style='clear:both;'/>"
 					+ formatBio(artist.getBio().getContent())
 					+ "</div></body></html>";
-
+				
 				success = true;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -752,10 +752,17 @@ public class Player extends Activity
 		@Override
 		public void onPostExecute(Boolean result) {
 			if(result) {
-				mWebView.loadData(mBio, "text/html", "utf-8");
-			} else {
-				mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
+				try {
+	    			mWebView.loadData(
+	    					new String(mBio.getBytes(), "utf-8"),		// need to do this, but is there a better way? 
+	    					"text/html", 
+	    					"utf-8");
+	    			return;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
+			mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
 		}
 	}
 
