@@ -35,9 +35,7 @@ public class FriendsBuilder extends XMLBuilder<Friends> {
     User[] users = new User[userNodes.size()];
     int i = 0;
     for (Node imageNode : userNodes) {
-    	if (i != 0) // small images are useless
-    		users[i-1] =userBuilder.build(imageNode);
-    	i++;
+  		users[i++] =userBuilder.build(imageNode);
     }
     return new Friends(users);
   }
