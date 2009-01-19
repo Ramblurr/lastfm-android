@@ -16,6 +16,7 @@ public class OnEventRowSelectedListener extends OnListRowSelectedListener {
 
 	public OnEventRowSelectedListener(ListView listView) {
 		super(listView);
+		setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth); //default values
 	}
 
 	@Override
