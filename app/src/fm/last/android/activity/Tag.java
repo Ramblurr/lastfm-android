@@ -19,7 +19,6 @@ import fm.last.api.Session;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -239,8 +238,8 @@ public class Tag extends Activity implements TabBarListener {
 	 * data (mTopTags, mUserTags & mTrackNewTags)
 	 */
 	private void fillData(){
-		mTopTagListAdapter.setSource(mTopTags);
-		mUserTagListAdapter.setSource(mUserTags);
+		mTopTagListAdapter.setSource(mTopTags, mTrackNewTags);
+		mUserTagListAdapter.setSource(mUserTags, mTrackNewTags);
 		for(int i=0; i<mTrackNewTags.size(); i++){
 			mTagLayout.addTag(mTrackNewTags.get(i));
 		}
@@ -307,7 +306,6 @@ public class Tag extends Activity implements TabBarListener {
 
 		for(int i=0; i<removeTags.size(); i++){
 			try {
-				Log.i("Lukasz", "removing tag "+removeTags.get(i));
 				mServer.removeTrackTag(mArtist, mTrack, removeTags.get(i), mSession.getKey());
 			} catch (IOException e) {
 				e.printStackTrace();

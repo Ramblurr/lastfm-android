@@ -44,8 +44,6 @@ public class TagListAdapter extends ListAdapter {
 	}
 	
 	private ArrayList<Entry> mList; 
-
-	// TODO public TagListAdapter(Activity context, ArrayList<String> presentTags)
 	
 	public TagListAdapter(Activity context) {
 		super(context);
@@ -111,16 +109,37 @@ public class TagListAdapter extends ListAdapter {
         ImageView icon;
     }
 	
-	public void setSource(ArrayList<String> list) {
+	/**
+	 * Sets data source (ArrayList of tags) for this adapter
+	 * 
+	 * @param tags ArrayList of tags
+	 */
+	public void setSource(ArrayList<String> tags) {
+		setSource(tags, null);
+	}
+	
+	/**
+	 * Sets data source (ArrayList of tags) for this adapter, additionally
+	 * allows to disable so called present tags which could have been previously
+	 * added by the user and we want them to be grayed out
+	 * 
+	 * @param tags ArrayList of tags
+	 * @param presentTags ArrayList of already added tags or null
+	 */
+	public void setSource(ArrayList<String> tags, ArrayList<String> presentTags) {
 		mList = new ArrayList<Entry>();
-		for(int i=0; i<list.size(); i++){
-			mList.add(new Entry(list.get(i), false));
+		for(int i=0; i<tags.size(); i++){
+			Entry entry = new Entry(tags.get(i), false);
+			if(presentTags != null){
+				entry.added = presentTags.contains(tags.get(i));
+			}
+			mList.add(entry);
 		}
 		notifyDataSetChanged();
 	}
 	
 	/**
-	 * Notify adapter that tag at given
+	 * Notify adapter that a tag at given
 	 * position has been added
 	 * 
 	 * @param position
@@ -131,7 +150,7 @@ public class TagListAdapter extends ListAdapter {
 	}
 	
 	/**
-	 * Notify adapter that given tag was
+	 * Notify adapter that a given tag was
 	 * unadded
 	 * 
 	 * @param tag
