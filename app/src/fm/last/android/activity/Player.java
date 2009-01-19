@@ -992,8 +992,14 @@ public class Player extends Activity
 		 */
 		public boolean mChangeMetadata = false;
 		
-		boolean mSuccess = false;
+		/**
+		 * States whether any events were fetched or not
+		 */
+		private boolean mSuccess = false;
 		
+		/**
+		 * New adapter representing events data
+		 */
 		private BaseAdapter mNewEventAdapter;
 		
 		private void updateMetadata(){
@@ -1011,7 +1017,7 @@ public class Player extends Activity
 		
 		private void reallyUpdateMetadata(){
 			mEventAdapter = mNewEventAdapter;
-			mEventList.setAdapter(mNewEventAdapter);
+			mEventList.setAdapter(mEventAdapter);
 			if(mSuccess){
 				mEventList.setOnItemClickListener(mEventOnItemClickListener);
 			} else {
@@ -1027,7 +1033,7 @@ public class Player extends Activity
 
 		@Override
 		public Boolean doInBackground(Void...params) {
-			boolean mSuccess = false;
+			mSuccess = false;
 
 			mNewEventAdapter = new EventListAdapter(Player.this);
 
