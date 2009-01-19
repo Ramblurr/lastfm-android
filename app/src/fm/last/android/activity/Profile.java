@@ -160,6 +160,8 @@ public class Profile extends ListActivity implements TabBarListener
     		b.setGravity( 3 | 16 ); //sorry not to use constants, I got lame and couldn't figure it out
     		b.setTypeface( Typeface.create( Typeface.DEFAULT, Typeface.BOLD ) );
     		b.setText(R.string.home_newstation);
+    		
+    		b.setTag( "header" );
 
     		getListView().addHeaderView(b, null, true);
         } else {
@@ -468,7 +470,6 @@ public class Profile extends ListActivity implements TabBarListener
     {
         public void onClick( View v )
         {
-
             Intent intent = new Intent( Profile.this, NewStation.class );
             startActivity( intent );
         }
@@ -512,8 +513,7 @@ public class Profile extends ListActivity implements TabBarListener
     private OnItemClickListener mProfileClickListener = new OnItemClickListener()
     {
 
-        public void onItemClick(AdapterView<?> arg0, View arg1, int position,
-                long id) 
+        public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) 
         {
             mProfileAdapter.enableLoadBar(position);
             switch ( position )

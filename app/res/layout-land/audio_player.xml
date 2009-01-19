@@ -98,7 +98,11 @@
 			            <TextView android:id="@+id/currenttime"
 			                style="@style/playback_time"
 			                android:layout_height="wrap_content"
-			                android:gravity="left" android:textStyle="bold" android:layout_gravity="bottom" android:layout_width="wrap_content" android:text="--:--"/>
+			                android:gravity="left" 
+			                android:textStyle="bold"
+			                android:layout_gravity="bottom"
+			                android:layout_width="wrap_content"
+			                android:text="--:--"/>
 			                
 			            <ProgressBar android:id="@android:id/progress"
 			                android:background="#000"
@@ -115,7 +119,10 @@
 			                style="@style/playback_time"
 			                android:layout_gravity="bottom"
 			                android:layout_height="wrap_content"
-			                android:textStyle="bold" android:gravity="right" android:layout_width="wrap_content" android:text="--:--"/>
+			                android:textStyle="bold"
+			                android:gravity="right"
+			                android:layout_width="wrap_content"
+			                android:text="--:--"/>
 			
 		            </LinearLayout>			
 		         </RelativeLayout>

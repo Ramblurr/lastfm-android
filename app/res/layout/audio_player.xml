@@ -81,21 +81,21 @@
 						android:layout_height="wrap_content">
 
 						<TextView android:id="@+id/currenttime" style="@style/playback_time"
-							android:layout_gravity="bottom" android:paddingLeft="5dip"
+							android:layout_gravity="bottom"
 							android:layout_height="wrap_content" android:layout_width="48dip"
-							android:gravity="right" android:maxWidth="48dip" android:width="48dip" android:text="--:--"/>
+							android:gravity="right" android:text="--:--"/>
 
 						<ProgressBar android:id="@android:id/progress"
 							android:background="#000" android:layout_height="8px"
 							android:paddingLeft="5px" android:paddingRight="5px"
+							android:layout_marginLeft="5px" android:layout_marginRight="5px"
 							android:indeterminateOnly="false" android:progressDrawable="@+drawable/progress_horizontal"
-							android:layout_width="200dip" android:layout_marginLeft="8dip"
-							android:layout_marginRight="8dip" android:layout_gravity="center_vertical" />
+							android:layout_width="200dip" android:layout_gravity="center_vertical" />
 
 						<TextView android:id="@+id/totaltime" style="@style/playback_time"
-							android:layout_gravity="bottom" android:paddingLeft="5dip"
+							android:layout_gravity="bottom"
 							android:layout_height="wrap_content" android:layout_width="48dip"
-							android:gravity="left" android:maxWidth="48dip" android:width="48dip" android:text="--:--"/>
+							android:gravity="left" android:text="--:--"/>
 
 					</LinearLayout>
 				</TableRow>

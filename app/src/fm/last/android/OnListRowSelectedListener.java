@@ -1,6 +1,7 @@
 package fm.last.android;
 
 import fm.last.android.adapter.LastFMStreamAdapter;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -68,7 +69,7 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 		
 		if (view.getTag() == "bottom")
 			view.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-		else
+		else if (view.getTag() != "header")
 			view.setBackgroundResource(mRestResource);
 		
 		if (view.findViewById(R.id.row_disclosure_icon) != null)
@@ -85,44 +86,29 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
     	mHighlightIconResource = highlight;
     }
             
-	public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
+	public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) 
+	{
 		if(mPreviousSelectedView != null) {
-			if (mPreviousPosition != 0 || mListView.getHeaderViewsCount() == 0)
+			if (mPreviousSelectedView.getTag() == "header")
+				mPreviousSelectedView.getOnFocusChangeListener().onFocusChange( mPreviousSelectedView , false);
+			else
 				unhighlight(mPreviousSelectedView, mPreviousPosition);
-			else {
-				// hackiness to get focus of header button working right
-				if (mListView.getHeaderViewsCount() > 0) {
-					View focusView = mListView.getChildAt( 0 );
-					if (focusView != null) {
-						focusView.getOnFocusChangeListener().onFocusChange(focusView, false);
-					}
-				}
+		}
+
+		if (view != null) {
+			if (view.getTag() == "header") {
+				view.requestFocus(); 
+			}
+			else if (mListView.getAdapter().isEnabled(position) && 
+				view != null && 
+				view.findViewById(R.id.row_disclosure_icon) != null)
+			{
+				highlight(view, position);
 			}
 		}
-
-		if (position >= 0 && 
-			mListView.getAdapter().isEnabled(position) && 
-			view != null && 
-			view.findViewById(R.id.row_disclosure_icon) != null)
-		{
-			highlight(view, position);
-		}
-		else if (position == 0) 
-		{
-			//Reached top of list - flick focus to header
-			//This is a bit hacky as it's a) presuming there is a header
-			//						 and  b) presuming the header is at child index 0
-			if (mListView.getHeaderViewsCount() > 0) {
-				View focusView = mListView.getChildAt( 0 );
-				if (focusView != null) {
-					focusView.requestFocus();
-				}
-			} 
-		}
-
+		
 		mPreviousSelectedView = view;
 		mPreviousPosition = position;
-	
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {
