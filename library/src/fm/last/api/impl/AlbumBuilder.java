@@ -28,7 +28,9 @@ public class AlbumBuilder extends XMLBuilder<Album> {
     ImageUrl[] images = new ImageUrl[imageNodes.size()];
     int i = 0;
     for (Node imageNode : imageNodes) {
-      images[i++] =imageBuilder.build(imageNode);
+    	if (i != 0) // small images are useless
+    		images[i-1] =imageBuilder.build(imageNode);
+    	i++;
     }
     return new Album(artist, title, mbid, url, images);
   }

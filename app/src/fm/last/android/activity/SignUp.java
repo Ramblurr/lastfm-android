@@ -29,8 +29,8 @@ public class SignUp extends Activity
 	protected TextView mPassword;
 	protected TextView mEmail;
 	
-    protected OnClickListener mOnSignUpClickListener = new OnClickListener() {
-		@Override
+    protected OnClickListener mOnSignUpClickListener = new OnClickListener() 
+    {	
 		public void onClick(View v) {
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			try {

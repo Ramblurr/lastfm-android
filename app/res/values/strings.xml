@@ -37,7 +37,7 @@
 	<string name="newstation_user">User</string>
 	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
-	<string name="newstation_hint_user">Type in a username to get started.</string>
+	<string name="newstation_hint_user">Type in a username\n to get started.</string>
 
 	<string name="event_showmap">Show Map</string>
 	<string name="event_attending">I\'m attending</string>

@@ -36,6 +36,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 	private ArrayList<ListEntry> mList;
 	private boolean mScrolling = false;
 	private int mLoadingBar = -1;
+	private boolean mScaled = true;
 	
 	public ListAdapter(Activity context) {
 		mContext = context;
@@ -81,7 +82,8 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		mList = new ArrayList<ListEntry>();
 	}
 	
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, ViewGroup parent)
+	{
 		View row=convertView;
 
 		ViewHolder holder;
@@ -153,6 +155,10 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 			holder.image.setImageResource(mList.get(position).disclosure_id);
 			
 		}
+		
+		if( !mScaled ) {
+        	((ImageView)row.findViewById( R.id.row_icon )).setScaleType( ImageView.ScaleType.CENTER );
+		}
 
 		return row;
 	}
@@ -194,6 +200,13 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 		if(mImageDownloader.getUserTask() == null){
 			mImageDownloader.getImages(urls);
 		}
+	}
+	
+	public void setIconsUnscaled()
+	{
+		// some icons shouldn't be scaled :(
+		// this is indeed dirty, class needs seperating out
+		mScaled = false;
 	}
 
 	public void asynOperationEnded() {

@@ -1,6 +1,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
 import android.widget.ViewSwitcher;
@@ -598,11 +600,21 @@ public class Profile extends ListActivity implements TabBarListener
                 if(topartists.length == 0 )
                     return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-                for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++){
+                for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++)
+                {
+                	String url = null;
+                	try 
+                	{
+                		ImageUrl[] urls = topartists[i].getImages();
+                		url = urls[0].getUrl();
+                	}
+                	catch (ArrayIndexOutOfBoundsException e)
+                	{}
+                                	
                     ListEntry entry = new ListEntry(topartists[i], 
                             R.drawable.artist_icon, 
                             topartists[i].getName(), 
-                            topartists[i].getImages()[0].getUrl(),
+                            url,
                             R.drawable.radio_icon);
                     iconifiedEntries.add(entry);
                 }
@@ -651,11 +663,21 @@ public class Profile extends ListActivity implements TabBarListener
                 if(topalbums.length == 0 )
                     return false;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-                for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++){
+                for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++)
+                {
+                	String url = null;
+                	try 
+                	{
+                		ImageUrl[] urls = topalbums[i].getImages();
+                		url = urls[ urls.length > 1 ? 1 : 0 ].getUrl();
+                	}
+                	catch (ArrayIndexOutOfBoundsException e)
+                	{}
+                	
                     ListEntry entry = new ListEntry(topalbums[i], 
                             R.drawable.no_artwork, 
                             topalbums[i].getTitle(),  
-                            topalbums[i].getImages()[0].getUrl(),
+                            url,
                             topalbums[i].getArtist());
                     iconifiedEntries.add(entry);
                 }
@@ -1018,6 +1040,7 @@ public class Profile extends ListActivity implements TabBarListener
 
         ArrayList<ListEntry> entries = prepareProfileActions(id);
         mDialogAdapter.setSourceIconified(entries);
+        mDialogAdapter.setIconsUnscaled();
         mDialogList.setAdapter(mDialogAdapter);
         mDialogList.setOnScrollListener(mDialogAdapter.getOnScrollListener());
         mDialogList.setOnItemClickListener(new OnItemClickListener() {

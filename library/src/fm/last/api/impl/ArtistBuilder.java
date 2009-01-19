@@ -37,7 +37,9 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
     ImageUrl[] images = new ImageUrl[imageNodes.size()];
     int i = 0;
     for (Node imageNode : imageNodes) {
-      images[i++] =imageBuilder.build(imageNode);
+    	if (i != 0) // small images are useless
+    		images[i-1] = imageBuilder.build(imageNode);
+    	i++;
     }
     Artist artist = new Artist(name, mbid, match, url, images, streamable, playcount, listeners);
     
