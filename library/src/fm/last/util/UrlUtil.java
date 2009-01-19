@@ -96,17 +96,23 @@ public class UrlUtil {
 			ostr = conn.getOutputStream();
 			copy(stuffToPost, ostr);
 		} finally {
-			ostr.close();
+			if( ostr != null )
+				ostr.close();
 		}
 
 		conn.connect();
 		BufferedReader reader = null;
 		try {
 			int rc = conn.getResponseCode();
-			if (rc != 200) {
+			InputStream contentStream = null;
+			if (rc == 400)
+				contentStream = conn.getErrorStream();
+			else if (rc != 200) {
 				throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
 			}
-			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+			else
+				contentStream = conn.getInputStream();
+			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
 			String response = toString(reader);
 			return response;
 		} finally {

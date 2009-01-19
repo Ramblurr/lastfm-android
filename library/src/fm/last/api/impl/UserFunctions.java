@@ -64,22 +64,22 @@ public class UserFunctions {
 	    }
 	}
 	
-	   public static User getAnyUserInfo(String url) throws IOException {
-	        URL theUrl = new URL(url);
-	        String response = UrlUtil.doGet(theUrl);
+   public static User getAnyUserInfo(String url) throws IOException {
+        URL theUrl = new URL(url);
+        String response = UrlUtil.doGet(theUrl);
 
 
-	        Document responseXML = null;
-	        try {
-	            responseXML = XMLUtil.stringToDocument(response);
-	        } catch (SAXException e) {
-	            throw new IOException(e.getMessage());
-	        }
+        Document responseXML = null;
+        try {
+            responseXML = XMLUtil.stringToDocument(response);
+        } catch (SAXException e) {
+            throw new IOException(e.getMessage());
+        }
 
-	        Node profileNode = XMLUtil.findNamedElementNode(responseXML, "profile");
-            UserBuilder builder = new UserBuilder();
-            return builder.buildOld(profileNode);
-	    }
+        Node profileNode = XMLUtil.findNamedElementNode(responseXML, "profile");
+        UserBuilder builder = new UserBuilder();
+        return builder.buildOld(profileNode);
+    }
 	
 	public static Tag[] getUserTopTags(String baseUrl, Map<String, String> params) throws IOException {
 		return TagFunctions.getTopTags(baseUrl, params);
@@ -188,6 +188,27 @@ public class UserFunctions {
 			}
 	
 			return playlists;
+	    }
+	}
+	
+	public static void signUp(String baseUrl, 
+			Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doPost(baseUrl, params);
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
 	    }
 	}
 }

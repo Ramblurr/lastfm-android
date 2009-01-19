@@ -2,6 +2,7 @@ package fm.last.android;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.activity.Profile;
+import fm.last.android.activity.SignUp;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
@@ -135,13 +136,27 @@ public class LastFm extends Activity
                 }
             }
         } );
+        
         mSignupButton.setOnClickListener( new OnClickListener() {
 
 			public void onClick(View v) {
-				startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse("https://m.last.fm/join/")));
+				Intent intent = new Intent( LastFm.this, SignUp.class );
+				startActivityForResult(intent, 0);
 			}
         	
         });
+    }
+    
+    @Override
+    public void onActivityResult( int requestCode, int resultCode, Intent data)
+    {
+    	if( requestCode != 0 || resultCode != RESULT_OK )
+    		return;
+    	
+    	mUserField.setText( data.getExtras().getString("username") );
+    	mPassField.setText( data.getExtras().getString("password") );
+    	mLoginButton.requestFocus();
+    	mLoginButton.performClick();
     }
 
     @Override

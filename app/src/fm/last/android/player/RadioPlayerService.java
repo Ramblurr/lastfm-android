@@ -517,8 +517,11 @@ public class RadioPlayerService extends Service
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
 			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
-			wakeLock.release();
-			wifiLock.release();
+			if( wakeLock.isHeld())
+				wakeLock.release();
+			
+			if( wifiLock.isHeld())
+				wifiLock.release();
 		}
 
 		public boolean tune( String url, Session session ) throws DeadObjectException, WSError

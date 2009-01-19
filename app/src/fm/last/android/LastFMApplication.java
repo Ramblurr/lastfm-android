@@ -192,6 +192,16 @@ public class LastFMApplication extends Application
     		}
     	}
     	
+    	if(error.getMethod().equals("user.signUp")) {
+    		title = R.string.ERROR_SIGNUP_TITLE;
+    		switch(error.getCode()) {
+	    		case WSError.ERROR_InvalidParameters:
+	    			presentError(ctx, getResources().getString(title), error.getMessage());
+	    			return;
+
+    		}
+    	}
+    	
     	if(title == 0)
     		title = R.string.ERROR_SERVER_UNAVAILABLE_TITLE;
     	

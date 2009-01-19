@@ -85,4 +85,7 @@
 	<string name="ERROR_NOSUCHUSER_TITLE">User Not Found</string>
 	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
 	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>
+<string name="signup_create_account">Create Account</string>
+<string name="ERROR_SIGNUP_TITLE">Could not signup</string>
+
 </resources>

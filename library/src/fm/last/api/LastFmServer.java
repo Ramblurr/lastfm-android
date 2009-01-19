@@ -49,6 +49,8 @@ public interface LastFmServer {
 	public Session getMobileSession(String username, String authToken) throws IOException;
 
 
+	public void signUp(String username, String password, String email) throws IOException;
+	
 	public Station tuneToStation(String station, String sk) throws IOException;
 
 	public RadioPlayList getRadioPlayList(String sk) throws IOException;
@@ -263,4 +265,5 @@ public interface LastFmServer {
     public void shareTrack(String artist, String track, String recipient, String sk) throws IOException;
     public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException;
     public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException;
+    
 }
