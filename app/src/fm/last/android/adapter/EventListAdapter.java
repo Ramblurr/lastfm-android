@@ -18,7 +18,7 @@ import android.widget.ArrayAdapter;
  */
 public class EventListAdapter extends SeparatedListAdapter{
 	
-	SimpleDateFormat mDateFormat = new SimpleDateFormat("dd MMMM yyyy");
+	SimpleDateFormat mDateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy");
 	
 	private Activity mContext;
 
