@@ -30,6 +30,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -104,7 +106,13 @@ public class Profile extends ListActivity implements TabBarListener
 	View previousSelectedView = null;
 	
 	ListView mDialogList;
-	private ListAdapter mDialogAdapter;;
+	private ListAdapter mDialogAdapter;
+	
+	//Animations
+	Animation mPushRightIn;
+	Animation mPushRightOut;
+	Animation mPushLeftIn;
+	Animation mPushLeftOut;
 	
 	//Profile lists
 	private ImageCache mImageCache;
@@ -174,6 +182,8 @@ public class Profile extends ListActivity implements TabBarListener
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
+		mNestedViewFlipper.setAnimateFirstView(false);
+		mNestedViewFlipper.setAnimationCacheEnabled(false);
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.setListener(this);
 		if(isAuthenticatedUser) {
@@ -223,6 +233,12 @@ public class Profile extends ListActivity implements TabBarListener
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
         mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
         mTagsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagsList));
+        
+        // Loading animations
+        mPushLeftIn = AnimationUtils.loadAnimation(this, R.anim.push_left_in);
+		mPushLeftOut = AnimationUtils.loadAnimation(this, R.anim.push_left_out);
+		mPushRightIn = AnimationUtils.loadAnimation(this, R.anim.push_right_in);
+		mPushRightOut = AnimationUtils.loadAnimation(this, R.anim.push_right_out);
         
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
@@ -497,6 +513,7 @@ public class Profile extends ListActivity implements TabBarListener
         {
             if( mViewFlipper.getDisplayedChild() == TAB_PROFILE && !mViewHistory.isEmpty() )
             {
+            	setPreviousAnimation();
                 mProfileAdapter.disableLoadBar();
                 mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
                 return true;
@@ -509,12 +526,23 @@ public class Profile extends ListActivity implements TabBarListener
         return false;
     }
     
+    private void setNextAnimation(){
+    	mNestedViewFlipper.setInAnimation(mPushLeftIn);
+		mNestedViewFlipper.setOutAnimation(mPushLeftOut);
+    }
+    
+    private void setPreviousAnimation(){
+    	mNestedViewFlipper.setInAnimation(mPushRightIn);
+		mNestedViewFlipper.setOutAnimation(mPushRightOut);
+    }
     
     private OnItemClickListener mProfileClickListener = new OnItemClickListener()
     {
 
+    	
         public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) 
         {
+        	setNextAnimation();
             mProfileAdapter.enableLoadBar(position);
             switch ( position )
             {
