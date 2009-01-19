@@ -57,6 +57,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
 import android.webkit.WebView;
 import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -81,8 +82,8 @@ public class Player extends Activity
 	private ProgressBar mProgress;
 	private long mDuration;
 	private boolean paused;
-    private ProgressDialog mProgressDialog;
-    private ViewFlipper mDetailFlipper;
+	private ProgressDialog mProgressDialog;
+	private ViewFlipper mDetailFlipper;
 
 	private static final int REFRESH = 1;
 
@@ -99,9 +100,9 @@ public class Player extends Activity
 	private ListAdapter mSimilarAdapter;
 	private ListAdapter mFanAdapter;
 	private ListAdapter mTagAdapter;
-	private EventListAdapter mEventAdapter;
+	//private EventListAdapter mEventAdapter;
 	private String mLastInfoArtist = "";
-	
+
 	TextView mTextView;
 	TabBar mTabBar;
 	ViewFlipper mViewFlipper;
@@ -118,7 +119,7 @@ public class Player extends Activity
 
 	private String mLastArtist = "";
 	private String mLastTrack = "";
-	
+
 	@Override
 	public void onCreate( Bundle icicle )
 	{
@@ -135,7 +136,7 @@ public class Player extends Activity
 		mAlbum = ( RemoteImageView ) findViewById( R.id.album );
 		mArtistName = ( TextView ) findViewById( R.id.track_artist );
 		mTrackName = ( TextView ) findViewById( R.id.track_title );
-		
+
 		mLoveButton = ( ImageButton ) findViewById( R.id.love );
 		mLoveButton.setOnClickListener( mLoveListener );
 		mBanButton = ( ImageButton ) findViewById( R.id.ban );
@@ -160,7 +161,7 @@ public class Player extends Activity
 		mFanList.setOnItemSelectedListener(new OnListRowSelectedListener(mFanList));
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 		mEventList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventList));
-        ((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
+		((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
 
 		mTabBar.setViewFlipper(mViewFlipper);
 		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, R.drawable.bio, TAB_BIO);
@@ -178,7 +179,7 @@ public class Player extends Activity
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_STATE_CHANGED );
 		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)  {
 		MenuInflater inflater = getMenuInflater();
@@ -203,17 +204,20 @@ public class Player extends Activity
 	}
 
 	public void showMetadata() {
-    	if(!mLastInfoArtist.contentEquals(mArtistName.getText())) {
-    		mLastInfoArtist = mArtistName.getText().toString();
+		if(!mLastInfoArtist.contentEquals(mArtistName.getText())) {
+			mLastInfoArtist = mArtistName.getText().toString();
 			new LoadBioTask().execute((Void)null);
 			new LoadSimilarTask().execute((Void)null);
 			new LoadListenersTask().execute((Void)null);
 			new LoadTagsTask().execute((Void)null);
-    	}
+			if(mLoadEventsTask != null){
+				mLoadEventsTask.updateMetadata();
+			}
+		}
 		mTabBar.setActive(TAB_BIO);
 		mDetailFlipper.showNext();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -222,32 +226,32 @@ public class Player extends Activity
 			break;
 		case R.id.buy_menu_item:
 			try {
-	            Intent intent = new Intent( Intent.ACTION_SEARCH );
-	            intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
-	            intent.putExtra("actionSearchString", LastFMApplication.getInstance().player.getArtistName() + " "
-	            		+ LastFMApplication.getInstance().player.getTrackName());
-	            intent.putExtra("actionSearchType", 0);
-	            startActivity( intent );
+				Intent intent = new Intent( Intent.ACTION_SEARCH );
+				intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
+				intent.putExtra("actionSearchString", LastFMApplication.getInstance().player.getArtistName() + " "
+						+ LastFMApplication.getInstance().player.getTrackName());
+				intent.putExtra("actionSearchType", 0);
+				startActivity( intent );
 			} catch (Exception e) {
 				LastFMApplication.getInstance().presentError(Player.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
 			}
-            break;
+			break;
 		case R.id.share_menu_item:
 			try {
-		        Intent intent = new Intent( this, Share.class );
-		        intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
-		        intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
-		        startActivity( intent );
+				Intent intent = new Intent( this, Share.class );
+				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
+				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
+				startActivity( intent );
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			break;
 		case R.id.playlist_menu_item:
 			try {
-		        Intent intent = new Intent( this, AddToPlaylist.class );
-		        intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
-		        intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
-		        startActivity( intent );
+				Intent intent = new Intent( this, AddToPlaylist.class );
+				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
+				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
+				startActivity( intent );
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -278,7 +282,7 @@ public class Player extends Activity
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Override
 	public void onStart()
 	{
@@ -302,7 +306,7 @@ public class Player extends Activity
 		paused = true;
 		mHandler.removeMessages( REFRESH );
 
-		
+
 		super.onStop();
 	}
 
@@ -336,42 +340,42 @@ public class Player extends Activity
 	}
 
 	private View.OnClickListener mLoveListener = new View.OnClickListener()
-    {
+	{
 
-        public void onClick( View v )
-        {
+		public void onClick( View v )
+		{
 
-            if ( LastFMApplication.getInstance().player == null )
-                return;
-            try
-            {
-                LastFMApplication.getInstance().player.love();
-            }
-            catch ( RemoteException ex )
-            {
-                System.out.println( ex.getMessage() );
-            }
-        }
-    };
+			if ( LastFMApplication.getInstance().player == null )
+				return;
+			try
+			{
+				LastFMApplication.getInstance().player.love();
+			}
+			catch ( RemoteException ex )
+			{
+				System.out.println( ex.getMessage() );
+			}
+		}
+	};
 
 	private View.OnClickListener mBanListener = new View.OnClickListener()
-    {
+	{
 
-        public void onClick( View v )
-        {
+		public void onClick( View v )
+		{
 
-            if ( LastFMApplication.getInstance().player == null )
-                return;
-            try
-            {
-                LastFMApplication.getInstance().player.ban();
-            }
-            catch ( RemoteException ex )
-            {
-                System.out.println( ex.getMessage() );
-            }
-        }
-    };
+			if ( LastFMApplication.getInstance().player == null )
+				return;
+			try
+			{
+				LastFMApplication.getInstance().player.ban();
+			}
+			catch ( RemoteException ex )
+			{
+				System.out.println( ex.getMessage() );
+			}
+		}
+	};
 
 	private View.OnClickListener mNextListener = new View.OnClickListener()
 	{
@@ -396,32 +400,32 @@ public class Player extends Activity
 			t.start();
 		}
 	};
-	
+
 	private View.OnClickListener mOntourListener = new View.OnClickListener(){
 
 		public void onClick(View v) {
 			showMetadata();
 			mTabBar.setActive(TAB_EVENTS);
 		}
-		
+
 	};
-	
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        if( keyCode == KeyEvent.KEYCODE_BACK )
-        {
-            if( mDetailFlipper.getDisplayedChild() == 1 )
-            {
-            	mDetailFlipper.showPrevious();
-                return true;
-            } else {
-            	finish();
-            	return true;
-            }
-        }
-        return false;
-    }
-	
+
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		if( keyCode == KeyEvent.KEYCODE_BACK )
+		{
+			if( mDetailFlipper.getDisplayedChild() == 1 )
+			{
+				mDetailFlipper.showPrevious();
+				return true;
+			} else {
+				finish();
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private View.OnClickListener mStopListener = new View.OnClickListener()
 	{
 
@@ -482,8 +486,8 @@ public class Player extends Activity
 					if(error != null) {
 						LastFMApplication.getInstance().presentError(context, error);
 					} else {
-    					LastFMApplication.getInstance().presentError(context, getResources().getString(R.string.ERROR_PLAYBACK_FAILED_TITLE),
-    							getResources().getString(R.string.ERROR_PLAYBACK_FAILED));
+						LastFMApplication.getInstance().presentError(context, getResources().getString(R.string.ERROR_PLAYBACK_FAILED_TITLE),
+								getResources().getString(R.string.ERROR_PLAYBACK_FAILED));
 					}
 				}
 				catch ( RemoteException e )
@@ -502,7 +506,7 @@ public class Player extends Activity
 			if ( LastFMApplication.getInstance().player == null ||
 					(mLastArtist.equals(LastFMApplication.getInstance().player.getArtistName()) &&
 							mLastTrack.equals(LastFMApplication.getInstance().player.getTrackName()))
-					)
+			)
 				return;
 			mLastArtist = LastFMApplication.getInstance().player.getArtistName();
 			mLastTrack = LastFMApplication.getInstance().player.getTrackName();
@@ -516,11 +520,12 @@ public class Player extends Activity
 			} else {
 				new LoadAlbumArtTask().execute((Void)null);
 			}
-			
+
 			// fetching artist events (On Tour indicator & Events tab)
 			if(!mLoadEventsTaskArtist.equals(artistName)){
 				mLoadEventsTaskArtist = artistName;
-				new LoadEventsTask().execute((Void)null);
+				mLoadEventsTask = new LoadEventsTask();
+				mLoadEventsTask.execute((Void)null);
 			}
 		}
 		catch ( RemoteException ex )
@@ -592,11 +597,11 @@ public class Player extends Activity
 				mAlbum.setArtwork( ( Bitmap ) msg.obj );
 				mAlbum.invalidate();
 				try {
-						LastFMApplication.getInstance().player.setAlbumArt((Bitmap)msg.obj);
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					LastFMApplication.getInstance().player.setAlbumArt((Bitmap)msg.obj);
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 
 			case REFRESH:
@@ -638,18 +643,18 @@ public class Player extends Activity
 		return new Formatter().format( "%02d:%02d", secs / 60, secs % 60 ).toString();
 	}
 
-    private class LoadAlbumArtTask extends UserTask<Void, Void, Boolean> {
-    	String artUrl;
-    	
-        @Override
-    	public void onPreExecute() {
-        }
-    	
-	    @Override
-	    public Boolean doInBackground(Void...params) {
-	    	Album album;
-	        boolean success = false;
-	        
+	private class LoadAlbumArtTask extends UserTask<Void, Void, Boolean> {
+		String artUrl;
+
+		@Override
+		public void onPreExecute() {
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			Album album;
+			boolean success = false;
+
 			try {
 				artUrl = LastFMApplication.getInstance().player.getArtUrl();
 				String artistName = LastFMApplication.getInstance().player.getArtistName();
@@ -669,41 +674,41 @@ public class Player extends Activity
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	        return success;
-	    }
-	    
-	    @Override
-	    public void onPostExecute(Boolean result) {
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
 			if ( artUrl != RadioPlayerService.UNKNOWN )
 			{
 				mAlbumArtHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
 				mAlbumArtHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE, artUrl )
 				.sendToTarget();
 			}
-	    }
-    }
-	
-    private class LoadBioTask extends UserTask<Void, Void, Boolean> {
-        @Override
-    	public void onPreExecute() {
-  			mWebView.loadData("Loading...", "text/html", "utf-8");
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-        	Artist artist;
-            boolean success = false;
-            
-    		try {
-    			artist = mServer.getArtistInfo(mArtistName.getText().toString(), null, null);
-    			String imageURL = "";
-    			for(ImageUrl image : artist.getImages()) {
-    				if(image.getSize().contentEquals("large")) {
-    					imageURL = image.getUrl();
-    					break;
-    				}
-    			}
-    			
+		}
+	}
+
+	private class LoadBioTask extends UserTask<Void, Void, Boolean> {
+		@Override
+		public void onPreExecute() {
+			mWebView.loadData("Loading...", "text/html", "utf-8");
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			Artist artist;
+			boolean success = false;
+
+			try {
+				artist = mServer.getArtistInfo(mArtistName.getText().toString(), null, null);
+				String imageURL = "";
+				for(ImageUrl image : artist.getImages()) {
+					if(image.getSize().contentEquals("large")) {
+						imageURL = image.getUrl();
+						break;
+					}
+				}
+
 				String listeners = "";
 				String plays = "";
 				try {
@@ -715,57 +720,57 @@ public class Player extends Activity
 				}
 
 				mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>"
-						+ "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>"
-						+ "<img src='"
-						+ imageURL
-						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
-						+ "<div style='margin-left:84px; margin-top:3px'>"
-						+ "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
-						+ mArtistName.getText()
-						+ "</span><br/>"
-						+ "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
-						+ listeners
-						+ " listeners<br/>"
-						+ plays
-						+ " plays</span></div>"
-						+ "<br style='clear:both;'/>"
-						+ formatBio(artist.getBio().getContent())
-						+ "</div></body></html>";
-    			
-    			success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-            return success;
-        }
-        
-        private String formatBio(String wikiText) {
-        	// last.fm api returns the wiki text without para formatting, correct that:
-        	return wikiText.replaceAll("\\n+", "<br>"); 
-        }
+					+ "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>"
+					+ "<img src='"
+					+ imageURL
+					+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
+					+ "<div style='margin-left:84px; margin-top:3px'>"
+					+ "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
+					+ mArtistName.getText()
+					+ "</span><br/>"
+					+ "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
+					+ listeners
+					+ " listeners<br/>"
+					+ plays
+					+ " plays</span></div>"
+					+ "<br style='clear:both;'/>"
+					+ formatBio(artist.getBio().getContent())
+					+ "</div></body></html>";
 
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
-    			mWebView.loadData(mBio, "text/html", "utf-8");
-       		 } else {
-    			mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
-       		 }
-        }
-    }
-	
-    private class LoadSimilarTask extends UserTask<Void, Void, Boolean> {
-    	
-        @Override
-    	public void onPreExecute() {
-	        mSimilarList.setOnItemClickListener(null);
-	        mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading...")); 
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-            
+				success = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return success;
+		}
+
+		private String formatBio(String wikiText) {
+			// last.fm api returns the wiki text without para formatting, correct that:
+			return wikiText.replaceAll("\\n+", "<br>"); 
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				mWebView.loadData(mBio, "text/html", "utf-8");
+			} else {
+				mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
+			}
+		}
+	}
+
+	private class LoadSimilarTask extends UserTask<Void, Void, Boolean> {
+
+		@Override
+		public void onPreExecute() {
+			mSimilarList.setOnItemClickListener(null);
+			mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading...")); 
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			boolean success = false;
+
 			mSimilarAdapter = new ListAdapter(Player.this, getImageCache());
 			mSimilarList.setOnItemClickListener(new OnItemClickListener() {
 
@@ -773,107 +778,107 @@ public class Player extends Activity
 						int position, long id) {
 					Artist artist = (Artist)mSimilarAdapter.getItem(position);
 					mSimilarAdapter.enableLoadBar(position);
-			    	LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+					LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
 				}
-				
+
 			});
 
-    		try {
-    			Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
-    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((similar.length < 10) ? similar.length : 10); i++){
-    				ListEntry entry = new ListEntry(similar[i], 
-    						R.drawable.artist_icon, 
-    						similar[i].getName(), 
-    						similar[i].getImages()[0].getUrl(),
-    						R.drawable.radio_icon);
-    				iconifiedEntries.add(entry);
-    			}
-    			mSimilarAdapter.setSourceIconified(iconifiedEntries);
-    			success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-            return success;
-        }
+			try {
+				Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
+				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+				for(int i=0; i< ((similar.length < 10) ? similar.length : 10); i++){
+					ListEntry entry = new ListEntry(similar[i], 
+							R.drawable.artist_icon, 
+							similar[i].getName(), 
+							similar[i].getImages()[0].getUrl(),
+							R.drawable.radio_icon);
+					iconifiedEntries.add(entry);
+				}
+				mSimilarAdapter.setSourceIconified(iconifiedEntries);
+				success = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return success;
+		}
 
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
-        		mSimilarList.setAdapter(mSimilarAdapter);
-        		mSimilarList.setOnScrollListener(mSimilarAdapter.getOnScrollListener());
-        	} else {
-        		mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
-        	}
-        }
-    }
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				mSimilarList.setAdapter(mSimilarAdapter);
+				mSimilarList.setOnScrollListener(mSimilarAdapter.getOnScrollListener());
+			} else {
+				mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
+			}
+		}
+	}
 
-    private class LoadListenersTask extends UserTask<Void, Void, Boolean> {
-    	
-        @Override
-    	public void onPreExecute() {
-        	mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
-        	mFanList.setOnItemClickListener(null);
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-            
+	private class LoadListenersTask extends UserTask<Void, Void, Boolean> {
+
+		@Override
+		public void onPreExecute() {
+			mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			mFanList.setOnItemClickListener(null);
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			boolean success = false;
+
 			mFanAdapter = new ListAdapter(Player.this, getImageCache());
 			mFanList.setOnItemClickListener(new OnItemClickListener() {
-				 
+
 				public void onItemClick(AdapterView<?> l, View v,
 						int position, long id) {
 					User user = (User)mFanAdapter.getItem(position);
-                    Intent profileIntent = new Intent(Player.this, fm.last.android.activity.Profile.class);
-                    profileIntent.putExtra("lastfm.profile.username", user.getName());
-                    startActivity(profileIntent);
+					Intent profileIntent = new Intent(Player.this, fm.last.android.activity.Profile.class);
+					profileIntent.putExtra("lastfm.profile.username", user.getName());
+					startActivity(profileIntent);
 				}
-				
-			});
-			
-    		try {
-    			User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
-    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((fans.length < 10) ? fans.length : 10); i++){
-    				ListEntry entry = new ListEntry(fans[i], 
-    						R.drawable.profile_unknown, 
-    						fans[i].getName(), 
-    						fans[i].getImages()[0].getUrl(),
-    						R.drawable.arrow);
-    				iconifiedEntries.add(entry);
-    			}
-    			mFanAdapter.setSourceIconified(iconifiedEntries);
-    			success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-            return success;
-        }
 
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
-        		mFanList.setAdapter(mFanAdapter);
-        		mFanList.setOnScrollListener(mFanAdapter.getOnScrollListener());
-        	} else {
-        		mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
-        	}
-        }
-    }
-	
-    private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
-    	
-        @Override
-    	public void onPreExecute() {
-        	mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
-   	        mTagList.setOnItemClickListener(null);
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
+			});
+
+			try {
+				User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
+				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+				for(int i=0; i< ((fans.length < 10) ? fans.length : 10); i++){
+					ListEntry entry = new ListEntry(fans[i], 
+							R.drawable.profile_unknown, 
+							fans[i].getName(), 
+							fans[i].getImages()[0].getUrl(),
+							R.drawable.arrow);
+					iconifiedEntries.add(entry);
+				}
+				mFanAdapter.setSourceIconified(iconifiedEntries);
+				success = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				mFanList.setAdapter(mFanAdapter);
+				mFanList.setOnScrollListener(mFanAdapter.getOnScrollListener());
+			} else {
+				mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
+			}
+		}
+	}
+
+	private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
+
+		@Override
+		public void onPreExecute() {
+			mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			mTagList.setOnItemClickListener(null);
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			boolean success = false;
 
 			mTagAdapter = new ListAdapter(Player.this, getImageCache());
 			mTagList.setOnItemClickListener(new OnItemClickListener() {
@@ -882,121 +887,170 @@ public class Player extends Activity
 						int position, long id) {
 					Tag tag = (Tag)mTagAdapter.getItem(position);
 					mTagAdapter.enableLoadBar(position);
-			    	LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
+					LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
 				}
-				
+
 			});
 
-    		try {
-    			Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
-    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
-    				ListEntry entry = new ListEntry(tags[i], 
-    						-1,
-    						tags[i].getName(), 
-    						R.drawable.radio_icon);
-    				iconifiedEntries.add(entry);
-    			}
-    			mTagAdapter.setSourceIconified(iconifiedEntries);
-    			success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-            return success;
-        }
+			try {
+				Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
+				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+				for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
+					ListEntry entry = new ListEntry(tags[i], 
+							-1,
+							tags[i].getName(), 
+							R.drawable.radio_icon);
+					iconifiedEntries.add(entry);
+				}
+				mTagAdapter.setSourceIconified(iconifiedEntries);
+				success = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return success;
+		}
 
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
-        		mTagList.setAdapter(mTagAdapter);
-        	} else {
-        		mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Tags"));
-        	}
-        }
-    }
-	
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				mTagList.setAdapter(mTagAdapter);
+			} else {
+				mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Tags"));
+			}
+		}
+	}
+
 	private OnItemClickListener mEventOnItemClickListener = new OnItemClickListener(){
 
 		public void onItemClick(final AdapterView<?> parent, final View v,
 				final int position, long id) {
-            Intent intent = new Intent( Player.this, fm.last.android.activity.Event.class );
-            Event event = (Event)mEventAdapter.getItem(position);
-            intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
-            intent.putExtra("lastfm.event.title", event.getTitle());
-            String artists = "";
-            for(String artist : event.getArtists()) {
-            	if(artists.length() > 0)
-            		artists += ", ";
-           		artists += artist;
-            }
-            for(ImageUrl image : event.getImages()) {
-            	if(image.getSize().contentEquals("large"))
-                    intent.putExtra("lastfm.event.poster", image.getUrl());
-            }
-            intent.putExtra("lastfm.event.artists", artists);
-            intent.putExtra("lastfm.event.venue", event.getVenue().getName());
-            intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
-            intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
-            intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
-            intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
-            intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
-            intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
-            try {
-            	Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
-            	for(Event e : events) {
-            		System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
-            		if(e.getId() == event.getId()) {
-            			System.out.printf("Matched! Status: %s\n", e.getStatus());
-            			intent.putExtra("lastfm.event.status", e.getStatus());
-            			break;
-            		}
-            			
-            	}
+			Intent intent = new Intent( Player.this, fm.last.android.activity.Event.class );
+			Event event = (Event)((EventListAdapter)mEventAdapter).getItem(position);
+			intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
+			intent.putExtra("lastfm.event.title", event.getTitle());
+			String artists = "";
+			for(String artist : event.getArtists()) {
+				if(artists.length() > 0)
+					artists += ", ";
+				artists += artist;
+			}
+			for(ImageUrl image : event.getImages()) {
+				if(image.getSize().contentEquals("large"))
+					intent.putExtra("lastfm.event.poster", image.getUrl());
+			}
+			intent.putExtra("lastfm.event.artists", artists);
+			intent.putExtra("lastfm.event.venue", event.getVenue().getName());
+			intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+			intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
+			intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
+			intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
+			intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
+			intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+			try {
+				Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
+				for(Event e : events) {
+					System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
+					if(e.getId() == event.getId()) {
+						System.out.printf("Matched! Status: %s\n", e.getStatus());
+						intent.putExtra("lastfm.event.status", e.getStatus());
+						break;
+					}
+
+				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-            startActivity( intent );
+			startActivity( intent );
 		}
 
 	};
+
+	private LoadEventsTask mLoadEventsTask;
 	
-    private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
-    	
-        @Override
-    	public void onPreExecute() {
-        	mOntourButton.setAnimation(null);
-        	mOntourButton.setVisibility(View.GONE);
-        	
-        	mEventList.setOnItemClickListener(null);
-        	mEventList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
+	private BaseAdapter mEventAdapter;
 
-            mEventAdapter = new EventListAdapter(Player.this);
+	/**
+	 * This load task is slightly bigger as it has to handle OnTour indicator
+	 * and Metadata's event list. The main problem here is new events must be
+	 * downloaded on track change even if the user is viewing old events in the
+	 * metadata view.
+	 * 
+	 * @author Lukasz Wisniewski
+	 */
+	private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
 
-    		try {
-    			Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
-    			mEventAdapter.setEventsSource(events);
-    			if(events.length > 0)
-    				success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-            return success;
-        }
+		/**
+		 * Checks whether this task should modify Metadata's event list
+		 */
+		public boolean mChangeMetadata = false;
+		
+		boolean mSuccess = false;
+		
+		private BaseAdapter mNewEventAdapter;
+		
+		private void updateMetadata(){
+			mChangeMetadata = true;
+			
+			if(getStatus() == Status.PENDING || getStatus() == Status.RUNNING){
+				mEventList.setOnItemClickListener(null);
+				mEventList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			}
+			
+			if(getStatus() == Status.FINISHED){
+				reallyUpdateMetadata();
+			}
+		}
+		
+		private void reallyUpdateMetadata(){
+			mEventAdapter = mNewEventAdapter;
+			mEventList.setAdapter(mNewEventAdapter);
+			if(mSuccess){
+				mEventList.setOnItemClickListener(mEventOnItemClickListener);
+			} else {
+				mEventList.setOnItemClickListener(null);
+			}
+		}
 
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
-        		mEventList.setAdapter(mEventAdapter);
-        		mEventList.setOnItemClickListener(mEventOnItemClickListener);
-        		mOntourButton.setVisibility(View.INVISIBLE);
-        		Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
-        		a.setAnimationListener(new AnimationListener(){
+		@Override
+		public void onPreExecute() {
+			mOntourButton.setAnimation(null);
+			mOntourButton.setVisibility(View.GONE);
+		}
+
+		@Override
+		public Boolean doInBackground(Void...params) {
+			boolean mSuccess = false;
+
+			mNewEventAdapter = new EventListAdapter(Player.this);
+
+			try {
+				Event[] events = mServer.getArtistEvents(mArtistName.getText().toString());
+				((EventListAdapter) mNewEventAdapter).setEventsSource(events);
+				if(events.length > 0)
+					mSuccess = true;
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			if(!mSuccess){
+				mNewEventAdapter = new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Upcoming Events");
+				mEventList.setOnItemClickListener(null);
+			}
+			
+			return mSuccess;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				if(mChangeMetadata){
+					reallyUpdateMetadata();
+				}
+				mOntourButton.setVisibility(View.INVISIBLE);
+				Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
+				a.setAnimationListener(new AnimationListener(){
 
 					public void onAnimationEnd(Animation animation) {
 						mOntourButton.setVisibility(View.VISIBLE);
@@ -1007,25 +1061,23 @@ public class Player extends Activity
 
 					public void onAnimationStart(Animation animation) {
 					}
-        			
-        		});
-        		mOntourButton.startAnimation(a);
-        	} else {
-        		mEventList.setOnItemClickListener(null);
-        		mEventList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Upcoming Events"));
-    	        mOntourButton.setVisibility(View.GONE);
-        	}
-        }
-    }
-    
-    private String mLoadEventsTaskArtist = "";
-	
+
+				});
+				mOntourButton.startAnimation(a);
+			} else {
+				mOntourButton.setVisibility(View.GONE);
+			}
+		}
+	}
+
+	private String mLoadEventsTaskArtist = "";
+
 	private ImageCache getImageCache(){
 		if(mImageCache == null){
 			mImageCache = new ImageCache();
 		}
 		return mImageCache;
 	}
-	
-	
+
+
 }
