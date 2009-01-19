@@ -64,7 +64,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
         for(int i=0; i < data.length; i++){
             ListEntry entry = new ListEntry(data[i], 
                     -1, 
-                    data[i], R.drawable.arrow);
+                    data[i], R.drawable.list_item_rest_arrow);
             mList.add(entry);
         }
     }

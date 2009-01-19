@@ -200,7 +200,7 @@ public class Profile extends ListActivity implements TabBarListener
         
         {
         	OnListRowSelectedListener listRowListener = new OnListRowSelectedListener(mProfileList);
-        	listRowListener.setIconResources( R.drawable.arrow, R.drawable.arrow );
+        	listRowListener.setIconResources( R.drawable.list_item_rest_arrow, R.drawable.list_item_focus_arrow );
         	listRowListener.setResources( R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth );
         	mProfileList.setOnItemSelectedListener( listRowListener );
         }

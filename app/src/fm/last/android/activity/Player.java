@@ -853,7 +853,7 @@ public class Player extends Activity
 							R.drawable.profile_unknown, 
 							fans[i].getName(), 
 							fans[i].getImages()[0].getUrl(),
-							R.drawable.arrow);
+							R.drawable.list_item_rest_arrow);
 					iconifiedEntries.add(entry);
 				}
 				mFanAdapter.setSourceIconified(iconifiedEntries);

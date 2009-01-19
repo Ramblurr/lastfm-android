@@ -189,7 +189,7 @@ public class TabBar extends LinearLayout {
 	private void init(){
 		mActiveTabColor = 0xff3a3a3c;
 		mInactiveTabColor = 0xff1d1d1e;
-		mPadding = 4;
+		mPadding = 0;
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class TabBar extends LinearLayout {
 		params.setMargins(mPadding, 0, 0, 0);
 		addViewInLayout(v.getView(), -1, params);
 		
-		if (mPadding == 4) mPadding = 6; //mattb aesthetics, second tab and onwards have more spacing
+		if (mPadding == 0) mPadding = 6; //mattb aesthetics, second tab and onwards have more spacing
 	}
 
 	/**

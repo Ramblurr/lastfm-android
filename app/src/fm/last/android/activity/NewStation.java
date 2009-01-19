@@ -316,7 +316,7 @@ public class NewStation extends ListActivity implements TabBarListener
 							R.drawable.artist_icon, 
 							user.getName(),
 							user.getImages().length == 0 ? "" : user.getImages()[0].getUrl(),
-							R.drawable.arrow);
+							R.drawable.list_item_rest_arrow);
 					iconifiedEntries.add(entry);
 	    			mAdapter.setSourceIconified(iconifiedEntries);
 	    			success = true;

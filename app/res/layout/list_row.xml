@@ -30,7 +30,7 @@
 		android:maxHeight="26px" 
 		android:maxWidth="34px"
 		android:layout_marginRight="10px"
-		android:layout_gravity="center_vertical"
+		android:layout_gravity="center_vertical|right"
 		android:visibility="gone"/>
 	<LinearLayout android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:orientation="vertical"
@@ -61,9 +61,10 @@
 		android:layout_height="wrap_content" android:visibility="gone">
 		<ImageView android:id="@+id/row_disclosure_icon" 
 		    android:paddingLeft="20px" 
-			android:src="@drawable/arrow"
+			android:src="@drawable/list_item_rest_arrow"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"/>
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical|right"/>
 		<ProgressBar android:layout_width="30px"
 			android:layout_height="30px"
 			android:indeterminate="true"

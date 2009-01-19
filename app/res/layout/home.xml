@@ -8,7 +8,8 @@
 	<fm.last.android.widget.TabBar
 		android:id="@+id/TabBar" android:layout_width="fill_parent"
 		android:layout_height="60dip" 
-		android:layout_marginTop="5px"
+		android:layout_marginTop="6px"
+		android:layout_marginLeft="4px"
 		android:layout_marginRight="11px"/>
 	<LinearLayout android:id="@+id/TabBarSpacer"
 		android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
@@ -31,8 +32,8 @@
 			android:layout_width="fill_parent" android:layout_height="fill_parent"  android:layout_below="@+id/TabBarSpacer">
 			<!-- Profile tab -->
 			<ListView android:id="@+id/profile_list_view"
-			android:dividerHeight="2dip" android:divider="@drawable/black_divider"
 			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:divider="#d9d7d7"
 			android:listSelector="#00000000"></ListView>
 			<!-- Top Artists list -->
 			<ListView android:id="@+id/topartists_list_view"
