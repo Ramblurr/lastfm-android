@@ -499,12 +499,6 @@ public class RadioPlayerService extends Service
 	private final IRadioPlayer.Stub mBinder = new IRadioPlayer.Stub()
 	{
 
-		public void skipForward() throws DeadObjectException
-		{
-
-			nextSong();
-		}
-
 		public void pause() throws DeadObjectException
 		{
 
@@ -513,7 +507,6 @@ public class RadioPlayerService extends Service
 
 		public void stop() throws DeadObjectException
 		{
-
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
 			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);

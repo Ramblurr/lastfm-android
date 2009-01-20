@@ -9,7 +9,6 @@ interface IRadioPlayer {
 
 	void pause();
 	void stop();
-	void skipForward();
 	void startRadio();
 
 	void love();
