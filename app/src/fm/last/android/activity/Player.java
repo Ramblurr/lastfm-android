@@ -393,19 +393,12 @@ public class Player extends Activity
 
 			if ( LastFMApplication.getInstance().player == null )
 				return;
-			Thread t = new Thread() {
-				public void run() {
-					try
-					{  
-						LastFMApplication.getInstance().player.skip();
-					}
-					catch ( RemoteException ex )
-					{
-						System.out.println( ex.getMessage() );
-					}
-				}
-			};
-			t.start();
+			try {
+				LastFMApplication.getInstance().player.skip();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	};
 
