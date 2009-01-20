@@ -67,6 +67,8 @@ public class RadioPlayerService extends Service
 	private AudioscrobblerService scrobbler;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
+	private boolean mPreparing = false;
+	private boolean mStopping = false;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -197,6 +199,9 @@ public class RadioPlayerService extends Service
 	{
 		try
 		{
+			if (mPreparing)
+				return;
+			
 			currentTrack = track;
 			mAlbumArt = null;
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
@@ -229,14 +234,26 @@ public class RadioPlayerService extends Service
 			mp.setOnPreparedListener(new OnPreparedListener() {
 
 				public void onPrepared(MediaPlayer mp) {
-					mp.start();
+					mPreparing = false;
+					if (mStopping) {
+						mStopping = false;
+						stop();
+					} else {
+						mp.start();
+						playingNotify();
+						currentStartTime = System.currentTimeMillis() / 1000;
+						mPlaying = true;
+					}
 				}
 			});
-			currentStartTime = System.currentTimeMillis() / 1000;
-			mPlaying = true;
 			mDeferredStopHandler.cancelStopSelf();
-			playingNotify();
+
+			mPreparing = true;
 			mp.prepareAsync();
+		}
+		catch ( IllegalStateException e )
+		{
+			Log.e( getString( R.string.app_name ), e.toString() );
 		}
 		catch ( IOException e )
 		{
@@ -244,6 +261,22 @@ public class RadioPlayerService extends Service
 		}
 	}
 
+	private void stop()
+	{
+		if (mPreparing) {
+			mStopping = true;
+		}
+		
+		nm.cancel( NOTIFY_ID );
+		mp.stop();
+		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
+		if( wakeLock.isHeld())
+			wakeLock.release();
+		
+		if( wifiLock.isHeld())
+			wifiLock.release();
+	}
+	
 	private void nextSong()
 	{
 		// Check if we're running low on tracks
@@ -501,20 +534,12 @@ public class RadioPlayerService extends Service
 
 		public void pause() throws DeadObjectException
 		{
-
 			RadioPlayerService.this.pause();
 		}
 
 		public void stop() throws DeadObjectException
 		{
-			nm.cancel( NOTIFY_ID );
-			mp.stop();
-			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
-			if( wakeLock.isHeld())
-				wakeLock.release();
-			
-			if( wifiLock.isHeld())
-				wifiLock.release();
+			RadioPlayerService.this.stop();
 		}
 
 		public boolean tune( String url, Session session ) throws DeadObjectException, WSError
