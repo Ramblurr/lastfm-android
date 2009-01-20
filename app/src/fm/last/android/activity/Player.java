@@ -197,10 +197,10 @@ public class Player extends Activity
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
-		//Toggle the View Info / View Artwork Menu item
+		//Toggle the "View Info" / "Now Playing" menu item
 		MenuItem changeView = menu.findItem( R.id.info_menu_item );
 		if( mDetailFlipper.getDisplayedChild() == 1 ) {
-			changeView.setTitle( "View Artwork" );
+			changeView.setTitle( "Now Playing" );
 			changeView.setIcon( R.drawable.view_artwork );		
 		}
 		else

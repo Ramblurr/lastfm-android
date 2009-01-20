@@ -469,13 +469,16 @@ public class Profile extends ListActivity implements TabBarListener
         try
         {
 	        String adapter_station = mMainAdapter.getStation(position-1);
-	        String current_station = LastFMApplication.getInstance().player.getStationUrl();
-	
-	        if( adapter_station.equals( current_station ) ) {
-	            Intent intent = new Intent( Profile.this, Player.class );
-	            startActivity( intent );
-	            return;
-	        }
+	        
+        	if ( LastFMApplication.getInstance().player.isPlaying() ) {
+		        String current_station = LastFMApplication.getInstance().player.getStationUrl();
+		
+		        if( adapter_station.equals( current_station ) ) {
+		            Intent intent = new Intent( Profile.this, Player.class );
+		            startActivity( intent );
+		            return;
+		        }
+        	}
 	        
 	    	l.setEnabled(false);
 	    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
@@ -1011,8 +1014,26 @@ public class Profile extends ListActivity implements TabBarListener
         // title
         MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
         logout.setIcon(R.drawable.logout);
+
+        MenuItem nowPlaying = menu.add(Menu.NONE, 1, Menu.NONE, "Now Playing");
+		nowPlaying.setIcon( R.drawable.view_artwork );
         return true;
     }
+    
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)  {
+		boolean isPlaying = false;
+		try {
+			if (LastFMApplication.getInstance() != null)
+				isPlaying = LastFMApplication.getInstance().player.isPlaying();
+		} catch (RemoteException e) {
+		}
+		
+		menu.findItem(1).setEnabled( isPlaying );
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+    
     
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
@@ -1020,7 +1041,8 @@ public class Profile extends ListActivity implements TabBarListener
             logout();
             return true;
         case 1:
-            // TODO Show profile
+            Intent intent = new Intent( Profile.this, Player.class );
+            startActivity( intent );
             return true;
         }
         return false;
