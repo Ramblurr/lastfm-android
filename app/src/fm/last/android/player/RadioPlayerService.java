@@ -265,16 +265,16 @@ public class RadioPlayerService extends Service
 	{
 		if (mPreparing) {
 			mStopping = true;
+		} else {
+			nm.cancel( NOTIFY_ID );
+			mp.stop();
+			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
+			if( wakeLock.isHeld())
+				wakeLock.release();
+			
+			if( wifiLock.isHeld())
+				wifiLock.release();
 		}
-		
-		nm.cancel( NOTIFY_ID );
-		mp.stop();
-		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
-		if( wakeLock.isHeld())
-			wakeLock.release();
-		
-		if( wifiLock.isHeld())
-			wifiLock.release();
 	}
 	
 	private void nextSong()
