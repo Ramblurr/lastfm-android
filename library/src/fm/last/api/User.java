@@ -29,10 +29,10 @@ public class User implements Serializable {
     this.images = images;
     this.country = country;
     this.age = age;
-    this.gender = gender;
     this.playcount = playcount;
   }
-  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String realname, String joindate) {
+  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String realname, String joindate)
+  {
       this(name, url, images, country, age, gender, playcount);
       this.realname = realname;
       this.joindate = joindate;
@@ -62,6 +62,12 @@ public class User implements Serializable {
     return gender;
   }
 
+  public String getPrettyGender() {
+	  if (gender == "m") return "male";
+	  if (gender == "f") return "female";
+	  return null;
+  }
+  
   public String getPlaycount() {
     return playcount;
   }

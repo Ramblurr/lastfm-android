@@ -41,15 +41,15 @@ public class UserBuilder extends XMLBuilder<User> {
     String age = getText("age");
     String gender = getText("gender");
     String playcount = getText("playcount");
+    
     List<Node> imageNodes = getChildNodes("image");
-    ImageUrl[] images = new ImageUrl[imageNodes.size()];
+    if (imageNodes.size() > 1)
+    	imageNodes.remove( 0 ); //remove smallest size if there is one
+    ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
     int i = 0;
-    for (Node imageNode : imageNodes) {
-    	if (i != 0) //ignore first image as it is too small to ever be useful
-    		images[i-1] =imageBuilder.build(imageNode);
-    	i++;
-    }
-
+    for (Node imageNode : imageNodes)
+  		images[i++] = imageBuilder.build(imageNode);
+    
     return new User(name, url, images, country, age, gender, playcount);
   }
   
@@ -67,14 +67,14 @@ public class UserBuilder extends XMLBuilder<User> {
       String playcount = getText("playcount");
       String realname = getText("realname");
       String date = getText("registered");
-      List<Node> imageNodes = getChildNodes("avatar");
-      ImageUrl[] images = new ImageUrl[imageNodes.size()];
+
+      List<Node> imageNodes = getChildNodes("image");
+      if (imageNodes.size() > 1)
+      	imageNodes.remove( 0 ); //remove smallest size if there is one
+      ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
       int i = 0;
-      for (Node imageNode : imageNodes) {
-    	  if (i != 0) //ignore first image as it is too small to ever be useful
-    		  images[i-1] =imageBuilder.build(imageNode);
-    	  i++;
-      }
+      for (Node imageNode : imageNodes)
+    		images[i++] = imageBuilder.build(imageNode);
 
       return new User(name, url, images, country, age, gender, playcount, realname, date);
     }

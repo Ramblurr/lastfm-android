@@ -1,6 +1,8 @@
 package fm.last.android.widget;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
@@ -21,7 +23,6 @@ public class ProfileBubble extends LinearLayout {
     User mUser;
     TextView mFirst;
     TextView mSecond;
-    TextView mThird;
     RemoteImageView mAvatar;
     private Worker mProfileImageWorker;
     private RemoteImageHandler mProfileImageHandler;
@@ -38,34 +39,45 @@ public class ProfileBubble extends LinearLayout {
     
     private void init()
     {
-        LayoutInflater.from(getContext())
-        .inflate(R.layout.profile_bubble, this);
-        this.setBackgroundResource(R.drawable.profile_bubble_bg);
-        mSecond = (TextView) findViewById(R.id.profile_geo);
-        mSecond.setText("Loading Profile...");
+        LayoutInflater.from(getContext()).inflate(R.layout.profile_bubble, this);
+        // we did do this but it looks wrong due to lack of 
+        //this.setBackgroundResource(R.drawable.profile_bubble_bg);
+
+        mFirst  = (TextView) findViewById(R.id.profile_username);
+        mSecond = (TextView) findViewById(R.id.profile_meta);
+        mAvatar = (RemoteImageView) findViewById(R.id.profile_avatar);
+
+        mSecond.setText("Loading profile...");
     }
 
     public void setUser(User user) {
-        mUser = user;
-        mFirst = (TextView) findViewById(R.id.profile_username);
-        mThird = (TextView) findViewById(R.id.profile_plays);
-        mAvatar = (RemoteImageView) findViewById(R.id.profile_avatar);
+        mUser   = user;
 
+        mAvatar.setDefaultImage( R.drawable.profile_unknown );
+        
         if(user.getRealName() == null)
             mFirst.setText(user.getName());
         else 
             mFirst.setText(user.getRealName());
-        String geo = user.getAge() + user.getGender() + ", "
-                + user.getCountry();
-        mSecond.setText(geo);
+        
+        
+        List seconds = new ArrayList();
+
+        if (user.getAge() != null) seconds.add( user.getAge() );
+        if (user.getGender() != null) seconds.add( user.getGender() );
+        if (user.getCountry() != null) seconds.add( user.getCountry() );
+        
+        String second = "";
+        for(Object s: seconds)
+        	second = (String)s + ", ";
 
         int playcount = Integer.parseInt(mUser.getPlaycount());
         NumberFormat format = NumberFormat.getNumberInstance();
         String count = format.format( playcount );
         String plays = count + " plays";
         if(mUser.getJoinDate() != null)
-            plays += " since " + mUser.getJoinDate(); 
-        mThird.setText(plays);
+            plays += " since " + mUser.getJoinDate();
+        mSecond.setText(second + plays);
 
         mProfileImageWorker = new Worker("profile image worker");
         mProfileImageHandler = new RemoteImageHandler(mProfileImageWorker

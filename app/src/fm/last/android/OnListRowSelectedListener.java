@@ -1,5 +1,7 @@
 package fm.last.android;
 
+import com.google.android.maps.ItemizedOverlay.OnFocusChangeListener;
+
 import fm.last.android.adapter.LastFMStreamAdapter;
 import android.util.Log;
 import android.view.View;
@@ -93,21 +95,20 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 	{
 		if(mPreviousSelectedView != null) {
 			if (mPreviousSelectedView.getTag() == "header")
-				mPreviousSelectedView.getOnFocusChangeListener().onFocusChange( mPreviousSelectedView , false);
+			{
+				android.view.View.OnFocusChangeListener listener = mPreviousSelectedView.getOnFocusChangeListener();
+				if (listener != null)
+					listener.onFocusChange( mPreviousSelectedView , false);
+			}
 			else
 				unhighlight(mPreviousSelectedView, mPreviousPosition);
 		}
 
-		if (view != null) {
-			if (view.getTag() == "header") {
+		if (view != null && mListView.getAdapter().isEnabled(position)) {
+			if (view.getTag() == "header")
 				view.requestFocus(); 
-			}
-			else if (mListView.getAdapter().isEnabled(position) && 
-				view != null /*&& 
-				view.findViewById(R.id.row_disclosure_icon) != null*/)
-			{
+			else
 				highlight(view, position);
-			}
 		}
 		
 		mPreviousSelectedView = view;

@@ -171,12 +171,14 @@ public class Profile extends ListActivity implements TabBarListener
     		b.setTypeface( Typeface.create( Typeface.DEFAULT, Typeface.BOLD ) );
     		b.setText(R.string.home_newstation);
     		
-    		b.setTag( "header" );
+    		b.setTag("header");
 
     		getListView().addHeaderView(b, null, true);
         } else {
             mProfileBubble = new ProfileBubble(this);
-            getListView().addHeaderView(mProfileBubble);
+            mProfileBubble.setTag("header");
+            mProfileBubble.setClickable( false );
+            getListView().addHeaderView(mProfileBubble, null, false);
         }
         
         
