@@ -8,7 +8,6 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -57,10 +56,9 @@ public class TagListAdapter extends ListAdapter {
 
 		if (row==null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
-			row=inflater.inflate(R.layout.list_row, null);
+			row=inflater.inflate(R.layout.tag_row, null);
 			
 			holder = new ViewHolder();
-			holder.icon = (ImageView)row.findViewById(R.id.row_icon);
 			holder.label = (TextView)row.findViewById(R.id.row_label);
 			
 			row.setTag(holder);
@@ -106,7 +104,6 @@ public class TagListAdapter extends ListAdapter {
 	 */
 	static class ViewHolder {
         TextView label;
-        ImageView icon;
     }
 	
 	/**

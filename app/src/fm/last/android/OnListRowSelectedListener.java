@@ -54,8 +54,11 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 		else
 			view.setBackgroundResource(mHighlightResource);
 		
-		((ImageView)view.findViewById(R.id.row_disclosure_icon)).setImageResource( iconResource );
-		((TextView)view.findViewById(R.id.row_label)).setTextColor(0xFFFFFFFF);
+		if (view.findViewById(R.id.row_disclosure_icon) != null)
+			((ImageView)view.findViewById(R.id.row_disclosure_icon)).setImageResource( iconResource );
+		
+		if (view.findViewById(R.id.row_label) != null)
+			((TextView)view.findViewById(R.id.row_label)).setTextColor(0xFFFFFFFF);
 		
     }
 
@@ -100,8 +103,8 @@ public class OnListRowSelectedListener implements AdapterView.OnItemSelectedList
 				view.requestFocus(); 
 			}
 			else if (mListView.getAdapter().isEnabled(position) && 
-				view != null && 
-				view.findViewById(R.id.row_disclosure_icon) != null)
+				view != null /*&& 
+				view.findViewById(R.id.row_disclosure_icon) != null*/)
 			{
 				highlight(view, position);
 			}

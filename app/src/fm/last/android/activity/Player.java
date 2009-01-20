@@ -159,6 +159,14 @@ public class Player extends Activity
 		mTagList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagList));
 		mFanList = (ListView) findViewById(R.id.listeners_list_view);
 		mFanList.setOnItemSelectedListener(new OnListRowSelectedListener(mFanList));
+		
+		{
+        	OnListRowSelectedListener listRowListener = new OnListRowSelectedListener(mFanList);
+        	listRowListener.setIconResources( R.drawable.list_item_rest_arrow, R.drawable.list_item_focus_arrow );
+        	listRowListener.setResources( R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth );
+        	mFanList.setOnItemSelectedListener( listRowListener );
+        }
+		
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 		mEventList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventList));
 		((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
