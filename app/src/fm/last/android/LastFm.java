@@ -31,6 +31,9 @@ public class LastFm extends Activity
     private EditText mUserField;
     private Button mLoginButton;
     private Button mSignupButton;
+    
+    /** Specifies if the user has just signed up */
+    private boolean mNewUser = false;
 
     String authInfo;
 
@@ -116,6 +119,7 @@ public class LastFm extends Activity
                     editor.putString( "lastfm_pass", password );
                     editor.commit();
                     Intent intent = new Intent( LastFm.this, Profile.class );
+                    intent.putExtra("lastfm.profile.new_user", mNewUser );
                     startActivity( intent );
                     finish();
                 }
@@ -155,6 +159,7 @@ public class LastFm extends Activity
     	
     	mUserField.setText( data.getExtras().getString("username") );
     	mPassField.setText( data.getExtras().getString("password") );
+    	mNewUser = true;
     	mLoginButton.requestFocus();
     	mLoginButton.performClick();
     }

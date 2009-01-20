@@ -244,6 +244,9 @@ public class Profile extends ListActivity implements TabBarListener
         
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
+		
+		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
+			startActivity( new Intent( Profile.this, NewStation.class ) );
     }
     
     private class LoadUserTask extends UserTask<Void, Void, Boolean> {
