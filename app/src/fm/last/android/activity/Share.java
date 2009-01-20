@@ -222,7 +222,6 @@ public class Share extends Activity {
             });
             if(result) {
                 mFriendsList.setAdapter(mFriendsAdapter);
-                mFriendsList.setOnScrollListener(mFriendsAdapter.getOnScrollListener());
             } else {
             	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.INFO_MODE, "No Friends :(")); 
             }

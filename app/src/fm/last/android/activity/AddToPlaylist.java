@@ -182,7 +182,6 @@ public class AddToPlaylist extends Activity {
             });
             if(result) {
                 mPlaylistsList.setAdapter(mPlaylistsAdapter);
-                mPlaylistsList.setOnScrollListener(mPlaylistsAdapter.getOnScrollListener());
             } else {
             	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.INFO_MODE, "No Playlists")); 
             }
@@ -249,7 +248,6 @@ public class AddToPlaylist extends Activity {
             if(result) {
                 mNewPlaylist.setText("");
                 mPlaylistsList.setAdapter(mPlaylistsAdapter);
-                mPlaylistsList.setOnScrollListener(mPlaylistsAdapter.getOnScrollListener());
             } else {
         		Toast.makeText(AddToPlaylist.this, "An error occured while creating the playlist. Please try again.", Toast.LENGTH_SHORT).show();
             }

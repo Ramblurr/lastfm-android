@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -638,7 +639,6 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(Boolean result) {
             if(result) {
                 mTopArtistsList.setAdapter(mTopArtistsAdapter);
-                mTopArtistsList.setOnScrollListener(mTopArtistsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Top Artists"};
                 mTopArtistsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
@@ -701,7 +701,6 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(Boolean result) {
             if(result) {
                 mTopAlbumsList.setAdapter(mTopAlbumsAdapter);
-                mTopAlbumsList.setOnScrollListener(mTopAlbumsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Top Albums"};
                 mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
@@ -754,8 +753,7 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(Boolean result) {
             if(result) {
                 mTopTracksList.setAdapter(mTopTracksAdapter);
-                mTopTracksList.setOnScrollListener(mTopTracksAdapter.getOnScrollListener());
-            } else {
+                            } else {
                 String[] strings = new String[]{"No Top Tracks"};
                 mTopTracksList.setAdapter(new ArrayAdapter<String>(Profile.this,
                         R.layout.list_row, R.id.row_label, strings));
@@ -807,7 +805,6 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(Boolean result) {
             if(result) {
                 mRecentTracksList.setAdapter(mRecentTracksAdapter);
-                mRecentTracksList.setOnScrollListener(mRecentTracksAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Recent Tracks"};
                 mRecentTracksList.setAdapter(new ArrayAdapter<String>(Profile.this,
@@ -957,8 +954,9 @@ public class Profile extends ListActivity implements TabBarListener
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
-
+            
             mFriendsAdapter = new ListAdapter(Profile.this, getImageCache());
+            
             try {
                 User[] friends = mServer.getFriends(mUser.getName(), null, null).getFriends();
                 if(friends.length == 0 )
@@ -994,7 +992,6 @@ public class Profile extends ListActivity implements TabBarListener
             });
             if(result) {
                 mFriendsList.setAdapter(mFriendsAdapter);
-                mFriendsList.setOnScrollListener(mFriendsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Friends Retrieved"};
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
@@ -1069,7 +1066,6 @@ public class Profile extends ListActivity implements TabBarListener
         mDialogAdapter.setSourceIconified(entries);
         mDialogAdapter.setIconsUnscaled();
         mDialogList.setAdapter(mDialogAdapter);
-        mDialogList.setOnScrollListener(mDialogAdapter.getOnScrollListener());
         mDialogList.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> l, View v, int position, long id) 
             {

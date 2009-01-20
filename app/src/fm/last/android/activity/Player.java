@@ -814,7 +814,6 @@ public class Player extends Activity
 		public void onPostExecute(Boolean result) {
 			if(result) {
 				mSimilarList.setAdapter(mSimilarAdapter);
-				mSimilarList.setOnScrollListener(mSimilarAdapter.getOnScrollListener());
 			} else {
 				mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
 			}
@@ -869,7 +868,6 @@ public class Player extends Activity
 		public void onPostExecute(Boolean result) {
 			if(result) {
 				mFanList.setAdapter(mFanAdapter);
-				mFanList.setOnScrollListener(mFanAdapter.getOnScrollListener());
 			} else {
 				mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
 			}

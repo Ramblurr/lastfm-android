@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 import android.widget.AbsListView.OnScrollListener;
@@ -27,14 +28,13 @@ import fm.last.android.utils.ImageDownloaderListener;
  * @author Lukasz Wisniewski
  * @author Casey Link
  */
-public class ListAdapter extends BaseAdapter implements ImageDownloaderListener, OnScrollListener {
+public class ListAdapter extends BaseAdapter implements ImageDownloaderListener {
 	
 	protected ImageCache mImageCache;
 	protected ImageDownloader mImageDownloader;
 	protected Activity mContext;
 	
 	private ArrayList<ListEntry> mList;
-	private boolean mScrolling = false;
 	private int mLoadingBar = -1;
 	private boolean mScaled = true;
 	
@@ -218,15 +218,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 	}
 
 	public void imageDownloadProgress(int imageDownloaded, int imageCount) {
-		// TODO We need to re-work this so the imageviews get updated instead of
-		// refreshing the entire list.  That way the selection indicator will
-		// not be reset to the top whenever a new item loads
-		
-		if(!mScrolling){
-			this.notifyDataSetInvalidated();
-		} else {
-			this.notifyDataSetChanged();
-		}
+		this.notifyDataSetChanged();
 	}
 
 	public void asynOperationStarted() {
@@ -239,10 +231,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 //	public void setListener(PreparationListener mListener) {
 //		this.mListener = mListener;
 //	}
-	
-	public OnScrollListener getOnScrollListener(){
-		return this;
-	}
+
 	
 	/**
 	 * Enables load bar at given position,
@@ -269,11 +258,7 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 			int visibleItemCount, int totalItemCount) {
 	}
 
-
-	public void onScrollStateChanged(AbsListView view, int scrollState) {
-		mScrolling = true;
-	}
-
+	
 	public int getCount() {
 		if(mList != null)
 			return mList.size();
