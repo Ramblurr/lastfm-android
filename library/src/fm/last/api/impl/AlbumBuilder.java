@@ -24,14 +24,15 @@ public class AlbumBuilder extends XMLBuilder<Album> {
     String title = getText("title");
     String mbid = getText("mbid");
     String url = getText("url");
+    
     List<Node> imageNodes = getChildNodes("image");
-    ImageUrl[] images = new ImageUrl[imageNodes.size()];
+    if (imageNodes.size() > 1)
+    	imageNodes.remove( 0 ); //remove smallest size if there is one
+    ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
     int i = 0;
-    for (Node imageNode : imageNodes) {
-    	if (i != 0) // small images are useless
-    		images[i-1] =imageBuilder.build(imageNode);
-    	i++;
-    }
+    for (Node imageNode : imageNodes)
+  		images[i++] = imageBuilder.build(imageNode);
+    
     return new Album(artist, title, mbid, url, images);
   }
   
@@ -42,12 +43,15 @@ public class AlbumBuilder extends XMLBuilder<Album> {
       String title = getText("name");
       String mbid = getText("mbid");
       String url = getText("url");
+
       List<Node> imageNodes = getChildNodes("image");
-      ImageUrl[] images = new ImageUrl[imageNodes.size()];
+      if (imageNodes.size() > 1)
+      	imageNodes.remove( 0 ); //remove smallest size if there is one
+      ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
       int i = 0;
-      for (Node imageNode : imageNodes) {
-        images[i++] =imageBuilder.build(imageNode);
-      }
+      for (Node imageNode : imageNodes)
+    		images[i++] = imageBuilder.build(imageNode);
+      
       return new Album(artist, title, mbid, url, images);
     }
 }
