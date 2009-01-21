@@ -60,14 +60,14 @@
 
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
 	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>
-	<string name="ERROR_CHART_EMPTY">This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.</string>
+	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
 	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT">There is not enough content available to play this station.  Please try another station.</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Insufficient Content</string>
 	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>
 	<string name="ERROR_INSUFFICIENT_MEMBERS">There are not enough members in this group to play this station.  Please try another group.</string>
-	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">Your musical neighbourhood hasn't been calculated yet.  Try listening to more music and try again in a few days.</string>
-	<string name="ERROR_MISSINGINFO">You must have a valid Last.fm username and password.  If you don't have an account, click the Sign Up button.</string>
+	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Your musical neighborhood hasn't been calculated yet.  Try listening to more music and try again in a few days.&quot;</string>
+	<string name="ERROR_MISSINGINFO">&quot;You must have a valid Last.fm username and password.  If you don't have an account, click the Sign Up button.&quot;</string>
 	<string name="ERROR_MISSINGINFO_TITLE">Missing Information</string>
 	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
 	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
