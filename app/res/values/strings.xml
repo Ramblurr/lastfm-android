@@ -5,7 +5,7 @@
 	<string name="main_login">Log in</string>
 	<string name="main_setup">Setup</string>
 	<string name="main_signup">Sign up</string>
-	<string name="main_newaccount">Haven't got an account yet?</string>
+	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
 
 	<string name="home_logout">Log out</string>
 	<string name="home_tracksplayed">plays</string>
