@@ -186,7 +186,7 @@ public class RadioPlayerService extends Service
 				+ currentTrack.getCreator(), System.currentTimeMillis() );
 		PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 				new Intent( this, Player.class ), 0 );
-		String info = currentTrack.getTitle() + "\n" + currentTrack.getCreator();
+		String info = currentTrack.getTitle() + " - " + currentTrack.getCreator();
 		notification.setLatestEventInfo( this, currentStation.getName(),
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;

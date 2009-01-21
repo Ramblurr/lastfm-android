@@ -62,6 +62,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -358,6 +359,7 @@ public class Player extends Activity
 			try
 			{
 				LastFMApplication.getInstance().player.love();
+				Toast.makeText(Player.this, "Track has been marked as loved", Toast.LENGTH_SHORT).show();
 			}
 			catch ( RemoteException ex )
 			{
@@ -469,6 +471,8 @@ public class Player extends Activity
 			{
 				try
 				{
+					if(mDetailFlipper.getDisplayedChild() == 1)
+						mDetailFlipper.showPrevious();
 					if(mStationName != null)
 						mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
 				}
