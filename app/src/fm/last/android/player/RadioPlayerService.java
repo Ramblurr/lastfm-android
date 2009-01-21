@@ -414,6 +414,7 @@ public class RadioPlayerService extends Service
 		currentStation = server.tuneToStation(url, session.getKey());
 		if(currentStation != null) {
 			Log.i("Last.fm","Station name: " + currentStation.getName());
+			mPlaylistRetryCount = 0;
 			refreshPlaylist();
 			currentStationURL = url;
 			notifyChange( STATION_CHANGED );
