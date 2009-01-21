@@ -686,7 +686,6 @@ public class RadioPlayerService extends Service
 			mAlbumArt = art;
 		}
 
-		@Override
 		public void resetScrobbler() throws RemoteException {
 			scrobbler = null;
 		}

@@ -1,24 +1,38 @@
 package fm.last.android;
 
+import java.io.IOException;
+import java.net.URL;
+
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.activity.AddToPlaylist;
+import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
+import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
 import fm.last.api.WSError;
+import fm.last.util.UrlUtil;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 
 public class LastFm extends Activity
 {
@@ -47,6 +61,9 @@ public class LastFm extends Activity
         SharedPreferences settings = getSharedPreferences( PREFS, 0 );
         String user = settings.getString( "lastfm_user", "" );
         String pass = settings.getString( "lastfm_pass", "" );
+        
+        new CheckUpdatesTask().execute((Void)null);
+        
         if ( !user.equals( "" ) && !pass.equals( "" ) )
         {
             try
@@ -190,4 +207,36 @@ public class LastFm extends Activity
         LastFMApplication.getInstance().map.put( "lastfm_session", session );
     }
 
+    private class CheckUpdatesTask extends UserTask<Void, Void, Boolean> {
+    	private String mUpdateURL = "";
+    	
+        @Override
+        public Boolean doInBackground(Void...params) {
+            boolean success = false;
+
+            try {
+            	URL url = new URL("http://cdn.last.fm/client/android/"+getPackageManager().getPackageInfo("fm.last.android", 0).versionName+".txt" );
+            	mUpdateURL = UrlUtil.doGet(url);
+            	success = true;
+            } catch (Exception e) {
+            	// No updates available! Yay!
+            }
+            return success;
+        }
+
+        @Override
+        public void onPostExecute(Boolean result) {
+        	if(result) {
+        		NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+        		Notification notification = new Notification(
+        				R.drawable.as_statusbar, "A new version of Last.fm is available", System.currentTimeMillis() );
+        		PendingIntent contentIntent = PendingIntent.getActivity( LastFm.this, 0,
+        				new Intent( Intent.ACTION_VIEW, Uri.parse(mUpdateURL)), 0 );
+        		notification.setLatestEventInfo( LastFm.this, "New version available",
+        				"Click here to download the update", contentIntent );
+
+        		nm.notify( 12345, notification );
+        	}
+        }
+    }
 }
