@@ -69,6 +69,7 @@ public class RadioPlayerService extends Service
 	private WifiManager.WifiLock wifiLock;
 	private boolean mPreparing = false;
 	private boolean mStopping = false;
+	private int mPlaylistRetryCount = 0;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -282,6 +283,7 @@ public class RadioPlayerService extends Service
 		// Check if we're running low on tracks
 		if ( currentQueue.size() < 2 )
 		{
+			mPlaylistRetryCount = 0;
 			refreshPlaylist();
 		}
 		// Check again, if size still == 0 then the playlist is empty.
@@ -367,8 +369,13 @@ public class RadioPlayerService extends Service
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			if(e.getMessage().contains("code 503")) {
-				Log.i("Last.fm", "Playlist service unavailable, retrying...");
-				refreshPlaylist();
+				if(mPlaylistRetryCount++ < 4 ) {
+					Log.i("Last.fm", "Playlist service unavailable, retrying...");
+					refreshPlaylist();
+				} else {
+					notifyChange( PLAYBACK_ERROR );
+					nm.cancel( NOTIFY_ID );
+				}
 			}
 		} catch (WSError e) {
 			notifyChange( PLAYBACK_ERROR );
