@@ -53,6 +53,7 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.adapter.SeparatedListAdapter;
+import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
@@ -1231,8 +1232,11 @@ public class Profile extends ListActivity implements TabBarListener
                             + LastFm.DB_TABLE_RECENTSTATIONS );
             db.close();
 
-            if(LastFMApplication.getInstance().player != null)
-        		LastFMApplication.getInstance().player.stop();
+            IRadioPlayer player = LastFMApplication.getInstance().player;
+            if(player != null) {
+        		player.stop();
+        		player.resetScrobbler();
+            }
         }
         catch ( Exception e )
         {

@@ -192,7 +192,7 @@ public class RadioPlayerService extends Service
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
 		nm.notify( NOTIFY_ID, notification );
-		new NowPlayingTask(currentTrack).execute((Void)null);
+		new NowPlayingTask(currentTrack).execute(scrobbler);
 	}
 
 	private void playTrack( RadioTrack track )
@@ -213,9 +213,9 @@ public class RadioPlayerService extends Service
 				public void onCompletion( MediaPlayer mp )
 				{
 					if(isLoved) {
-						new SubmitTrackTask(currentTrack, currentStartTime, "L").execute((Void)null);
+						new SubmitTrackTask(currentTrack, currentStartTime, "L").execute(scrobbler);
 					} else {
-						new SubmitTrackTask(currentTrack, currentStartTime, "").execute((Void)null);
+						new SubmitTrackTask(currentTrack, currentStartTime, "").execute(scrobbler);
 					}
 					RadioPlayerService.this.nextSong();
 				}
@@ -420,18 +420,18 @@ public class RadioPlayerService extends Service
 		}
 	}
 
-	private class NowPlayingTask extends UserTask<Void, Void, Boolean> {
+	private class NowPlayingTask extends UserTask<AudioscrobblerService, Void, Boolean> {
 		RadioTrack mTrack;
-
+		
 		public NowPlayingTask(RadioTrack track) {
 			mTrack = track;
 		}
 
-		public Boolean doInBackground(Void... urls) {
+		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			try
 			{
-				scrobbler.nowPlaying(mTrack);
+				scrobbler[0].nowPlaying(mTrack);
 				success = true;
 			}
 			catch ( Exception e )
@@ -446,18 +446,18 @@ public class RadioPlayerService extends Service
 		}
 	}
 
-	private class SubmitTrackTask extends UserTask<Void, Void, Boolean> {
+	private class SubmitTrackTask extends UserTask<AudioscrobblerService, Void, Boolean> {
 		RadioTrack mTrack;
 		String mRating;
 		long mTime;
-
+		
 		public SubmitTrackTask(RadioTrack track, long time, String rating) {
 			mTrack = track;
 			mRating = rating;
 			mTime = time;
 		}
 
-		public Boolean doInBackground(Void... urls) {
+		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			try
 			{
@@ -468,7 +468,7 @@ public class RadioPlayerService extends Service
 				if(mRating.equals("B")) {
 					server.banTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
 				}
-				scrobbler.submit(mTrack, mTime, mRating);
+				scrobbler[0].submit(mTrack, mTime, mRating);
 				success = true;
 			}
 			catch ( Exception e )
@@ -570,7 +570,7 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "S").execute((Void)null);
+			new SubmitTrackTask(currentTrack, currentStartTime, "S").execute(scrobbler);
 			nextSong();
 		}
 
@@ -583,7 +583,7 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "B").execute((Void)null);
+			new SubmitTrackTask(currentTrack, currentStartTime, "B").execute(scrobbler);
 			nextSong();
 		}
 
@@ -684,6 +684,11 @@ public class RadioPlayerService extends Service
 
 		public void setAlbumArt(Bitmap art) throws RemoteException {
 			mAlbumArt = art;
+		}
+
+		@Override
+		public void resetScrobbler() throws RemoteException {
+			scrobbler = null;
 		}
 	};
 
