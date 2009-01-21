@@ -335,7 +335,7 @@ public class Tag extends Activity implements TabBarListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-    public void tabChanged(int index) {
+    public void tabChanged(int index, int previousIndex) {
     	switch(index) {
 	    	case TAB_MYTAGS:
 				mTagList.setAdapter(mUserTagListAdapter);

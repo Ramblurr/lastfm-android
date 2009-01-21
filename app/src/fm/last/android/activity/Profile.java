@@ -310,7 +310,7 @@ public class Profile extends ListActivity implements TabBarListener
         mMyRecentAdapter.updateModel();
     }
 
-    public void tabChanged(int index) {
+    public void tabChanged(int index, int previousIndex) {
 		//Log.i("Lukasz", "Changed tab to "+text+", index="+index);
 	}
 	

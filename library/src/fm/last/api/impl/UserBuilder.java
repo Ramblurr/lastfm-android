@@ -68,7 +68,7 @@ public class UserBuilder extends XMLBuilder<User> {
       String realname = getText("realname");
       String date = getText("registered");
 
-      List<Node> imageNodes = getChildNodes("image");
+      List<Node> imageNodes = getChildNodes("avatar");
       if (imageNodes.size() > 1)
       	imageNodes.remove( 0 ); //remove smallest size if there is one
       ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    

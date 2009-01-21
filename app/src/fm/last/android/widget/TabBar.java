@@ -288,6 +288,12 @@ public class TabBar extends LinearLayout {
 	 * @param text Child to which ViewFillper should switch when pressed
 	 */
 	public void setActive(int childIndex){
+		int previousTab;
+		if( mActiveTab != null )
+			 previousTab = mActiveTab;
+		else
+			previousTab = 0;
+		
 		if(mActiveTab != null){
 			// deactivate old tab
 			Tab tab = getTab(mActiveTab);
@@ -308,7 +314,7 @@ public class TabBar extends LinearLayout {
 			mViewFlipper.setDisplayedChild(childIndex);
 		}
 		if(mListener != null){
-			mListener.tabChanged(childIndex);
+			mListener.tabChanged(childIndex, previousTab);
 		}
 	}
 	

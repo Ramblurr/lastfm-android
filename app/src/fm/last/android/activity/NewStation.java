@@ -9,6 +9,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -51,11 +52,13 @@ public class NewStation extends ListActivity implements TabBarListener
     
     private SearchType searching;
     private EditText searchBar;
-    private ListAdapter mAdapter;
+    private ListAdapter mListAdapter[] = new ListAdapter[3];
     private Button mSearchButton;
     private TabBar mTabBar;
 	private ImageCache mImageCache;
 	private TextView mHint;
+	
+	private String mSearchText[] = new String[3];
     
     private final int TAB_ARTIST = 0;
     private final int TAB_TAG = 1;
@@ -96,7 +99,7 @@ public class NewStation extends ListActivity implements TabBarListener
 		mTabBar.addTab("Tag", TAB_TAG);
 		mTabBar.addTab("User", TAB_USER);
 		mTabBar.setActive(TAB_ARTIST);
-		tabChanged(TAB_ARTIST);
+		tabChanged(TAB_ARTIST, TAB_ARTIST);
         
         if ( searching == null )
             mTabBar.setActive(TAB_ARTIST);
@@ -109,31 +112,45 @@ public class NewStation extends ListActivity implements TabBarListener
     @Override
     public void onResume()
     {
-    	if(mAdapter != null) {
-    		mAdapter.enableLoadBar(-1);
-    		mAdapter.notifyDataSetInvalidated();
+    	for( int tabIndex = 0; tabIndex < 3; tabIndex++ )
+    	if(mListAdapter[ tabIndex ] != null) {
+    		mListAdapter[ tabIndex ].enableLoadBar(-1);
+    		mListAdapter[ tabIndex ].notifyDataSetInvalidated();
     	}
+    	
     	super.onResume();
     }
     
-	public void tabChanged(int index) {
+	public void tabChanged(int index, int previousIndex) {
+		mSearchText[previousIndex] = searchBar.getText().toString();
+        if( mSearchText[index] != null )
+        {
+        	searchBar.setText( mSearchText[index] );
+        	searchBar.setSelection( mSearchText[index].length() );
+        } else {
+        	searchBar.setText( "" );
+        }
+		
         if ( index == TAB_ARTIST )
         {
             searching = SearchType.Artist;
             searchBar.setHint( "Enter an Artist" );
             mHint.setText(getResources().getString(R.string.newstation_hint_artist));
+            setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_TAG )
         {
             searching = SearchType.Tag;
             searchBar.setHint( "Enter a Tag" );
             mHint.setText(getResources().getString(R.string.newstation_hint_tag));
+            setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_USER )
         {
             searching = SearchType.User;
             searchBar.setHint( "Enter a Username" );
             mHint.setText(getResources().getString(R.string.newstation_hint_user));
+            setListAdapter(mListAdapter[index]);
         }
 	}
 
@@ -169,13 +186,13 @@ public class NewStation extends ListActivity implements TabBarListener
             	.getText().toString();
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
-            mAdapter = new ListAdapter(NewStation.this, mImageCache);
+            mListAdapter[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
 			getListView().setOnItemClickListener(new OnItemClickListener() {
 
 				public void onItemClick(AdapterView<?> l, View v,
 						int position, long id) {
-					Tag tag = (Tag)mAdapter.getItem(position);
-					mAdapter.enableLoadBar(position);
+					Tag tag = (Tag)mListAdapter[TAB_TAG].getItem(position);
+					mListAdapter[TAB_TAG].enableLoadBar(position);
 			    	LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
 				}
 				
@@ -191,7 +208,7 @@ public class NewStation extends ListActivity implements TabBarListener
     						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);
     			}
-    			mAdapter.setSourceIconified(iconifiedEntries);
+    			mListAdapter[TAB_TAG].setSourceIconified(iconifiedEntries);
     			success = true;
     		} catch (IOException e) {
     			e.printStackTrace();
@@ -202,7 +219,7 @@ public class NewStation extends ListActivity implements TabBarListener
         @Override
         public void onPostExecute(Boolean result) {
         	if(result) {
-                setListAdapter( mAdapter );
+                setListAdapter( mListAdapter[TAB_TAG] );
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
@@ -229,13 +246,13 @@ public class NewStation extends ListActivity implements TabBarListener
             	.getText().toString();
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
-            mAdapter = new ListAdapter(NewStation.this, mImageCache);
+            mListAdapter[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
 			getListView().setOnItemClickListener(new OnItemClickListener() {
 
 				public void onItemClick(AdapterView<?> l, View v,
 						int position, long id) {
-					Artist artist = (Artist)mAdapter.getItem(position);
-					mAdapter.enableLoadBar(position);
+					Artist artist = (Artist)mListAdapter[TAB_ARTIST].getItem(position);
+					mListAdapter[TAB_ARTIST].enableLoadBar(position);
 			    	LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
 				}
 				
@@ -255,7 +272,7 @@ public class NewStation extends ListActivity implements TabBarListener
     	            }
     			}
     			if(iconifiedEntries.size() > 0) {
-	    			mAdapter.setSourceIconified(iconifiedEntries);
+    				mListAdapter[TAB_ARTIST].setSourceIconified(iconifiedEntries);
 	    			success = true;
     			}
     		} catch (IOException e) {
@@ -267,7 +284,7 @@ public class NewStation extends ListActivity implements TabBarListener
         @Override
         public void onPostExecute(Boolean result) {
         	if(result) {
-                setListAdapter( mAdapter );
+                setListAdapter( mListAdapter[TAB_ARTIST] );
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
@@ -294,13 +311,13 @@ public class NewStation extends ListActivity implements TabBarListener
             	.getText().toString();
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
-            mAdapter = new ListAdapter(NewStation.this, mImageCache);
+            mListAdapter[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
 			getListView().setOnItemClickListener(new OnItemClickListener() {
 
 				public void onItemClick(AdapterView<?> l, View v,
 						int position, long id) {
-					User user = (User)mAdapter.getItem(position);
-					mAdapter.enableLoadBar(position);
+					User user = (User)mListAdapter[TAB_USER].getItem(position);
+					mListAdapter[TAB_USER].enableLoadBar(position);
                     Intent profileIntent = new Intent(NewStation.this, fm.last.android.activity.Profile.class);
                     profileIntent.putExtra("lastfm.profile.username", user.getName());
                     startActivity(profileIntent);
@@ -313,12 +330,12 @@ public class NewStation extends ListActivity implements TabBarListener
    				if(user != null) {
 	    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 					ListEntry entry = new ListEntry(user, 
-							R.drawable.artist_icon, 
+							R.drawable.profile_unknown, 
 							user.getName(),
 							user.getImages().length == 0 ? "" : user.getImages()[0].getUrl(),
 							R.drawable.list_item_rest_arrow);
 					iconifiedEntries.add(entry);
-	    			mAdapter.setSourceIconified(iconifiedEntries);
+					mListAdapter[TAB_USER].setSourceIconified(iconifiedEntries);
 	    			success = true;
    				}
     		} catch (IOException e) {
@@ -330,7 +347,7 @@ public class NewStation extends ListActivity implements TabBarListener
         @Override
         public void onPostExecute(Boolean result) {
         	if(result) {
-                setListAdapter( mAdapter );
+                setListAdapter( mListAdapter[TAB_USER] );
         		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
