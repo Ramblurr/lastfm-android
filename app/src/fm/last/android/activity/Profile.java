@@ -290,11 +290,14 @@ public class Profile extends ListActivity implements TabBarListener
 
         @Override
         public void onPostExecute(Boolean result) {
+            Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
             if( !isAuthenticatedUser ) {
                 mProfileBubble.setUser(Profile.this.mUser);
                 SetupCommonArtists(tasteometer);
             }
-            RebuildMainMenu();
+            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
+            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
+            mMainAdapter.notifyDataSetChanged();
         }
     }
     
@@ -342,6 +345,7 @@ public class Profile extends ListActivity implements TabBarListener
 		registerReceiver( mStatusListener, mIntentFilter );
     	SetupRecentStations();
     	RebuildMainMenu();
+    	mMainAdapter.disableLoadBar();
 
     	if(mTopArtistsAdapter != null)
     		mTopArtistsAdapter.disableLoadBar();
@@ -484,8 +488,7 @@ public class Profile extends ListActivity implements TabBarListener
 	        
 	    	l.setEnabled(false);
 	    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
-	    	ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
-	    	switcher.showNext();
+	    	mMainAdapter.enableLoadBar(position-1);
 	    	LastFMApplication.getInstance().playRadioStation(this, adapter_station);
 	    }
 	    catch (RemoteException e)
@@ -1022,7 +1025,7 @@ public class Profile extends ListActivity implements TabBarListener
 	public boolean onPrepareOptionsMenu(Menu menu)  {
 		boolean isPlaying = false;
 		try {
-			if (LastFMApplication.getInstance() != null)
+			if (LastFMApplication.getInstance().player != null)
 				isPlaying = LastFMApplication.getInstance().player.isPlaying();
 		} catch (RemoteException e) {
 		}
@@ -1223,6 +1226,8 @@ public class Profile extends ListActivity implements TabBarListener
         SharedPreferences.Editor editor = settings.edit();
         editor.remove( "lastfm_user" );
         editor.remove( "lastfm_pass" );
+        editor.remove( "lastfm_session_key" );
+        editor.remove( "lastfm_subscriber" );
         editor.commit();
         SQLiteDatabase db = null;
         try

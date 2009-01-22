@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
+import android.widget.ViewSwitcher;
 
 /** WHAT IS THIS?!?!?!? */
 public class LastFMStreamAdapter extends BaseAdapter
@@ -50,6 +51,27 @@ public class LastFMStreamAdapter extends BaseAdapter
 	
 	ArrayList<Stream> mItems;
     Activity context;
+    private int mLoadingBar = -1;
+
+    /**
+	 * Enables load bar at given position,
+	 * at the same time only one can
+	 * be launched per adapter
+	 * 
+	 * @param position
+	 */
+	public void enableLoadBar(int position){
+		this.mLoadingBar = position;
+		notifyDataSetChanged();
+	}
+	
+	/**
+	 * Disables load bar
+	 */
+	public void disableLoadBar(){
+		this.mLoadingBar = -1;
+		notifyDataSetChanged();
+	}
 
     public LastFMStreamAdapter( Activity context )
     {
@@ -87,16 +109,32 @@ public class LastFMStreamAdapter extends BaseAdapter
         TextView name = (TextView)row.findViewById(R.id.row_label);
         name.setText( mItems.get(position).mLabel );
         
-        row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
+        ViewSwitcher switcher = (ViewSwitcher)row.findViewById(R.id.row_view_switcher);
+        switcher.setVisibility(View.VISIBLE);
+		if(mLoadingBar == position) {
+			switcher.setDisplayedChild(1);
+			name.setTextColor(0xFFFFFFFF);
+	        if(position == mItems.size() - 1) {
+	        	row.setBackgroundResource(R.drawable.list_item_focus_rounded_bottom);
+	        	row.setTag("bottom");
+	        }
+	        else
+	        	row.setBackgroundResource(R.drawable.list_item_focus);
+		}
+		else{
+			switcher.setDisplayedChild(0);
+			name.setTextColor(0xFF000000);
+	        if(position == mItems.size() - 1) {
+	        	row.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
+	        	row.setTag("bottom");
+	        }
+	        else
+	        	row.setBackgroundResource(R.drawable.list_item_rest);
+		}
+        
         ImageView icon = (ImageView)row.findViewById(R.id.row_disclosure_icon);
 		icon.setImageResource( radioIcon( position, false ) );
         
-        if(position == mItems.size() - 1) {
-        	row.setBackgroundResource(R.drawable.list_item_rest_rounded_bottom);
-        	row.setTag("bottom");
-        }
-        else
-        	row.setBackgroundResource(R.drawable.list_item_rest);
         return ( row );
     }
     

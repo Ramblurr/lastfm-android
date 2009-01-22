@@ -59,7 +59,36 @@ public class SeparatedListAdapter extends BaseAdapter
         }
         return null;
     }
-    
+
+    public void enableLoadBar(int position) {
+        for(Object section : this.sections.keySet()) {
+            Adapter adapter = (LastFMStreamAdapter)sections.get(section);
+            int size = adapter.getCount() + 1;
+
+            // check if position inside this section
+            if(position < size) {
+                if( adapter instanceof LastFMStreamAdapter)
+                {
+                    LastFMStreamAdapter ladapter = (LastFMStreamAdapter) adapter;
+            		ladapter.enableLoadBar(position - 1);
+            		notifyDataSetChanged();
+                }
+            	return;
+            }
+
+            // otherwise jump into next section
+            position -= size;
+        }
+    }
+
+    public void disableLoadBar() {
+        for(Object section : this.sections.keySet()) {
+            LastFMStreamAdapter adapter = (LastFMStreamAdapter)sections.get(section);
+            if(adapter != null)
+            	adapter.disableLoadBar();
+        }
+    }
+
     public String getStation(int position) {
         for(Object section : this.sections.keySet()) {
             Adapter adapter = sections.get(section);
@@ -73,6 +102,23 @@ public class SeparatedListAdapter extends BaseAdapter
                     LastFMStreamAdapter ladapter = (LastFMStreamAdapter) adapter;
                     return ladapter.getStation( position - 1 );
                 }
+            }
+
+            // otherwise jump into next section
+            position -= size;
+        }
+        return null;
+    }
+
+    public Adapter getAdapterForPosition(int position) {
+        for(Object section : this.sections.keySet()) {
+            Adapter adapter = sections.get(section);
+            int size = adapter.getCount() + 1;
+
+            // check if position inside this section
+            if(position == 0) return null;
+            if(position < size){
+            	return adapter;
             }
 
             // otherwise jump into next section
