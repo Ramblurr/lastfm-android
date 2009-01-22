@@ -31,6 +31,7 @@ import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
@@ -218,7 +219,7 @@ public class RadioPlayerService extends Service
 					} else {
 						new SubmitTrackTask(currentTrack, currentStartTime, "").execute(scrobbler);
 					}
-					RadioPlayerService.this.nextSong();
+					new NextTrackTask().execute((Void)null);
 				}
 			} );
 
@@ -247,6 +248,24 @@ public class RadioPlayerService extends Service
 					}
 				}
 			});
+			
+			mp.setOnErrorListener(new OnErrorListener() {
+				public boolean onError(MediaPlayer mp, int what, int extra) {
+					notifyChange(PLAYBACK_ERROR);
+					mPlaying = false;
+					mStopping = false;
+					mPreparing = false;
+					nm.cancel( NOTIFY_ID );
+					if( wakeLock.isHeld())
+						wakeLock.release();
+					
+					if( wifiLock.isHeld())
+						wifiLock.release();
+					mDeferredStopHandler.deferredStopSelf();
+					return true;
+				}
+			});
+			
 			mDeferredStopHandler.cancelStopSelf();
 
 			mPreparing = true;
@@ -275,6 +294,7 @@ public class RadioPlayerService extends Service
 			
 			if( wifiLock.isHeld())
 				wifiLock.release();
+			mDeferredStopHandler.deferredStopSelf();
 		}
 	}
 	
@@ -477,6 +497,27 @@ public class RadioPlayerService extends Service
 					server.banTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
 				}
 				scrobbler[0].submit(mTrack, mTime, mRating);
+				success = true;
+			}
+			catch ( Exception e )
+			{
+				success = false;
+			}
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+		}
+	}
+
+	private class NextTrackTask extends UserTask<Void, Void, Boolean> {
+
+		public Boolean doInBackground(Void... input) {
+			boolean success = false;
+			try
+			{
+				nextSong();
 				success = true;
 			}
 			catch ( Exception e )

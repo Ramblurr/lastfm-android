@@ -35,6 +35,9 @@ public class LastFMApplication extends Application
 
     private static LastFMApplication instance;
     private Context mCtx;
+    
+    private String mTuningStation = "";
+    private boolean mShowPlayer;
 
     public static LastFMApplication getInstance()
     {
@@ -50,19 +53,6 @@ public class LastFMApplication extends Application
 
         // construct an 'application global' object
         this.map = new WeakHashMap();
-
-        // start our media player service
-		Intent mpIntent = new Intent(
-				this,
-				fm.last.android.player.RadioPlayerService.class );
-		startService( mpIntent );
-		boolean b = bindService( mpIntent, mConnection, 0 );
-		if ( !b )
-		{
-			// something went wrong
-			// mHandler.sendEmptyMessage(QUIT);
-			System.out.println( "Binding to service failed " + mConnection );
-		}
     }
     
 	private ServiceConnection mConnection = new ServiceConnection()
@@ -71,6 +61,10 @@ public class LastFMApplication extends Application
 		public void onServiceConnected( ComponentName className, IBinder service )
 		{
 			player = fm.last.android.player.IRadioPlayer.Stub.asInterface( service );
+			if(mTuningStation.length() > 0) {
+				new TuneRadioTask(mShowPlayer).execute(new String[] {mTuningStation});
+				mTuningStation = "";
+			}
 		}
 
 		public void onServiceDisconnected( ComponentName className )
@@ -86,12 +80,25 @@ public class LastFMApplication extends Application
 	
 	public void playRadioStation(Context ctx, String url, boolean showPlayer)
 	{
-
-		if ( LastFMApplication.getInstance().player == null )
-			return;
-
 		mCtx = ctx;
-		new TuneRadioTask(showPlayer).execute(new String[] {url});
+
+		if ( LastFMApplication.getInstance().player == null ) {
+	        // start our media player service
+			Intent mpIntent = new Intent(
+					this,
+					fm.last.android.player.RadioPlayerService.class );
+			boolean b = bindService( mpIntent, mConnection, BIND_AUTO_CREATE );
+			if ( !b )
+			{
+				// something went wrong
+				// mHandler.sendEmptyMessage(QUIT);
+				System.out.println( "Binding to service failed " + mConnection );
+			}
+			mTuningStation = url;
+			mShowPlayer = showPlayer;
+		} else {
+			new TuneRadioTask(showPlayer).execute(new String[] {url});
+		}
 	}
 	
 	public WeakHashMap<String, String> getRecentStations()
@@ -301,6 +308,9 @@ public class LastFMApplication extends Application
         	
             if (!result) {
 				try {
+					if(LastFMApplication.getInstance().player == null)
+						return;
+					
 					WSError error = LastFMApplication.getInstance().player.getError();
 					if(error != null)
 						LastFMApplication.getInstance().presentError(mCtx, error);

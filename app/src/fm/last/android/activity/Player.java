@@ -235,6 +235,8 @@ public class Player extends Activity
 			break;
 		case R.id.buy_menu_item:
 			try {
+				if(LastFMApplication.getInstance().player == null)
+					return false;
 				Intent intent = new Intent( Intent.ACTION_SEARCH );
 				intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
 				intent.putExtra("actionSearchString", LastFMApplication.getInstance().player.getArtistName() + " "
@@ -247,6 +249,8 @@ public class Player extends Activity
 			break;
 		case R.id.share_menu_item:
 			try {
+				if(LastFMApplication.getInstance().player == null)
+					return false;
 				Intent intent = new Intent( this, Share.class );
 				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
 				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
@@ -257,6 +261,8 @@ public class Player extends Activity
 			break;
 		case R.id.playlist_menu_item:
 			try {
+				if(LastFMApplication.getInstance().player == null)
+					return false;
 				Intent intent = new Intent( this, AddToPlaylist.class );
 				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
 				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
@@ -281,6 +287,8 @@ public class Player extends Activity
 		String track = null;
 
 		try {
+			if(LastFMApplication.getInstance().player == null)
+				return;
 			artist = LastFMApplication.getInstance().player.getArtistName();
 			track = LastFMApplication.getInstance().player.getTrackName();
 			Intent myIntent = new Intent(this, fm.last.android.activity.Tag.class);
@@ -297,13 +305,6 @@ public class Player extends Activity
 	{
 		super.onStart();
 		paused = false;
-		try {
-			if(mStationName != null)
-				mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		long next = refreshNow();
 		queueNextRefresh( next );
 	}
@@ -469,24 +470,16 @@ public class Player extends Activity
 			}
 			else if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
 			{
-				try
-				{
-					if(mDetailFlipper.getDisplayedChild() == 1)
-						mDetailFlipper.showPrevious();
-					if(mStationName != null)
-						mStationName.setText( LastFMApplication.getInstance().player.getStationName() );
-				}
-				catch ( RemoteException e )
-				{
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				if(mDetailFlipper.getDisplayedChild() == 1)
+					mDetailFlipper.showPrevious();
 			}
 			else if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
 			{
 				// TODO add a skip counter and try to skip 3 times before display an error message
 				try
 				{
+					if(LastFMApplication.getInstance().player == null)
+						return;
 					WSError error = LastFMApplication.getInstance().player.getError();
 					if(error != null) {
 						LastFMApplication.getInstance().presentError(context, error);
@@ -602,7 +595,8 @@ public class Player extends Activity
 				mAlbum.setArtwork( ( Bitmap ) msg.obj );
 				mAlbum.invalidate();
 				try {
-					LastFMApplication.getInstance().player.setAlbumArt((Bitmap)msg.obj);
+					if(LastFMApplication.getInstance().player != null)
+						LastFMApplication.getInstance().player.setAlbumArt((Bitmap)msg.obj);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -661,21 +655,23 @@ public class Player extends Activity
 			boolean success = false;
 
 			try {
-				artUrl = LastFMApplication.getInstance().player.getArtUrl();
-				String artistName = LastFMApplication.getInstance().player.getArtistName();
-				String albumName = LastFMApplication.getInstance().player.getAlbumName();
-				if(albumName != null && albumName.length() > 0) {
-					album = mServer.getAlbumInfo(artistName, albumName);
-					if(album != null) {
-						for(ImageUrl image : album.getImages()) {
-							if(image.getSize().contentEquals("extralarge")) {
-								artUrl = image.getUrl();
-								break;
+				if(LastFMApplication.getInstance().player != null) {
+					artUrl = LastFMApplication.getInstance().player.getArtUrl();
+					String artistName = LastFMApplication.getInstance().player.getArtistName();
+					String albumName = LastFMApplication.getInstance().player.getAlbumName();
+					if(albumName != null && albumName.length() > 0) {
+						album = mServer.getAlbumInfo(artistName, albumName);
+						if(album != null) {
+							for(ImageUrl image : album.getImages()) {
+								if(image.getSize().contentEquals("extralarge")) {
+									artUrl = image.getUrl();
+									break;
+								}
 							}
 						}
 					}
+					success = true;
 				}
-				success = true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -30,7 +30,7 @@ public class LastFMStreamAdapter extends BaseAdapter
 	    public int radioIcon( boolean hasFocus )
 	    {
 	        try {
-	        	if(LastFMApplication.getInstance().player.isPlaying()) {
+	        	if(LastFMApplication.getInstance().player != null && LastFMApplication.getInstance().player.isPlaying()) {
 		        	String current = LastFMApplication.getInstance().player.getStationUrl();
 					if (current != null && mStationUrl.compareTo(current) == 0) {
 						// now playing is always the same (focus or not) 

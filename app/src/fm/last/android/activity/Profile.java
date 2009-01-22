@@ -472,7 +472,7 @@ public class Profile extends ListActivity implements TabBarListener
         {
 	        String adapter_station = mMainAdapter.getStation(position-1);
 	        
-        	if ( LastFMApplication.getInstance().player.isPlaying() ) {
+        	if ( LastFMApplication.getInstance().player != null && LastFMApplication.getInstance().player.isPlaying() ) {
 		        String current_station = LastFMApplication.getInstance().player.getStationUrl();
 		
 		        if( adapter_station.equals( current_station ) ) {
