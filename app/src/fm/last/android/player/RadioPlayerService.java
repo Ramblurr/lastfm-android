@@ -258,10 +258,7 @@ public class RadioPlayerService extends Service
 				public boolean onError(MediaPlayer mp, int what, int extra) {
 					if(mAutoSkipCount++ < 4) {
 						//If we weren't able to start playing after 3 attempts, bail out and notify
-						//the user.  This will bring us into a stopped state.  The user will
-						//need to tune a new station at this point, as pressing the skip button
-						//will do nothing.  Perhaps we should have an additional ERROR state where
-						//the user can press skip to retry after our attempts.
+						//the user.  This will bring us into a stopped state.
 						mState = STATE_STOPPED;
 						notifyChange(PLAYBACK_ERROR);
 						nm.cancel( NOTIFY_ID );
@@ -644,7 +641,11 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			nextSong();
+			//Enter a TUNING state if the user presses the skip button when the player is in a
+			//STOPPED state
+			if(mState == STATE_STOPPED)
+				mState = STATE_TUNING;
+			new NextTrackTask().execute((Void)null);
 		}
 
 		public void skip() throws RemoteException

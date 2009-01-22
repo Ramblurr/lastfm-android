@@ -398,7 +398,11 @@ public class Player extends Activity
 			if ( LastFMApplication.getInstance().player == null )
 				return;
 			try {
-				LastFMApplication.getInstance().player.skip();
+				//If the player is in a stopped state, call startRadio instead of skip
+				if(LastFMApplication.getInstance().player.isPlaying())
+					LastFMApplication.getInstance().player.skip();
+				else
+					LastFMApplication.getInstance().player.startRadio();
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
