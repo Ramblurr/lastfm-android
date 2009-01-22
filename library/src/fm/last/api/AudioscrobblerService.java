@@ -75,7 +75,7 @@ public class AudioscrobblerService extends Object
     	Map<String, String> params = new HashMap<String, String>();
     	params.put( "hs", "true" );
     	params.put( "p", "1.2.1" );
-    	params.put( "c", "ass" ); //FIXME
+    	params.put( "c", "lnd" ); //FIXME
     	params.put( "v", "0.1" ); // FIXME
     	params.put( "u", mUsername );
     	params.put( "t", timestamp );
