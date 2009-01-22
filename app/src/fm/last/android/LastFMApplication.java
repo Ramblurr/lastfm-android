@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
@@ -53,6 +54,17 @@ public class LastFMApplication extends Application
 
         // construct an 'application global' object
         this.map = new WeakHashMap();
+        
+        //Populate our Session object
+        SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
+        String user = settings.getString( "lastfm_user", "" );
+        String session_key = settings.getString( "lastfm_session_key", "" );
+        String subscriber = settings.getString( "lastfm_subscriber", "0" );
+        if ( !user.equals( "" ) && !session_key.equals( "" ) )
+        {
+	    	Session session = new Session(user, session_key, subscriber);
+	        this.map.put( "lastfm_session", session );
+        }
     }
     
 	private ServiceConnection mConnection = new ServiceConnection()

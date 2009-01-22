@@ -68,8 +68,6 @@ public class LastFm extends Activity
         
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
-        	Session session = new Session(user, session_key, subscriber);
-            LastFMApplication.getInstance().map.put( "lastfm_session", session );
             Intent intent = new Intent( LastFm.this, Profile.class );
             startActivity( intent );
             finish();
