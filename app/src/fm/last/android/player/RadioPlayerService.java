@@ -60,7 +60,6 @@ public class RadioPlayerService extends Service
 	private RadioTrack currentTrack;
 	private long currentStartTime;
 	private ArrayBlockingQueue<RadioTrack> currentQueue;
-	private boolean mPlaying = false;
 	private NotificationManager nm = null;
 	private int bufferPercent;
 	private WSError mError = null;
@@ -68,8 +67,13 @@ public class RadioPlayerService extends Service
 	private AudioscrobblerService scrobbler;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
-	private boolean mPreparing = false;
-	private boolean mStopping = false;
+	private final int STATE_STOPPED = 0;
+	private final int STATE_TUNING = 1;
+	private final int STATE_PREPARING = 2;
+	private final int STATE_PLAYING = 3;
+	private final int STATE_SKIPPING = 4;
+	private final int STATE_PAUSED = 5;
+	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 
 	/**
@@ -126,7 +130,7 @@ public class RadioPlayerService extends Service
 			@Override
 			public void onCallStateChanged(int state, String incomingNumber) {
 				if(state == TelephonyManager.CALL_STATE_RINGING){
-					if(mPlaying){
+					if(mState != STATE_STOPPED){
 						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 5000, 10){
 
 							@Override
@@ -141,7 +145,7 @@ public class RadioPlayerService extends Service
 						};
 					}
 				}
-				if(state == TelephonyManager.CALL_STATE_IDLE && mPausedOnCall && !mPlaying){
+				if(state == TelephonyManager.CALL_STATE_IDLE && mPausedOnCall && mState == STATE_PAUSED){
 					new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000, 10){
 
 						@Override
@@ -201,7 +205,7 @@ public class RadioPlayerService extends Service
 	{
 		try
 		{
-			if (mPreparing)
+			if (mState == STATE_STOPPED || mState == STATE_PREPARING)
 				return;
 			
 			currentTrack = track;
@@ -236,15 +240,13 @@ public class RadioPlayerService extends Service
 			mp.setOnPreparedListener(new OnPreparedListener() {
 
 				public void onPrepared(MediaPlayer mp) {
-					mPreparing = false;
-					if (mStopping) {
-						mStopping = false;
-						stop();
-					} else {
+					if (mState == STATE_PREPARING) {
 						mp.start();
 						playingNotify();
 						currentStartTime = System.currentTimeMillis() / 1000;
-						mPlaying = true;
+						mState = STATE_PLAYING;
+					} else {
+						mp.stop();
 					}
 				}
 			});
@@ -252,9 +254,7 @@ public class RadioPlayerService extends Service
 			mp.setOnErrorListener(new OnErrorListener() {
 				public boolean onError(MediaPlayer mp, int what, int extra) {
 					notifyChange(PLAYBACK_ERROR);
-					mPlaying = false;
-					mStopping = false;
-					mPreparing = false;
+					mState = STATE_STOPPED;
 					nm.cancel( NOTIFY_ID );
 					if( wakeLock.isHeld())
 						wakeLock.release();
@@ -268,7 +268,7 @@ public class RadioPlayerService extends Service
 			
 			mDeferredStopHandler.cancelStopSelf();
 
-			mPreparing = true;
+			mState = STATE_PREPARING;
 			mp.prepareAsync();
 		}
 		catch ( IllegalStateException e )
@@ -283,32 +283,44 @@ public class RadioPlayerService extends Service
 
 	private void stop()
 	{
-		if (mPreparing) {
-			mStopping = true;
-		} else {
-			nm.cancel( NOTIFY_ID );
+		if (mState == STATE_PLAYING) {
 			mp.stop();
-			RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
-			if( wakeLock.isHeld())
-				wakeLock.release();
-			
-			if( wifiLock.isHeld())
-				wifiLock.release();
-			mDeferredStopHandler.deferredStopSelf();
 		}
+		nm.cancel( NOTIFY_ID );
+		mState = STATE_STOPPED;
+		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
+		if( wakeLock.isHeld())
+			wakeLock.release();
+		
+		if( wifiLock.isHeld())
+			wifiLock.release();
+		mDeferredStopHandler.deferredStopSelf();
 	}
 	
 	private void nextSong()
 	{
+		if(mState == STATE_SKIPPING || mState == STATE_STOPPED)
+			return;
+		
+		mState = STATE_SKIPPING;
 		// Check if we're running low on tracks
 		if ( currentQueue.size() < 2 )
 		{
 			mPlaylistRetryCount = 0;
-			refreshPlaylist();
+			try {
+				refreshPlaylist();
+			} catch (WSError e) {
+				mError = e;
+				notifyChange( PLAYBACK_ERROR );
+				return;
+			}
 		}
+		
 		// Check again, if size still == 0 then the playlist is empty.
 		if ( currentQueue.size() > 0 )
 		{
+			//playTrack will check if mStopping is true, and stop us if the user has
+			//pressed stop while we were fetching the playlist
 			playTrack( currentQueue.poll() );
 			notifyChange( META_CHANGED );
 		}
@@ -327,7 +339,7 @@ public class RadioPlayerService extends Service
 		//TODO: This should not be exposed in the UI, only used to pause
 		//during a phone call or similar interruption
 
-		if ( mPlaying )
+		if ( mState != STATE_STOPPED )
 		{
 			if ( mActive == false )
 				mDeferredStopHandler.deferredStopSelf();
@@ -355,20 +367,14 @@ public class RadioPlayerService extends Service
 			nm.notify( NOTIFY_ID, notification );
 			notifyChange( PLAYBACK_STATE_CHANGED );
 			mp.pause();
-			mPlaying = false;
+			mState = STATE_PAUSED;
 		}
 		else
 		{
 			playingNotify();
 			mp.start();
-			mPlaying = true;
+			mState = STATE_PLAYING;
 		}
-	}
-
-	private void prevSong()
-	{
-
-		// NOT IMPLEMENTED FOR LASTFM
 	}
 
 	private void refreshPlaylist() throws WSError
@@ -424,10 +430,11 @@ public class RadioPlayerService extends Service
 		wakeLock.acquire();
 		wifiLock.acquire();
 		Log.i("Last.fm","Tuning to station: " + url);
-		if(mp.isPlaying()) {
+		if(mState == STATE_PLAYING) {
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
 		}
+		mState = STATE_TUNING;
 		currentQueue.clear();
 		currentSession = session;
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
@@ -520,6 +527,10 @@ public class RadioPlayerService extends Service
 				nextSong();
 				success = true;
 			}
+			catch ( WSError e ) {
+				mError = e;
+				success = false;
+			}
 			catch ( Exception e )
 			{
 				success = false;
@@ -529,6 +540,9 @@ public class RadioPlayerService extends Service
 
 		@Override
 		public void onPostExecute(Boolean result) {
+			if(!result) {
+				notifyChange( PLAYBACK_ERROR );
+			}
 		}
 	}
 
@@ -612,7 +626,7 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			nextSong();            		
+			nextSong();
 		}
 
 		public void skip() throws RemoteException
@@ -620,7 +634,7 @@ public class RadioPlayerService extends Service
 			if(Looper.myLooper() == null)
 				Looper.prepare();
 			new SubmitTrackTask(currentTrack, currentStartTime, "S").execute(scrobbler);
-			nextSong();
+			new NextTrackTask().execute((Void)null);
 		}
 
 		public void love() throws RemoteException
@@ -674,7 +688,7 @@ public class RadioPlayerService extends Service
 		public boolean isPlaying() throws RemoteException
 		{
 
-			return mp.isPlaying();
+			return mState != STATE_STOPPED;
 		}
 
 		public long getPosition() throws RemoteException
@@ -763,7 +777,7 @@ public class RadioPlayerService extends Service
 
 		mActive = false;
 
-		if ( mPlaying == true ) // || mResumeAfterCall == true)
+		if ( mState != STATE_STOPPED ) // || mResumeAfterCall == true)
 			return true;
 
 		mDeferredStopHandler.deferredStopSelf();
