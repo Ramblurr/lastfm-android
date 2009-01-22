@@ -41,7 +41,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class AddToPlaylist extends Activity {
 	private ListView mPlaylistsList;
-	private ListAdapter mPlaylistsAdapter;
 	private EditText mNewPlaylist;
 	private Button mCreateBtn;
 	private ImageCache mImageCache;
@@ -84,7 +83,20 @@ public class AddToPlaylist extends Activity {
 		});
 
 		mPlaylistsList = (ListView)findViewById(R.id.playlists);
-		mPlaylistsList.setOnItemSelectedListener(new OnListRowSelectedListener(mPlaylistsList));
+		mPlaylistsList.setOnItemClickListener(new OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> l, View v, int position,
+					long id) {
+				ListAdapter adapter = (ListAdapter) mPlaylistsList.getAdapter(); 
+				adapter.enableLoadBar(position);
+				RadioPlayList playlist = (RadioPlayList) adapter.getItem(position);
+				String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
+				String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
+				new AddToPlaylistTask(artist, track, playlist.getId())
+						.execute((Void) null);
+			}
+		});
+
 		new LoadPlaylistsTask().execute((Void)null);
 	}
 	
@@ -110,22 +122,28 @@ public class AddToPlaylist extends Activity {
         public Boolean doInBackground(Void...params) {
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
-            boolean success = false;
 
             try {
     			mServer.addTrackToPlaylist(mArtist, mTrack, mPlaylistId, session.getKey());
-                success = true;
+                return true;
             } catch (WSError e) {
-            	LastFMApplication.getInstance().presentError(AddToPlaylist.this, e);
+            	// 'invalidate parameters' error in this case means
+				// "track already exists in playlist", which we will
+				// usefully treat as a non-error.
+				// of course we're assuming that we always get our
+				// parameters right.  but in the face of not enough
+            	// error codes from the api, what are you gonna do?
+            	if (e.getCode() == WSError.ERROR_InvalidParameters) 
+            		return true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return success;
+            return false;
         }
 
         @Override
         public void onPostExecute(Boolean result) {
-        	mPlaylistsAdapter.disableLoadBar();
+        	((ListAdapter) mPlaylistsList.getAdapter()).disableLoadBar();
         	if(result) {
             	AddToPlaylist.this.finish();
         	} else {
@@ -134,24 +152,22 @@ public class AddToPlaylist extends Activity {
         }
     }
 
-    private class LoadPlaylistsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadPlaylistsTask extends UserTask<Void, Void, ListAdapter> {
     	@Override
     	public void onPreExecute() {
         	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE, "Loading..."));
-        	mPlaylistsList.setOnItemClickListener(null);
     	}
     	
         @Override
-        public Boolean doInBackground(Void...params) {
+        public ListAdapter doInBackground(Void...params) {
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
-            boolean success = false;
 
-            mPlaylistsAdapter = new ListAdapter(AddToPlaylist.this, getImageCache());
             try {
                 RadioPlayList[] playlists = mServer.getUserPlaylists(session.getName());
-                if(playlists.length == 0 )
-                    return false;
+                if(playlists == null || playlists.length == 0 )
+                	return null;
+                
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i < playlists.length; i++){
                     ListEntry entry = new ListEntry(playlists[i],
@@ -159,36 +175,27 @@ public class AddToPlaylist extends Activity {
                             playlists[i].getTitle());
                     iconifiedEntries.add(entry);
                 }
-                mPlaylistsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
+                
+                ListAdapter result = new ListAdapter(AddToPlaylist.this, getImageCache()); 
+                result.setSourceIconified(iconifiedEntries);
+            	return result;
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            mPlaylistsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    mPlaylistsAdapter.enableLoadBar(position);
-                    RadioPlayList playlist = (RadioPlayList) mPlaylistsAdapter.getItem(position);
-                    String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
-                    String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                    new AddToPlaylistTask(artist,track,playlist.getId()).execute((Void)null);
-                }
-            });
-            if(result) {
-                mPlaylistsList.setAdapter(mPlaylistsAdapter);
+        public void onPostExecute(ListAdapter result) {
+            if(result != null) {
+                mPlaylistsList.setAdapter(result);
             } else {
             	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.INFO_MODE, "No Playlists")); 
             }
         }
     }
     
-    private class CreatePlaylistTask extends UserTask<Void, Void, Boolean> {
+    private class CreatePlaylistTask extends UserTask<Void, Void, ListAdapter> {
     	private String mTitle;
     	
     	public CreatePlaylistTask(String title) {
@@ -202,19 +209,19 @@ public class AddToPlaylist extends Activity {
     	}
     	
         @Override
-        public Boolean doInBackground(Void...params) {
+        public ListAdapter doInBackground(Void...params) {
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
-            boolean success = false;
 
-            mPlaylistsAdapter = new ListAdapter(AddToPlaylist.this, getImageCache());
             try {
                 RadioPlayList[] playlists = mServer.createPlaylist(mTitle, "", session.getKey());
-                if(playlists.length == 0 )
-                    return false;
+                if(playlists == null || playlists.length == 0 )
+                    return null;
+                
                 playlists = mServer.getUserPlaylists(session.getName());
-                if(playlists.length == 0 )
-                    return false;
+                if(playlists == null || playlists.length == 0 )
+                    return null;
+                
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i < playlists.length; i++){
                     ListEntry entry = new ListEntry(playlists[i],
@@ -222,34 +229,24 @@ public class AddToPlaylist extends Activity {
                             playlists[i].getTitle());
                     iconifiedEntries.add(entry);
                 }
-                mPlaylistsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
+                
+                ListAdapter result = new ListAdapter(AddToPlaylist.this, getImageCache());
+                result.setSourceIconified(iconifiedEntries);
+                return result;
             } catch (WSError e) {
-            	LastFMApplication.getInstance().presentError(AddToPlaylist.this, e);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            mPlaylistsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    mPlaylistsAdapter.enableLoadBar(position);
-                    RadioPlayList playlist = (RadioPlayList) mPlaylistsAdapter.getItem(position);
-                    String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
-                    String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                    new AddToPlaylistTask(artist,track,playlist.getId()).execute((Void)null);
-                }
-            });
-            if(result) {
-                mNewPlaylist.setText("");
-                mPlaylistsList.setAdapter(mPlaylistsAdapter);
+        public void onPostExecute(ListAdapter result) {
+            if(result != null) {
+                mNewPlaylist.setText("");	// ?
+                mPlaylistsList.setAdapter(result);
             } else {
-        		Toast.makeText(AddToPlaylist.this, "An error occured while creating the playlist. Please try again.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(AddToPlaylist.this, "An error occurred while creating the playlist. Please try again.", Toast.LENGTH_SHORT).show();
             }
         	mNewPlaylist.setEnabled(true);
         }
