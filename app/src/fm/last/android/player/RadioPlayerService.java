@@ -210,6 +210,7 @@ public class RadioPlayerService extends Service
 			
 			currentTrack = track;
 			mAlbumArt = null;
+			isLoved = false;
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
 			mp.reset();
 			mp.setDataSource( track.getLocationUrl() );
