@@ -187,6 +187,7 @@ public class Player extends Activity
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_FINISHED );
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_STATE_CHANGED );
 		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
+		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
 	}
 
 	@Override
@@ -568,7 +569,7 @@ public class Player extends Activity
 				mCurrentTime.setText( "--:--" );
 				mTotalTime.setText( "--:--" );
 				mProgress.setProgress( 0 );
-				if(mProgressDialog == null) {
+				if(mProgressDialog == null && LastFMApplication.getInstance().player.isPlaying()) {
 					mProgressDialog = ProgressDialog.show(this, "", "Buffering", true, false);
 					mProgressDialog.setCancelable(true);
 				}

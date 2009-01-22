@@ -75,6 +75,7 @@ public class RadioPlayerService extends Service
 	private final int STATE_PAUSED = 5;
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
+	private int mAutoSkipCount = 0;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -246,6 +247,7 @@ public class RadioPlayerService extends Service
 						playingNotify();
 						currentStartTime = System.currentTimeMillis() / 1000;
 						mState = STATE_PLAYING;
+						mAutoSkipCount = 0;
 					} else {
 						mp.stop();
 					}
@@ -254,15 +256,26 @@ public class RadioPlayerService extends Service
 			
 			mp.setOnErrorListener(new OnErrorListener() {
 				public boolean onError(MediaPlayer mp, int what, int extra) {
-					notifyChange(PLAYBACK_ERROR);
-					mState = STATE_STOPPED;
-					nm.cancel( NOTIFY_ID );
-					if( wakeLock.isHeld())
-						wakeLock.release();
-					
-					if( wifiLock.isHeld())
-						wifiLock.release();
-					mDeferredStopHandler.deferredStopSelf();
+					if(mAutoSkipCount++ < 4) {
+						//If we weren't able to start playing after 3 attempts, bail out and notify
+						//the user.  This will bring us into a stopped state.  The user will
+						//need to tune a new station at this point, as pressing the skip button
+						//will do nothing.  Perhaps we should have an additional ERROR state where
+						//the user can press skip to retry after our attempts.
+						mState = STATE_STOPPED;
+						notifyChange(PLAYBACK_ERROR);
+						nm.cancel( NOTIFY_ID );
+						if( wakeLock.isHeld())
+							wakeLock.release();
+						
+						if( wifiLock.isHeld())
+							wifiLock.release();
+						mDeferredStopHandler.deferredStopSelf();
+					} else {
+						//We should be at either STATE_PREPARING or STATE_PLAYING at this point
+						//so we try to skip to the next track behind-the-scenes
+						new NextTrackTask().execute((Void)null);
+					}
 					return true;
 				}
 			});
@@ -595,7 +608,11 @@ public class RadioPlayerService extends Service
 
 	private final IRadioPlayer.Stub mBinder = new IRadioPlayer.Stub()
 	{
-
+		public int getState() throws DeadObjectException
+		{
+			return mState;
+		}
+		
 		public void pause() throws DeadObjectException
 		{
 			RadioPlayerService.this.pause();

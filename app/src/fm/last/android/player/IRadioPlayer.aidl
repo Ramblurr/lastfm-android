@@ -25,6 +25,7 @@ interface IRadioPlayer {
 	int	   getBufferPercent();
 	
 	boolean isPlaying();
+	int getState();
 	String getStationName();
 	String getStationUrl();
 	Bitmap getAlbumArt();

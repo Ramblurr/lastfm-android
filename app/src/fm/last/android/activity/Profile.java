@@ -379,8 +379,18 @@ public class Profile extends ListActivity implements TabBarListener
 			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
 			{
 				RebuildMainMenu();
+		    	mMainAdapter.disableLoadBar();
+
 		    	if(mTopArtistsAdapter != null)
 		    		mTopArtistsAdapter.disableLoadBar();
+		    	if(mTopAlbumsAdapter != null)
+		    		mTopAlbumsAdapter.disableLoadBar();
+		    	if(mTopTracksAdapter != null)
+		    		mTopTracksAdapter.disableLoadBar();
+		    	if(mRecentTracksAdapter != null)
+		    		mRecentTracksAdapter.disableLoadBar();
+		    	if(mFriendsAdapter != null)
+		    		mFriendsAdapter.disableLoadBar();
 		    	if(mTagsAdapter != null)
 		    		mTagsAdapter.disableLoadBar();
 			}
