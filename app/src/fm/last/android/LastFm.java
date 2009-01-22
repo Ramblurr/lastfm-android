@@ -60,30 +60,26 @@ public class LastFm extends Activity
         requestWindowFeature( Window.FEATURE_NO_TITLE );
         SharedPreferences settings = getSharedPreferences( PREFS, 0 );
         String user = settings.getString( "lastfm_user", "" );
-        String pass = settings.getString( "lastfm_pass", "" );
+        String session_key = settings.getString( "lastfm_session_key", "" );
+        String subscriber = settings.getString( "lastfm_subscriber", "0" );
+        String pass;
         
         new CheckUpdatesTask().execute((Void)null);
         
-        if ( !user.equals( "" ) && !pass.equals( "" ) )
+        if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
-            try
-            {
-                doLogin( user, pass );
-                Intent intent = new Intent( LastFm.this, Profile.class );
-                startActivity( intent );
-                finish();
-                return;
-            }
-            catch ( Exception e )
-            { // login failed
-                Intent data = new Intent();
-                data.setAction( e.getMessage() );
-                setResult( RESULT_CANCELED, data );
-            }
+        	Session session = new Session(user, session_key, subscriber);
+            LastFMApplication.getInstance().map.put( "lastfm_session", session );
+            Intent intent = new Intent( LastFm.this, Profile.class );
+            startActivity( intent );
+            finish();
+            return;
         }
         setContentView( R.layout.login );
         mPassField = ( EditText ) findViewById( R.id.password );
         mUserField = ( EditText ) findViewById( R.id.username );
+        if(!user.equals(""))
+        	mUserField.setText(user);
         mLoginButton = ( Button ) findViewById( R.id.sign_in_button );
         mSignupButton = ( Button ) findViewById( R.id.sign_up_button );
         mUserField.setNextFocusDownId( R.id.password );
@@ -129,12 +125,14 @@ public class LastFm extends Activity
                 
                 try
                 {
-                    doLogin( user, password );
+                	Session session = doLogin( user, password );
                     SharedPreferences settings = getSharedPreferences( PREFS, 0 );
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString( "lastfm_user", user );
-                    editor.putString( "lastfm_pass", password );
+                    editor.putString( "lastfm_session_key", session.getKey());
+                    editor.putString( "lastfm_subscriber", session.getSubscriber());
                     editor.commit();
+                    LastFMApplication.getInstance().map.put( "lastfm_session", session );
                     Intent intent = new Intent( LastFm.this, Profile.class );
                     intent.putExtra("lastfm.profile.new_user", mNewUser );
                     startActivity( intent );
@@ -196,7 +194,7 @@ public class LastFm extends Activity
         super.onSaveInstanceState( outState );
     }
 
-    void doLogin( String user, String pass ) throws Exception, WSError
+    Session doLogin( String user, String pass ) throws Exception, WSError
     {
         LastFmServer server = AndroidLastFmServerFactory.getServer();
         String md5Password = MD5.getInstance().hash(pass);
@@ -204,7 +202,7 @@ public class LastFm extends Activity
         Session session = server.getMobileSession(user, authToken);
         if(session == null)
         	throw(new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
-        LastFMApplication.getInstance().map.put( "lastfm_session", session );
+        return session;
     }
 
     private class CheckUpdatesTask extends UserTask<Void, Void, Boolean> {
