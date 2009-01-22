@@ -57,11 +57,15 @@ public class MD5 {
       // should not happen, UTF-8 is built-in
       throw new RuntimeException(e);
     }
-    return toHex(hashBytes);
+    String hash = toHex(hashBytes);
+    
+	while( 32 - hash.length() > 0 )
+		hash = "0" + hash;
+	return hash;
   }
 
   private static String toHex(byte[] array) {
     BigInteger bi = new BigInteger(1, array);
-    return bi.toString(16);
+    return bi.toString(16).toLowerCase();
   }
 }
