@@ -17,6 +17,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -107,6 +108,19 @@ public class NewStation extends ListActivity implements TabBarListener
         mImageCache = new ImageCache();
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
+		
+		if( icicle == null )
+			return;
+		int selectedTab = icicle.getInt( "selected_tab", -1 );
+		if( selectedTab >= 0)
+		{
+			mTabBar.setActive( selectedTab );
+			tabChanged(TAB_ARTIST, selectedTab );
+			mListAdapter = (ListAdapter[]) icicle.getSerializable( "results" );
+			getListView().setAdapter(mListAdapter[selectedTab]);
+			getListView().setVisibility(View.VISIBLE);
+    		findViewById(R.id.search_hint).setVisibility(View.GONE);
+		}
     }
 
     @Override
@@ -119,6 +133,17 @@ public class NewStation extends ListActivity implements TabBarListener
     	}
     	
     	super.onResume();
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) 
+    {
+    	if( isFinishing() )
+    		return;
+    	
+    	outState.putInt( "selected_tab", mTabBar.getActive());
+    	outState.putSerializable( "results", mListAdapter );
+    	
     }
     
 	public void tabChanged(int index, int previousIndex) {

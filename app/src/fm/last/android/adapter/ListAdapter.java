@@ -1,5 +1,6 @@
 package fm.last.android.adapter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -28,7 +29,7 @@ import fm.last.android.utils.ImageDownloaderListener;
  * @author Lukasz Wisniewski
  * @author Casey Link
  */
-public class ListAdapter extends BaseAdapter implements ImageDownloaderListener {
+public class ListAdapter extends BaseAdapter implements ImageDownloaderListener, Serializable {
 	
 	protected ImageCache mImageCache;
 	protected ImageDownloader mImageDownloader;
