@@ -198,8 +198,12 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 
 //		super.setSource(oldList);
 
-		if(mImageDownloader.getUserTask() == null){
-			mImageDownloader.getImages(urls);
+		try {
+			if(mImageDownloader.getUserTask() == null){
+				mImageDownloader.getImages(urls);
+			}
+		} catch (java.util.concurrent.RejectedExecutionException e) {
+			e.printStackTrace();
 		}
 	}
 	
