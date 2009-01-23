@@ -130,7 +130,7 @@ public class RadioPlayerService extends Service
 
 			@Override
 			public void onCallStateChanged(int state, String incomingNumber) {
-				if(state == TelephonyManager.CALL_STATE_RINGING){
+				if(state == TelephonyManager.CALL_STATE_RINGING || state == TelephonyManager.CALL_STATE_OFFHOOK){
 					if(mState != STATE_STOPPED){
 						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 2500, 10){
 
