@@ -531,8 +531,13 @@ public class Player extends Activity
 				mLoadEventsTask.execute((Void)null);
 			}
 		}
+		catch (java.util.concurrent.RejectedExecutionException e )
+		{
+			e.printStackTrace();
+		}
 		catch ( RemoteException ex )
 		{
+			//FIXME why do we finish() ?????
 			finish();
 		}
 	}
