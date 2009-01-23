@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.BaseAdapter;
 import android.widget.ViewSwitcher;
 
-/** WHAT IS THIS?!?!?!? */
+/** The adapter for radio streams, uses non-full-width list entry graphics */
 public class LastFMStreamAdapter extends BaseAdapter
 {
 	public class Stream
@@ -103,8 +103,9 @@ public class LastFMStreamAdapter extends BaseAdapter
             LayoutInflater inflater = context.getLayoutInflater();
             row = inflater.inflate( R.layout.list_row, null );
         }
+        else
+        	row.setTag( "" ); // when reused, don't pretend to be something else
 
-        row.setTag( "" );
         row.setBackgroundResource(R.drawable.list_item_rest);
         
         TextView name = (TextView)row.findViewById(R.id.row_label);

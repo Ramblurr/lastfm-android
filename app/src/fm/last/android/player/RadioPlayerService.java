@@ -132,7 +132,7 @@ public class RadioPlayerService extends Service
 			public void onCallStateChanged(int state, String incomingNumber) {
 				if(state == TelephonyManager.CALL_STATE_RINGING){
 					if(mState != STATE_STOPPED){
-						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 5000, 10){
+						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 2500, 10){
 
 							@Override
 							public void onPreExecute() {
@@ -347,10 +347,13 @@ public class RadioPlayerService extends Service
 
 	private void pause()
 	{
+		if ( mState == STATE_STOPPED )
+			return;
+		
 		//TODO: This should not be exposed in the UI, only used to pause
 		//during a phone call or similar interruption
 
-		if ( mState != STATE_STOPPED )
+		if ( mState != STATE_PAUSED)
 		{
 			if ( mActive == false )
 				mDeferredStopHandler.deferredStopSelf();
