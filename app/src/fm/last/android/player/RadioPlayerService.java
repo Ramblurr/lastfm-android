@@ -1,11 +1,6 @@
 package fm.last.android.player;
 
 import java.io.IOException;
-import java.net.ResponseCache;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -18,7 +13,6 @@ import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
 import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -26,7 +20,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -55,8 +48,6 @@ public class RadioPlayerService extends Service
 	private MediaPlayer mp = new MediaPlayer();
 	private Station currentStation;
 	private Session currentSession;
-	private boolean handshaked = false;
-	private int failCounter;
 	private RadioTrack currentTrack;
 	private long currentStartTime;
 	private ArrayBlockingQueue<RadioTrack> currentQueue;
@@ -76,6 +67,8 @@ public class RadioPlayerService extends Service
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
+	private Bitmap mAlbumArt;
+	private boolean isLoved;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -84,7 +77,7 @@ public class RadioPlayerService extends Service
 	boolean mActive = false;
 
 	private static final int NOTIFY_ID = 1337;
-	private static final int SCROBBLE_HANDSHAKE = 1;
+//	private static final int SCROBBLE_HANDSHAKE = 1;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
 	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackfinished";
@@ -93,8 +86,6 @@ public class RadioPlayerService extends Service
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
 	public static final String UNKNOWN = "fm.last.android.unknown";
 
-	private Bitmap mAlbumArt;
-	private boolean isLoved;
 
 	/**
 	 * Used for pausing on incoming call
@@ -108,8 +99,6 @@ public class RadioPlayerService extends Service
 		super.onCreate();
 
 		nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-		failCounter = 0;
-		handshaked = false;
 		bufferPercent = 0;
 		setForeground( true ); // we dont want the service to be killed while
 		// playing
@@ -232,11 +221,7 @@ public class RadioPlayerService extends Service
 
 				public void onCompletion( MediaPlayer mp )
 				{
-					if(isLoved) {
-						new SubmitTrackTask(currentTrack, currentStartTime, "L").execute(scrobbler);
-					} else {
-						new SubmitTrackTask(currentTrack, currentStartTime, "").execute(scrobbler);
-					}
+					new SubmitTrackTask(currentTrack, currentStartTime, isLoved ? "L" : "", isLoved).execute(scrobbler);
 					new NextTrackTask().execute((Void)null);
 				}
 			} );
@@ -313,6 +298,7 @@ public class RadioPlayerService extends Service
 	{
 		if (mState == STATE_PLAYING) {
 			mp.stop();
+			new SubmitTrackTask(currentTrack, currentStartTime, "S", isLoved).execute(scrobbler);
 		}
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
@@ -516,11 +502,13 @@ public class RadioPlayerService extends Service
 		RadioTrack mTrack;
 		String mRating;
 		long mTime;
+		boolean mLoved;
 		
-		public SubmitTrackTask(RadioTrack track, long time, String rating) {
+		public SubmitTrackTask(RadioTrack track, long time, String rating, boolean loved) {
 			mTrack = track;
 			mRating = rating;
 			mTime = time;
+			mLoved = loved;
 		}
 
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
@@ -528,7 +516,7 @@ public class RadioPlayerService extends Service
 			try
 			{
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				if(mRating.equals("L")) {
+				if(mRating.equals("L") || mLoved) {
 					server.loveTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
 				}
 				if(mRating.equals("B")) {
@@ -672,7 +660,7 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "S").execute(scrobbler);
+			new SubmitTrackTask(currentTrack, currentStartTime, "S", isLoved).execute(scrobbler);
 			new NextTrackTask().execute((Void)null);
 		}
 
@@ -685,7 +673,7 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "B").execute(scrobbler);
+			new SubmitTrackTask(currentTrack, currentStartTime, "B", false).execute(scrobbler);
 			nextSong();
 		}
 
