@@ -253,7 +253,7 @@ public class RadioPlayerService extends Service
 			
 			mp.setOnErrorListener(new OnErrorListener() {
 				public boolean onError(MediaPlayer mp, int what, int extra) {
-					if(mAutoSkipCount++ < 4) {
+					if(mAutoSkipCount++ > 4) {
 						//If we weren't able to start playing after 3 attempts, bail out and notify
 						//the user.  This will bring us into a stopped state.
 						mState = STATE_STOPPED;
@@ -266,8 +266,8 @@ public class RadioPlayerService extends Service
 							wifiLock.release();
 						mDeferredStopHandler.deferredStopSelf();
 					} else {
-						//We should be at either STATE_PREPARING or STATE_PLAYING at this point
-						//so we try to skip to the next track behind-the-scenes
+						//Enter a state that will allow nextSong to do its thang
+						mState = STATE_PREPARING;
 						new NextTrackTask().execute((Void)null);
 					}
 					return true;
