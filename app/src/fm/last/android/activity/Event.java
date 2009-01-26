@@ -1,17 +1,9 @@
 package fm.last.android.activity;
 
-import java.io.IOException;
+import java.text.SimpleDateFormat;
 
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.RemoteImageHandler;
-import fm.last.android.RemoteImageView;
-import fm.last.android.Worker;
-import fm.last.api.LastFmServer;
-import fm.last.api.Session;
-import fm.last.api.WSError;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,6 +15,16 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.RemoteImageHandler;
+import fm.last.android.RemoteImageView;
+import fm.last.android.Worker;
+import fm.last.api.ImageUrl;
+import fm.last.api.LastFmServer;
+import fm.last.api.Session;
+import fm.last.api.WSError;
 
 public class Event extends Activity {
 	private TextView mTitle;
@@ -35,6 +37,29 @@ public class Event extends Activity {
 	private Worker mPosterImageWorker;
 	private RemoteImageView mPosterImage;
 	private RemoteImageHandler mPosterImageHandler;
+
+	public interface EventActivityResult
+	{
+		public void onEventStatus(int status);
+	}
+	
+    private static int resourceToStatus(int resId) {
+    	switch(resId) {
+	    	case R.id.attending: return 0;
+	    	case R.id.maybe: return 1;
+	    	case R.id.notattending: return 2;
+		}
+    	return 2;
+    }
+
+    private static int statusToResource(int status) {
+    	switch(status) {
+	    	case 0: return R.id.attending;
+	    	case 1: return R.id.maybe;
+	    	case 2: return R.id.notattending;
+		}
+    	return R.id.notattending;
+    }
 	
     @Override
     public void onCreate( Bundle icicle )
@@ -69,22 +94,20 @@ public class Event extends Activity {
         mPosterImageHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE,
                 getIntent().getStringExtra("lastfm.event.poster") ).sendToTarget();
         
-        mAttendance = (RadioGroup)findViewById(R.id.attend);
-        String status = getIntent().getStringExtra("lastfm.event.status");
-        System.out.printf("Incoming status: %s\n", status);
-        if(status != null) {
-	        if(status.contentEquals("0"))
-	        	mAttendance.check(R.id.attending);
-	        else if(status.contentEquals("1"))
-	        	mAttendance.check(R.id.maybe);
-	        else
-	        	mAttendance.check(R.id.notattending);
-        } else {
-        	mAttendance.check(R.id.notattending);
+        int statusResource;
+        try {
+        	statusResource = statusToResource(
+        			Integer.parseInt( 
+        					getIntent().getStringExtra("lastfm.event.status") ) );
+        } catch (Exception e) {
+        	statusResource = R.id.notattending;
         }
+        mAttendance = (RadioGroup)findViewById(R.id.attend);
+        mAttendance.check(statusResource);
         
         findViewById(R.id.cancel).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
+				setResult(RESULT_CANCELED);
 				finish();
 			}
         });
@@ -116,17 +139,16 @@ public class Event extends Activity {
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
 
 				try {
-					if(mAttendance.getCheckedRadioButtonId() == R.id.attending) {
-						server.attendEvent(getIntent().getStringExtra("lastfm.event.id"), "0", ((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getKey());
-					} else if(mAttendance.getCheckedRadioButtonId() == R.id.maybe) {
-						server.attendEvent(getIntent().getStringExtra("lastfm.event.id"), "1", ((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getKey());
-					} else {
-						server.attendEvent(getIntent().getStringExtra("lastfm.event.id"), "2", ((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getKey());
-					}
+					int status = resourceToStatus(mAttendance.getCheckedRadioButtonId());
+					server.attendEvent(
+							getIntent().getStringExtra("lastfm.event.id"), 
+							String.valueOf(status), 
+							((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getKey() );
+					setResult(RESULT_OK, new Intent().putExtra("status", status));
 					finish();
 				} catch (WSError e) {
 					LastFMApplication.getInstance().presentError(Event.this, e);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -153,4 +175,31 @@ public class Event extends Activity {
             }
         }
     };
+    
+    public static Intent intentFromEvent(Context packageContext, fm.last.api.Event event)
+    {
+	    Intent intent = new Intent( packageContext, fm.last.android.activity.Event.class );
+	    intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
+	    intent.putExtra("lastfm.event.title", event.getTitle());
+	    String artists = "";
+	    for(String artist : event.getArtists()) {
+	        if(artists.length() > 0)
+	            artists += ", ";
+	        artists += artist;
+	    }
+	    for(ImageUrl image : event.getImages()) {
+	        if(image.getSize().contentEquals("large"))
+	            intent.putExtra("lastfm.event.poster", image.getUrl());
+	    }
+	    intent.putExtra("lastfm.event.artists", artists);
+	    intent.putExtra("lastfm.event.venue", event.getVenue().getName());
+	    intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+	    intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
+	    intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
+	    intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
+	    intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
+	    intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+	    intent.putExtra("lastfm.event.status", event.getStatus());
+	    return intent;
+    }
 }

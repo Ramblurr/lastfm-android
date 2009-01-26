@@ -2,7 +2,6 @@ package fm.last.android.activity;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Formatter;
 
@@ -13,6 +12,7 @@ import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
+import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.ListAdapter;
@@ -101,7 +101,6 @@ public class Player extends Activity
 	private ListAdapter mSimilarAdapter;
 	private ListAdapter mFanAdapter;
 	private ListAdapter mTagAdapter;
-	//private EventListAdapter mEventAdapter;
 	private String mLastInfoArtist = "";
 
 	TextView mTextView;
@@ -113,7 +112,6 @@ public class Player extends Activity
 	ListView mFanList;
 	ListView mEventList;
 
-
 	private Worker mAlbumArtWorker;
 	private RemoteImageHandler mAlbumArtHandler;
 	private IntentFilter mIntentFilter;
@@ -121,6 +119,9 @@ public class Player extends Activity
 	private String mLastArtist = "";
 	private String mLastTrack = "";
 
+	private EventActivityResult mOnEventActivityResult;
+	
+    
 	@Override
 	public void onCreate( Bundle icicle )
 	{
@@ -940,34 +941,16 @@ public class Player extends Activity
 
 		public void onItemClick(final AdapterView<?> parent, final View v,
 				final int position, long id) {
-			Intent intent = new Intent( Player.this, fm.last.android.activity.Event.class );
-			Event event = (Event)((EventListAdapter)mEventAdapter).getItem(position);
-			intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
-			intent.putExtra("lastfm.event.title", event.getTitle());
-			String artists = "";
-			for(String artist : event.getArtists()) {
-				if(artists.length() > 0)
-					artists += ", ";
-				artists += artist;
-			}
-			for(ImageUrl image : event.getImages()) {
-				if(image.getSize().contentEquals("large"))
-					intent.putExtra("lastfm.event.poster", image.getUrl());
-			}
-			intent.putExtra("lastfm.event.artists", artists);
-			intent.putExtra("lastfm.event.venue", event.getVenue().getName());
-			intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
-			intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
-			intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
-			intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
-			intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
-			intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+			
+            final Event event = (Event) parent.getAdapter().getItem(position);
+
+            Intent intent = fm.last.android.activity.Event.intentFromEvent(Player.this, event);
 			try {
 				Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
 				for(Event e : events) {
-					System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
+//					System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
 					if(e.getId() == event.getId()) {
-						System.out.printf("Matched! Status: %s\n", e.getStatus());
+//						System.out.printf("Matched! Status: %s\n", e.getStatus());
 						intent.putExtra("lastfm.event.status", e.getStatus());
 						break;
 					}
@@ -977,11 +960,30 @@ public class Player extends Activity
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			startActivity( intent );
+			
+    	    mOnEventActivityResult = new EventActivityResult() {
+    	    	public void onEventStatus(int status) 
+    	    	{
+    	    		event.setStatus(String.valueOf(status));
+    	    		mOnEventActivityResult = null;
+    	    	}
+    	    };
+    	    
+            startActivityForResult( intent, 0 );
 		}
 
 	};
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if( requestCode == 0 && resultCode == RESULT_OK ) {
+	    	int status = data.getExtras().getInt("status", -1);
+	    	if (mOnEventActivityResult != null && status != -1) {
+	    		mOnEventActivityResult.onEventStatus(status);
+	    	}
+    	}
+    }
+	
 	private LoadEventsTask mLoadEventsTask;
 	
 	private BaseAdapter mEventAdapter;

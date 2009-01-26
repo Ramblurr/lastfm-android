@@ -3,6 +3,7 @@ package fm.last.api;
 import java.io.Serializable;
 import java.util.Date;
 
+
 /**
  * Represents an event
  * 
@@ -153,6 +154,10 @@ public class Event implements Serializable{
 	
 	public String getStatus() {
 		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

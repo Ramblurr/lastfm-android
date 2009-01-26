@@ -1,7 +1,6 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.DataSetObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -37,16 +35,15 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
-import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
+import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
@@ -76,7 +73,6 @@ public class Profile extends ListActivity implements TabBarListener
 {
 	private static int TAB_RADIO = 0;
 	private static int TAB_PROFILE = 1;
-	
 	
 	//Goddamn Java doesn't let you treat enums as ints easily, so we have to have this mess 
 	private static final int PROFILE_TOPARTISTS = 0;
@@ -129,11 +125,12 @@ public class Profile extends ListActivity implements TabBarListener
     ListView mRecentTracksList;
     private ListAdapter mRecentTracksAdapter;
     ListView mEventsList;
-    private EventListAdapter mEventsAdapter;
     ListView mFriendsList;
     private ListAdapter mFriendsAdapter;
     ListView mTagsList;
     private ListAdapter mTagsAdapter;
+    
+    private EventActivityResult mOnEventActivityResult;
     
     private Track mTrackInfo; // For the profile actions' dialog
     private Album mAlbumInfo; // Ditto
@@ -341,6 +338,16 @@ public class Profile extends ListActivity implements TabBarListener
     }
     
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	if( requestCode == 0 && resultCode == RESULT_OK ) {
+	    	int status = data.getExtras().getInt("status", -1);
+	    	if (mOnEventActivityResult != null && status != -1) {
+	    		mOnEventActivityResult.onEventStatus(status);
+	    	}
+    	}
+    }
+    
+    @Override
     public void onResume() {
 		registerReceiver( mStatusListener, mIntentFilter );
     	SetupRecentStations();
@@ -444,34 +451,6 @@ public class Profile extends ListActivity implements TabBarListener
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         }
         
-/*
- * we were going to do this (see issue 26) but it didn't look so good
- *     
-        // if we're tuned to something, 
-        // and it isn't one of the above, 
-        // then we want to add it in at the top!
-    	String currentStationUrl = null;
-    	String currentStationName = null; 
-    	try {
-	    	currentStationUrl = LastFMApplication.getInstance().player.getStationUrl();
-	    	currentStationName = LastFMApplication.getInstance().player.getStationName();
-		} catch (RemoteException e) {
-		}
-        if (currentStationUrl != null) {
-    		if (currentStationName == null) {
-    			currentStationName = "fixme please";
-    		}
-            boolean playing = false;
-            for(int i = 0; !playing && i < mMyStationsAdapter.getCount(); i++) {
-    			if (mMyStationsAdapter.getStation(i).equals(currentStationUrl)) {
-    				playing = true;
-    			}
-    		}
-            if (!playing) {
-        		mMyStationsAdapter.putStationAtFront(currentStationName, currentStationUrl);
-            }
-        }
-*/        
         mMyStationsAdapter.updateModel();
     }
 
@@ -837,32 +816,32 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
     
-    private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadEventsTask extends UserTask<Void, Void, EventListAdapter> {
 
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
+        public EventListAdapter doInBackground(Void...params) {
 
-            mEventsAdapter = new EventListAdapter(Profile.this);
             try {
                 fm.last.api.Event[] events = mServer.getUserEvents(mUser.getName());
-                mEventsAdapter.setEventsSource(events);
-                if(events.length > 0)
-                    success = true;
+                if (events.length > 0) {
+                    EventListAdapter result = new EventListAdapter(Profile.this);
+                	result.setEventsSource(events);
+                	return result;
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NullPointerException e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            if(result) {
-                mEventsList.setAdapter(mEventsAdapter);
-                //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
+        public void onPostExecute(EventListAdapter result) {
+            if (result != null) {
+                mEventsList.setAdapter(result);
                 mEventsList.setOnItemClickListener(mEventOnItemClickListener);
+                //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Upcoming Events"};
                 mEventsList.setAdapter(new ArrayAdapter<String>(Profile.this,
@@ -876,46 +855,19 @@ public class Profile extends ListActivity implements TabBarListener
     private OnItemClickListener mEventOnItemClickListener = new OnItemClickListener(){
 
         public void onItemClick(final AdapterView<?> parent, final View v,
-                final int position, long id) {
-            Intent intent = new Intent( Profile.this, fm.last.android.activity.Event.class );
-            Event event = (Event)mEventsAdapter.getItem(position);
-            intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
-            intent.putExtra("lastfm.event.title", event.getTitle());
-            String artists = "";
-            for(String artist : event.getArtists()) {
-                if(artists.length() > 0)
-                    artists += ", ";
-                artists += artist;
-            }
-            for(ImageUrl image : event.getImages()) {
-                if(image.getSize().contentEquals("large"))
-                    intent.putExtra("lastfm.event.poster", image.getUrl());
-            }
-            intent.putExtra("lastfm.event.artists", artists);
-            intent.putExtra("lastfm.event.venue", event.getVenue().getName());
-            intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
-            intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
-            intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
-            intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
-            intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
-            intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
-            try {
-                Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
-                for(Event e : events) {
-                    System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
-                    if(e.getId() == event.getId()) {
-                        System.out.printf("Matched! Status: %s\n", e.getStatus());
-                        intent.putExtra("lastfm.event.status", e.getStatus());
-                        break;
-                    }
-                        
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            } catch (NullPointerException e) {
-            	e.printStackTrace();
-            }
-            startActivity( intent );
+                final int position, long id) 
+        {
+            final Event event = (Event) parent.getAdapter().getItem(position);
+ 
+    	    mOnEventActivityResult = new EventActivityResult() {
+    	    	public void onEventStatus(int status) 
+    	    	{
+    	    		event.setStatus(String.valueOf(status));
+    	    		mOnEventActivityResult = null;
+    	    	}
+    	    };
+    	    
+            startActivityForResult( fm.last.android.activity.Event.intentFromEvent(Profile.this, event), 0 );
         }
 
     };
@@ -1031,7 +983,7 @@ public class Profile extends ListActivity implements TabBarListener
             mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
         }
     }
-    
+       
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         
