@@ -1,12 +1,14 @@
 package fm.last.android.adapter;
 
+import java.io.Serializable;
+
 /**
  * Elementary class to use with IconifiedListAdapter in order to provide
  * eye-candy ListViews
  * 
  * @author Lukasz Wisniewski
  */
-public class ListEntry{
+public class ListEntry implements Serializable{
 	/**
 	 * Text that will appear in ListView's row
 	 */

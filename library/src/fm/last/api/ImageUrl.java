@@ -2,13 +2,15 @@
 
 package fm.last.api;
 
+import java.io.Serializable;
+
 /**
  * represents a URL to an image
  * 
  *
  * @author Mike Jennings
  */
-public class ImageUrl {
+public class ImageUrl implements Serializable {
   private String url;
   private String size;
 

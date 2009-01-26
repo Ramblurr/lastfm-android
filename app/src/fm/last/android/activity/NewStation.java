@@ -23,6 +23,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
@@ -40,10 +41,11 @@ import fm.last.api.Artist;
 import fm.last.api.Tag;
 import fm.last.api.User;
 
-public class NewStation extends ListActivity implements TabBarListener
+public class NewStation extends ListActivity implements TabBarListener, Serializable
 {
+	private static final long serialVersionUID = 2513501434143727293L;
 
-    private enum SearchType
+	private enum SearchType
     {
         Artist, Tag, User
     };
@@ -109,8 +111,40 @@ public class NewStation extends ListActivity implements TabBarListener
         
 		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
 		
+		getListView().setOnItemClickListener(new OnItemClickListener() {
+
+			public void onItemClick(AdapterView<?> l, View v,
+					int position, long id) {
+				
+				((ListAdapter) getListAdapter()).enableLoadBar(position);
+				
+				if( getListAdapter() == mListAdapter[TAB_ARTIST])
+				{
+					Artist artist = (Artist)getListAdapter().getItem(position);
+					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+				}
+				else if( getListAdapter() == mListAdapter[TAB_TAG])
+				{
+					Tag tag = (Tag)getListAdapter().getItem(position);
+					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+				}
+				else if( getListAdapter() == mListAdapter[TAB_USER])
+				{
+					User user = (User)getListAdapter().getItem(position);
+	                Intent profileIntent = new Intent(NewStation.this, fm.last.android.activity.Profile.class);
+	                profileIntent.putExtra("lastfm.profile.username", user.getName());
+	                startActivity(profileIntent);
+				}
+					
+				
+			}
+			
+		});
+		
+		
 		if( icicle == null )
 			return;
+		
 		int selectedTab = icicle.getInt( "selected_tab", -1 );
 		if( selectedTab >= 0)
 		{
@@ -119,10 +153,12 @@ public class NewStation extends ListActivity implements TabBarListener
 			mListAdapter = (ListAdapter[]) icicle.getSerializable( "results" );
 			if( mListAdapter[selectedTab] == null )
 				return;
-			getListView().setAdapter(mListAdapter[selectedTab]);
+			setListAdapter(mListAdapter[selectedTab]);
 			getListView().setVisibility(View.VISIBLE);
+
     		findViewById(R.id.search_hint).setVisibility(View.GONE);
 		}
+
     }
 
     @Override
@@ -147,7 +183,9 @@ public class NewStation extends ListActivity implements TabBarListener
     	if( mListAdapter != null )
     		outState.putSerializable( "results", mListAdapter );
     	
+    	super.onSaveInstanceState(outState);
     }
+
     
 	public void tabChanged(int index, int previousIndex) {
 		mSearchText[previousIndex] = searchBar.getText().toString();
@@ -215,16 +253,6 @@ public class NewStation extends ListActivity implements TabBarListener
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mListAdapter[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
-			getListView().setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					Tag tag = (Tag)mListAdapter[TAB_TAG].getItem(position);
-					mListAdapter[TAB_TAG].enableLoadBar(position);
-			    	LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
-				}
-				
-			});
             
     		try {
    				mTags = server.searchForTag( txt );
@@ -275,16 +303,6 @@ public class NewStation extends ListActivity implements TabBarListener
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mListAdapter[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
-			getListView().setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					Artist artist = (Artist)mListAdapter[TAB_ARTIST].getItem(position);
-					mListAdapter[TAB_ARTIST].enableLoadBar(position);
-			    	LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
-				}
-				
-			});
             
     		try {
    				mArtists = server.searchForArtist( txt );
@@ -340,18 +358,6 @@ public class NewStation extends ListActivity implements TabBarListener
 	        LastFmServer server = AndroidLastFmServerFactory.getServer();
             boolean success = false;
             mListAdapter[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
-			getListView().setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					User user = (User)mListAdapter[TAB_USER].getItem(position);
-					mListAdapter[TAB_USER].enableLoadBar(position);
-                    Intent profileIntent = new Intent(NewStation.this, fm.last.android.activity.Profile.class);
-                    profileIntent.putExtra("lastfm.profile.username", user.getName());
-                    startActivity(profileIntent);
-				}
-				
-			});
             
     		try {
    				User user = server.getAnyUserInfo( txt );

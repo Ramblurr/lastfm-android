@@ -1,5 +1,6 @@
 package fm.last.android.adapter;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,10 +13,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
-import android.widget.AbsListView.OnScrollListener;
 
 import fm.last.android.R;
 import fm.last.android.utils.ImageCache;
@@ -29,8 +28,9 @@ import fm.last.android.utils.ImageDownloaderListener;
  * @author Lukasz Wisniewski
  * @author Casey Link
  */
-public class ListAdapter extends BaseAdapter implements ImageDownloaderListener, Serializable {
+public class ListAdapter extends BaseAdapter implements Serializable, ImageDownloaderListener {
 	
+
 	protected ImageCache mImageCache;
 	protected ImageDownloader mImageDownloader;
 	protected Activity mContext;
@@ -38,6 +38,17 @@ public class ListAdapter extends BaseAdapter implements ImageDownloaderListener,
 	private ArrayList<ListEntry> mList;
 	private int mLoadingBar = -1;
 	private boolean mScaled = true;
+	
+	private void writeObject(java.io.ObjectOutputStream out) throws IOException
+    {
+		out.writeObject( mList );
+    }
+	 
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+	{
+		mList = (ArrayList<ListEntry>)in.readObject();
+	}
+
 	
 	public ListAdapter(Activity context) {
 		mContext = context;
