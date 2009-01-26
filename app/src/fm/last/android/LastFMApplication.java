@@ -89,23 +89,28 @@ public class LastFMApplication extends Application
 	{
 		playRadioStation(ctx,url,true);
 	}
+
+	public void bindPlayerService() {
+        // start our media player service
+		Intent mpIntent = new Intent(
+				this,
+				fm.last.android.player.RadioPlayerService.class );
+		startService(mpIntent);
+		boolean b = bindService( mpIntent, mConnection, BIND_AUTO_CREATE );
+		if ( !b )
+		{
+			// something went wrong
+			// mHandler.sendEmptyMessage(QUIT);
+			System.out.println( "Binding to service failed " + mConnection );
+		}
+	}
 	
 	public void playRadioStation(Context ctx, String url, boolean showPlayer)
 	{
 		mCtx = ctx;
 
 		if ( LastFMApplication.getInstance().player == null ) {
-	        // start our media player service
-			Intent mpIntent = new Intent(
-					this,
-					fm.last.android.player.RadioPlayerService.class );
-			boolean b = bindService( mpIntent, mConnection, BIND_AUTO_CREATE );
-			if ( !b )
-			{
-				// something went wrong
-				// mHandler.sendEmptyMessage(QUIT);
-				System.out.println( "Binding to service failed " + mConnection );
-			}
+			bindPlayerService();
 			mTuningStation = url;
 			mShowPlayer = showPlayer;
 		} else {

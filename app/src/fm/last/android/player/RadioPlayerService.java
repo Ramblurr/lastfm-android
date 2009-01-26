@@ -786,6 +786,9 @@ public class RadioPlayerService extends Service
 	{
 
 		mActive = true;
+		if(mState != STATE_STOPPED) {
+			notifyChange(META_CHANGED);
+		}
 		return mBinder;
 	}
 
@@ -795,6 +798,9 @@ public class RadioPlayerService extends Service
 
 		mActive = true;
 		mDeferredStopHandler.cancelStopSelf();
+		if(mState != STATE_STOPPED) {
+			notifyChange(META_CHANGED);
+		}
 		super.onRebind( intent );
 	}
 

@@ -341,6 +341,8 @@ public class Player extends Activity
 	public void onResume()
 	{
 		registerReceiver( mStatusListener, mIntentFilter );
+		if(LastFMApplication.getInstance().player == null)
+			LastFMApplication.getInstance().bindPlayerService();
 		updateTrackInfo();
 		super.onResume();
 	}
