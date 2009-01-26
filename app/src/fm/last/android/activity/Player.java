@@ -130,6 +130,7 @@ public class Player extends Activity
 		requestWindowFeature( Window.FEATURE_NO_TITLE );
 
 		setContentView( R.layout.audio_player );
+		setVolumeControlStream( android.media.AudioManager.STREAM_MUSIC );
 
 		mCurrentTime = ( TextView ) findViewById( R.id.currenttime );
 		mTotalTime = ( TextView ) findViewById( R.id.totaltime );
@@ -581,6 +582,7 @@ public class Player extends Activity
 				mProgress.setProgress( 0 );
 				if(mProgressDialog == null && LastFMApplication.getInstance().player.isPlaying()) {
 					mProgressDialog = ProgressDialog.show(this, "", "Buffering", true, false);
+					mProgressDialog.setVolumeControlStream( android.media.AudioManager.STREAM_MUSIC );
 					mProgressDialog.setCancelable(true);
 				}
 			}
