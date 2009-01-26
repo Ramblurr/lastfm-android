@@ -126,7 +126,6 @@ public class Profile extends ListActivity implements TabBarListener
     private ListAdapter mRecentTracksAdapter;
     ListView mEventsList;
     ListView mFriendsList;
-    private ListAdapter mFriendsAdapter;
     ListView mTagsList;
     private ListAdapter mTagsAdapter;
     
@@ -234,6 +233,7 @@ public class Profile extends ListActivity implements TabBarListener
         ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
+        
         mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
         mTagsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagsList));
         
@@ -362,8 +362,8 @@ public class Profile extends ListActivity implements TabBarListener
     		mTopTracksAdapter.disableLoadBar();
     	if(mRecentTracksAdapter != null)
     		mRecentTracksAdapter.disableLoadBar();
-    	if(mFriendsAdapter != null)
-    		mFriendsAdapter.disableLoadBar();
+    	if(mFriendsList.getAdapter() != null)
+    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
     	if(mTagsAdapter != null)
     		mTagsAdapter.disableLoadBar();
 		super.onResume();
@@ -385,6 +385,7 @@ public class Profile extends ListActivity implements TabBarListener
 			String action = intent.getAction();
 			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
 			{
+				// see also repeated code one page above in OnResume
 				RebuildMainMenu();
 		    	mMainAdapter.disableLoadBar();
 
@@ -396,8 +397,8 @@ public class Profile extends ListActivity implements TabBarListener
 		    		mTopTracksAdapter.disableLoadBar();
 		    	if(mRecentTracksAdapter != null)
 		    		mRecentTracksAdapter.disableLoadBar();
-		    	if(mFriendsAdapter != null)
-		    		mFriendsAdapter.disableLoadBar();
+		    	if(mFriendsList.getAdapter() != null)
+		    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
 		    	if(mTagsAdapter != null)
 		    		mTagsAdapter.disableLoadBar();
 			}
@@ -929,18 +930,14 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
 
-    private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadFriendsTask extends UserTask<Void, Void, ListAdapter> {
 
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-            
-            mFriendsAdapter = new ListAdapter(Profile.this, getImageCache());
-            
+        public ListAdapter doInBackground(Void...params) {
             try {
                 User[] friends = mServer.getFriends(mUser.getName(), null, null).getFriends();
                 if(friends.length == 0 )
-                    return false;
+                    return null;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i < friends.length; i++){
                     ListEntry entry = new ListEntry(friends[i],
@@ -949,35 +946,35 @@ public class Profile extends ListActivity implements TabBarListener
                             friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl()); // some tracks don't have images
                     iconifiedEntries.add(entry);
                 }
-                mFriendsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
+                ListAdapter result = new ListAdapter(Profile.this, getImageCache());
+                result.setSourceIconified(iconifiedEntries);
+                return result;
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            mFriendsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    mFriendsAdapter.enableLoadBar(position);
-                    User user = (User) mFriendsAdapter.getItem(position);
-                    Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
-                    profileIntent.putExtra("lastfm.profile.username", user.getName());
-                    startActivity(profileIntent);
-                }
-            });
-            if(result) {
-                mFriendsList.setAdapter(mFriendsAdapter);
+        public void onPostExecute(ListAdapter result) {
+            if(result != null) {
+                mFriendsList.setAdapter(result);
+                mFriendsList.setOnItemClickListener(new OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> l, View v,
+                            int position, long id) {
+                    	ListAdapter la = (ListAdapter) l.getAdapter();
+                    	la.enableLoadBar(position);
+                        User user = (User) la.getItem(position);
+                        Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
+                        profileIntent.putExtra("lastfm.profile.username", user.getName());
+                        startActivity(profileIntent);
+                    }
+                });
             } else {
                 String[] strings = new String[]{"No Friends Retrieved"};
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
                         R.layout.list_row, R.id.row_label, strings));
+                mFriendsList.setOnItemClickListener(null);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
