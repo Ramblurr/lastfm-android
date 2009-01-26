@@ -115,8 +115,10 @@ public class NewStation extends ListActivity implements TabBarListener
 		if( selectedTab >= 0)
 		{
 			mTabBar.setActive( selectedTab );
-			tabChanged(TAB_ARTIST, selectedTab );
+			tabChanged(selectedTab, TAB_ARTIST );
 			mListAdapter = (ListAdapter[]) icicle.getSerializable( "results" );
+			if( mListAdapter[selectedTab] == null )
+				return;
 			getListView().setAdapter(mListAdapter[selectedTab]);
 			getListView().setVisibility(View.VISIBLE);
     		findViewById(R.id.search_hint).setVisibility(View.GONE);
@@ -142,7 +144,8 @@ public class NewStation extends ListActivity implements TabBarListener
     		return;
     	
     	outState.putInt( "selected_tab", mTabBar.getActive());
-    	outState.putSerializable( "results", mListAdapter );
+    	if( mListAdapter != null )
+    		outState.putSerializable( "results", mListAdapter );
     	
     }
     
