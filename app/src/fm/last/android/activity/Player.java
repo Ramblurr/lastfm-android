@@ -191,7 +191,7 @@ public class Player extends Activity
 		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)  {
 		MenuInflater inflater = getMenuInflater();
@@ -341,8 +341,6 @@ public class Player extends Activity
 	public void onResume()
 	{
 		registerReceiver( mStatusListener, mIntentFilter );
-		if(LastFMApplication.getInstance().player == null)
-			LastFMApplication.getInstance().bindPlayerService();
 		updateTrackInfo();
 		super.onResume();
 	}
@@ -514,7 +512,7 @@ public class Player extends Activity
 					(mLastArtist.equals(LastFMApplication.getInstance().player.getArtistName()) &&
 							mLastTrack.equals(LastFMApplication.getInstance().player.getTrackName()))
 			)
-				return;
+			return;
 			mLastArtist = LastFMApplication.getInstance().player.getArtistName();
 			mLastTrack = LastFMApplication.getInstance().player.getTrackName();
 			String artistName = LastFMApplication.getInstance().player.getArtistName();

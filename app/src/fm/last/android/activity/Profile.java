@@ -1,6 +1,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,6 +116,10 @@ public class Profile extends ListActivity implements TabBarListener
 	Animation mPushLeftOut;
 	
 	//Profile lists
+	//FIXME: currently there is no way to iterate through the various
+	//		 profile listviews and their associated listadapters
+	//		 therefore, if you're going to add a new one - make sure
+	//		 you update onSaveInstanceState / onRestoreInstanceState.
 	private ImageCache mImageCache;
 	ListView mTopArtistsList;
 	private ListAdapter mTopArtistsAdapter;
@@ -128,6 +133,7 @@ public class Profile extends ListActivity implements TabBarListener
     ListView mFriendsList;
     ListView mTagsList;
     private ListAdapter mTagsAdapter;
+    
     
     private EventActivityResult mOnEventActivityResult;
     
@@ -222,20 +228,32 @@ public class Profile extends ListActivity implements TabBarListener
 		
 		mTopArtistsList = (ListView) findViewById(R.id.topartists_list_view);
 		mTopArtistsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopArtistsList));
+		mTopArtistsList.setOnItemClickListener( mArtistListItemClickListener );
+		
 		mTopAlbumsList = (ListView) findViewById(R.id.topalbums_list_view);
         mTopAlbumsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopAlbumsList));
+        mTopAlbumsList.setOnItemClickListener( mAlbumListItemClickListener );
+        
         mTopTracksList = (ListView) findViewById(R.id.toptracks_list_view);
         mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
+        mTopTracksList.setOnItemClickListener( mTrackListItemClickListener );
+        
         mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
         mRecentTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mRecentTracksList));
+        mRecentTracksList.setOnItemClickListener( mTrackListItemClickListener );
+        
         mEventsList = (ListView) findViewById(R.id.profileevents_list_view);
         mEventsList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventsList));
+        mEventsList.setOnItemClickListener( mEventItemClickListener );
         ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
+        
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
         mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
+        mFriendsList.setOnItemClickListener( mUserItemClickListener );
         
         mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
         mTagsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagsList));
+        mTagsList.setOnItemClickListener( mTagListItemClickListener );
         
         // Loading animations
         mPushLeftIn = AnimationUtils.loadAnimation(this, R.anim.push_left_in);
@@ -245,10 +263,97 @@ public class Profile extends ListActivity implements TabBarListener
         
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
-		mIntentFilter.addAction( RadioPlayerService.META_CHANGED );
 		
 		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
 			startActivity( new Intent( Profile.this, NewStation.class ) );
+    }
+    
+    
+    @Override
+    protected void onSaveInstanceState( Bundle outState )
+    {
+     	outState.putInt( "selected_tab", mTabBar.getActive());
+     	outState.putInt( "displayed_view", mNestedViewFlipper.getDisplayedChild());
+     	outState.putSerializable("view_history", mViewHistory); 
+     	
+    	outState.putSerializable("adapter_topArtists", (ListAdapter)mTopArtistsList.getAdapter());
+    	outState.putSerializable("adapter_topAlbums", (ListAdapter)mTopAlbumsList.getAdapter());
+        outState.putSerializable("adapter_topTracks", (ListAdapter)mTopTracksList.getAdapter());
+        outState.putSerializable("adapter_recentTracks", (ListAdapter)mRecentTracksList.getAdapter());
+        outState.putSerializable("adapter_friends", (ListAdapter)mFriendsList.getAdapter());
+        outState.putSerializable("adapter_tags", (ListAdapter)mTagsList.getAdapter());
+        
+    	//FIXME: it's not so easy to serialize the events adapter as it's a 
+    	//		 Seperated List Adapter.
+    	//		Rather than doing a half-arsed job, i just left it out altogether.
+        //outState.putSerializable("adapter_events", (ListAdapter)mEventsList.getAdapter());
+        
+    }
+    
+    @Override
+    protected void onRestoreInstanceState( Bundle state )
+    {
+    	mTabBar.setActive( state.getInt( "selected_tab" ));
+    	mNestedViewFlipper.setDisplayedChild( state.getInt("displayed_view"));
+    	mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    	
+    	//Restore the adapters and disable the spinner for all the profile lists
+    	ListAdapter topArtistAdapter = (ListAdapter)state.getSerializable("adapter_topArtists");
+    	if( topArtistAdapter != null )
+    	{
+	    	topArtistAdapter.enableLoadBar( -1 );
+	    	mTopArtistsList.setAdapter( topArtistAdapter );
+    	}
+    	
+    	ListAdapter topAlbumsAdapter = (ListAdapter)state.getSerializable("adapter_topAlbums");
+    	if( topAlbumsAdapter != null )
+    	{
+	    	topAlbumsAdapter.enableLoadBar( -1 ); 
+	    	mTopAlbumsList.setAdapter( topAlbumsAdapter );
+    	}
+    	
+    	ListAdapter topTracksAdapter = (ListAdapter)state.getSerializable("adapter_topTracks");
+    	if( topTracksAdapter != null )
+    	{
+	    	topTracksAdapter.enableLoadBar( -1 );
+	    	mTopTracksList.setAdapter( topTracksAdapter );
+    	}
+    	
+    	ListAdapter recentTracksAdapter = (ListAdapter)state.getSerializable("adapter_recentTracks");
+    	if( recentTracksAdapter != null )
+    	{
+    		recentTracksAdapter.enableLoadBar( -1 );
+    		mRecentTracksList.setAdapter( recentTracksAdapter );
+    	}
+    	
+    	ListAdapter tagsAdapter = (ListAdapter)state.getSerializable("adapter_tags");
+    	if( tagsAdapter != null )
+    	{
+	    	tagsAdapter.enableLoadBar( -1 );
+	    	mTagsList.setAdapter( tagsAdapter );
+    	}
+    	
+    	//FIXME: it's not so easy to serialize the events adapter as it's a 
+    	//		 Seperated List Adapter.
+    	//		Rather than doing a half-arsed job, i just left it out altogether.
+//    	ListAdapter eventsAdapter = state.getSerializable("adapter_events");
+//    	if( eventsAdapter != null )
+//    	{
+//	    	eventsAdapter.enableLoadBar( -1 );
+//	    	mEventsList.setAdapter( eventsAdapter );
+//    	}
+    	
+    	//Related to the above, don't leave the user with a totally empty
+    	//list if we've restored into the events list
+    	if( mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
+    		mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
+    	
+    	ListAdapter friendsAdapter = (ListAdapter)state.getSerializable("adapter_friends");
+    	if( friendsAdapter != null )
+    	{
+	    	friendsAdapter.enableLoadBar( -1 );
+	    	mFriendsList.setAdapter( friendsAdapter );
+    	}
     }
     
     private class LoadUserTask extends UserTask<Void, Void, Boolean> {
@@ -351,13 +456,6 @@ public class Profile extends ListActivity implements TabBarListener
     @Override
     public void onResume() {
 		registerReceiver( mStatusListener, mIntentFilter );
-		//We need to bind the player so we can see whether it's playing or not
-		//in order to properly display the Now Playing indicator if we've been
-		//relaunched after being killed.
-		
-		if(LastFMApplication.getInstance().player == null)
-			LastFMApplication.getInstance().bindPlayerService();
-
     	SetupRecentStations();
     	RebuildMainMenu();
     	mMainAdapter.disableLoadBar();
@@ -409,12 +507,6 @@ public class Profile extends ListActivity implements TabBarListener
 		    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
 		    	if(mTagsAdapter != null)
 		    		mTagsAdapter.disableLoadBar();
-			}
-			else if( action.equals( RadioPlayerService.META_CHANGED))
-			{
-				//Update now playing buttons after the service is re-bound
-		    	SetupRecentStations();
-		    	RebuildMainMenu();
 			}
 		}
 	};
@@ -595,22 +687,101 @@ public class Profile extends ListActivity implements TabBarListener
         
     };
     
+    private OnItemClickListener mArtistListItemClickListener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+            Artist artist = (Artist)l.getAdapter().getItem(position);
+            
+        	ListAdapter la = (ListAdapter) l.getAdapter();
+        	la.enableLoadBar(position);
+        	
+            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+		}
+    	
+    };
+    
+    private OnItemClickListener mAlbumListItemClickListener = new OnItemClickListener() {
+
+		@Override
+	    public void onItemClick(AdapterView<?> l, View v,
+	            int position, long id) {
+	        Album album = (Album) l.getAdapter().getItem(position);
+	        showAlbumDialog(album);
+	    }
+    	
+    };
+    
+    private OnItemClickListener mTrackListItemClickListener = new OnItemClickListener() {
+
+        public void onItemClick(AdapterView<?> l, View v,
+                int position, long id) {
+            Track track = (Track) l.getAdapter().getItem(position);
+            showTrackDialog(track);
+        }
+
+    };
+    
+    private OnItemClickListener mTagListItemClickListener = new OnItemClickListener() {
+
+		public void onItemClick(AdapterView<?> l, View v,
+				int position, long id) {
+	        Session session = ( Session ) LastFMApplication.getInstance().map
+            .get( "lastfm_session" );
+			Tag tag = (Tag)l.getAdapter().getItem(position);
+			
+        	ListAdapter la = (ListAdapter) l.getAdapter();
+        	la.enableLoadBar(position);
+        	
+			if(session.getSubscriber().equals("1"))
+				LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
+			else
+				LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+		}
+		
+	};
+	
+	
+    private OnItemClickListener mEventItemClickListener = new OnItemClickListener(){
+
+        public void onItemClick(final AdapterView<?> parent, final View v,
+                final int position, long id) 
+        {
+            final Event event = (Event) parent.getAdapter().getItem(position);
+ 
+    	    mOnEventActivityResult = new EventActivityResult() {
+    	    	public void onEventStatus(int status) 
+    	    	{
+    	    		event.setStatus(String.valueOf(status));
+    	    		mOnEventActivityResult = null;
+    	    	}
+    	    };
+    	    
+            startActivityForResult( fm.last.android.activity.Event.intentFromEvent(Profile.this, event), 0 );
+        }
+
+    };
+    
+    private OnItemClickListener mUserItemClickListener = new OnItemClickListener() {
+        public void onItemClick(AdapterView<?> l, View v,
+                int position, long id) {
+        	ListAdapter la = (ListAdapter) l.getAdapter();
+        	la.enableLoadBar(position);
+        	
+            User user = (User) la.getItem(position);
+            Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
+            profileIntent.putExtra("lastfm.profile.username", user.getName());
+            startActivity(profileIntent);
+        }
+    };
+
+    
     private class LoadTopArtistsTask extends UserTask<Void, Void, Boolean> {
         
         public Boolean doInBackground(Void...params) {
             boolean success = false;
             
             mTopArtistsAdapter = new ListAdapter(Profile.this, getImageCache());
-            mTopArtistsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    Artist artist = (Artist)mTopArtistsAdapter.getItem(position);
-                    mTopArtistsAdapter.enableLoadBar(position);
-                    LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
-                }
-                
-            });
 
             try {
                 Artist[] topartists = mServer.getUserTopArtists(mUser.getName(), "overall");
@@ -666,15 +837,6 @@ public class Profile extends ListActivity implements TabBarListener
             boolean success = false;
             
             mTopAlbumsAdapter = new ListAdapter(Profile.this, getImageCache());
-            mTopAlbumsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    Album album = (Album) mTopAlbumsAdapter.getItem(position);
-                    showAlbumDialog(album);
-                }
-                
-            });
 
             try {
                 Album[] topalbums = mServer.getUserTopAlbums(mUser.getName(), "overall");
@@ -730,15 +892,6 @@ public class Profile extends ListActivity implements TabBarListener
             boolean success = false;
 
             mTopTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-            mTopTracksList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    Track track = (Track) mTopTracksAdapter.getItem(position);
-                    showTrackDialog(track);
-                }
-
-            });
 
             try {
                 Track[] toptracks = mServer.getUserTopTracks(mUser.getName(), "overall");
@@ -784,15 +937,6 @@ public class Profile extends ListActivity implements TabBarListener
             boolean success = false;
 
             mRecentTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-            mRecentTracksList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    Track track = (Track) mRecentTracksAdapter.getItem(position);
-                    showTrackDialog(track);
-                }
-
-            });
 
             try {
                 Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
@@ -855,7 +999,6 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(EventListAdapter result) {
             if (result != null) {
                 mEventsList.setAdapter(result);
-                mEventsList.setOnItemClickListener(mEventOnItemClickListener);
                 //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Upcoming Events"};
@@ -867,26 +1010,6 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
     
-    private OnItemClickListener mEventOnItemClickListener = new OnItemClickListener(){
-
-        public void onItemClick(final AdapterView<?> parent, final View v,
-                final int position, long id) 
-        {
-            final Event event = (Event) parent.getAdapter().getItem(position);
- 
-    	    mOnEventActivityResult = new EventActivityResult() {
-    	    	public void onEventStatus(int status) 
-    	    	{
-    	    		event.setStatus(String.valueOf(status));
-    	    		mOnEventActivityResult = null;
-    	    	}
-    	    };
-    	    
-            startActivityForResult( fm.last.android.activity.Event.intentFromEvent(Profile.this, event), 0 );
-        }
-
-    };
-    
     private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
     	
         @Override
@@ -894,21 +1017,6 @@ public class Profile extends ListActivity implements TabBarListener
             boolean success = false;
 
 			mTagsAdapter = new ListAdapter(Profile.this, getImageCache());
-			mTagsList.setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-			        Session session = ( Session ) LastFMApplication.getInstance().map
-	                .get( "lastfm_session" );
-					Tag tag = (Tag)mTagsAdapter.getItem(position);
-					mTagsAdapter.enableLoadBar(position);
-					if(session.getSubscriber().equals("1"))
-						LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
-					else
-						LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
-				}
-				
-			});
 
     		try {
     			Tag[] tags = mServer.getUserTopTags(mUsername, 10);
@@ -973,17 +1081,6 @@ public class Profile extends ListActivity implements TabBarListener
         public void onPostExecute(ListAdapter result) {
             if(result != null) {
                 mFriendsList.setAdapter(result);
-                mFriendsList.setOnItemClickListener(new OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> l, View v,
-                            int position, long id) {
-                    	ListAdapter la = (ListAdapter) l.getAdapter();
-                    	la.enableLoadBar(position);
-                        User user = (User) la.getItem(position);
-                        Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
-                        profileIntent.putExtra("lastfm.profile.username", user.getName());
-                        startActivity(profileIntent);
-                    }
-                });
             } else {
                 String[] strings = new String[]{"No Friends Retrieved"};
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
