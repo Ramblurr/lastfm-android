@@ -263,6 +263,7 @@ public class Profile extends ListActivity implements TabBarListener
         
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
+		mIntentFilter.addAction( RadioPlayerService.META_CHANGED );
 		
 		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
 			startActivity( new Intent( Profile.this, NewStation.class ) );
@@ -456,6 +457,13 @@ public class Profile extends ListActivity implements TabBarListener
     @Override
     public void onResume() {
 		registerReceiver( mStatusListener, mIntentFilter );
+		//We need to bind the player so we can see whether it's playing or not
+		//in order to properly display the Now Playing indicator if we've been
+		//relaunched after being killed.
+	
+		if(LastFMApplication.getInstance().player == null)
+			LastFMApplication.getInstance().bindPlayerService();
+		
     	SetupRecentStations();
     	RebuildMainMenu();
     	mMainAdapter.disableLoadBar();
@@ -507,6 +515,12 @@ public class Profile extends ListActivity implements TabBarListener
 		    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
 		    	if(mTagsAdapter != null)
 		    		mTagsAdapter.disableLoadBar();
+			}
+			else if( action.equals( RadioPlayerService.META_CHANGED))
+			{
+				//Update now playing buttons after the service is re-bound
+		    	SetupRecentStations();
+		    	RebuildMainMenu();
 			}
 		}
 	};
