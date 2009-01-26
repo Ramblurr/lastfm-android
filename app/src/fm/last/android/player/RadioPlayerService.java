@@ -124,45 +124,57 @@ public class RadioPlayerService extends Service
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
 		mTelephonyManager = (TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE);
-		mTelephonyManager.listen(new PhoneStateListener(){
-
-			private boolean mPausedOnCall = false;
-
+		mTelephonyManager.listen(new PhoneStateListener()
+		{
+			private FadeVolumeTask mFadeVolumeTask = null;
+			
 			@Override
-			public void onCallStateChanged(int state, String incomingNumber) {
-				if(state == TelephonyManager.CALL_STATE_RINGING || state == TelephonyManager.CALL_STATE_OFFHOOK){
-					if(mState != STATE_STOPPED){
-						new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 2500, 10){
-
-							@Override
-							public void onPreExecute() {
-							}
-
-							@Override
-							public void onPostExecute() {
-								RadioPlayerService.this.pause();
-								mPausedOnCall = true;
-							}
-						};
-					}
-				}
-				if(state == TelephonyManager.CALL_STATE_IDLE && mPausedOnCall && mState == STATE_PAUSED){
-					new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000, 10){
-
+			public void onCallStateChanged(int state, String incomingNumber) 
+			{
+				if (mFadeVolumeTask != null)
+					mFadeVolumeTask.cancel();
+				
+				if (state == TelephonyManager.CALL_STATE_IDLE)  // fade music in to 100%
+				{
+					mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000)
+					{
 						@Override
 						public void onPreExecute() {
-							RadioPlayerService.this.pause();
-							mPausedOnCall = false;
+							if (mState == STATE_PAUSED)
+								RadioPlayerService.this.pause();
 						}
 
 						@Override
 						public void onPostExecute() {
+							mFadeVolumeTask = null;
+						}
+					};
+				} else { // fade music out to silence
+					if (mState == STATE_PAUSED) {
+						// this particular state of affairs should be impossible, seeing as we are the only
+						// component that dares the pause the radio. But we cater to it just in case
+						mp.setVolume( 0.0f, 0.0f );
+						return;
+					}
+
+					// fade out faster if making a call, this feels more natural
+					int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
+					
+					mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration)
+					{
+						@Override
+						public void onPreExecute() {
+						}
+
+						@Override
+						public void onPostExecute() {
+							RadioPlayerService.this.pause();
+							mFadeVolumeTask = null;
 						}
 					};
 				}
 				super.onCallStateChanged(state, incomingNumber);
 			}
-
 		}, PhoneStateListener.LISTEN_CALL_STATE);
 
 	}
@@ -279,6 +291,11 @@ public class RadioPlayerService extends Service
 			
 			mDeferredStopHandler.cancelStopSelf();
 
+			// We do this because there has been bugs in our phonecall fade code
+			// that resulted in the music never becoming audible again after a call.
+			// Leave this precaution here please.
+			mp.setVolume( 1.0f, 1.0f );
+			
 			mState = STATE_PREPARING;
 			mp.prepareAsync();
 		}
@@ -811,6 +828,13 @@ public class RadioPlayerService extends Service
 	 * for instance when a phone call arrives 
 	 * 
 	 * @author Lukasz Wisniewski
+	 * 
+	 * TODO if volume is not at 1.0 or 0.0 when this starts (eg. old fade task didn't finish)
+	 * then this sounds broken. Hard to fix though as you have to recalculate the fade duration etc.
+	 * 
+	 * TODO setVolume is not logarithmic, and the ear is. We need a natural log scale
+	 * see: http://stackoverflow.com/questions/207016/how-to-fade-out-volume-naturally
+	 * see: http://code.google.com/android/reference/android/media/MediaPlayer.html#setVolume(float,%20float)
 	 */
 	private abstract class FadeVolumeTask extends TimerTask {
 
@@ -828,18 +852,17 @@ public class RadioPlayerService extends Service
 		 * @param millis Time the fade process should take
 		 * @param steps Number of volume gradations within given fade time
 		 */
-		public FadeVolumeTask(int mode, long millis, int steps){
+		public FadeVolumeTask(int mode, int millis){
 			this.mMode = mode;
-			this.mSteps = steps;
+			this.mSteps = millis / 20; //20 times per second
 			this.onPreExecute();
-			new Timer().scheduleAtFixedRate(this, 0, millis/steps);
+			new Timer().scheduleAtFixedRate(this, 0, millis/mSteps);
 		}
 
 		@Override
 		public void run() {
-
 			float volumeValue = 1.0f;
-
+			
 			if(mMode == FADE_OUT){
 				volumeValue *= (float)(mSteps-mCurrentStep)/(float)mSteps;
 			}
