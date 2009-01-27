@@ -726,12 +726,14 @@ public class Profile extends ListActivity implements TabBarListener
     private OnItemClickListener mArtistListItemClickListener = new OnItemClickListener() 
     {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-            Artist artist = (Artist)l.getAdapter().getItem(position);
-            
-        	ListAdapter la = (ListAdapter) l.getAdapter();
-        	la.enableLoadBar(position);
-        	
-            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+			try {
+	            Artist artist = (Artist)l.getAdapter().getItem(position);
+	        	ListAdapter la = (ListAdapter) l.getAdapter();
+	        	la.enableLoadBar(position);
+	            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+			} catch (ClassCastException e) {
+				// fine.
+			}
 		}
     	
     };
@@ -740,8 +742,12 @@ public class Profile extends ListActivity implements TabBarListener
     {
 	    public void onItemClick(AdapterView<?> l, View v,
 	            int position, long id) {
-	        Album album = (Album) l.getAdapter().getItem(position);
-	        showAlbumDialog(album);
+	    	try {
+		        Album album = (Album) l.getAdapter().getItem(position);
+		        showAlbumDialog(album);
+	    	} catch (ClassCastException e) {
+	    		// (Album) cast can fail, like when the list contains a string saying: "no items"
+	    	}
 	    }
     	
     };
@@ -750,8 +756,12 @@ public class Profile extends ListActivity implements TabBarListener
 
         public void onItemClick(AdapterView<?> l, View v,
                 int position, long id) {
-            Track track = (Track) l.getAdapter().getItem(position);
-            showTrackDialog(track);
+        	try {
+        		Track track = (Track) l.getAdapter().getItem(position);
+        		showTrackDialog(track);
+        	} catch (ClassCastException e) {
+        		// (Track) cast can fail, like when the list contains a string saying: "no items"
+        	}
         }
 
     };
@@ -760,17 +770,20 @@ public class Profile extends ListActivity implements TabBarListener
 
 		public void onItemClick(AdapterView<?> l, View v,
 				int position, long id) {
-	        Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
-			Tag tag = (Tag)l.getAdapter().getItem(position);
-			
-        	ListAdapter la = (ListAdapter) l.getAdapter();
-        	la.enableLoadBar(position);
-        	
-			if(session.getSubscriber().equals("1"))
-				LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
-			else
-				LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+			try {
+		        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+				Tag tag = (Tag)l.getAdapter().getItem(position);
+				
+	        	ListAdapter la = (ListAdapter) l.getAdapter();
+	        	la.enableLoadBar(position);
+	        	
+				if(session.getSubscriber().equals("1"))
+					LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
+				else
+					LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+			} catch (ClassCastException e) {
+				// when the list item is not a tag
+			}
 		}
 		
 	};
@@ -781,17 +794,19 @@ public class Profile extends ListActivity implements TabBarListener
         public void onItemClick(final AdapterView<?> parent, final View v,
                 final int position, long id) 
         {
-            final Event event = (Event) parent.getAdapter().getItem(position);
- 
-    	    mOnEventActivityResult = new EventActivityResult() {
-    	    	public void onEventStatus(int status) 
-    	    	{
-    	    		event.setStatus(String.valueOf(status));
-    	    		mOnEventActivityResult = null;
-    	    	}
-    	    };
-    	    
-            startActivityForResult( fm.last.android.activity.Event.intentFromEvent(Profile.this, event), 0 );
+        	try {
+	            final Event event = (Event) parent.getAdapter().getItem(position);
+	    	    mOnEventActivityResult = new EventActivityResult() {
+	    	    	public void onEventStatus(int status) 
+	    	    	{
+	    	    		event.setStatus(String.valueOf(status));
+	    	    		mOnEventActivityResult = null;
+	    	    	}
+	    	    };
+	            startActivityForResult( fm.last.android.activity.Event.intentFromEvent(Profile.this, event), 0 );
+        	} catch (ClassCastException e) {
+        		// when the list item is not an event
+        	}
         }
 
     };
@@ -799,13 +814,17 @@ public class Profile extends ListActivity implements TabBarListener
     private OnItemClickListener mUserItemClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> l, View v,
                 int position, long id) {
-        	ListAdapter la = (ListAdapter) l.getAdapter();
-        	la.enableLoadBar(position);
-        	
-            User user = (User) la.getItem(position);
-            Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
-            profileIntent.putExtra("lastfm.profile.username", user.getName());
-            startActivity(profileIntent);
+        	try {
+	        	ListAdapter la = (ListAdapter) l.getAdapter();
+	        	la.enableLoadBar(position);
+	        	
+	            User user = (User) la.getItem(position);
+	            Intent profileIntent = new Intent(Profile.this, fm.last.android.activity.Profile.class);
+	            profileIntent.putExtra("lastfm.profile.username", user.getName());
+	            startActivity(profileIntent);
+        	} catch (ClassCastException e) {
+        		// when the list item is not a User        		
+        	}
         }
     };
 
@@ -959,16 +978,16 @@ public class Profile extends ListActivity implements TabBarListener
         public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
                 Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
-                if(recenttracks.length == 0 )
-                    return null;
+                if(recenttracks.length == 0)
+                	return null;
                 
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-                for(int i=0; i< ((recenttracks.length < 10) ? recenttracks.length : 10); i++){
-                    ListEntry entry = new ListEntry(recenttracks[i],
+                for(Track track : recenttracks) {
+                    ListEntry entry = new ListEntry(track,
                             R.drawable.song_icon,
-                            recenttracks[i].getName(), 
-                            recenttracks[i].getImages().length == 0 ? "" : recenttracks[i].getImages()[0].getUrl(), // some tracks don't have images
-                            recenttracks[i].getArtist().getName());
+                            track.getName(), 
+                            track.getImages().length == 0 ? "" : track.getImages()[0].getUrl(), // some tracks don't have images
+                            track.getArtist().getName());
                     iconifiedEntries.add(entry);
                 }
                 return iconifiedEntries;
@@ -1035,6 +1054,9 @@ public class Profile extends ListActivity implements TabBarListener
         public ArrayList<ListEntry> doInBackground(Void...params) {
     		try {
     			Tag[] tags = mServer.getUserTopTags(mUsername, 10);
+    			if (tags.length == 0)
+    				return null;
+    			
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
     				ListEntry entry = new ListEntry(tags[i], 
@@ -1099,7 +1121,6 @@ public class Profile extends ListActivity implements TabBarListener
                 String[] strings = new String[]{"No Friends Retrieved"};
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
                         R.layout.list_row, R.id.row_label, strings));
-                mFriendsList.setOnItemClickListener(null);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
