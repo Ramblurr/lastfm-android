@@ -200,21 +200,21 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         if ( index == TAB_ARTIST )
         {
             searching = SearchType.Artist;
-            searchBar.setHint( "Enter an Artist" );
+            searchBar.setHint( "eg. Nirvana" );
             mHint.setText(getResources().getString(R.string.newstation_hint_artist));
             setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_TAG )
         {
             searching = SearchType.Tag;
-            searchBar.setHint( "Enter a Tag" );
+            searchBar.setHint( "eg. Rock" );
             mHint.setText(getResources().getString(R.string.newstation_hint_tag));
             setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_USER )
         {
             searching = SearchType.User;
-            searchBar.setHint( "Enter a Username" );
+            searchBar.setHint( "eg. Last.hq" );
             mHint.setText(getResources().getString(R.string.newstation_hint_user));
             setListAdapter(mListAdapter[index]);
         }

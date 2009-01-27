@@ -29,8 +29,10 @@ import android.provider.Contacts.ContactMethods;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -48,8 +50,6 @@ import android.widget.AdapterView.OnItemClickListener;
  */
 public class Share extends Activity {
 	private TabBar mTabBar;
-	private ListView mAddressBookList;
-	private SimpleCursorAdapter mAddressBookAdapter;
 	private ListView mFriendsList;
 	private ListAdapter mFriendsAdapter;
 	private ViewFlipper mViewFlipper;
@@ -74,49 +74,21 @@ public class Share extends Activity {
 		mViewFlipper = (ViewFlipper)findViewById(R.id.ViewFlipper);
 		mTabBar = (TabBar)findViewById(R.id.TabBar);
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Address Book", TAB_ADDRESSBOOK);
+		mTabBar.addTab("Email", TAB_ADDRESSBOOK);
 		mTabBar.addTab("Friends", TAB_FRIENDS);
 		mTabBar.setActive(TAB_ADDRESSBOOK);
-		mAddressBookList = (ListView)findViewById(R.id.addressbook_list_view);
-		Cursor C = managedQuery(People.CONTENT_URI, null, People.PRIMARY_EMAIL_ID + " not null", null, null);
 
-		String[] columns = new String[] {People.NAME};
-		int[] names = new int[] {R.id.row_label};
-
-		mAddressBookAdapter = new SimpleCursorAdapter(this, R.layout.list_row, C, columns, names);
-		mAddressBookList.setAdapter(mAddressBookAdapter);
-		mAddressBookList.setOnItemSelectedListener(new OnListRowSelectedListener(mAddressBookList));
-		mAddressBookList.setOnItemClickListener(new OnItemClickListener() {
-
-            public void onItemClick(AdapterView<?> l, View v,
-                    int position, long id) {
-            	Cursor C = (Cursor) mAddressBookAdapter.getItem(position);
-            	long personid = C.getLong(C.getColumnIndex(People._ID));
-            	C = managedQuery(ContactMethods.CONTENT_EMAIL_URI, null, ContactMethods.PERSON_ID + " = " + personid, null, null);
-            	if(C.getCount() > 0) {
-            		String[] columns = new String[] {ContactMethods.DATA};
-            		int[] names = new int[] {R.id.row_label};
-                    mDialogList = new ListView(Share.this);
-                    mDialogAdapter = new SimpleCursorAdapter(Share.this, R.layout.list_row, C, columns, names);
-
-                    mDialogList.setAdapter(mDialogAdapter);
-                    mDialogList.setOnItemClickListener(new OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> l, View v, int position, long id) 
-                        {
-                        	Cursor C = (Cursor) mDialogAdapter.getItem(position);
-                    		String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
-                            String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                        	String email = C.getString(C.getColumnIndex(ContactMethods.DATA));
-                            ViewSwitcher switcher = (ViewSwitcher)v.findViewById(R.id.row_view_switcher);
-                            switcher.setVisibility(View.VISIBLE);
-                            switcher.setDisplayedChild(1);
-                            new ShareTrackTask(artist,track,email).execute((Void)null);
-                        }
-                        });
-                    mDialog = new AlertDialog.Builder(Share.this).setTitle("Select Address").setView(mDialogList).show();
-            	}
-            }
-        });
+		findViewById(R.id.email_button).setOnClickListener( new OnClickListener()
+		{
+			public void onClick( View v )
+			{
+				EditText edit = (EditText)findViewById(R.id.email);
+				
+                String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
+                String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
+                new ShareTrackTask(artist, track, edit.getText().toString()).execute((Void)null);			
+			}
+		} );
 		
 		mFriendsList = (ListView)findViewById(R.id.friends_list_view);
 		mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
@@ -167,6 +139,7 @@ public class Share extends Activity {
         	}
         	if(result) {
             	Share.this.finish();
+            	Toast.makeText(Share.this, "The track was shared.", Toast.LENGTH_SHORT).show();
         	} else {
         		Toast.makeText(Share.this, "An error occured while sharing. Please try again.", Toast.LENGTH_SHORT).show();
         	}

@@ -713,9 +713,8 @@ public class Profile extends ListActivity implements TabBarListener
         
     };
     
-    private OnItemClickListener mArtistListItemClickListener = new OnItemClickListener() {
-
-		@Override
+    private OnItemClickListener mArtistListItemClickListener = new OnItemClickListener() 
+    {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
             Artist artist = (Artist)l.getAdapter().getItem(position);
             
@@ -727,9 +726,8 @@ public class Profile extends ListActivity implements TabBarListener
     	
     };
     
-    private OnItemClickListener mAlbumListItemClickListener = new OnItemClickListener() {
-
-		@Override
+    private OnItemClickListener mAlbumListItemClickListener = new OnItemClickListener() 
+    {
 	    public void onItemClick(AdapterView<?> l, View v,
 	            int position, long id) {
 	        Album album = (Album) l.getAdapter().getItem(position);

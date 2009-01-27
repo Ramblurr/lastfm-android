@@ -51,6 +51,8 @@
 			android:textStyle="bold" 
 			android:layout_width="fill_parent" 
 			android:layout_marginTop="32dip"
+			android:paddingLeft="12px"
+			android:paddingRight="12px"
 			android:textColor="#494848" />
 	</LinearLayout>
 	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
