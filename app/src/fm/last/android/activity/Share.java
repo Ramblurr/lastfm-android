@@ -121,24 +121,24 @@ public class Share extends Activity {
     	
         @Override
         public Boolean doInBackground(Void...params) {
-            Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
-            boolean success = false;
-
             try {
+                Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
     			mServer.shareTrack(mArtist, mTrack, mRecipient, session.getKey());
-                success = true;
+                return true;
             } catch (WSError e) {
-            	LastFMApplication.getInstance().presentError(Share.this, e);
-            } catch (IOException e) {
+            	// can't presentError here. it's not a UI thread. the app crashes.
+            	// leave it to the toasting in onPostExecute
+            	//LastFMApplication.getInstance().presentError(Share.this, e);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            return success;
+            return false;
         }
 
         @Override
         public void onPostExecute(Boolean result) {
-        	mFriendsAdapter.disableLoadBar();
+        	if (mFriendsAdapter != null)
+        		mFriendsAdapter.disableLoadBar();
         	if(mDialog != null) {
         		mDialog.dismiss();
         		mDialog = null;
@@ -147,12 +147,13 @@ public class Share extends Activity {
             	Share.this.finish();
             	Toast.makeText(Share.this, "The track was shared.", Toast.LENGTH_SHORT).show();
         	} else {
-        		Toast.makeText(Share.this, "An error occured while sharing. Please try again.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(Share.this, "An error occurred when sharing. Please try again.", Toast.LENGTH_SHORT).show();
+        		findViewById(R.id.email_button).setEnabled( true );
         	}
         }
     }
 	
-    private class LoadFriendsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadFriendsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	@Override
     	public void onPreExecute() {
         	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, "Loading..."));
@@ -160,16 +161,13 @@ public class Share extends Activity {
     	}
     	
         @Override
-        public Boolean doInBackground(Void...params) {
-            Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
-            boolean success = false;
-
-            mFriendsAdapter = new ListAdapter(Share.this, getImageCache());
+        public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
+                Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
                 User[] friends = mServer.getFriends(session.getName(), null, null).getFriends();
                 if(friends.length == 0 )
-                    return false;
+                    return null;
+                
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i < friends.length; i++){
                     ListEntry entry = new ListEntry(friends[i],
@@ -178,29 +176,30 @@ public class Share extends Activity {
                             friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl()); // some tracks don't have images
                     iconifiedEntries.add(entry);
                 }
-                mFriendsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
-            } catch (IOException e) {
+                return iconifiedEntries;
+            } catch (Exception e) {
                 e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            mFriendsList.setOnItemClickListener(new OnItemClickListener() {
-
-                public void onItemClick(AdapterView<?> l, View v,
-                        int position, long id) {
-                    mFriendsAdapter.enableLoadBar(position);
-                    User user = (User) mFriendsAdapter.getItem(position);
-                    String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
-                    String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                    new ShareTrackTask(artist,track,user.getName()).execute((Void)null);
-                }
-            });
-            if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                mFriendsAdapter = new ListAdapter(Share.this, getImageCache());
+                mFriendsAdapter.setSourceIconified(iconifiedEntries);
                 mFriendsList.setAdapter(mFriendsAdapter);
+                mFriendsList.setOnItemClickListener(new OnItemClickListener() {
+
+                    public void onItemClick(AdapterView<?> l, View v,
+                            int position, long id) {
+                        mFriendsAdapter.enableLoadBar(position);
+                        User user = (User) mFriendsAdapter.getItem(position);
+                        String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
+                        String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
+                        new ShareTrackTask(artist,track,user.getName()).execute((Void)null);
+                    }
+                });
             } else {
             	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.INFO_MODE, "No Friends :(")); 
             }

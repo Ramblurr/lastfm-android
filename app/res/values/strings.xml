@@ -71,7 +71,7 @@
 	<string name="ERROR_MISSINGINFO_TITLE">Missing Information</string>
 	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
 	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
-	<string name="ERROR_PLAYBACK_FAILED">An error occured while trying to play this track.  Please try again shortly.</string>
+	<string name="ERROR_PLAYBACK_FAILED">An error occurred while trying to play this track.  Please try again shortly.</string>
 	<string name="ERROR_PLAYBACK_FAILED_TITLE">Playback Failed</string>
 	<string name="ERROR_REGFAILURE_TITLE">Account Creation Failed</string>
 	<string name="ERROR_SERVER_UNAVAILABLE">There was a problem communicating with the Last.fm servers.  Please try again shortly.</string>
