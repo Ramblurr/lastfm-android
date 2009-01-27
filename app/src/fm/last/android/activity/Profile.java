@@ -284,6 +284,10 @@ public class Profile extends ListActivity implements TabBarListener
         outState.putSerializable("adapter_friends", (ListAdapter)mFriendsList.getAdapter());
         outState.putSerializable("adapter_tags", (ListAdapter)mTagsList.getAdapter());
         
+        outState.putSerializable("info_album", mAlbumInfo);
+        outState.putSerializable("info_track", mTrackInfo);
+        
+        
     	//FIXME: it's not so easy to serialize the events adapter as it's a 
     	//		 Seperated List Adapter.
     	//		Rather than doing a half-arsed job, i just left it out altogether.
@@ -302,35 +306,35 @@ public class Profile extends ListActivity implements TabBarListener
     	ListAdapter topArtistAdapter = (ListAdapter)state.getSerializable("adapter_topArtists");
     	if( topArtistAdapter != null )
     	{
-	    	topArtistAdapter.enableLoadBar( -1 );
+	    	topArtistAdapter.disableLoadBar();
 	    	mTopArtistsList.setAdapter( topArtistAdapter );
     	}
     	
     	ListAdapter topAlbumsAdapter = (ListAdapter)state.getSerializable("adapter_topAlbums");
     	if( topAlbumsAdapter != null )
     	{
-	    	topAlbumsAdapter.enableLoadBar( -1 ); 
+	    	topAlbumsAdapter.disableLoadBar();
 	    	mTopAlbumsList.setAdapter( topAlbumsAdapter );
     	}
     	
     	ListAdapter topTracksAdapter = (ListAdapter)state.getSerializable("adapter_topTracks");
     	if( topTracksAdapter != null )
     	{
-	    	topTracksAdapter.enableLoadBar( -1 );
+	    	topTracksAdapter.disableLoadBar();
 	    	mTopTracksList.setAdapter( topTracksAdapter );
     	}
     	
     	ListAdapter recentTracksAdapter = (ListAdapter)state.getSerializable("adapter_recentTracks");
     	if( recentTracksAdapter != null )
     	{
-    		recentTracksAdapter.enableLoadBar( -1 );
+    		recentTracksAdapter.disableLoadBar();
     		mRecentTracksList.setAdapter( recentTracksAdapter );
     	}
     	
     	ListAdapter tagsAdapter = (ListAdapter)state.getSerializable("adapter_tags");
     	if( tagsAdapter != null )
     	{
-	    	tagsAdapter.enableLoadBar( -1 );
+	    	tagsAdapter.disableLoadBar();
 	    	mTagsList.setAdapter( tagsAdapter );
     	}
     	
@@ -352,9 +356,12 @@ public class Profile extends ListActivity implements TabBarListener
     	ListAdapter friendsAdapter = (ListAdapter)state.getSerializable("adapter_friends");
     	if( friendsAdapter != null )
     	{
-	    	friendsAdapter.enableLoadBar( -1 );
+	    	friendsAdapter.disableLoadBar();
 	    	mFriendsList.setAdapter( friendsAdapter );
     	}
+    	
+    	mAlbumInfo = (Album)state.getSerializable("info_album");
+        mTrackInfo = (Track)state.getSerializable("info_track");
     }
     
     private class LoadUserTask extends UserTask<Void, Void, Boolean> {
@@ -480,6 +487,9 @@ public class Profile extends ListActivity implements TabBarListener
     		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
     	if(mTagsAdapter != null)
     		mTagsAdapter.disableLoadBar();
+        if( mDialogAdapter != null )
+        	mDialogAdapter.disableLoadBar();
+        
 		super.onResume();
     }
     
@@ -515,6 +525,8 @@ public class Profile extends ListActivity implements TabBarListener
 		    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
 		    	if(mTagsAdapter != null)
 		    		mTagsAdapter.disableLoadBar();
+		        if( mDialogAdapter != null )
+		        	mDialogAdapter.disableLoadBar();
 			}
 			else if( action.equals( RadioPlayerService.META_CHANGED))
 			{
@@ -1149,6 +1161,7 @@ public class Profile extends ListActivity implements TabBarListener
         ArrayList<ListEntry> entries = prepareProfileActions(id);
         mDialogAdapter.setSourceIconified(entries);
         mDialogAdapter.setIconsUnscaled();
+        mDialogAdapter.disableLoadBar();
         mDialogList.setAdapter(mDialogAdapter);
         mDialogList.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> l, View v, int position, long id) 
