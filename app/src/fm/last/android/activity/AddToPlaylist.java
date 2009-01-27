@@ -152,14 +152,14 @@ public class AddToPlaylist extends Activity {
         }
     }
 
-    private class LoadPlaylistsTask extends UserTask<Void, Void, ListAdapter> {
+    private class LoadPlaylistsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	@Override
     	public void onPreExecute() {
         	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE, "Loading..."));
     	}
     	
         @Override
-        public ListAdapter doInBackground(Void...params) {
+        public ArrayList<ListEntry> doInBackground(Void...params) {
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
 
@@ -175,10 +175,7 @@ public class AddToPlaylist extends Activity {
                             playlists[i].getTitle());
                     iconifiedEntries.add(entry);
                 }
-                
-                ListAdapter result = new ListAdapter(AddToPlaylist.this, getImageCache()); 
-                result.setSourceIconified(iconifiedEntries);
-            	return result;
+            	return iconifiedEntries;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -186,16 +183,18 @@ public class AddToPlaylist extends Activity {
         }
 
         @Override
-        public void onPostExecute(ListAdapter result) {
-            if(result != null) {
-                mPlaylistsList.setAdapter(result);
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                ListAdapter adaptor = new ListAdapter(AddToPlaylist.this, getImageCache()); 
+                adaptor.setSourceIconified(iconifiedEntries);
+                mPlaylistsList.setAdapter(adaptor);
             } else {
             	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.INFO_MODE, "No Playlists")); 
             }
         }
     }
     
-    private class CreatePlaylistTask extends UserTask<Void, Void, ListAdapter> {
+    private class CreatePlaylistTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	private String mTitle;
     	
     	public CreatePlaylistTask(String title) {
@@ -209,7 +208,7 @@ public class AddToPlaylist extends Activity {
     	}
     	
         @Override
-        public ListAdapter doInBackground(Void...params) {
+        public ArrayList<ListEntry>  doInBackground(Void...params) {
             Session session = ( Session ) LastFMApplication.getInstance().map
             .get( "lastfm_session" );
 
@@ -230,10 +229,9 @@ public class AddToPlaylist extends Activity {
                     iconifiedEntries.add(entry);
                 }
                 
-                ListAdapter result = new ListAdapter(AddToPlaylist.this, getImageCache());
-                result.setSourceIconified(iconifiedEntries);
-                return result;
+                return iconifiedEntries;
             } catch (WSError e) {
+            	// TODO: something useful...
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -241,10 +239,12 @@ public class AddToPlaylist extends Activity {
         }
 
         @Override
-        public void onPostExecute(ListAdapter result) {
-            if(result != null) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
                 mNewPlaylist.setText("");	// ?
-                mPlaylistsList.setAdapter(result);
+                ListAdapter adapter = new ListAdapter(AddToPlaylist.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mPlaylistsList.setAdapter(adapter);
             } else {
         		Toast.makeText(AddToPlaylist.this, "An error occurred while creating the playlist. Please try again.", Toast.LENGTH_SHORT).show();
             }
