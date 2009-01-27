@@ -1,8 +1,6 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
@@ -69,6 +67,8 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
+
+//TODO: refactor all the UserTasks
 
 public class Profile extends ListActivity implements TabBarListener
 {
@@ -790,17 +790,14 @@ public class Profile extends ListActivity implements TabBarListener
     };
 
     
-    private class LoadTopArtistsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadTopArtistsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
         
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-            
-            mTopArtistsAdapter = new ListAdapter(Profile.this, getImageCache());
+        public ArrayList<ListEntry> doInBackground(Void...params) {
 
             try {
                 Artist[] topartists = mServer.getUserTopArtists(mUser.getName(), "overall");
                 if(topartists.length == 0 )
-                    return false;
+                    return null;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topartists.length < 10) ? topartists.length : 10); i++)
                 {
@@ -820,19 +817,18 @@ public class Profile extends ListActivity implements TabBarListener
                             R.drawable.radio_icon);
                     iconifiedEntries.add(entry);
                 }
-                mTopArtistsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
+                return iconifiedEntries;
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                mTopArtistsAdapter = new ListAdapter(Profile.this, getImageCache());
+                mTopArtistsAdapter.setSourceIconified(iconifiedEntries);
                 mTopArtistsList.setAdapter(mTopArtistsAdapter);
             } else {
                 String[] strings = new String[]{"No Top Artists"};
@@ -844,18 +840,15 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
 
-    private class LoadTopAlbumsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadTopAlbumsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
         
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-            
-            mTopAlbumsAdapter = new ListAdapter(Profile.this, getImageCache());
+        public ArrayList<ListEntry> doInBackground(Void...params) {
 
             try {
                 Album[] topalbums = mServer.getUserTopAlbums(mUser.getName(), "overall");
                 if(topalbums.length == 0 )
-                    return false;
+                    return null;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((topalbums.length < 10) ? topalbums.length : 10); i++)
                 {
@@ -875,19 +868,18 @@ public class Profile extends ListActivity implements TabBarListener
                             topalbums[i].getArtist());
                     iconifiedEntries.add(entry);
                 }
-                mTopAlbumsAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
+                return iconifiedEntries;
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                mTopAlbumsAdapter = new ListAdapter(Profile.this, getImageCache());
+                mTopAlbumsAdapter.setSourceIconified(iconifiedEntries);
                 mTopAlbumsList.setAdapter(mTopAlbumsAdapter);
             } else {
                 String[] strings = new String[]{"No Top Albums"};
@@ -899,18 +891,14 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
     
-    private class LoadTopTracksTask extends UserTask<Void, Void, Boolean> {
+    private class LoadTopTracksTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-
-            mTopTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-
+        public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
                 Track[] toptracks = mServer.getUserTopTracks(mUser.getName(), "overall");
                 if(toptracks.length == 0 )
-                    return false;
+                    return null;
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((toptracks.length < 10) ? toptracks.length : 10); i++){
                     ListEntry entry = new ListEntry(toptracks[i],
@@ -920,21 +908,22 @@ public class Profile extends ListActivity implements TabBarListener
                             toptracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
                 }
-                mTopTracksAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
+                return iconifiedEntries;
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (NullPointerException e) {
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                mTopTracksAdapter = new ListAdapter(Profile.this, getImageCache());
+                mTopTracksAdapter.setSourceIconified(iconifiedEntries);
                 mTopTracksList.setAdapter(mTopTracksAdapter);
-                            } else {
+            } else {
                 String[] strings = new String[]{"No Top Tracks"};
                 mTopTracksList.setAdapter(new ArrayAdapter<String>(Profile.this,
                         R.layout.list_row, R.id.row_label, strings));
@@ -944,18 +933,15 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
     
-    private class LoadRecentTracksTask extends UserTask<Void, Void, Boolean> {
+    private class LoadRecentTracksTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-
-            mRecentTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-
+        public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
                 Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
                 if(recenttracks.length == 0 )
-                    return false;
+                    return null;
+                
                 ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
                 for(int i=0; i< ((recenttracks.length < 10) ? recenttracks.length : 10); i++){
                     ListEntry entry = new ListEntry(recenttracks[i],
@@ -965,19 +951,18 @@ public class Profile extends ListActivity implements TabBarListener
                             recenttracks[i].getArtist().getName());
                     iconifiedEntries.add(entry);
                 }
-                mRecentTracksAdapter.setSourceIconified(iconifiedEntries);
-                success = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
+                return iconifiedEntries;
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-            if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                mRecentTracksAdapter = new ListAdapter(Profile.this, getImageCache());
+                mRecentTracksAdapter.setSourceIconified(iconifiedEntries);
                 mRecentTracksList.setAdapter(mRecentTracksAdapter);
             } else {
                 String[] strings = new String[]{"No Recent Tracks"};
@@ -1024,14 +1009,10 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
     
-    private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
+    private class LoadTagsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	
         @Override
-        public Boolean doInBackground(Void...params) {
-            boolean success = false;
-
-			mTagsAdapter = new ListAdapter(Profile.this, getImageCache());
-
+        public ArrayList<ListEntry> doInBackground(Void...params) {
     		try {
     			Tag[] tags = mServer.getUserTopTags(mUsername, 10);
     			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
@@ -1042,19 +1023,18 @@ public class Profile extends ListActivity implements TabBarListener
     						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);
     			}
-    			mTagsAdapter.setSourceIconified(iconifiedEntries);
-    			success = true;
-    		} catch (IOException e) {
-    			e.printStackTrace();
-            } catch (NullPointerException e) {
+    			return iconifiedEntries;
+            } catch (Exception e) {
             	e.printStackTrace();
             }
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+        	if(iconifiedEntries != null) {
+    			mTagsAdapter = new ListAdapter(Profile.this, getImageCache());
+    			mTagsAdapter.setSourceIconified(iconifiedEntries);
         		mTagsList.setAdapter(mTagsAdapter);
                 mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
                 mNestedViewFlipper.setDisplayedChild(PROFILE_TAGS + 1);
@@ -1066,10 +1046,10 @@ public class Profile extends ListActivity implements TabBarListener
         }
     }
 
-    private class LoadFriendsTask extends UserTask<Void, Void, ListAdapter> {
+    private class LoadFriendsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
         @Override
-        public ListAdapter doInBackground(Void...params) {
+        public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
                 User[] friends = mServer.getFriends(mUser.getName(), null, null).getFriends();
                 if(friends.length == 0 )
@@ -1082,9 +1062,7 @@ public class Profile extends ListActivity implements TabBarListener
                             friends[i].getImages().length == 0 ? "" : friends[i].getImages()[0].getUrl()); // some tracks don't have images
                     iconifiedEntries.add(entry);
                 }
-                ListAdapter result = new ListAdapter(Profile.this, getImageCache());
-                result.setSourceIconified(iconifiedEntries);
-                return result;
+                return iconifiedEntries;
             } catch (Exception e) {
             	e.printStackTrace();
             }
@@ -1092,9 +1070,11 @@ public class Profile extends ListActivity implements TabBarListener
         }
 
         @Override
-        public void onPostExecute(ListAdapter result) {
-            if(result != null) {
-                mFriendsList.setAdapter(result);
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+            if(iconifiedEntries != null) {
+                ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mFriendsList.setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Friends Retrieved"};
                 mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
