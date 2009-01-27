@@ -83,10 +83,16 @@ public class Share extends Activity {
 			public void onClick( View v )
 			{
 				EditText edit = (EditText)findViewById(R.id.email);
+				String text = edit.getText().toString();
+				
+				if (text == null || text.length() == 0)
+					return;
+				
+				findViewById(R.id.email_button).setEnabled( false );
 				
                 String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
                 String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                new ShareTrackTask(artist, track, edit.getText().toString()).execute((Void)null);			
+                new ShareTrackTask(artist, track, text).execute((Void)null);			
 			}
 		} );
 		
