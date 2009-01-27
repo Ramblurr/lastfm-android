@@ -300,7 +300,9 @@ public class Profile extends ListActivity implements TabBarListener
     {
     	mTabBar.setActive( state.getInt( "selected_tab" ));
     	mNestedViewFlipper.setDisplayedChild( state.getInt("displayed_view"));
-    	mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    	
+    	if( state.getSerializable("view_history") != null )
+    		mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
     	
     	//Restore the adapters and disable the spinner for all the profile lists
     	ListAdapter topArtistAdapter = (ListAdapter)state.getSerializable("adapter_topArtists");
