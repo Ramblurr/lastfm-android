@@ -28,7 +28,6 @@ import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
@@ -70,7 +69,6 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     @Override
     public void onCreate( Bundle icicle )
     {
-
         super.onCreate( icicle );
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView( R.layout.newstation );
@@ -88,7 +86,6 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 						return false;
 				}
 			}
-			
 		});
 
 		mSearchButton = (Button)findViewById(R.id.search);
@@ -98,18 +95,13 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mTabBar.setListener(this);
-		mTabBar.addTab( "Artist", R.drawable.similar_artists, R.drawable.similar_artists, R.drawable.similar_artists, TAB_ARTIST);
-		mTabBar.addTab("Tag", R.drawable.tags, R.drawable.tags, R.drawable.tags, TAB_TAG);
-		mTabBar.addTab("User", R.drawable.top_listeners, R.drawable.top_listeners, R.drawable.top_listeners, TAB_USER);
-		mTabBar.setActive(TAB_ARTIST);
+		mTabBar.addTab("Artist", R.drawable.similar_artists);
+		mTabBar.addTab("Tag", R.drawable.tags);
+		mTabBar.addTab("User", R.drawable.top_listeners);
 		tabChanged(TAB_ARTIST, TAB_ARTIST);
         
-        if ( searching == null )
-            mTabBar.setActive(TAB_ARTIST);
 
         mImageCache = new ImageCache();
-        
-		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
 		
 		getListView().setOnItemClickListener(new OnItemClickListener() {
 
@@ -257,7 +249,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     				ListEntry entry = new ListEntry(mTags[i], 
     						R.drawable.tag_dark, 
     						mTags[i].getName(), 
-    						R.drawable.radio_icon);
+    						R.drawable.list_icon_station);
     				iconifiedEntries.add(entry);
     			}
     			return iconifiedEntries;
@@ -299,7 +291,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 	    						R.drawable.tag_dark, 
 	    						mArtists[i].getName(), 
 	    						mArtists[i].getImages()[0].getUrl(),
-	    						R.drawable.radio_icon);
+	    						R.drawable.list_icon_station);
 	    				iconifiedEntries.add(entry);
     	            }
     			}

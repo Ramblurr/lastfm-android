@@ -8,8 +8,10 @@ import java.util.Iterator;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -77,7 +79,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
         for(int i=0; i < data.length; i++){
             ListEntry entry = new ListEntry(data[i], 
                     -1, 
-                    data[i], R.drawable.list_item_rest_arrow);
+                    data[i], R.drawable.list_icon_arrow);
             mList.add(entry);
         }
     }
@@ -93,7 +95,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		mImageCache = imageCache;
 		mList = new ArrayList<ListEntry>();
 	}
-	
+		
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
 		View row=convertView;
@@ -137,19 +139,8 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 			holder.vs.setVisibility(View.GONE);
 		}
 		
-		if(mLoadingBar == position) {
-			holder.vs.setDisplayedChild(1);
-			holder.label.setTextColor(0xFFFFFFFF);
-			holder.label_second.setTextColor(0xFFFFFFFF);
-	    	row.setBackgroundResource(R.drawable.list_item_focus_fullwidth);
-		}
-		else{
-			holder.vs.setDisplayedChild(0);
-			holder.label.setTextColor(0xFF000000);
-			holder.label_second.setTextColor(0xFF000000);
-	    	row.setBackgroundResource(R.drawable.list_item_rest_fullwidth);
-		}
-
+		holder.vs.setDisplayedChild( mLoadingBar == position ? 1 : 0 );
+		
 		// optionally if an URL is specified
 		if(mList.get(position).url != null){
 			Bitmap bmp = mImageCache.get(mList.get(position).url);
@@ -165,8 +156,8 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		} else if( mList.get(position).disclosure_id >= 0 ) {
 			
 			holder.image.setImageResource(mList.get(position).disclosure_id);
-			
 		}
+			
 		
 		if( !mScaled ) {
         	((ImageView)row.findViewById( R.id.row_icon )).setScaleType( ImageView.ScaleType.CENTER );
@@ -221,7 +212,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 	public void setIconsUnscaled()
 	{
 		// some icons shouldn't be scaled :(
-		// this is indeed dirty, class needs seperating out
+		// this is indeed dirty, class needs separating out
 		mScaled = false;
 	}
 

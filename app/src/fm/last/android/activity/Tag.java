@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.adapter.TagListAdapter;
 import fm.last.android.utils.UserTask;
@@ -56,9 +55,6 @@ public class Tag extends Activity implements TabBarListener {
 
 	Animation mFadeOutAnimation;
 	boolean animate = false;
-
-	private final int TAB_TOPTAGS = 0;
-	private final int TAB_MYTAGS = 1;
 	
 	// --------------------------------
 	// XML LAYOUT start
@@ -94,7 +90,6 @@ public class Tag extends Activity implements TabBarListener {
 		mTagButton = (Button) findViewById(R.id.tag_add_button);
 		mTagLayout = (TagLayout)findViewById(R.id.TagLayout);
 		mTagList = (ListView)findViewById(R.id.TagList);
-		mTagList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagList));
 		mTabBar = (TabBar)findViewById(R.id.TabBar);
 
 		// loading & setting animations
@@ -102,10 +97,8 @@ public class Tag extends Activity implements TabBarListener {
 		mTagLayout.setAnimationsEnabled(true);
 		
 		// configure the tabs
-		mTabBar.setListener(this);
-		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, R.drawable.list_add_to_playlist, TAB_TOPTAGS);
-		mTabBar.addTab("Your Tags", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_MYTAGS);
-		mTabBar.setActive(TAB_TOPTAGS);
+		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist);
+		mTabBar.addTab("Your Tags", R.drawable.profile);
 		
 		// restoring or creatingData
 		restoreMe();
@@ -337,10 +330,10 @@ public class Tag extends Activity implements TabBarListener {
 
     public void tabChanged(int index, int previousIndex) {
     	switch(index) {
-	    	case TAB_MYTAGS:
+	    	case R.drawable.profile:
 				mTagList.setAdapter(mUserTagListAdapter);
 	    		break;
-	    	case TAB_TOPTAGS:
+	    	case R.drawable.list_add_to_playlist:
 				mTagList.setAdapter(mTopTagListAdapter);
 	    		break;
     	}

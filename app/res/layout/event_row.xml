@@ -16,20 +16,20 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:orientation="vertical"
-	android:layout_height="wrap_content" android:background="@drawable/list_item_rest_fullwidth"
+	android:layout_height="wrap_content" android:background="@drawable/list_entry_fullwidth"
 	  android:gravity="left|center_vertical">
 
 	<TextView android:id="@+id/ExtendedRowBiggerText" android:layout_marginLeft="10px"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical" android:textSize="14sp"
-		android:textColor="#333333" android:singleLine="true" android:textStyle="bold" android:layout_marginTop="5px"></TextView>
+		android:textColor="@drawable/list_entry_color" android:singleLine="true" android:textStyle="bold" android:layout_marginTop="5px"></TextView>
 	<TextView android:id="@+id/ExtendedRowSmallerText0" android:layout_marginLeft="10px"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical" android:textSize="14sp"
-		android:textColor="#666666" android:singleLine="true"></TextView>
+		android:textColor="@drawable/list_entry_secondary_color" android:singleLine="true"></TextView>
 	<TextView android:id="@+id/ExtendedRowSmallerText1" android:layout_marginLeft="10px"
 		android:layout_width="wrap_content" android:layout_height="wrap_content"
 		android:layout_gravity="center_vertical" android:textSize="14sp"
-		android:textColor="#666666" android:singleLine="true" android:layout_marginBottom="5px"></TextView>
+		android:textColor="@drawable/list_entry_secondary_color" android:singleLine="true" android:layout_marginBottom="5px"></TextView>
 
 </LinearLayout>

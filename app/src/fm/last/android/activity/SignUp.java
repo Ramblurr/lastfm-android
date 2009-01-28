@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;

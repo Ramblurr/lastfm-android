@@ -14,28 +14,16 @@
 		License.
 	-->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-	<LinearLayout
-	    android:orientation="vertical"
-		android:gravity="center_horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
-		<ImageButton 
-		    android:layout_width="fill_parent"
-			android:adjustViewBounds="true"
-			android:layout_height="wrap_content"
-			android:background="@null"
-			android:id="@+id/tab_image_button"
-			android:layout_weight="1"
-			android:layout_marginTop="2px"/>
-		<TextView android:layout_height="wrap_content"
-			android:layout_width="wrap_content" 
-			android:textColor="#fff"
-			android:gravity="center"
-			android:id="@+id/tab_text_view"
-			android:text=""
-			android:textSize="6pt"
-			android:textStyle="bold"
-			android:layout_gravity="center" />
-	</LinearLayout>
-</merge>
+<TextView 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/tab_text_view"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:textColor="#fff"
+	android:gravity="bottom|center_horizontal"
+	android:textSize="6pt"
+	android:textStyle="bold"
+	android:background="@drawable/tab"
+	android:paddingTop="10px"
+	android:paddingBottom="1px">
+</TextView>

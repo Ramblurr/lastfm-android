@@ -18,6 +18,9 @@
 	<string name="home_recentstations">Recent Stations</string>
 	<string name="home_commonartists">Common Artists</string>
 	
+	<string name="radio">Radio</string>
+	<string name="profile">Profile</string>
+	<string name="fans">Fans</string>
 	
 	<string name="dialog_amazon">Buy on Amazon</string>
 	<string name="dialog_similar">Listen to Similar Artists</string>

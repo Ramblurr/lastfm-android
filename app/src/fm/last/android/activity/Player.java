@@ -7,7 +7,6 @@ import java.util.Formatter;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
@@ -17,7 +16,6 @@ import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.NotificationAdapter;
-import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
@@ -88,12 +86,6 @@ public class Player extends Activity
 
 	private static final int REFRESH = 1;
 
-	private final static int TAB_BIO = 0;
-	private final static int TAB_SIMILAR = 1;
-	private final static int TAB_TAGS = 2;
-	private final static int TAB_EVENTS = 3;
-	private final static int TAB_LISTENERS = 4;
-
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
 	private ImageCache mImageCache;
@@ -157,29 +149,16 @@ public class Player extends Activity
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mWebView = (WebView) findViewById(R.id.webview);
 		mSimilarList = (ListView) findViewById(R.id.similar_list_view);
-		mSimilarList.setOnItemSelectedListener(new OnListRowSelectedListener(mSimilarList));
 		mTagList = (ListView) findViewById(R.id.tags_list_view);
-		mTagList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagList));
-		mFanList = (ListView) findViewById(R.id.listeners_list_view);
-		mFanList.setOnItemSelectedListener(new OnListRowSelectedListener(mFanList));
-		
-		{
-        	OnListRowSelectedListener listRowListener = new OnListRowSelectedListener(mFanList);
-        	listRowListener.setIconResources( R.drawable.list_item_rest_arrow, R.drawable.list_item_focus_arrow );
-        	listRowListener.setResources( R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth );
-        	mFanList.setOnItemSelectedListener( listRowListener );
-        }
-		
+		mFanList = (ListView) findViewById(R.id.listeners_list_view);		
 		mEventList = (ListView) findViewById(R.id.events_list_view);
-		mEventList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventList));
-		((OnEventRowSelectedListener)mEventList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
 
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Bio", R.drawable.bio, R.drawable.bio, R.drawable.bio, TAB_BIO);
-		mTabBar.addTab("Similar", R.drawable.similar_artists, R.drawable.similar_artists, R.drawable.similar_artists, TAB_SIMILAR);
-		mTabBar.addTab("Tags", R.drawable.tags, R.drawable.tags, R.drawable.tags, TAB_TAGS);
-		mTabBar.addTab("Events", R.drawable.events, R.drawable.events, R.drawable.events, TAB_EVENTS);
-		mTabBar.addTab("Fans", R.drawable.top_listeners, R.drawable.top_listeners, R.drawable.top_listeners, TAB_LISTENERS);
+		mTabBar.addTab("Bio", R.drawable.bio);
+		mTabBar.addTab("Similar", R.drawable.similar_artists);
+		mTabBar.addTab("Tags", R.drawable.tags);
+		mTabBar.addTab("Events", R.drawable.events);
+		mTabBar.addTab("Fans", R.drawable.top_listeners);
 
 		mAlbumArtWorker = new Worker( "album art worker" );
 		mAlbumArtHandler = new RemoteImageHandler( mAlbumArtWorker.getLooper(), mHandler );
@@ -226,7 +205,7 @@ public class Player extends Activity
 				mLoadEventsTask.updateMetadata();
 			}
 		}
-		mTabBar.setActive(TAB_BIO);
+		mTabBar.setActive( R.drawable.bio );
 		mDetailFlipper.showNext();
 	}
 
@@ -418,7 +397,7 @@ public class Player extends Activity
 
 		public void onClick(View v) {
 			showMetadata();
-			mTabBar.setActive(TAB_EVENTS);
+			mTabBar.setActive( R.drawable.events );
 		}
 
 	};
@@ -814,7 +793,7 @@ public class Player extends Activity
 							R.drawable.artist_icon, 
 							similar[i].getName(), 
 							similar[i].getImages()[0].getUrl(),
-							R.drawable.radio_icon);
+							R.drawable.list_icon_station);
 					iconifiedEntries.add(entry);
 				}
 				mSimilarAdapter.setSourceIconified(iconifiedEntries);
@@ -868,7 +847,7 @@ public class Player extends Activity
 							R.drawable.profile_unknown, 
 							fans[i].getName(), 
 							fans[i].getImages()[0].getUrl(),
-							R.drawable.list_item_rest_arrow);
+							R.drawable.list_icon_arrow);
 					iconifiedEntries.add(entry);
 				}
 				mFanAdapter.setSourceIconified(iconifiedEntries);
@@ -920,7 +899,7 @@ public class Player extends Activity
 					ListEntry entry = new ListEntry(tags[i], 
 							-1,
 							tags[i].getName(), 
-							R.drawable.radio_icon);
+							R.drawable.list_icon_station);
 					iconifiedEntries.add(entry);
 				}
 				mTagAdapter.setSourceIconified(iconifiedEntries);

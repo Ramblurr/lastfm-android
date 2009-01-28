@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;

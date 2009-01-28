@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -40,14 +39,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
-import fm.last.android.adapter.OnEventRowSelectedListener;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
@@ -55,7 +52,6 @@ import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
 import fm.last.android.widget.TabBar;
-import fm.last.android.widget.TabBarListener;
 import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
@@ -70,11 +66,8 @@ import fm.last.api.ImageUrl;
 
 //TODO: refactor all the UserTasks
 
-public class Profile extends ListActivity implements TabBarListener
-{
-	private static int TAB_RADIO = 0;
-	private static int TAB_PROFILE = 1;
-	
+public class Profile extends ListActivity
+{		
 	//Goddamn Java doesn't let you treat enums as ints easily, so we have to have this mess 
 	private static final int PROFILE_TOPARTISTS = 0;
 	private static final int PROFILE_TOPALBUMS = 1;
@@ -134,7 +127,8 @@ public class Profile extends ListActivity implements TabBarListener
     ListView mTagsList;
     private ListAdapter mTagsAdapter;
     
-    
+    private Button mNewStationButton;
+       
     private EventActivityResult mOnEventActivityResult;
     
     private Track mTrackInfo; // For the profile actions' dialog
@@ -148,8 +142,7 @@ public class Profile extends ListActivity implements TabBarListener
         super.onCreate( icicle );
         requestWindowFeature( Window.FEATURE_NO_TITLE );
         setContentView( R.layout.home );
-        Session session = ( Session ) LastFMApplication.getInstance().map
-                .get( "lastfm_session" );
+        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
         if( session == null )
             logout();
         mUsername = getIntent().getStringExtra("lastfm.profile.username");
@@ -161,47 +154,40 @@ public class Profile extends ListActivity implements TabBarListener
             isAuthenticatedUser = false;
         
         if( isAuthenticatedUser ) {
-            Button b = new Button(this);
-            b.setOnClickListener( mNewStationListener );
-            b.setOnFocusChangeListener( mNewStationFocusChangeListener );
-            
-            //Note: The focus and rest drawable resources are also
-            // 		hardcoded into the mNewStationFocusChangeListener.
-            b.setBackgroundResource( R.drawable.list_station_starter_rest );
+            Button b = mNewStationButton = new Button(this);
+            b.setBackgroundResource( R.drawable.start_a_new_station_button );
             b.setTextColor(0xffffffff);
     		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 7);
-    		b.setFocusable( true );
+    		b.setFocusable( false ); //essential!
+    		b.setClickable( false ); // getListView() clicklistener handles this as the other routes had bugs
     		b.setGravity( 3 | 16 ); //sorry not to use constants, I got lame and couldn't figure it out
     		b.setTypeface( Typeface.create( Typeface.DEFAULT, Typeface.BOLD ) );
     		b.setText(R.string.home_newstation);
-    		
-    		b.setTag("header");
-
+   	 		b.setTag("header");
     		getListView().addHeaderView(b, null, true);
+    		getListView().setItemsCanFocus( true );
         } else {
             mProfileBubble = new ProfileBubble(this);
             mProfileBubble.setTag("header");
             mProfileBubble.setClickable( false );
             getListView().addHeaderView(mProfileBubble, null, false);
         }
-        
-        
+                
         mViewHistory = new Stack<Integer>();
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
 		mNestedViewFlipper.setAnimateFirstView(false);
 		mNestedViewFlipper.setAnimationCacheEnabled(false);
+		
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.setListener(this);
 		if(isAuthenticatedUser) {
-		    mTabBar.addTab("Radio", R.drawable.radio, R.drawable.radio, R.drawable.radio, TAB_RADIO);
-		    mTabBar.addTab("Profile", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		    mTabBar.addTab("Radio", R.drawable.radio);
+		    mTabBar.addTab("Profile", R.drawable.profile);
 		} else {
-		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio, R.drawable.radio, R.drawable.radio, TAB_RADIO);
-            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile, R.drawable.profile, R.drawable.profile, TAB_PROFILE);
+		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio);
+            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile);
 		}
-		mTabBar.setActive(TAB_RADIO);
        
         mMyRecentAdapter = new LastFMStreamAdapter( this );
 
@@ -215,44 +201,27 @@ public class Profile extends ListActivity implements TabBarListener
         mProfileAdapter = new ListAdapter(Profile.this, mStrings);
         mProfileList.setAdapter(mProfileAdapter); 
         mProfileList.setOnItemClickListener(mProfileClickListener);
-        
-        {
-        	OnListRowSelectedListener listRowListener = new OnListRowSelectedListener(mProfileList);
-        	listRowListener.setIconResources( R.drawable.list_item_rest_arrow, R.drawable.list_item_focus_arrow );
-        	listRowListener.setResources( R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth );
-        	mProfileList.setOnItemSelectedListener( listRowListener );
-        }
-               
-		getListView().setOnItemSelectedListener(new OnListRowSelectedListener(getListView()));
-		((OnListRowSelectedListener)getListView().getOnItemSelectedListener()).setResources(R.drawable.list_item_rest, R.drawable.list_item_focus);
-		
+
+        //TODO should be functions and not member variables, caching is evil
 		mTopArtistsList = (ListView) findViewById(R.id.topartists_list_view);
-		mTopArtistsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopArtistsList));
 		mTopArtistsList.setOnItemClickListener( mArtistListItemClickListener );
 		
 		mTopAlbumsList = (ListView) findViewById(R.id.topalbums_list_view);
-        mTopAlbumsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopAlbumsList));
         mTopAlbumsList.setOnItemClickListener( mAlbumListItemClickListener );
         
         mTopTracksList = (ListView) findViewById(R.id.toptracks_list_view);
-        mTopTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mTopTracksList));
         mTopTracksList.setOnItemClickListener( mTrackListItemClickListener );
         
         mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
-        mRecentTracksList.setOnItemSelectedListener(new OnListRowSelectedListener(mRecentTracksList));
         mRecentTracksList.setOnItemClickListener( mTrackListItemClickListener );
         
         mEventsList = (ListView) findViewById(R.id.profileevents_list_view);
-        mEventsList.setOnItemSelectedListener(new OnEventRowSelectedListener(mEventsList));
         mEventsList.setOnItemClickListener( mEventItemClickListener );
-        ((OnEventRowSelectedListener)mEventsList.getOnItemSelectedListener()).setResources(R.drawable.list_item_rest_fullwidth, R.drawable.list_item_focus_fullwidth);
         
         mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
-        mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
         mFriendsList.setOnItemClickListener( mUserItemClickListener );
         
         mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
-        mTagsList.setOnItemSelectedListener(new OnListRowSelectedListener(mTagsList));
         mTagsList.setOnItemClickListener( mTagListItemClickListener );
         
         // Loading animations
@@ -427,10 +396,6 @@ public class Profile extends ListActivity implements TabBarListener
         mMyRecentAdapter.updateModel();
     }
 
-    public void tabChanged(int index, int previousIndex) {
-		//Log.i("Lukasz", "Changed tab to "+text+", index="+index);
-	}
-	
     private void RebuildMainMenu() 
     {
         Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
@@ -596,6 +561,13 @@ public class Profile extends ListActivity implements TabBarListener
         if( !mMainAdapter.isEnabled( position-1 ))
         	return;
         
+        if (v == mNewStationButton && v != null)
+        {
+        	Intent intent = new Intent( Profile.this, NewStation.class );
+            startActivity( intent );
+            return;
+        }
+        
         try
         {
         	String adapter_station;
@@ -619,7 +591,6 @@ public class Profile extends ListActivity implements TabBarListener
         	}
 	        
 	    	l.setEnabled(false);
-	    	l.getOnItemSelectedListener().onItemSelected(l, v, position, id);
 	    	mMainAdapter.enableLoadBar(position-1);
 	    	LastFMApplication.getInstance().playRadioStation(this, adapter_station);
 	    }
@@ -627,38 +598,15 @@ public class Profile extends ListActivity implements TabBarListener
 	    {
 	    	Log.e( "Last.fm", e.getMessage() );
 	    }
+	    catch (Exception e) //:P
+	    {}
     }
-
-    private OnClickListener mNewStationListener = new OnClickListener()
-    {
-        public void onClick( View v )
-        {
-            Intent intent = new Intent( Profile.this, NewStation.class );
-            startActivity( intent );
-        }
-    };
-    
-    private OnFocusChangeListener mNewStationFocusChangeListener = new OnFocusChangeListener()
-    {
-    	public void onFocusChange( View v, boolean hasFocus )
-    	{
-    		if( hasFocus )
-    		{
-    			v.setBackgroundResource( R.drawable.list_station_starter_focus );
-    		}
-    		else
-    		{
-    			v.setBackgroundResource( R.drawable.list_station_starter_rest );
-    		}
-    		
-    	}
-    };
-    
+        
     public boolean onKeyDown(int keyCode, KeyEvent event)
     {
         if( keyCode == KeyEvent.KEYCODE_BACK )
         {
-            if( mViewFlipper.getDisplayedChild() == TAB_PROFILE && !mViewHistory.isEmpty() )
+            if( mTabBar.getActive() == R.drawable.profile && !mViewHistory.isEmpty() )
             {
             	setPreviousAnimation();
                 mProfileAdapter.disableLoadBar();
@@ -752,10 +700,10 @@ public class Profile extends ListActivity implements TabBarListener
     	
     };
     
-    private OnItemClickListener mTrackListItemClickListener = new OnItemClickListener() {
-
-        public void onItemClick(AdapterView<?> l, View v,
-                int position, long id) {
+    private OnItemClickListener mTrackListItemClickListener = new OnItemClickListener()
+    {
+        public void onItemClick(AdapterView<?> l, View v, int position, long id) 
+        {
         	try {
         		Track track = (Track) l.getAdapter().getItem(position);
         		showTrackDialog(track);
@@ -766,10 +714,10 @@ public class Profile extends ListActivity implements TabBarListener
 
     };
     
-    private OnItemClickListener mTagListItemClickListener = new OnItemClickListener() {
-
-		public void onItemClick(AdapterView<?> l, View v,
-				int position, long id) {
+    private OnItemClickListener mTagListItemClickListener = new OnItemClickListener() 
+    {
+		public void onItemClick(AdapterView<?> l, View v, int position, long id) 
+		{
 			try {
 		        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
 				Tag tag = (Tag)l.getAdapter().getItem(position);
@@ -853,7 +801,7 @@ public class Profile extends ListActivity implements TabBarListener
                             R.drawable.artist_icon, 
                             topartists[i].getName(), 
                             url,
-                            R.drawable.radio_icon);
+                            R.drawable.list_icon_station);
                     iconifiedEntries.add(entry);
                 }
                 return iconifiedEntries;
@@ -1062,7 +1010,7 @@ public class Profile extends ListActivity implements TabBarListener
     				ListEntry entry = new ListEntry(tags[i], 
     						-1,
     						tags[i].getName(), 
-    						R.drawable.radio_icon);
+    						R.drawable.list_icon_station);
     				iconifiedEntries.add(entry);
     			}
     			return iconifiedEntries;

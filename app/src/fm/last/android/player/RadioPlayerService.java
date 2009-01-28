@@ -95,7 +95,6 @@ public class RadioPlayerService extends Service
 	@Override
 	public void onCreate()
 	{
-
 		super.onCreate();
 
 		nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );

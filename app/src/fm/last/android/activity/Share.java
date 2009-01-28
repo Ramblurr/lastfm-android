@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.OnListRowSelectedListener;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
@@ -55,12 +54,8 @@ public class Share extends Activity {
 	private ViewFlipper mViewFlipper;
 	private ImageCache mImageCache;
 	ListView mDialogList;
-	private SimpleCursorAdapter mDialogAdapter;
 	private Dialog mDialog;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
-	
-	private final int TAB_ADDRESSBOOK = 0;
-	private final int TAB_FRIENDS = 1;
 	
 	public static final String INTENT_EXTRA_TRACK = "lastfm.track";
 	public static final String INTENT_EXTRA_ARTIST = "lastfm.artist";
@@ -74,10 +69,10 @@ public class Share extends Activity {
 		mViewFlipper = (ViewFlipper)findViewById(R.id.ViewFlipper);
 		mTabBar = (TabBar)findViewById(R.id.TabBar);
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Email", TAB_ADDRESSBOOK);
-		mTabBar.addTab("Friends", TAB_FRIENDS);
-		mTabBar.setActive(TAB_ADDRESSBOOK);
+		mTabBar.addTab("Email" );
+		mTabBar.addTab("Friends" );
 
+		
 		findViewById(R.id.email_button).setOnClickListener( new OnClickListener()
 		{
 			public void onClick( View v )
@@ -95,9 +90,8 @@ public class Share extends Activity {
                 new ShareTrackTask(artist, track, text).execute((Void)null);			
 			}
 		} );
-		
+
 		mFriendsList = (ListView)findViewById(R.id.friends_list_view);
-		mFriendsList.setOnItemSelectedListener(new OnListRowSelectedListener(mFriendsList));
 		new LoadFriendsTask().execute((Void)null);
 	}
 	
