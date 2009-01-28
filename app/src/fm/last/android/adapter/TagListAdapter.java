@@ -70,7 +70,7 @@ public class TagListAdapter extends ListAdapter {
 		if(mList.get(position).added){
 			holder.label.setTextColor(0x337a7a7a);
 		} else {
-			holder.label.setTextColor(0xff000000);
+			holder.label.setTextColor(mContext.getResources().getColorStateList(R.drawable.list_entry_color));
 		}
 		
 		holder.label.setText(mList.get(position).text);

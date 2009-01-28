@@ -20,7 +20,7 @@
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
 	android:id="@+id/station_row"
-	android:background="@drawable/list_item_rest_fullwidth">
+	android:background="@drawable/list_entry_fullwidth">
 	<LinearLayout 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
@@ -36,6 +36,6 @@
 				android:gravity="left|center_vertical"
 				android:textSize="7pt"
 				android:textStyle="bold"
-				android:textColor="#000"/>
+				android:textColor="@drawable/list_entry_color"/>
 	</LinearLayout>
 </LinearLayout>
