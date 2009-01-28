@@ -2,12 +2,12 @@
 <animation-list
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:oneshot="false">
-    <item android:drawable="@+drawable/spinner_small_01" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_02" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_03" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_04" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_05" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_06" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_07" android:duration="50" />
-    <item android:drawable="@+drawable/spinner_small_08" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_01_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_02_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_03_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_04_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_05_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_06_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_07_black" android:duration="50" />
+    <item android:drawable="@+drawable/spinner_small_08_black" android:duration="50" />
 </animation-list>
