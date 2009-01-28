@@ -225,38 +225,34 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
         public void onClick( View v )
         {
-			if(searching == SearchType.Artist ) {
-				new SearchArtistsTask().execute((Void)null);
-			}
-			if(searching == SearchType.Tag ) {
-				new SearchTagsTask().execute((Void)null);
-			}
-			if(searching == SearchType.User ) {
-				new SearchUsersTask().execute((Void)null);
-			}
+	        String searchTxt = ( ( EditText ) findViewById( R.id.station_editbox ) ).getText().toString();
+        	if (searchTxt == null || searchTxt.length() == 0)
+        		return;
+	        
+            if (searching == SearchType.Artist) {
+            	new SearchArtistsTask().execute(searchTxt);
+            } else if (searching == SearchType.Tag) {
+            	new SearchTagsTask().execute(searchTxt);
+            } else if (searching == SearchType.User) {
+            	new SearchUsersTask().execute(searchTxt);
+            } else {
+            	return;
+            }
+            
+        	searchBar.setEnabled(false);
+        	mSearchButton.setEnabled(false);
+            Toast.makeText( NewStation.this, "Searching...", Toast.LENGTH_LONG ).show();
         }
     };
     
-    private class SearchTagsTask extends UserTask<Void, Void, Boolean> {
+    private class SearchTagsTask extends UserTask<String, Void, ArrayList<ListEntry>> {
     	
         @Override
-    	public void onPreExecute() {
-        	searchBar.setEnabled(false);
-            Toast.makeText( NewStation.this, "Searching...",
-                    Toast.LENGTH_LONG ).show();
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
-            	.getText().toString();
-	        LastFmServer server = AndroidLastFmServerFactory.getServer();
-            boolean success = false;
-            mListAdapter[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
-            
+        public ArrayList<ListEntry> doInBackground(String...params) {
     		try {
-   				mTags = server.searchForTag( txt );
-    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    	        LastFmServer server = AndroidLastFmServerFactory.getServer();
+   				mTags = server.searchForTag( params[0] );
+   				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((mTags.length < 10) ? mTags.length : 10); i++){
     				ListEntry entry = new ListEntry(mTags[i], 
     						R.drawable.tag_dark, 
@@ -264,19 +260,19 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     						R.drawable.radio_icon);
     				iconifiedEntries.add(entry);
     			}
-    			mListAdapter[TAB_TAG].setSourceIconified(iconifiedEntries);
-    			success = true;
-    		} catch (IOException e) {
+    			return iconifiedEntries;
+    		} catch (Exception e) {
     			e.printStackTrace();
     		}
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+        	if(iconifiedEntries != null) {
+                mListAdapter[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
+    			mListAdapter[TAB_TAG].setSourceIconified(iconifiedEntries);
                 setListAdapter( mListAdapter[TAB_TAG] );
-        		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No tags found", Toast.LENGTH_SHORT).show();
@@ -284,29 +280,19 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
         	searchBar.setEnabled(true);
+        	mSearchButton.setEnabled(true);
+        	mTabBar.setActive(TAB_TAG);
         }
     }
 
-    private class SearchArtistsTask extends UserTask<Void, Void, Boolean> {
+    private class SearchArtistsTask extends UserTask<String, Void, ArrayList<ListEntry>> {
     	
         @Override
-    	public void onPreExecute() {
-        	searchBar.setEnabled(false);
-            Toast.makeText( NewStation.this, "Searching...",
-                    Toast.LENGTH_LONG ).show();
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
-            	.getText().toString();
-	        LastFmServer server = AndroidLastFmServerFactory.getServer();
-            boolean success = false;
-            mListAdapter[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
-            
+        public ArrayList<ListEntry> doInBackground(String...params) {
     		try {
-   				mArtists = server.searchForArtist( txt );
-    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+    	        LastFmServer server = AndroidLastFmServerFactory.getServer();
+   				mArtists = server.searchForArtist( params[0] );
+   				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++){
     	            if ( mArtists[i].getStreamable().equals("1") ) {
 	    				ListEntry entry = new ListEntry(mArtists[i], 
@@ -318,20 +304,20 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     	            }
     			}
     			if(iconifiedEntries.size() > 0) {
-    				mListAdapter[TAB_ARTIST].setSourceIconified(iconifiedEntries);
-	    			success = true;
+	    			return iconifiedEntries;
     			}
-    		} catch (IOException e) {
+    		} catch (Exception e) {
     			e.printStackTrace();
     		}
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+        	if(iconifiedEntries != null) {
+                mListAdapter[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
+				mListAdapter[TAB_ARTIST].setSourceIconified(iconifiedEntries);
                 setListAdapter( mListAdapter[TAB_ARTIST] );
-        		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No artists found", Toast.LENGTH_SHORT).show();
@@ -339,28 +325,18 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
         	searchBar.setEnabled(true);
+        	mSearchButton.setEnabled(true);
+        	mTabBar.setActive(TAB_ARTIST);
         }
     }
 
-    private class SearchUsersTask extends UserTask<Void, Void, Boolean> {
+    private class SearchUsersTask extends UserTask<String, Void, ArrayList<ListEntry>> {
     	
         @Override
-    	public void onPreExecute() {
-        	searchBar.setEnabled(false);
-            Toast.makeText( NewStation.this, "Searching...",
-                    Toast.LENGTH_LONG ).show();
-        }
-    	
-        @Override
-        public Boolean doInBackground(Void...params) {
-	        final String txt = ( ( EditText ) findViewById( R.id.station_editbox ) )
-            	.getText().toString();
-	        LastFmServer server = AndroidLastFmServerFactory.getServer();
-            boolean success = false;
-            mListAdapter[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
-            
+        public ArrayList<ListEntry> doInBackground(String...params) {
     		try {
-   				User user = server.getAnyUserInfo( txt );
+    	        LastFmServer server = AndroidLastFmServerFactory.getServer();
+   				User user = server.getAnyUserInfo( params[0] );
    				if(user != null) {
 	    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 					ListEntry entry = new ListEntry(user, 
@@ -369,20 +345,20 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 							user.getImages().length == 0 ? "" : user.getImages()[0].getUrl(),
 							R.drawable.list_item_rest_arrow);
 					iconifiedEntries.add(entry);
-					mListAdapter[TAB_USER].setSourceIconified(iconifiedEntries);
-	    			success = true;
+	    			return iconifiedEntries;
    				}
-    		} catch (IOException e) {
+    		} catch (Exception e) {
     			e.printStackTrace();
     		}
-            return success;
+            return null;
         }
 
         @Override
-        public void onPostExecute(Boolean result) {
-        	if(result) {
+        public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+        	if(iconifiedEntries != null) {
+                mListAdapter[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
+				mListAdapter[TAB_USER].setSourceIconified(iconifiedEntries);
                 setListAdapter( mListAdapter[TAB_USER] );
-        		getListView().setVisibility(View.VISIBLE);
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No users found", Toast.LENGTH_SHORT).show();
@@ -390,6 +366,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
         	searchBar.setEnabled(true);
+        	mSearchButton.setEnabled(true);
+        	mTabBar.setActive(TAB_USER);
         }
     }
 
