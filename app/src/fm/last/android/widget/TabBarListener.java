@@ -12,5 +12,5 @@ public interface TabBarListener {
 	 * 
 	 * @param index ViewFlipper child's index
 	 */
-	public void tabChanged(int index, int previousIndex);
+	public void tabChanged(int id, int previousId);
 }

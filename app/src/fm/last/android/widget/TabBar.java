@@ -97,13 +97,13 @@ public class TabBar extends LinearLayout
 	{
 		if (tab == null) return;
 		
-		int i = 0;
-		int current = -1;
 		int previous = -1;
+		int index = -1;
+		int i = 0;
 		for (View v: mTabs)
-		{
-			if (v.isSelected()) previous = i;
-			if (tab == v) current = i;
+		{			
+			if (v.isSelected()) previous = v.getId();
+			if (tab == v) index = i;
 			i++;
 			
 			v.setSelected( false );
@@ -114,10 +114,9 @@ public class TabBar extends LinearLayout
 		tab.setSelected( true );
 		tab.setFocusable( false );
 		tab.setClickable( false );
-		if (mViewFlipper != null) mViewFlipper.setDisplayedChild( current );		
 		
-		if (mListener != null)
-			mListener.tabChanged( current, previous );
+		if (mViewFlipper != null) mViewFlipper.setDisplayedChild( index );		
+		if (mListener != null) mListener.tabChanged( tab.getId(), previous );
 	}
 	
 	public int getActive()
