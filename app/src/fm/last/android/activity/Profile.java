@@ -18,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -1106,6 +1107,7 @@ public class Profile extends ListActivity
         mDialogAdapter.setIconsUnscaled();
         mDialogAdapter.disableLoadBar();
         mDialogList.setAdapter(mDialogAdapter);
+        mDialogList.setDivider( new ColorDrawable( 0xffd9d7d7 ) );
         mDialogList.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> l, View v, int position, long id) 
             {
@@ -1142,9 +1144,15 @@ public class Profile extends ListActivity
                             break;
                     }
             	}
+            	
+            	((Dialog)mDialogList.getTag()).dismiss();
             }
             });
-        return new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+        
+        AlertDialog dialog = new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+        mDialogList.setTag( dialog );
+        
+        return dialog; 
     }
     
     void buyAmazon(int type)
