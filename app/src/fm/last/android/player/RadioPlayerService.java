@@ -445,6 +445,9 @@ public class RadioPlayerService extends Service
 	{
 		wakeLock.acquire();
 		wifiLock.acquire();
+		
+		currentStationURL = url;
+		
 		Log.i("Last.fm","Tuning to station: " + url);
 		if(mState == STATE_PLAYING) {
 			nm.cancel( NOTIFY_ID );
@@ -462,6 +465,7 @@ public class RadioPlayerService extends Service
 			currentStationURL = url;
 			notifyChange( STATION_CHANGED );
 		} else {
+			currentStationURL = null;
 			wakeLock.release();
 			wifiLock.release();
 		}
