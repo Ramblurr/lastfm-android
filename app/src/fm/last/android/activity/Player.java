@@ -752,6 +752,8 @@ public class Player extends Activity
 	    					new String(mBio.getBytes(), "utf-8"),		// need to do this, but is there a better way? 
 	    					"text/html", 
 	    					"utf-8");
+	    			// request focus to make the web view immediately scrollable
+	    			mWebView.requestFocus();	
 	    			return;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -761,7 +763,7 @@ public class Player extends Activity
 		}
 	}
 
-	private class LoadSimilarTask extends UserTask<Void, Void, Boolean> {
+	private class LoadSimilarTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -770,20 +772,7 @@ public class Player extends Activity
 		}
 
 		@Override
-		public Boolean doInBackground(Void...params) {
-			boolean success = false;
-
-			mSimilarAdapter = new ListAdapter(Player.this, getImageCache());
-			mSimilarList.setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					Artist artist = (Artist)mSimilarAdapter.getItem(position);
-					mSimilarAdapter.enableLoadBar(position);
-					LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
-				}
-
-			});
+		public ArrayList<ListEntry> doInBackground(Void...params) {
 
 			try {
 				Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
@@ -796,25 +785,36 @@ public class Player extends Activity
 							R.drawable.list_icon_station);
 					iconifiedEntries.add(entry);
 				}
-				mSimilarAdapter.setSourceIconified(iconifiedEntries);
-				success = true;
+				return iconifiedEntries;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			return success;
+			return null;
 		}
 
 		@Override
-		public void onPostExecute(Boolean result) {
-			if(result) {
+		public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+			if(iconifiedEntries != null) {
+				mSimilarAdapter = new ListAdapter(Player.this, getImageCache());
+				mSimilarAdapter.setSourceIconified(iconifiedEntries);
 				mSimilarList.setAdapter(mSimilarAdapter);
+				mSimilarList.setOnItemClickListener(new OnItemClickListener() {
+
+					public void onItemClick(AdapterView<?> l, View v,
+							int position, long id) {
+						Artist artist = (Artist)mSimilarAdapter.getItem(position);
+						mSimilarAdapter.enableLoadBar(position);
+						LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+					}
+
+				});
 			} else {
 				mSimilarList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
 			}
 		}
 	}
 
-	private class LoadListenersTask extends UserTask<Void, Void, Boolean> {
+	private class LoadListenersTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -823,22 +823,7 @@ public class Player extends Activity
 		}
 
 		@Override
-		public Boolean doInBackground(Void...params) {
-			boolean success = false;
-
-			mFanAdapter = new ListAdapter(Player.this, getImageCache());
-			mFanList.setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					User user = (User)mFanAdapter.getItem(position);
-					Intent profileIntent = new Intent(Player.this, fm.last.android.activity.Profile.class);
-					profileIntent.putExtra("lastfm.profile.username", user.getName());
-					startActivity(profileIntent);
-				}
-
-			});
-
+		public ArrayList<ListEntry> doInBackground(Void...params) {
 			try {
 				User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
@@ -850,25 +835,35 @@ public class Player extends Activity
 							R.drawable.list_icon_arrow);
 					iconifiedEntries.add(entry);
 				}
-				mFanAdapter.setSourceIconified(iconifiedEntries);
-				success = true;
-			} catch (IOException e) {
+				return iconifiedEntries;
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return success;
+			return null;
 		}
 
 		@Override
-		public void onPostExecute(Boolean result) {
-			if(result) {
+		public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+			if(iconifiedEntries != null) {
+				mFanAdapter = new ListAdapter(Player.this, getImageCache());
+				mFanAdapter.setSourceIconified(iconifiedEntries);
 				mFanList.setAdapter(mFanAdapter);
+				mFanList.setOnItemClickListener(new OnItemClickListener() {
+					public void onItemClick(AdapterView<?> l, View v,
+							int position, long id) {
+						User user = (User)mFanAdapter.getItem(position);
+						Intent profileIntent = new Intent(Player.this, fm.last.android.activity.Profile.class);
+						profileIntent.putExtra("lastfm.profile.username", user.getName());
+						startActivity(profileIntent);
+					}
+				});
 			} else {
 				mFanList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
 			}
 		}
 	}
 
-	private class LoadTagsTask extends UserTask<Void, Void, Boolean> {
+	private class LoadTagsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -877,21 +872,7 @@ public class Player extends Activity
 		}
 
 		@Override
-		public Boolean doInBackground(Void...params) {
-			boolean success = false;
-
-			mTagAdapter = new ListAdapter(Player.this, getImageCache());
-			mTagList.setOnItemClickListener(new OnItemClickListener() {
-
-				public void onItemClick(AdapterView<?> l, View v,
-						int position, long id) {
-					Tag tag = (Tag)mTagAdapter.getItem(position);
-					mTagAdapter.enableLoadBar(position);
-					LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
-				}
-
-			});
-
+		public ArrayList<ListEntry> doInBackground(Void...params) {
 			try {
 				Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
@@ -902,18 +883,28 @@ public class Player extends Activity
 							R.drawable.list_icon_station);
 					iconifiedEntries.add(entry);
 				}
-				mTagAdapter.setSourceIconified(iconifiedEntries);
-				success = true;
-			} catch (IOException e) {
+				return iconifiedEntries;
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return success;
+			return null;
 		}
 
 		@Override
-		public void onPostExecute(Boolean result) {
-			if(result) {
+		public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+			if(iconifiedEntries != null) {
+				mTagAdapter = new ListAdapter(Player.this, getImageCache());
+				mTagAdapter.setSourceIconified(iconifiedEntries);
 				mTagList.setAdapter(mTagAdapter);
+				mTagList.setOnItemClickListener(new OnItemClickListener() {
+
+					public void onItemClick(AdapterView<?> l, View v, int position, long id) {
+						Tag tag = (Tag) mTagAdapter.getItem(position);
+						mTagAdapter.enableLoadBar(position);
+						LastFMApplication.getInstance().playRadioStation(Player.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
+					}
+
+				});
 			} else {
 				mTagList.setAdapter(new NotificationAdapter(Player.this, NotificationAdapter.INFO_MODE, "No Tags"));
 			}
