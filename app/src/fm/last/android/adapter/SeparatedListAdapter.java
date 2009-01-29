@@ -136,11 +136,17 @@ public class SeparatedListAdapter extends BaseAdapter
     }
 
     public int getViewTypeCount() {
-        // assume that headers count as one, then total all sections
-        int total = 1;
-        for(Adapter adapter : this.sections.values())
-            total += adapter.getViewTypeCount();
-        return total;
+        // i've commented out sharkey's original implementation because 
+        // it was totally crashy (when flinging the list, and moving through 
+        // with cursors) and i have no idea why!.  please explain.  [doug]  
+    	
+    	return 2;
+    	
+    	// assume that headers count as one, then total all sections
+//        int total = 1;
+//        for(Adapter adapter : this.sections.values())
+//            total += adapter.getViewTypeCount();
+//        return total;
     }
 
     public int getItemViewType(int position) {
@@ -151,7 +157,13 @@ public class SeparatedListAdapter extends BaseAdapter
 
             // check if position inside this section
             if(position == 0) return TYPE_SECTION_HEADER;
-            if(position < size) return type + adapter.getItemViewType(position - 1);
+            
+            // i've replaced sharkey's original line below because 
+            // it was totally crashy (when flinging the list, and moving through 
+            // with cursors) and i have no idea why!.  please explain.  [doug]
+            
+//            if(position < size) return type + adapter.getItemViewType(position - 1);
+            if(position < size) return 1;
 
             // otherwise jump into next section
             position -= size;
