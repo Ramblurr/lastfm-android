@@ -1,5 +1,6 @@
 package fm.last.android;
 
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -48,12 +49,22 @@ public class LastFMApplication extends Application
 
     public void onCreate()
     {
-
         super.onCreate();
         instance = this;
 
         // construct an 'application global' object
         this.map = new WeakHashMap();
+
+        String version_with_spaces;
+        try {
+        	version_with_spaces = " " + getPackageManager().getPackageInfo("fm.last.android", 0).versionName + " ";
+        }
+        catch( Exception e )
+        {
+        	version_with_spaces = " ";
+        }
+        String useragent = "Last.fm Client" + version_with_spaces + "(Android)";
+		HttpURLConnection.setDefaultRequestProperty("User-Agent", useragent );        
         
         //Populate our Session object
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
