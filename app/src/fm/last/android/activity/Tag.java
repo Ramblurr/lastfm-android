@@ -99,6 +99,7 @@ public class Tag extends Activity implements TabBarListener {
 		// configure the tabs
 		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist);
 		mTabBar.addTab("Your Tags", R.drawable.profile);
+		mTabBar.setListener( this );
 		
 		// restoring or creatingData
 		restoreMe();
@@ -328,8 +329,10 @@ public class Tag extends Activity implements TabBarListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-    public void tabChanged(int index, int previousIndex) {
-    	switch(index) {
+	
+	/// @see TabBarListener
+	public void tabChanged(int id, int previousId) {
+    	switch(id) {
 	    	case R.drawable.profile:
 				mTagList.setAdapter(mUserTagListAdapter);
 	    		break;

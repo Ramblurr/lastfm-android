@@ -56,8 +56,11 @@
 
 	</LinearLayout>
 
-	<ListView android:id="@+id/TagList" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:background="#ffffff">
+	<ListView android:id="@+id/TagList"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:background="#ffffff"
+		android:divider="#d9d7d7">
 	</ListView>
 
 </LinearLayout>

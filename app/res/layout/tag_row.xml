@@ -20,7 +20,8 @@
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
 	android:id="@+id/station_row"
-	android:background="@drawable/list_entry_fullwidth">
+	android:background="@drawable/list_entry_fullwidth"
+	android:layout_margin="0px">
 	<LinearLayout 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
@@ -28,14 +29,15 @@
 		android:layout_gravity="center_vertical"
 		android:layout_weight="1"
 		android:layout_marginLeft="12px">
-		<TextView android:id="@+id/row_label" android:layout_width="fill_parent"
-				android:layout_height="wrap_content" 
-				android:text="Black Eyed Peas"
-				android:layout_weight="1"
-				android:layout_gravity="center"
-				android:gravity="left|center_vertical"
-				android:textSize="7pt"
-				android:textStyle="bold"
-				android:textColor="@drawable/list_entry_color"/>
+		<TextView android:id="@+id/row_label"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content" 
+			android:text="Black Eyed Peas"
+			android:layout_weight="1"
+			android:layout_gravity="center"
+			android:gravity="left|center_vertical"
+			android:textSize="7pt"
+			android:textStyle="bold"
+			android:textColor="@drawable/list_entry_color"/>
 	</LinearLayout>
 </LinearLayout>
