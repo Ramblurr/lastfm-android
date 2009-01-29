@@ -2,6 +2,7 @@ package fm.last.android.activity;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.WeakHashMap;
@@ -108,27 +109,11 @@ public class Profile extends ListActivity
 	Animation mPushLeftIn;
 	Animation mPushLeftOut;
 	
-	//Profile lists
-	//FIXME: currently there is no way to iterate through the various
-	//		 profile listviews and their associated listadapters
-	//		 therefore, if you're going to add a new one - make sure
-	//		 you update onSaveInstanceState / onRestoreInstanceState.
-	private ImageCache mImageCache;
-	ListView mTopArtistsList;
-	private ListAdapter mTopArtistsAdapter;
-	ListView mTopAlbumsList;
-    private ListAdapter mTopAlbumsAdapter;
-    ListView mTopTracksList;
-    private ListAdapter mTopTracksAdapter;
-    ListView mRecentTracksList;
-    private ListAdapter mRecentTracksAdapter;
-    ListView mEventsList;
-    ListView mFriendsList;
-    ListView mTagsList;
-    private ListAdapter mTagsAdapter;
-    
+	ListView[] mProfileLists = new ListView[7];
+
+	private ImageCache mImageCache = null;
+
     private Button mNewStationButton;
-       
     private EventActivityResult mOnEventActivityResult;
     
     private Track mTrackInfo; // For the profile actions' dialog
@@ -203,27 +188,27 @@ public class Profile extends ListActivity
         mProfileList.setOnItemClickListener(mProfileClickListener);
 
         //TODO should be functions and not member variables, caching is evil
-		mTopArtistsList = (ListView) findViewById(R.id.topartists_list_view);
-		mTopArtistsList.setOnItemClickListener( mArtistListItemClickListener );
+		mProfileLists[PROFILE_TOPARTISTS] = (ListView) findViewById(R.id.topartists_list_view);
+		mProfileLists[PROFILE_TOPARTISTS].setOnItemClickListener( mArtistListItemClickListener );
 		
-		mTopAlbumsList = (ListView) findViewById(R.id.topalbums_list_view);
-        mTopAlbumsList.setOnItemClickListener( mAlbumListItemClickListener );
+		mProfileLists[PROFILE_TOPALBUMS] = (ListView) findViewById(R.id.topalbums_list_view);
+        mProfileLists[PROFILE_TOPALBUMS].setOnItemClickListener( mAlbumListItemClickListener );
+
+        mProfileLists[PROFILE_TOPTRACKS] = (ListView) findViewById(R.id.toptracks_list_view);
+        mProfileLists[PROFILE_TOPTRACKS].setOnItemClickListener( mTrackListItemClickListener );
+
+        mProfileLists[PROFILE_RECENTLYPLAYED] = (ListView) findViewById(R.id.recenttracks_list_view);
+        mProfileLists[PROFILE_RECENTLYPLAYED].setOnItemClickListener( mTrackListItemClickListener );
         
-        mTopTracksList = (ListView) findViewById(R.id.toptracks_list_view);
-        mTopTracksList.setOnItemClickListener( mTrackListItemClickListener );
+        mProfileLists[PROFILE_EVENTS] = (ListView) findViewById(R.id.profileevents_list_view);
+        mProfileLists[PROFILE_EVENTS].setOnItemClickListener( mEventItemClickListener );
+
+        mProfileLists[PROFILE_FRIENDS] = (ListView) findViewById(R.id.profilefriends_list_view);
+        mProfileLists[PROFILE_FRIENDS].setOnItemClickListener( mUserItemClickListener );
         
-        mRecentTracksList = (ListView) findViewById(R.id.recenttracks_list_view);
-        mRecentTracksList.setOnItemClickListener( mTrackListItemClickListener );
-        
-        mEventsList = (ListView) findViewById(R.id.profileevents_list_view);
-        mEventsList.setOnItemClickListener( mEventItemClickListener );
-        
-        mFriendsList = (ListView) findViewById(R.id.profilefriends_list_view);
-        mFriendsList.setOnItemClickListener( mUserItemClickListener );
-        
-        mTagsList = (ListView) findViewById(R.id.profiletags_list_view);
-        mTagsList.setOnItemClickListener( mTagListItemClickListener );
-        
+        mProfileLists[PROFILE_TAGS] = (ListView) findViewById(R.id.profiletags_list_view);
+        mProfileLists[PROFILE_TAGS].setOnItemClickListener( mTagListItemClickListener );
+
         // Loading animations
         mPushLeftIn = AnimationUtils.loadAnimation(this, R.anim.push_left_in);
 		mPushLeftOut = AnimationUtils.loadAnimation(this, R.anim.push_left_out);
@@ -246,12 +231,17 @@ public class Profile extends ListActivity
      	outState.putInt( "displayed_view", mNestedViewFlipper.getDisplayedChild());
      	outState.putSerializable("view_history", mViewHistory); 
      	
-    	outState.putSerializable("adapter_topArtists", (ListAdapter)mTopArtistsList.getAdapter());
-    	outState.putSerializable("adapter_topAlbums", (ListAdapter)mTopAlbumsList.getAdapter());
-        outState.putSerializable("adapter_topTracks", (ListAdapter)mTopTracksList.getAdapter());
-        outState.putSerializable("adapter_recentTracks", (ListAdapter)mRecentTracksList.getAdapter());
-        outState.putSerializable("adapter_friends", (ListAdapter)mFriendsList.getAdapter());
-        outState.putSerializable("adapter_tags", (ListAdapter)mTagsList.getAdapter());
+     	HashMap< Integer, ListAdapter > adapters = new HashMap< Integer, ListAdapter>(mProfileLists.length);
+		for( int i = 0 ; i < mProfileLists.length; i++ )
+		{
+	     	ListView lv = mProfileLists[ i ];
+	     	if( lv.getAdapter() == null )
+	     		continue;
+	     	if( lv.getAdapter().getClass() == ListAdapter.class )
+	     		adapters.put( i, (ListAdapter)lv.getAdapter());
+		}
+     	
+     	outState.putSerializable("adapters", adapters);
         
         outState.putSerializable("info_album", mAlbumInfo);
         outState.putSerializable("info_track", mTrackInfo);
@@ -270,67 +260,41 @@ public class Profile extends ListActivity
     	mTabBar.setActive( state.getInt( "selected_tab" ));
     	mNestedViewFlipper.setDisplayedChild( state.getInt("displayed_view"));
     	
-    	if( state.getSerializable("view_history") != null )
-    		mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    	if( state.containsKey("view_history") )
+    		try {
+    			if( state.getSerializable("view_history" ).getClass() == Stack.class )
+    				mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    			else
+    			{
+    				//For some reason when the process gets killed and then resumed,
+    				//the serializable becomes an ArrayList
+    				for( Integer i : (ArrayList<Integer>)state.getSerializable("view_history") )
+    					mViewHistory.push( i );
+    			}
+    		} catch( ClassCastException e) {
+    				
+    		}
     	
     	//Restore the adapters and disable the spinner for all the profile lists
-    	ListAdapter topArtistAdapter = (ListAdapter)state.getSerializable("adapter_topArtists");
-    	if( topArtistAdapter != null )
+    	HashMap< Integer, ListAdapter > adapters = (HashMap<Integer, ListAdapter>)state.getSerializable("adapters");
+    	
+    	for( int key : adapters.keySet() )
     	{
-	    	topArtistAdapter.disableLoadBar();
-	    	mTopArtistsList.setAdapter( topArtistAdapter );
+    		ListAdapter adapter = adapters.get(key); 
+			if( adapter != null )
+			{
+				adapter.setContext( this );
+				adapter.setImageCache( getImageCache() );
+		    	adapter.disableLoadBar();
+				adapter.refreshList();
+		    	mProfileLists[key].setAdapter( adapter );
+			}
     	}
     	
-    	ListAdapter topAlbumsAdapter = (ListAdapter)state.getSerializable("adapter_topAlbums");
-    	if( topAlbumsAdapter != null )
-    	{
-	    	topAlbumsAdapter.disableLoadBar();
-	    	mTopAlbumsList.setAdapter( topAlbumsAdapter );
-    	}
-    	
-    	ListAdapter topTracksAdapter = (ListAdapter)state.getSerializable("adapter_topTracks");
-    	if( topTracksAdapter != null )
-    	{
-	    	topTracksAdapter.disableLoadBar();
-	    	mTopTracksList.setAdapter( topTracksAdapter );
-    	}
-    	
-    	ListAdapter recentTracksAdapter = (ListAdapter)state.getSerializable("adapter_recentTracks");
-    	if( recentTracksAdapter != null )
-    	{
-    		recentTracksAdapter.disableLoadBar();
-    		mRecentTracksList.setAdapter( recentTracksAdapter );
-    	}
-    	
-    	ListAdapter tagsAdapter = (ListAdapter)state.getSerializable("adapter_tags");
-    	if( tagsAdapter != null )
-    	{
-	    	tagsAdapter.disableLoadBar();
-	    	mTagsList.setAdapter( tagsAdapter );
-    	}
-    	
-    	//FIXME: it's not so easy to serialize the events adapter as it's a 
-    	//		 Seperated List Adapter.
-    	//		Rather than doing a half-arsed job, i just left it out altogether.
-//    	ListAdapter eventsAdapter = state.getSerializable("adapter_events");
-//    	if( eventsAdapter != null )
-//    	{
-//	    	eventsAdapter.enableLoadBar( -1 );
-//	    	mEventsList.setAdapter( eventsAdapter );
-//    	}
-    	
-    	//Related to the above, don't leave the user with a totally empty
-    	//list if we've restored into the events list
-    	if( mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
+      	if( mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
     		mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
     	
-    	ListAdapter friendsAdapter = (ListAdapter)state.getSerializable("adapter_friends");
-    	if( friendsAdapter != null )
-    	{
-	    	friendsAdapter.disableLoadBar();
-	    	mFriendsList.setAdapter( friendsAdapter );
-    	}
-    	
+     	
     	mAlbumInfo = (Album)state.getSerializable("info_album");
         mTrackInfo = (Track)state.getSerializable("info_track");
     }
@@ -442,18 +406,12 @@ public class Profile extends ListActivity
     	RebuildMainMenu();
     	mMainAdapter.disableLoadBar();
 
-    	if(mTopArtistsAdapter != null)
-    		mTopArtistsAdapter.disableLoadBar();
-    	if(mTopAlbumsAdapter != null)
-    		mTopAlbumsAdapter.disableLoadBar();
-    	if(mTopTracksAdapter != null)
-    		mTopTracksAdapter.disableLoadBar();
-    	if(mRecentTracksAdapter != null)
-    		mRecentTracksAdapter.disableLoadBar();
-    	if(mFriendsList.getAdapter() != null)
-    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
-    	if(mTagsAdapter != null)
-    		mTagsAdapter.disableLoadBar();
+    	for( ListView list : mProfileLists )
+    	{
+    		if( list.getAdapter() != null )
+    			((ListAdapter)list.getAdapter()).disableLoadBar();
+    	}
+
         if( mDialogAdapter != null )
         	mDialogAdapter.disableLoadBar();
         
@@ -480,18 +438,12 @@ public class Profile extends ListActivity
 				RebuildMainMenu();
 		    	mMainAdapter.disableLoadBar();
 
-		    	if(mTopArtistsAdapter != null)
-		    		mTopArtistsAdapter.disableLoadBar();
-		    	if(mTopAlbumsAdapter != null)
-		    		mTopAlbumsAdapter.disableLoadBar();
-		    	if(mTopTracksAdapter != null)
-		    		mTopTracksAdapter.disableLoadBar();
-		    	if(mRecentTracksAdapter != null)
-		    		mRecentTracksAdapter.disableLoadBar();
-		    	if(mFriendsList.getAdapter() != null)
-		    		((ListAdapter) mFriendsList.getAdapter()).disableLoadBar();
-		    	if(mTagsAdapter != null)
-		    		mTagsAdapter.disableLoadBar();
+		    	for( ListView list : mProfileLists )
+		    	{
+		    		if( list.getAdapter() != null )
+		    			((ListAdapter)list.getAdapter()).disableLoadBar();
+		    	}
+
 		        if( mDialogAdapter != null )
 		        	mDialogAdapter.disableLoadBar();
 			}
@@ -814,13 +766,15 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
             if(iconifiedEntries != null) {
-                mTopArtistsAdapter = new ListAdapter(Profile.this, getImageCache());
-                mTopArtistsAdapter.setSourceIconified(iconifiedEntries);
-                mTopArtistsList.setAdapter(mTopArtistsAdapter);
+                ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mProfileLists[PROFILE_TOPARTISTS].setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Top Artists"};
-                mTopArtistsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
-                        R.layout.list_row, R.id.row_label, strings)); 
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_TOPARTISTS].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_TOPARTISTS + 1);
@@ -865,13 +819,15 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
             if(iconifiedEntries != null) {
-                mTopAlbumsAdapter = new ListAdapter(Profile.this, getImageCache());
-                mTopAlbumsAdapter.setSourceIconified(iconifiedEntries);
-                mTopAlbumsList.setAdapter(mTopAlbumsAdapter);
+                ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mProfileLists[PROFILE_TOPALBUMS].setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Top Albums"};
-                mTopAlbumsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
-                        R.layout.list_row, R.id.row_label, strings)); 
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_TOPALBUMS].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_TOPALBUMS + 1); 
@@ -907,13 +863,15 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
             if(iconifiedEntries != null) {
-                mTopTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-                mTopTracksAdapter.setSourceIconified(iconifiedEntries);
-                mTopTracksList.setAdapter(mTopTracksAdapter);
+                ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mProfileLists[PROFILE_TOPTRACKS].setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Top Tracks"};
-                mTopTracksList.setAdapter(new ArrayAdapter<String>(Profile.this,
-                        R.layout.list_row, R.id.row_label, strings));
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_TOPTRACKS].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_TOPTRACKS + 1);
@@ -948,13 +906,15 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
             if(iconifiedEntries != null) {
-                mRecentTracksAdapter = new ListAdapter(Profile.this, getImageCache());
-                mRecentTracksAdapter.setSourceIconified(iconifiedEntries);
-                mRecentTracksList.setAdapter(mRecentTracksAdapter);
+                ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+                adapter.setSourceIconified(iconifiedEntries);
+                mProfileLists[PROFILE_RECENTLYPLAYED].setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Recent Tracks"};
-                mRecentTracksList.setAdapter(new ArrayAdapter<String>(Profile.this,
-                        R.layout.list_row, R.id.row_label, strings));
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_RECENTLYPLAYED].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_RECENTLYPLAYED + 1);
@@ -984,12 +944,14 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(EventListAdapter result) {
             if (result != null) {
-                mEventsList.setAdapter(result);
+                mProfileLists[PROFILE_EVENTS].setAdapter(result);
                 //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
             } else {
                 String[] strings = new String[]{"No Upcoming Events"};
-                mEventsList.setAdapter(new ArrayAdapter<String>(Profile.this,
-                        R.layout.list_row, R.id.row_label, strings));
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_EVENTS].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_EVENTS + 1);
@@ -1023,15 +985,17 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
         	if(iconifiedEntries != null) {
-    			mTagsAdapter = new ListAdapter(Profile.this, getImageCache());
-    			mTagsAdapter.setSourceIconified(iconifiedEntries);
-        		mTagsList.setAdapter(mTagsAdapter);
+    			ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
+    			adapter.setSourceIconified(iconifiedEntries);
+        		mProfileLists[PROFILE_TAGS].setAdapter(adapter);
                 mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
                 mNestedViewFlipper.setDisplayedChild(PROFILE_TAGS + 1);
         	} else {
-    	        String[] strings = new String[]{"No Tags"};
-    	        mTagsList.setAdapter(new ArrayAdapter<String>(Profile.this, 
-    	                R.layout.list_row, R.id.row_label, strings)); 
+                String[] strings = new String[]{"No Tags"};
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_TAGS].setAdapter(adapter);
         	}
         }
     }
@@ -1064,11 +1028,13 @@ public class Profile extends ListActivity
             if(iconifiedEntries != null) {
                 ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
                 adapter.setSourceIconified(iconifiedEntries);
-                mFriendsList.setAdapter(adapter);
+                mProfileLists[PROFILE_FRIENDS].setAdapter(adapter);
             } else {
                 String[] strings = new String[]{"No Friends Retrieved"};
-                mFriendsList.setAdapter(new ArrayAdapter<String>(Profile.this,
-                        R.layout.list_row, R.id.row_label, strings));
+    	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
+    	        adapter.disableDisclosureIcons();
+    	        adapter.setDisabled();
+                mProfileLists[PROFILE_FRIENDS].setAdapter(adapter);
             }
             mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
             mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);

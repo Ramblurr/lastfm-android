@@ -2,16 +2,15 @@ package fm.last.android.adapter;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -32,14 +31,14 @@ import fm.last.android.utils.ImageDownloaderListener;
  */
 public class ListAdapter extends BaseAdapter implements Serializable, ImageDownloaderListener {
 	
-
-	protected ImageCache mImageCache;
-	protected ImageDownloader mImageDownloader;
-	protected Activity mContext;
+	protected transient ImageCache mImageCache;
+	protected transient ImageDownloader mImageDownloader;
+	protected transient Activity mContext;
 	
 	private ArrayList<ListEntry> mList;
 	private int mLoadingBar = -1;
 	private boolean mScaled = true;
+	private boolean mEnabled = true;
 	
 	private void writeObject(java.io.ObjectOutputStream out) throws IOException
     {
@@ -48,10 +47,14 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 	 
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
-		mList = (ArrayList<ListEntry>)in.readObject();
+		
+		try {
+			mList = (ArrayList<ListEntry>)in.readObject();
+		} catch( ClassCastException e )	{
+			mList = null;
+		}
 	}
 
-	
 	public ListAdapter(Activity context) {
 		mContext = context;
 	}
@@ -90,12 +93,10 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 	 * @param imageCache
 	 */
 	private void init(ImageCache imageCache){
-		mImageDownloader = new ImageDownloader(imageCache);
-		mImageDownloader.setListener(this);
-		mImageCache = imageCache;
+		setImageCache(imageCache);
 		mList = new ArrayList<ListEntry>();
 	}
-		
+	
 	public View getView(int position, View convertView, ViewGroup parent)
 	{
 		View row=convertView;
@@ -140,7 +141,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		}
 		
 		holder.vs.setDisplayedChild( mLoadingBar == position ? 1 : 0 );
-		
+
 		// optionally if an URL is specified
 		if(mList.get(position).url != null){
 			Bitmap bmp = mImageCache.get(mList.get(position).url);
@@ -157,13 +158,17 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 			
 			holder.image.setImageResource(mList.get(position).disclosure_id);
 		}
-			
 		
 		if( !mScaled ) {
         	((ImageView)row.findViewById( R.id.row_icon )).setScaleType( ImageView.ScaleType.CENTER );
 		}
 
 		return row;
+	}
+	
+	@Override
+	public boolean isEnabled(int position) {
+		return mEnabled;
 	}
 
 	/**
@@ -188,7 +193,8 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 	 */
 	public void setSourceIconified(ArrayList<ListEntry> list) {
 		mList = list;
-
+		if( list == null )
+			return;
 		ArrayList<String> urls = new ArrayList<String>();
 		Iterator<ListEntry> it = list.iterator ();
 		while (it.hasNext ()) {
@@ -279,6 +285,29 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 
 	public long getItemId(int position) {
 		return position;
+	}
+	
+	public void setImageCache( ImageCache imageCache ) {
+		mImageDownloader = new ImageDownloader(imageCache);
+		mImageDownloader.setListener(this);
+		mImageCache = imageCache;
+	}
+	
+	public void setDisabled() {
+		mEnabled = false;
+	}
+	
+	public void setContext( Activity context ) {
+		mContext = context;
+	}
+	
+	public void refreshList() {
+		setSourceIconified( mList );
+	}
+	
+	public void disableDisclosureIcons() {
+		for( ListEntry l : mList )
+			l.disclosure_id = -1;
 	}
 
 }

@@ -54,7 +54,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     
     private SearchType searching;
     private EditText searchBar;
-    private ListAdapter mListAdapter[] = new ListAdapter[3];
+    private ListAdapter mListAdapters[] = new ListAdapter[3];
     private Button mSearchButton;
     private TabBar mTabBar;
 	private ImageCache mImageCache;
@@ -110,17 +110,17 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 				
 				((ListAdapter) getListAdapter()).enableLoadBar(position);
 				
-				if( getListAdapter() == mListAdapter[TAB_ARTIST])
+				if( getListAdapter() == mListAdapters[TAB_ARTIST])
 				{
 					Artist artist = (Artist)getListAdapter().getItem(position);
 					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
 				}
-				else if( getListAdapter() == mListAdapter[TAB_TAG])
+				else if( getListAdapter() == mListAdapters[TAB_TAG])
 				{
 					Tag tag = (Tag)getListAdapter().getItem(position);
 					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
 				}
-				else if( getListAdapter() == mListAdapter[TAB_USER])
+				else if( getListAdapter() == mListAdapters[TAB_USER])
 				{
 					User user = (User)getListAdapter().getItem(position);
 	                Intent profileIntent = new Intent(NewStation.this, fm.last.android.activity.Profile.class);
@@ -132,7 +132,6 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 			
 		});
-		
 		
 		if( icicle == null )
 			return;
@@ -150,16 +149,15 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
     		findViewById(R.id.search_hint).setVisibility(View.GONE);
 		}
-
     }
 
     @Override
     public void onResume()
     {
     	for( int tabIndex = 0; tabIndex < 3; tabIndex++ )
-    	if(mListAdapter[ tabIndex ] != null) {
-    		mListAdapter[ tabIndex ].enableLoadBar(-1);
-    		mListAdapter[ tabIndex ].notifyDataSetInvalidated();
+    	if(mListAdapters[ tabIndex ] != null) {
+    		mListAdapters[ tabIndex ].enableLoadBar(-1);
+    		mListAdapters[ tabIndex ].notifyDataSetInvalidated();
     	}
     	
     	super.onResume();
@@ -172,10 +170,42 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     		return;
     	
     	outState.putInt( "selected_tab", mTabBar.getActive());
-    	if( mListAdapter != null )
-    		outState.putSerializable( "results", mListAdapter );
+    	if( mListAdapters != null )
+    		outState.putSerializable( "results", mListAdapters );
     	
     	super.onSaveInstanceState(outState);
+    }
+    
+       
+    @Override
+    protected void onRestoreInstanceState(Bundle icicle)
+    {
+		if( icicle == null )
+			return;
+		
+		int selectedTab = icicle.getInt( "selected_tab", -1 );
+		if( selectedTab >= 0)
+		{
+			mTabBar.setActive( selectedTab );
+			if( icicle.containsKey( "results" ))
+			{
+				Object[] results = (Object[]) icicle.getSerializable( "results" );
+				for (int i = 0; i < results.length; i++) {
+					if( results[i] != null ) {
+						mListAdapters[ i ] = (ListAdapter)results[i];
+						mListAdapters[ i ].setContext( this );
+						mListAdapters[ i ].setImageCache( mImageCache );
+					}
+				}
+
+				if( mListAdapters[selectedTab] == null )
+					return;
+				
+				setListAdapter(mListAdapters[selectedTab]);
+			}
+		
+			tabChanged(selectedTab, TAB_ARTIST );
+		}
     }
 
     
@@ -209,6 +239,18 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
             searchBar.setHint( "eg. Last.hq" );
             mHint.setText(getResources().getString(R.string.newstation_hint_user));
             setListAdapter(mListAdapter[index]);
+        }
+        
+        setListAdapter(mListAdapters[index]);
+        if( mListAdapters[index] == null || mListAdapters[index].isEmpty() )
+        {
+        	getListView().setVisibility( View.GONE );
+        	findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
+        }
+        else
+        {        	
+        	getListView().setVisibility( View.VISIBLE );
+        	findViewById(R.id.search_hint).setVisibility(View.GONE);
         }
 	}
 
@@ -262,9 +304,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
         	if(iconifiedEntries != null) {
-                mListAdapter[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
-    			mListAdapter[TAB_TAG].setSourceIconified(iconifiedEntries);
-                setListAdapter( mListAdapter[TAB_TAG] );
+                mListAdapters[TAB_TAG] = new ListAdapter(NewStation.this, mImageCache);
+    			mListAdapters[TAB_TAG].setSourceIconified(iconifiedEntries);
+                setListAdapter( mListAdapters[TAB_TAG] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No tags found", Toast.LENGTH_SHORT).show();
@@ -307,9 +349,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
         	if(iconifiedEntries != null) {
-                mListAdapter[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
-				mListAdapter[TAB_ARTIST].setSourceIconified(iconifiedEntries);
-                setListAdapter( mListAdapter[TAB_ARTIST] );
+                mListAdapters[TAB_ARTIST] = new ListAdapter(NewStation.this, mImageCache);
+				mListAdapters[TAB_ARTIST].setSourceIconified(iconifiedEntries);
+                setListAdapter( mListAdapters[TAB_ARTIST] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No artists found", Toast.LENGTH_SHORT).show();
@@ -348,9 +390,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         @Override
         public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
         	if(iconifiedEntries != null) {
-                mListAdapter[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
-				mListAdapter[TAB_USER].setSourceIconified(iconifiedEntries);
-                setListAdapter( mListAdapter[TAB_USER] );
+                mListAdapters[TAB_USER] = new ListAdapter(NewStation.this, mImageCache);
+				mListAdapters[TAB_USER].setSourceIconified(iconifiedEntries);
+                setListAdapter( mListAdapters[TAB_USER] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
         		Toast.makeText(NewStation.this, "No users found", Toast.LENGTH_SHORT).show();
