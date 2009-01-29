@@ -95,9 +95,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mTabBar.setListener(this);
-		mTabBar.addTab("Artist", R.drawable.similar_artists);
-		mTabBar.addTab("Tag", R.drawable.tags);
-		mTabBar.addTab("User", R.drawable.top_listeners);
+		mTabBar.addTab("Artist", R.drawable.similar_artists).setId(TAB_ARTIST);
+		mTabBar.addTab("Tag", R.drawable.tags).setId(TAB_TAG);
+		mTabBar.addTab("User", R.drawable.top_listeners).setId(TAB_USER);
 		tabChanged(TAB_ARTIST, TAB_ARTIST);
         
 
