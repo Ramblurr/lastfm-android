@@ -11,6 +11,7 @@ import fm.last.android.utils.UserTask;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.WSError;
+import fm.last.util.UrlUtil;
 
 import android.app.AlertDialog;
 import android.app.Application;
@@ -52,20 +53,19 @@ public class LastFMApplication extends Application
         super.onCreate();
         instance = this;
 
-        // construct an 'application global' object
-        this.map = new WeakHashMap();
-
-        String version_with_spaces;
+		String version_with_spaces;
         try {
-        	version_with_spaces = " " + getPackageManager().getPackageInfo("fm.last.android", 0).versionName + " ";
+        	version_with_spaces = " " + LastFMApplication.getInstance().getPackageManager().getPackageInfo("fm.last.android", 0).versionName + " ";
         }
         catch( Exception e )
         {
         	version_with_spaces = " ";
         }
-        String useragent = "Last.fm Client" + version_with_spaces + "(Android)";
-		HttpURLConnection.setDefaultRequestProperty("User-Agent", useragent );        
+        UrlUtil.useragent = "Last.fm Client" + version_with_spaces + "(Android)";        
         
+        // construct an 'application global' object
+        this.map = new WeakHashMap();
+
         //Populate our Session object
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
         String user = settings.getString( "lastfm_user", "" );

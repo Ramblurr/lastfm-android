@@ -30,10 +30,19 @@ public class UrlUtil {
 
 	private UrlUtil() {
 	}
+	
+	public static String useragent;
 
-
+	/** mainly sets the User-Agent we need */
+	private static void setUserAgent( HttpURLConnection conn )
+	{
+		if (useragent != null)
+			conn.setRequestProperty("User-Agent", useragent );
+	}
+	
 	public static URL getRedirectedUrl(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
 		conn.setRequestMethod("GET");
 		conn.setInstanceFollowRedirects(false);
 		int rc = conn.getResponseCode();
@@ -86,6 +95,7 @@ public class UrlUtil {
 
 	public static String doPost(URL url, InputStream stuffToPost, String contentType) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		if (contentType != null) {
@@ -125,6 +135,7 @@ public class UrlUtil {
 
 	public static String doGet(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
@@ -151,6 +162,7 @@ public class UrlUtil {
 	 */
 	public static byte[] doGetAndReturnBytes(URL url, int maxBytes) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
 		conn.setRequestMethod("GET");
 		InputStream istr = null;
 		try {
@@ -207,6 +219,7 @@ public class UrlUtil {
 
 	public static String getXML(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
