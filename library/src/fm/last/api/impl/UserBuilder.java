@@ -16,14 +16,9 @@ package fm.last.api.impl;
 
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
-import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
 import org.w3c.dom.Node;
 
-import java.security.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 /**

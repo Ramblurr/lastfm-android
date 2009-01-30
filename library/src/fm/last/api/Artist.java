@@ -10,6 +10,7 @@ import java.io.Serializable;
  * @author Mike Jennings
  */
 public class Artist implements Serializable {
+	private static final long serialVersionUID = -2072451730401030848L;
 	private String name;
 	private String mbid;
 	private String match;

@@ -21,6 +21,7 @@ import java.io.Serializable;
  *         Date: Oct 21, 2008
  */
 public class Track implements Serializable {
+  private static final long serialVersionUID = 8485165481980957393L;
   private String id;
   private String name;
   private String mbid;

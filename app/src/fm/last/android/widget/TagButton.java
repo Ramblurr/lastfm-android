@@ -3,11 +3,9 @@ package fm.last.android.widget;
 import fm.last.android.R;
 
 import android.content.Context;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
@@ -23,7 +21,6 @@ public class TagButton extends Button {
 	public static final String TAG = "TagButton";
 	
 	private String mText;
-	private TextPaint mTextPaint;
 	
 	// animation support
 	boolean newPosition = true;

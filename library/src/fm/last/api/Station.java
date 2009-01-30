@@ -19,6 +19,8 @@ import java.io.Serializable;
  *         Date: Oct 23, 2008
  */
 public class Station implements Serializable {
+
+  private static final long serialVersionUID = 1499806102972292532L;
   private String name;
   private String type;
   private String url;

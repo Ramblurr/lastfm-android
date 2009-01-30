@@ -1,21 +1,16 @@
 package fm.last.android;
 
-import java.net.HttpURLConnection;
-import java.util.Map;
 import java.util.WeakHashMap;
 
-import fm.last.android.activity.Profile;
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.Session;
-import fm.last.api.Station;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
 import android.app.AlertDialog;
 import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -33,7 +28,7 @@ import android.util.Log;
 public class LastFMApplication extends Application
 {
 
-    public WeakHashMap map;
+    public WeakHashMap<String, Session> map;
 	public fm.last.android.player.IRadioPlayer player = null;
 
     private static LastFMApplication instance;
@@ -64,7 +59,7 @@ public class LastFMApplication extends Application
         UrlUtil.useragent = "Last.fm Client" + version_with_spaces + "(Android)";        
         
         // construct an 'application global' object
-        this.map = new WeakHashMap();
+        this.map = new WeakHashMap<String, Session>();
 
         //Populate our Session object
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
@@ -313,7 +308,7 @@ public class LastFMApplication extends Application
             boolean success = false;
     		try
     		{
-    			Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+    			Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
     			LastFMApplication.getInstance().player.setSession( session );
     			if(LastFMApplication.getInstance().player.tune( urls[0], session )) {
     				LastFMApplication.getInstance().player.startRadio();

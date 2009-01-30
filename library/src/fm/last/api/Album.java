@@ -21,6 +21,8 @@ import java.io.Serializable;
  *         Date: Oct 21, 2008
  */
 public class Album implements Serializable {
+
+  private static final long serialVersionUID = -8821153568949520331L;
   private String artist;
   private String title;
   private String mbid;

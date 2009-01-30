@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Lukasz Wisniewski
  */
 public class GeoPoint implements Serializable {
+	private static final long serialVersionUID = 4241815999032525503L;
 	private double latitude;
 	private double longitude;
 	

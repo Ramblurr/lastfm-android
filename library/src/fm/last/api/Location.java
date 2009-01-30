@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Lukasz Wisniewski
  */
 public class Location implements Serializable {
+	private static final long serialVersionUID = 7670348098081408246L;
 	private String city;
 	private String country;
 	private String street;

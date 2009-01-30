@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import android.util.Log;
 
 /**
  * A collection of utility methods to manipulate URLs.
@@ -214,7 +215,15 @@ public class UrlUtil {
 	}
 
 	private static String escape(String s) {
-		return URLEncoder.encode(s);
+		try
+		{
+			return URLEncoder.encode(s, "UTF-8" );
+		} catch( UnsupportedEncodingException e )
+		{
+			Log.e( "UrlUtil", "Cannot find UTF-8 encoding - this is not very likely!");
+			return s;
+		}
+		
 	}
 
 	public static String getXML(URL url) throws IOException {
@@ -241,6 +250,7 @@ public class UrlUtil {
 		return sb.toString();
 	}
 
+	@SuppressWarnings("unused")
 	private static String readString(BufferedReader reader) throws IOException {
 		String line;
 		StringBuilder sb = new StringBuilder();
@@ -251,6 +261,7 @@ public class UrlUtil {
 	}
 
 
+	@SuppressWarnings("unused")
 	private static Map<String, String> getParams(BufferedReader reader) throws IOException {
 		Map<String, String> params = new HashMap<String, String>();
 		String line;

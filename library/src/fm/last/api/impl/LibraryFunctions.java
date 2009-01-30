@@ -7,7 +7,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import fm.last.api.Album;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;

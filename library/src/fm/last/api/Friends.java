@@ -21,6 +21,7 @@ import java.io.Serializable;
  *         Date: Oct 20, 2008
  */
 public class Friends implements Serializable {
+  private static final long serialVersionUID = 50693901684109497L;
   private User[] friends;
 
   public Friends(User[] friends) {

@@ -2,7 +2,6 @@ package fm.last.android.adapter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -30,7 +29,8 @@ import fm.last.android.utils.ImageDownloaderListener;
  * @author Casey Link
  */
 public class ListAdapter extends BaseAdapter implements Serializable, ImageDownloaderListener {
-	
+
+	private static final long serialVersionUID = 2679887824070220768L;
 	protected transient ImageCache mImageCache;
 	protected transient ImageDownloader mImageDownloader;
 	protected transient Activity mContext;
@@ -45,9 +45,9 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		out.writeObject( mList );
     }
 	 
+	@SuppressWarnings("unchecked")
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
 	{
-		
 		try {
 			mList = (ArrayList<ListEntry>)in.readObject();
 		} catch( ClassCastException e )	{

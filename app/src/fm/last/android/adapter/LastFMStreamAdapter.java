@@ -1,12 +1,10 @@
 package fm.last.android.adapter;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 
-import android.R.string;
 import android.app.Activity;
 import android.os.RemoteException;
 import android.view.LayoutInflater;

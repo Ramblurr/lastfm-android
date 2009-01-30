@@ -51,7 +51,7 @@ public class ProfileBubble extends LinearLayout {
     }
 
     public void setUser(User user) {
-        mUser   = user;
+        mUser = user;
 
         mAvatar.setDefaultImage( R.drawable.profile_unknown );
         
@@ -61,15 +61,15 @@ public class ProfileBubble extends LinearLayout {
             mFirst.setText(user.getRealName());
         
         
-        List seconds = new ArrayList();
+        List<String> seconds = new ArrayList<String>();
 
         if (user.getAge() != null) seconds.add( user.getAge() );
         if (user.getGender() != null) seconds.add( user.getGender() );
         if (user.getCountry() != null) seconds.add( user.getCountry() );
         
         String second = "";
-        for(Object s: seconds)
-        	second = (String)s + ", ";
+        for(String s: seconds)
+        	second = s + ", ";
 
         int playcount = Integer.parseInt(mUser.getPlaycount());
         NumberFormat format = NumberFormat.getNumberInstance();

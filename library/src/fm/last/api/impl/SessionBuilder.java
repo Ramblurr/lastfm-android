@@ -18,8 +18,6 @@ import fm.last.api.Session;
 import fm.last.xml.XMLBuilder;
 import org.w3c.dom.Node;
 
-import java.util.List;
-
 /**
  * @author jennings
  *         Date: Oct 20, 2008

@@ -14,7 +14,6 @@ import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
-import fm.last.api.User;
 import fm.last.api.WSError;
 import android.app.Activity;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -119,7 +117,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public Boolean doInBackground(Void...params) {
-            Session session = ( Session ) LastFMApplication.getInstance().map
+            Session session = LastFMApplication.getInstance().map
             .get( "lastfm_session" );
 
             try {
@@ -159,8 +157,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public ArrayList<ListEntry> doInBackground(Void...params) {
-            Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
 
             try {
                 RadioPlayList[] playlists = mServer.getUserPlaylists(session.getName());
@@ -208,8 +205,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public ArrayList<ListEntry>  doInBackground(Void...params) {
-            Session session = ( Session ) LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
 
             try {
                 RadioPlayList[] playlists = mServer.createPlaylist(mTitle, "", session.getKey());

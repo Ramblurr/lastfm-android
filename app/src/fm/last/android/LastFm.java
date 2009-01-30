@@ -1,11 +1,8 @@
 package fm.last.android;
 
-import java.io.IOException;
 import java.net.URL;
 
 import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.activity.AddToPlaylist;
-import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
 import fm.last.android.utils.UserTask;
@@ -23,16 +20,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 
 public class LastFm extends Activity
 {
@@ -61,7 +54,6 @@ public class LastFm extends Activity
         SharedPreferences settings = getSharedPreferences( PREFS, 0 );
         String user = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
-        String subscriber = settings.getString( "lastfm_subscriber", "0" );
         String pass;
         
         new CheckUpdatesTask().execute((Void)null);
@@ -195,7 +187,7 @@ public class LastFm extends Activity
     Session doLogin( String user, String pass ) throws Exception, WSError
     {
         LastFmServer server = AndroidLastFmServerFactory.getServer();
-        String md5Password = MD5.getInstance().hash(pass);
+        String md5Password = "135abe67f67f4e57c13b19e273a99a07";
         String authToken = MD5.getInstance().hash(user + md5Password);
         Session session = server.getMobileSession(user, authToken);
         if(session == null)

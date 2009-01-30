@@ -25,7 +25,6 @@ import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
-import fm.last.api.Session;
 import fm.last.api.Tag;
 import fm.last.api.User;
 import fm.last.api.WSError;
@@ -77,7 +76,6 @@ public class Player extends Activity
 	private TextView mTotalTime;
 	private TextView mArtistName;
 	private TextView mTrackName;
-	private TextView mStationName;
 	private ProgressBar mProgress;
 	private long mDuration;
 	private boolean paused;
@@ -918,7 +916,7 @@ public class Player extends Activity
 
             Intent intent = fm.last.android.activity.Event.intentFromEvent(Player.this, event);
 			try {
-				Event[] events = mServer.getUserEvents(((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getName());
+				Event[] events = mServer.getUserEvents((LastFMApplication.getInstance().map.get("lastfm_session")).getName());
 				for(Event e : events) {
 //					System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
 					if(e.getId() == event.getId()) {

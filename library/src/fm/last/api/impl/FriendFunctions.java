@@ -14,7 +14,6 @@
 
 package fm.last.api.impl;
 
-import fm.last.api.Artist;
 import fm.last.api.Friends;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -22,8 +21,6 @@ import fm.last.util.XMLUtil;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

@@ -18,7 +18,8 @@ import android.widget.TextView;
  * @author Lukasz Wisniewski
  */
 public class TagListAdapter extends ListAdapter {
-	
+	private static final long serialVersionUID = 7881125993100457743L;
+
 	/**
 	 * Internal class representing single row entry
 	 * 

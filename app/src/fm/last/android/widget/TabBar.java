@@ -3,19 +3,11 @@ package fm.last.android.widget;
 import java.util.ArrayList;
 
 import fm.last.android.R;
-import fm.last.android.R.id;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
@@ -54,7 +46,7 @@ public class TabBar extends LinearLayout
 		return addTab( text, -1 );
 	}
 	
-	private ArrayList<View> mTabs = new ArrayList();
+	private ArrayList<View> mTabs = new ArrayList<View>();
 	
 	/**
 	 * Set the id of the @returned view if you want to observe it via the TabListener

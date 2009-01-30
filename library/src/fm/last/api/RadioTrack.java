@@ -41,6 +41,7 @@ import java.io.Serializable;
 
  */
 public class RadioTrack implements Serializable {
+  private static final long serialVersionUID = -2981580772307269182L;
   private String locationUrl;
   private String title;
   private String identifier;

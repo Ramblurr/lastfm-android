@@ -1,6 +1,5 @@
 package fm.last.android.activity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import fm.last.android.AndroidLastFmServerFactory;
@@ -17,26 +16,16 @@ import fm.last.api.Session;
 import fm.last.api.User;
 import fm.last.api.WSError;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.Contacts;
-import android.provider.Contacts.People;
-import android.provider.Contacts.ContactMethods;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
-import android.widget.ViewSwitcher;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
@@ -116,7 +105,7 @@ public class Share extends Activity {
         @Override
         public Boolean doInBackground(Void...params) {
             try {
-                Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+                Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
     			mServer.shareTrack(mArtist, mTrack, mRecipient, session.getKey());
                 return true;
             } catch (WSError e) {
@@ -157,7 +146,7 @@ public class Share extends Activity {
         @Override
         public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
-                Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+                Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
                 User[] friends = mServer.getFriends(session.getName(), null, null).getFriends();
                 if(friends.length == 0 )
                     return null;

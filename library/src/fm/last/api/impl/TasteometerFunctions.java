@@ -9,8 +9,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import fm.last.api.Artist;
-import fm.last.api.Event;
 import fm.last.api.Tasteometer;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;

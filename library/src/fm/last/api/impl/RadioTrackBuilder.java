@@ -14,11 +14,6 @@ package fm.last.api.impl;
 
 import org.w3c.dom.Node;
 
-import android.util.Log;
-
-import fm.last.api.Artist;
-import fm.last.api.Track;
-import fm.last.api.Album;
 import fm.last.api.RadioTrack;
 import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;

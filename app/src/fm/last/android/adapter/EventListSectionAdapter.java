@@ -17,7 +17,7 @@ import android.widget.TextView;
  * @author Lukasz Wisniewski
  */
 public class EventListSectionAdapter extends ListAdapter{
-
+	private static final long serialVersionUID = 2070559787839689784L;
 	private ArrayList<Event> mEvents;
 
 //	private EventListAdapterListener mAdapterListener;

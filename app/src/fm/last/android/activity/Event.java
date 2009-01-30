@@ -23,7 +23,6 @@ import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
-import fm.last.api.Session;
 import fm.last.api.WSError;
 
 public class Event extends Activity {
@@ -143,7 +142,7 @@ public class Event extends Activity {
 					server.attendEvent(
 							getIntent().getStringExtra("lastfm.event.id"), 
 							String.valueOf(status), 
-							((Session)LastFMApplication.getInstance().map.get("lastfm_session")).getKey() );
+							(LastFMApplication.getInstance().map.get("lastfm_session")).getKey() );
 					setResult(RESULT_OK, new Intent().putExtra("status", status));
 					finish();
 				} catch (WSError e) {

@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Lukasz Wisniewski
  */
 public class Venue implements Serializable{
+	private static final long serialVersionUID = -9136513976031500466L;
 	private String name;
 	private String url;
 	private Location location;

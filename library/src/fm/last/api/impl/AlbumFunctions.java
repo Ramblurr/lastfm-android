@@ -13,8 +13,6 @@
 package fm.last.api.impl;
 
 import fm.last.api.Album;
-import fm.last.api.Event;
-import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;

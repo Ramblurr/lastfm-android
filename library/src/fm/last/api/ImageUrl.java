@@ -11,6 +11,7 @@ import java.io.Serializable;
  * @author Mike Jennings
  */
 public class ImageUrl implements Serializable {
+  private static final long serialVersionUID = -4669136811511963355L;
   private String url;
   private String size;
 

@@ -6,7 +6,6 @@ import org.w3c.dom.Node;
 
 import fm.last.api.ImageUrl;
 import fm.last.xml.XMLBuilder;
-import fm.last.util.XMLUtil;
 
 /**
  * a class for building ImageURL objects

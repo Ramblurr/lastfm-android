@@ -19,7 +19,6 @@ import org.w3c.dom.Node;
 import fm.last.api.Artist;
 import fm.last.api.ImageUrl;
 import fm.last.api.Track;
-import fm.last.api.Album;
 import fm.last.xml.XMLBuilder;
 
 /**

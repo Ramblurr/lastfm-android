@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class WSError extends Error implements Parcelable {
+	private static final long serialVersionUID = 4424446450329878122L;
 	private String method;
 	private String message;
 	private Integer code;

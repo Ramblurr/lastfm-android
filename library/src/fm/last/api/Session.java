@@ -23,6 +23,7 @@ import android.os.Parcelable;
  * @author Mike Jennings
  */
 public class Session implements Serializable, Parcelable {
+  private static final long serialVersionUID = -8500867686679447824L;
   private String name, key, subscriber;
 
   public Session(String name, String key, String subscriber) {

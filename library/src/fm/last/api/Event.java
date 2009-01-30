@@ -10,6 +10,7 @@ import java.util.Date;
  * @author Lukasz Wisniewski
  */
 public class Event implements Serializable{
+	private static final long serialVersionUID = 4832815335124538661L;
 	private int id;
 	private String title;
 	private String[] artists;

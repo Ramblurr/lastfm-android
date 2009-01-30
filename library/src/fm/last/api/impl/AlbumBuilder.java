@@ -6,7 +6,6 @@ import org.w3c.dom.Node;
 
 import java.util.List;
 
-import fm.last.api.Artist;
 import fm.last.api.ImageUrl;
 import fm.last.api.Album;
 import fm.last.util.XMLUtil;

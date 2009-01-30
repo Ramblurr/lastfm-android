@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author Lukasz Wisniewski
  */
 public class Bio implements Serializable{
+	private static final long serialVersionUID = 4621707915046399813L;
 	private String published;
 	private String summary;
 	private String content;

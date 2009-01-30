@@ -29,11 +29,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ViewFlipper;
@@ -128,7 +126,7 @@ public class Profile extends ListActivity
         super.onCreate( icicle );
         requestWindowFeature( Window.FEATURE_NO_TITLE );
         setContentView( R.layout.home );
-        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
         if( session == null )
             logout();
         mUsername = getIntent().getStringExtra("lastfm.profile.username");
@@ -255,7 +253,8 @@ public class Profile extends ListActivity
         
     }
     
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     protected void onRestoreInstanceState( Bundle state )
     {
     	mTabBar.setActive( state.getInt( "selected_tab" ));
@@ -263,8 +262,9 @@ public class Profile extends ListActivity
     	
     	if( state.containsKey("view_history") )
     		try {
-    			if( state.getSerializable("view_history" ).getClass() == Stack.class )
-    				mViewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    			Object viewHistory = (Stack<Integer>) state.getSerializable("view_history");
+    			if( viewHistory == Stack.class )
+    				mViewHistory = (Stack<Integer>)viewHistory;
     			else
     			{
     				//For some reason when the process gets killed and then resumed,
@@ -311,7 +311,7 @@ public class Profile extends ListActivity
         public Boolean doInBackground(Void...params) {
         	RadioPlayList[] playlists;
             boolean success = false;
-            Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
     		try {
     		    if( mUsername == null) {
     				mUser = mServer.getUserInfo( session.getKey() );
@@ -337,7 +337,7 @@ public class Profile extends ListActivity
 
         @Override
         public void onPostExecute(Boolean result) {
-            Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
             if( !isAuthenticatedUser ) {
                 mProfileBubble.setUser(Profile.this.mUser);
                 SetupCommonArtists(tasteometer);
@@ -363,7 +363,7 @@ public class Profile extends ListActivity
 
     private void RebuildMainMenu() 
     {
-        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMainAdapter = new SeparatedListAdapter(this);
         if(isAuthenticatedUser) {
             mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
@@ -480,7 +480,7 @@ public class Profile extends ListActivity
 
     private void SetupMyStations()
     {
-        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMyStationsAdapter = new LastFMStreamAdapter( this );
         if(isAuthenticatedUser) {
 	        mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
@@ -672,7 +672,7 @@ public class Profile extends ListActivity
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) 
 		{
 			try {
-		        Session session = ( Session ) LastFMApplication.getInstance().map.get( "lastfm_session" );
+		        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
 				Tag tag = (Tag)l.getAdapter().getItem(position);
 				
 	        	ListAdapter la = (ListAdapter) l.getAdapter();

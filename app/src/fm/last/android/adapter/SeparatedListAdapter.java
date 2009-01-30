@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import fm.last.android.R;
-import fm.last.android.R.layout;
 
 import android.content.Context;
 import android.view.View;

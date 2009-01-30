@@ -15,7 +15,6 @@
 package fm.last.api;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * @author jennings
@@ -23,6 +22,7 @@ import java.util.Date;
  */
 public class User implements Serializable {
 
+  private static final long serialVersionUID = 2047407259337226913L;
   public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount) {
     this.name = name;
     this.url = url;

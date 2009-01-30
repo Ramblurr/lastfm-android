@@ -140,6 +140,8 @@ import java.io.Serializable;
  */
 
 public class RadioPlayList implements Serializable {
+
+  private static final long serialVersionUID = -2942384510726687260L;
   private String title;
   private String creator;
   private String date;

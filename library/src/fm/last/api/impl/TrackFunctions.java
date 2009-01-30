@@ -14,7 +14,6 @@
 
 package fm.last.api.impl;
 
-import fm.last.api.Album;
 import fm.last.api.Tag;
 import fm.last.api.Track;
 import fm.last.api.User;
