@@ -523,15 +523,7 @@ public class Profile extends ListActivity
         
         try
         {
-        	String adapter_station;
-        	try {
-        		adapter_station = mMainAdapter.getStation(position-1);
-        	}catch( IndexOutOfBoundsException e ) {
-        		//I'm not entirely sure how we're getting in a state where the position -1
-        		//is and invalid index - a lot of this code looks dodgy anyways.
-        		//Atleast this stops a crash.
-        		return;
-        	}
+        	String adapter_station = mMainAdapter.getStation(position-1);
 	        
         	if ( LastFMApplication.getInstance().player != null && LastFMApplication.getInstance().player.isPlaying() ) {
 		        String current_station = LastFMApplication.getInstance().player.getStationUrl();
