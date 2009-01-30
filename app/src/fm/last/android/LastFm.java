@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -24,12 +25,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
 public class LastFm extends Activity
 {
-
     public static final String PREFS = "LoginPrefs";
     public static final String DB_NAME = "lastfm";
     public static final String DB_TABLE_RECENTSTATIONS = "t_recentstations";
@@ -98,13 +99,14 @@ public class LastFm extends Activity
 			if(pass != null)
 			    mPassField.setText( pass );
         }
+        
         mLoginButton.setOnClickListener( new View.OnClickListener()
         {
-
             public void onClick( View v )
             {
-
-                String user = mUserField.getText().toString();
+            	if (mLoginTask != null) return; 
+            	
+            	String user = mUserField.getText().toString();
                 String password = mPassField.getText().toString();
 
                 if(user.length() == 0 || password.length() == 0) {
@@ -112,47 +114,18 @@ public class LastFm extends Activity
 							getResources().getString(R.string.ERROR_MISSINGINFO));
 					return;
                 }
-                
-                try
-                {
-                	Session session = doLogin( user, password );
-                    SharedPreferences settings = getSharedPreferences( PREFS, 0 );
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString( "lastfm_user", user );
-                    editor.putString( "lastfm_session_key", session.getKey());
-                    editor.putString( "lastfm_subscriber", session.getSubscriber());
-                    editor.commit();
-                    LastFMApplication.getInstance().map.put( "lastfm_session", session );
-                    Intent intent = new Intent( LastFm.this, Profile.class );
-                    intent.putExtra("lastfm.profile.new_user", mNewUser );
-                    startActivity( intent );
-                    finish();
-                }
-                catch ( WSError e )
-                {
-                    LastFMApplication.getInstance().presentError(v.getContext(), e);
-                }
-                catch ( Exception e )
-                {
-                	if(e.getMessage().contains("code 403")) {
-    					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_AUTH_TITLE),
-    							getResources().getString(R.string.ERROR_AUTH));
-    					( ( EditText ) findViewById( R.id.password ) ).setText( "" );
-                	} else {
-    					LastFMApplication.getInstance().presentError(v.getContext(), getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
-    							getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
-                	}
-                }
+            
+                mLoginTask = new LoginTask( v.getContext() );
+                mLoginTask.execute( user, password );
             }
-        } );
+        });
         
-        mSignupButton.setOnClickListener( new OnClickListener() {
-
+        mSignupButton.setOnClickListener( new OnClickListener() 
+        {
 			public void onClick(View v) {
 				Intent intent = new Intent( LastFm.this, SignUp.class );
 				startActivityForResult(intent, 0);
 			}
-        	
         });
     }
     
@@ -172,7 +145,6 @@ public class LastFm extends Activity
     @Override
     public void onSaveInstanceState( Bundle outState )
     {
-
         outState.putBoolean( "loginshown", mLoginShown );
         if ( mLoginShown )
         {
@@ -184,16 +156,104 @@ public class LastFm extends Activity
         super.onSaveInstanceState( outState );
     }
 
-    Session doLogin( String user, String pass ) throws Exception, WSError
+
+    /** In a task because it can take a while, and Android has a tendency to 
+      * panic and show the force quit/wait dialog quickly. And this blocks. 
+      */
+    private class LoginTask extends UserTask<String, Void, Session>
     {
-        LastFmServer server = AndroidLastFmServerFactory.getServer();
-        String md5Password = "135abe67f67f4e57c13b19e273a99a07";
-        String authToken = MD5.getInstance().hash(user + md5Password);
-        Session session = server.getMobileSession(user, authToken);
-        if(session == null)
-        	throw(new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
-        return session;
+    	Context context;
+    	ProgressDialog mDialog;
+    	
+    	Exception e;
+    	WSError wse;
+    	
+    	LoginTask( Context c )
+    	{
+    		this.context = c;
+    		mLoginButton.setEnabled( false );
+    		
+			mDialog = ProgressDialog.show( c , "", "Authenticating", true, false );
+			mDialog.setCancelable( true );
+    	}
+    	    	
+        public Session doInBackground(String...params) 
+        {
+        	String user = params[0];
+        	String pass = params[1];
+        	
+            try
+            {
+            	return login( user, pass );
+            }
+            catch ( WSError e )
+            {
+                wse = e;
+            }
+            catch ( Exception e )
+            {
+            	this.e = e;
+            }        	
+
+            return null;
+        }         
+        
+        Session login( String user, String pass ) throws Exception, WSError
+        {
+            LastFmServer server = AndroidLastFmServerFactory.getServer();
+            String md5Password = MD5.getInstance().hash(pass);
+            String authToken = MD5.getInstance().hash(user + md5Password);
+            Session session = server.getMobileSession(user, authToken);
+            if(session == null)
+            	throw(new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
+            return session;
+        }
+        
+        @Override
+        public void onPostExecute( Session session ) 
+        {
+        	mLoginButton.setEnabled( true );
+        	mLoginTask = null;
+        	
+        	if (session != null)
+        	{	        	
+	            SharedPreferences.Editor editor = getSharedPreferences( PREFS, 0 ).edit();
+	            editor.putString( "lastfm_user", session.getName() );
+	            editor.putString( "lastfm_session_key", session.getKey());
+	            editor.putString( "lastfm_subscriber", session.getSubscriber());
+	            editor.commit();
+	            
+	            LastFMApplication.getInstance().map.put( "lastfm_session", session );
+	            Intent intent = new Intent( LastFm.this, Profile.class );
+	            intent.putExtra("lastfm.profile.new_user", mNewUser );
+	            startActivity( intent );
+	            finish();
+        	}
+        	else if (wse != null)
+        	{
+                LastFMApplication.getInstance().presentError( context, wse );
+            }
+        	else if (e != null)
+            {           	
+        		String one, two;
+            	if(e.getMessage().contains("code 403")) {
+            		one = getResources().getString(R.string.ERROR_AUTH_TITLE);
+    				two = getResources().getString(R.string.ERROR_AUTH);
+    				((EditText)findViewById( R.id.password )).setText( "" );
+            	} else {
+    				one = getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE);
+    				two = getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE);
+            	}
+            	
+				LastFMApplication.getInstance().presentError( context, one, two );
+            }
+            
+            mDialog.dismiss();
+        }
     }
+    
+    private LoginTask mLoginTask;
+    
 
     private class CheckUpdatesTask extends UserTask<Void, Void, Boolean> {
     	private String mUpdateURL = "";
