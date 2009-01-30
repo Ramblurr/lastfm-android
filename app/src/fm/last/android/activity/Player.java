@@ -772,6 +772,9 @@ public class Player extends Activity
 
 			try {
 				Artist[] similar = mServer.getSimilarArtists(mArtistName.getText().toString(), null);
+				if (similar.length == 0)
+					return null;
+				
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for(int i=0; i< ((similar.length < 10) ? similar.length : 10); i++){
 					ListEntry entry = new ListEntry(similar[i], 
@@ -822,6 +825,9 @@ public class Player extends Activity
 		public ArrayList<ListEntry> doInBackground(Void...params) {
 			try {
 				User[] fans = mServer.getTrackTopFans(mTrackName.getText().toString(), mArtistName.getText().toString(), null);
+				if (fans.length == 0)
+					return null;
+				
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for(int i=0; i< ((fans.length < 10) ? fans.length : 10); i++){
 					ListEntry entry = new ListEntry(fans[i], 
@@ -871,6 +877,9 @@ public class Player extends Activity
 		public ArrayList<ListEntry> doInBackground(Void...params) {
 			try {
 				Tag[] tags = mServer.getTrackTopTags(mArtistName.getText().toString(), mTrackName.getText().toString(), null);
+				if (tags.length == 0)
+					return null;
+				
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for(int i=0; i< ((tags.length < 10) ? tags.length : 10); i++){
 					ListEntry entry = new ListEntry(tags[i], 
