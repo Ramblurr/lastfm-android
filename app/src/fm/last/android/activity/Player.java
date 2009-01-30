@@ -499,14 +499,12 @@ public class Player extends Activity
 			String artistName = LastFMApplication.getInstance().player.getArtistName();
 			mArtistName.setText( artistName );
 			mTrackName.setText( LastFMApplication.getInstance().player.getTrackName() );
-			Bitmap art = LastFMApplication.getInstance().player.getAlbumArt();
-			if(art != null) {
-				mAlbum.setArtwork(art);
-				mAlbum.invalidate();
-			} else {
-				new LoadAlbumArtTask().execute((Void)null);
-			}
 
+			Bitmap art = LastFMApplication.getInstance().player.getAlbumArt();
+			mAlbum.setArtwork(art);
+			mAlbum.invalidate();
+			if(art == null) new LoadAlbumArtTask().execute((Void)null);
+			
 			// fetching artist events (On Tour indicator & Events tab)
 			if(!mLoadEventsTaskArtist.equals(artistName)){
 				mLoadEventsTaskArtist = artistName;
