@@ -635,6 +635,11 @@ public class RadioPlayerService extends Service
 		public void stop() throws DeadObjectException
 		{
 			RadioPlayerService.this.stop();
+			long playTime = (System.currentTimeMillis() / 1000) - currentStartTime; 
+			boolean played = playTime > (currentTrack.getDuration() / 2000) || playTime > 240;
+			if (played || isLoved) {
+				new SubmitTrackTask(currentTrack, currentStartTime, "", isLoved).execute(scrobbler);
+			}
 		}
 
 		public boolean tune( String url, Session session ) throws DeadObjectException, WSError
@@ -669,7 +674,11 @@ public class RadioPlayerService extends Service
 		{
 			if(Looper.myLooper() == null)
 				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "S", isLoved).execute(scrobbler);
+			
+			long playTime = (System.currentTimeMillis() / 1000) - currentStartTime; 
+			boolean played = playTime > (currentTrack.getDuration() / 2000) || playTime > 240;
+				
+			new SubmitTrackTask(currentTrack, currentStartTime, played ? "" : "S", isLoved).execute(scrobbler);
 			new NextTrackTask().execute((Void)null);
 		}
 
