@@ -398,8 +398,8 @@ final class LastFmServerImpl implements LastFmServer {
         return AlbumFunctions.getAlbumInfo(baseUrl, params);
     }
 
-	public AudioscrobblerService createAudioscrobbler(Session session) {
-		return new AudioscrobblerService( session, api_key, shared_secret );
+	public AudioscrobblerService createAudioscrobbler(Session session, String clientVersion) {
+		return new AudioscrobblerService( session, api_key, shared_secret, clientVersion );
 	}
 
     public void loveTrack(String artist, String track, String sk) throws IOException {

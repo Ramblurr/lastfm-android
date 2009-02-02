@@ -47,18 +47,20 @@ public class AudioscrobblerService extends Object
 	private String mSessionKey;
 	private String mSharedSecret;
 	private String mApiKey;
+	private String mClientVersion;
 	
 	// responses from handshake
 	private String mSessionId;
 	private URL mNpUrl;
 	private URL mSubsUrl;
 	
-	public AudioscrobblerService( Session session, String api_key, String shared_secret )
+	public AudioscrobblerService( Session session, String apiKey, String sharedSecret, String clientVersion )
 	{
 		mUsername = session.getName();
 		mSessionKey = session.getKey();
-		mSharedSecret = shared_secret;
-		mApiKey = api_key;
+		mSharedSecret = sharedSecret;
+		mClientVersion = clientVersion;
+		mApiKey = apiKey;
 	}
 	
 	private static String timestamp()
@@ -75,17 +77,15 @@ public class AudioscrobblerService extends Object
     	Map<String, String> params = new HashMap<String, String>();
     	params.put( "hs", "true" );
     	params.put( "p", "1.2.1" );
-    	params.put( "c", "lnd" ); //FIXME
-    	params.put( "v", "0.1" ); // FIXME
+    	params.put( "c", "lnd" );
+    	params.put( "v", mClientVersion );
     	params.put( "u", mUsername );
     	params.put( "t", timestamp );
     	params.put( "a", MD5.getInstance().hash( mSharedSecret + timestamp ) );
     	params.put( "api_key", mApiKey );
     	params.put( "sk", mSessionKey );
 
-		URL url = new URL( "http://post.audioscrobbler.com/?" + UrlUtil.buildQuery( params ) );
-				
-		String response = UrlUtil.doGet( url );
+		String response = UrlUtil.doGet( "http://post.audioscrobbler.com/", params );
 		Log.d( "handshake response: " + response );
 
 		String lines[] = response.split( "\n" );

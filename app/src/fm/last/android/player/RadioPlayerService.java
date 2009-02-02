@@ -20,6 +20,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -471,7 +472,12 @@ public class RadioPlayerService extends Service
 		}
 
 		if (scrobbler == null) {
-			scrobbler = server.createAudioscrobbler( currentSession );
+			String version = "0.1";
+			try {
+				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
+			} catch (NameNotFoundException e) {
+			}
+			scrobbler = server.createAudioscrobbler( currentSession, version );
 		}
 	}
 
