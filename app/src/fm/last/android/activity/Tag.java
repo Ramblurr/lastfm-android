@@ -67,7 +67,6 @@ public class Tag extends Activity implements TabBarListener {
 	TabBar mTabBar;
 	ListView mTagList;
 	
-	ProgressDialog mLoadDialog;
 	ProgressDialog mSaveDialog;
 	// --------------------------------
 	// XML LAYOUT start
@@ -184,11 +183,20 @@ public class Tag extends Activity implements TabBarListener {
 			mUserTags = (ArrayList<String>) savedState[1];
 			mTrackOldTags = (ArrayList<String>) savedState[2];
 			mTrackNewTags = (ArrayList<String>) savedState[3];
-			fillData();
+			
+			// this looks insane, and well, it is. Basically when changing orientation we are 
+			// serialised and unserialised - unserialisation happens here. But if we are still
+			// loading tags the above 4 members will be null, so we need to do a new usertask
+			// because otherwise we'll never get the tags, and we can't serialise the usertask
+			try {
+				fillData();
+				return;
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
 		}  
-		else {
-			new LoadTagTask().execute((Object)null);
-		}
+		
+		new LoadTagTask().execute((Object)null);
 	}
 	
 	private void fetchDataFromServer(){
@@ -231,7 +239,8 @@ public class Tag extends Activity implements TabBarListener {
 	 * Fills mTopTagListAdapter, mUserTagListListAdapter and mTagLayout with
 	 * data (mTopTags, mUserTags & mTrackNewTags)
 	 */
-	private void fillData(){
+	private void fillData()
+	{
 		mTopTagListAdapter.setSource(mTopTags, mTrackNewTags);
 		mUserTagListAdapter.setSource(mUserTags, mTrackNewTags);
 		for(int i=0; i<mTrackNewTags.size(); i++){
@@ -399,7 +408,7 @@ public class Tag extends Activity implements TabBarListener {
 	 * @author Lukasz Wisniewski
 	 */
 	private class LoadTagTask extends UserTask<Object, Integer, Object>{
-
+		ProgressDialog mLoadDialog;
 		@Override
 		public void onPreExecute() {
 			if(mLoadDialog == null){
@@ -417,9 +426,17 @@ public class Tag extends Activity implements TabBarListener {
 		@Override
 		public void onPostExecute(Object result) {
 			fillData();
-			if(mLoadDialog != null){
-				mLoadDialog.dismiss();
-				mLoadDialog = null;
+			try {
+				if(mLoadDialog != null){
+					mLoadDialog.dismiss();
+					mLoadDialog = null;
+				}
+			}
+			catch( IllegalArgumentException e )
+			{
+				// for some reason this happens if you change orientation during the tag loading phase
+				// we reason it is because a new activity is created, but it's a bit mysterious
+				e.printStackTrace();
 			}
 		}	
 	}
