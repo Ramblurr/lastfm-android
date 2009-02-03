@@ -226,6 +226,12 @@ public class Profile extends ListActivity
     @Override
     protected void onSaveInstanceState( Bundle outState )
     {
+    	// the event list adapter (a SeparatedListAdapter) doesn't serialise,
+    	// so move away from it if we happen to be looking at it now.
+    	// FIXME: make the SeparatedListAdapter serialize.
+    	if( mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
+    		mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
+    	
      	outState.putInt( "selected_tab", mTabBar.getActive());
      	outState.putInt( "displayed_view", mNestedViewFlipper.getDisplayedChild());
      	outState.putSerializable("view_history", mViewHistory); 
@@ -241,16 +247,8 @@ public class Profile extends ListActivity
 		}
      	
      	outState.putSerializable("adapters", adapters);
-        
         outState.putSerializable("info_album", mAlbumInfo);
         outState.putSerializable("info_track", mTrackInfo);
-        
-        
-    	//FIXME: it's not so easy to serialize the events adapter as it's a 
-    	//		 Seperated List Adapter.
-    	//		Rather than doing a half-arsed job, i just left it out altogether.
-        //outState.putSerializable("adapter_events", (ListAdapter)mEventsList.getAdapter());
-        
     }
     
     @SuppressWarnings("unchecked")
@@ -263,7 +261,7 @@ public class Profile extends ListActivity
     	if( state.containsKey("view_history") )
     		try {
     			Object viewHistory = (Stack<Integer>) state.getSerializable("view_history");
-    			if( viewHistory == Stack.class )
+    			if( viewHistory instanceof Stack )
     				mViewHistory = (Stack<Integer>)viewHistory;
     			else
     			{
@@ -291,9 +289,6 @@ public class Profile extends ListActivity
 		    	mProfileLists[key].setAdapter( adapter );
 			}
     	}
-    	
-      	if( mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
-    		mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
     	
      	
     	mAlbumInfo = (Album)state.getSerializable("info_album");
