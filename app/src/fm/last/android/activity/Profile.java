@@ -409,8 +409,11 @@ public class Profile extends ListActivity
 
     	for( ListView list : mProfileLists )
     	{
-    		if( list.getAdapter() != null )
+    		try { 
     			((ListAdapter)list.getAdapter()).disableLoadBar();
+    		} catch (Exception e) { 
+    			// FIXME: this is ugly, but sometimes adapters aren't the shape we expect.
+    		}
     	}
 
         if( mDialogAdapter != null )
