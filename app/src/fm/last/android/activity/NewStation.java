@@ -327,7 +327,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++){
     	            if ( mArtists[i].getStreamable().equals("1") ) {
 	    				ListEntry entry = new ListEntry(mArtists[i], 
-	    						R.drawable.tag_dark, 
+	    						R.drawable.artist_icon, 
 	    						mArtists[i].getName(), 
 	    						mArtists[i].getImages()[0].getUrl(),
 	    						R.drawable.list_icon_station);
