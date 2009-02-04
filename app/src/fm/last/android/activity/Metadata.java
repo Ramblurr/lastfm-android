@@ -53,7 +53,7 @@ public class Metadata extends Activity {
 	private BaseAdapter mEventAdapter;
 	
 	private ImageCache mImageCache;
-	
+	private EventActivityResult mOnEventActivityResult;
 	
 	TextView mTextView;
 	TabBar mTabBar;
@@ -387,7 +387,6 @@ public class Metadata extends Activity {
 		}
 	}
 	
-	protected EventActivityResult mOnEventActivityResult;
 	
 	/**
 	 * This load task is slightly bigger as it has to handle OnTour indicator
@@ -481,4 +480,15 @@ public class Metadata extends Activity {
 		}
 
 	};
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 0 && resultCode == RESULT_OK) {
+			int status = data.getExtras().getInt("status", -1);
+			if (mOnEventActivityResult != null && status != -1) {
+				mOnEventActivityResult.onEventStatus(status);
+			}
+		}
+	}
+	
 }

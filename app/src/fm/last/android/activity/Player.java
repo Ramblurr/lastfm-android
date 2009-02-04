@@ -68,8 +68,6 @@ public class Player extends Activity {
 	private RemoteImageHandler mAlbumArtHandler;
 	private IntentFilter mIntentFilter;
 
-	private EventActivityResult mOnEventActivityResult;
-
 	@Override
 	public void onCreate(Bundle icicle) {
 
@@ -630,16 +628,6 @@ public class Player extends Activity {
 				mOntourButton.startAnimation(a);
 			} else {
 
-			}
-		}
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 0 && resultCode == RESULT_OK) {
-			int status = data.getExtras().getInt("status", -1);
-			if (mOnEventActivityResult != null && status != -1) {
-				mOnEventActivityResult.onEventStatus(status);
 			}
 		}
 	}
