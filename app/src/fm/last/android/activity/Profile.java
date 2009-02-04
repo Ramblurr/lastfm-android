@@ -979,8 +979,6 @@ public class Profile extends ListActivity
     			ListAdapter adapter = new ListAdapter(Profile.this, getImageCache());
     			adapter.setSourceIconified(iconifiedEntries);
         		mProfileLists[PROFILE_TAGS].setAdapter(adapter);
-                mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
-                mNestedViewFlipper.setDisplayedChild(PROFILE_TAGS + 1);
         	} else {
                 String[] strings = new String[]{"No Tags"};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
@@ -988,6 +986,8 @@ public class Profile extends ListActivity
     	        adapter.setDisabled();
                 mProfileLists[PROFILE_TAGS].setAdapter(adapter);
         	}
+            mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save the current view
+            mNestedViewFlipper.setDisplayedChild(PROFILE_TAGS + 1);
         }
     }
 
