@@ -47,5 +47,8 @@
 <category android:name="android.intent.category.DEFAULT"></category>
 </intent-filter>
 </activity>
+<activity android:name=".activity.Metadata"><intent-filter>
+</intent-filter>
+</activity>
 </application>
 </manifest> 
