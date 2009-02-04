@@ -184,22 +184,22 @@ public class Metadata extends Activity {
 				}
 
 				mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>"
-					+ "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>"
-					+ "<img src='"
-					+ imageURL
-					+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
-					+ "<div style='margin-left:84px; margin-top:3px'>"
-					+ "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
-					+ mArtistName
-					+ "</span><br/>"
-					+ "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
-					+ listeners
-					+ " listeners<br/>"
-					+ plays
-					+ " plays</span></div>"
-					+ "<br style='clear:both;'/>"
-					+ formatBio(artist.getBio().getContent())
-					+ "</div></body></html>";
+					 + "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>"
+					 + "<img src='"
+					 + imageURL
+					 + "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
+					 + "<div style='margin-left:84px; margin-top:3px'>"
+					 + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
+					 + mArtistName
+					 + "</span><br/>"
+					 + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
+					 + listeners
+					 + " listeners<br/>"
+					 + plays
+					 + " plays</span></div>"
+					 + "<br style='clear:both;'/>"
+					 + formatBio(artist.getBio().getContent())
+					 + "</div></body></html>";
 				
 				success = true;
 			} catch (IOException e) {
@@ -217,10 +217,11 @@ public class Metadata extends Activity {
 		public void onPostExecute(Boolean result) {
 			if(result) {
 				try {
-	    			mWebView.loadData(
-	    					new String(mBio.getBytes(), "utf-8"),		// need to do this, but is there a better way? 
-	    					"text/html", 
-	    					"utf-8");
+	    			mWebView.loadDataWithBaseURL(null,
+	    										 new String(mBio.getBytes(), "utf-8"),		// need to do this, but is there a better way? 
+	    										 "text/html", 
+	    										 "utf-8",
+	    										 null);
 	    			// request focus to make the web view immediately scrollable
 	    			mWebView.requestFocus();	
 	    			return;
