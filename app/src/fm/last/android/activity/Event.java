@@ -26,6 +26,7 @@ import fm.last.api.LastFmServer;
 import fm.last.api.WSError;
 
 public class Event extends Activity {
+
 	private TextView mTitle;
 	private TextView mArtists;
 	private TextView mVenue;
@@ -86,7 +87,7 @@ public class Event extends Activity {
         mDay.setText(getIntent().getStringExtra("lastfm.event.day"));
         
         mPosterImage = (RemoteImageView)findViewById(R.id.poster);
-        mPosterImageWorker = new Worker( "profile image worker" );
+        mPosterImageWorker = new Worker( "poster image worker" );
         mPosterImageHandler = new RemoteImageHandler( mPosterImageWorker
                 .getLooper(), mHandler );
         mPosterImageHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
@@ -174,6 +175,12 @@ public class Event extends Activity {
             }
         }
     };
+
+	@Override
+	protected void onStop() {
+		mPosterImageWorker.quit();
+		super.onStop();
+	}
     
     public static Intent intentFromEvent(Context packageContext, fm.last.api.Event event)
     {

@@ -79,13 +79,13 @@ public class ProfileBubble extends LinearLayout {
             plays += " since " + mUser.getJoinDate();
         mSecond.setText(second + plays);
 
-        mProfileImageWorker = new Worker("profile image worker");
-        mProfileImageHandler = new RemoteImageHandler(mProfileImageWorker
-                .getLooper(), mHandler);
-        mProfileImageHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-        if( mUser.getImages().length > 0 )
+        if( mUser.getImages().length > 0 ) {
+            mProfileImageWorker = new Worker("profile image worker");
+            mProfileImageHandler = new RemoteImageHandler(mProfileImageWorker.getLooper(), mHandler);
+            mProfileImageHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
             mProfileImageHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE,
                     mUser.getImages()[0].getUrl()).sendToTarget();
+        }
     }
 
     private final Handler mHandler = new Handler()
@@ -95,6 +95,7 @@ public class ProfileBubble extends LinearLayout {
             switch (msg.what)
             {
             case RemoteImageHandler.REMOTE_IMAGE_DECODED:
+                mProfileImageWorker.quit();
                 if (mAvatar != null) {
                     mAvatar.setArtwork((Bitmap) msg.obj);
                     mAvatar.invalidate();
