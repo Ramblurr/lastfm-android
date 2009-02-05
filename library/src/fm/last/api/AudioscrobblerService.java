@@ -134,7 +134,10 @@ public class AudioscrobblerService extends Object
 		params.put( "b[0]", t.getAlbum() );
 		params.put( "l[0]", new Integer(t.getDuration() / 1000).toString() );
 		params.put( "i[0]", new Long(timestamp).toString() );
-		params.put( "o[0]", "L" + t.getTrackAuth() );
+		if(t.getTrackAuth().length() > 0)
+			params.put( "o[0]", "L" + t.getTrackAuth() );
+		else
+			params.put( "o[0]", "P" );
 		params.put( "r[0]", ratingCharacter );
 		params.put( "m[0]", "");
 		params.put( "n[0]", "");
