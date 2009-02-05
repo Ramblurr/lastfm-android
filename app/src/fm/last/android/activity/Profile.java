@@ -1274,7 +1274,7 @@ public class Profile extends ListActivity
             IRadioPlayer player = LastFMApplication.getInstance().player;
             if(player != null) {
         		player.stop();
-        		player.resetScrobbler();
+        		//player.resetScrobbler();
             }
         }
         catch ( Exception e )

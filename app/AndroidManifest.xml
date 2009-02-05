@@ -9,8 +9,12 @@
 		<activity android:name=".LastFm" android:label="@string/app_name" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
+				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lastfm" />
+            </intent-filter>
 		</activity>
 		<activity android:name=".activity.Profile" android:label="Last.fm: Profile" android:configChanges="keyboardHidden">
 			<intent-filter>
@@ -42,13 +46,28 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<service android:name=".player.RadioPlayerService" android:process=":remote" />
-	<activity android:name=".activity.SignUp" android:label="Last.fm: Sign Up"><intent-filter><action android:name="android.intent.action.VIEW"></action>
-<category android:name="android.intent.category.DEFAULT"></category>
-</intent-filter>
-</activity>
-<activity android:name=".activity.Metadata"><intent-filter>
-</intent-filter>
-</activity>
-</application>
+		<activity android:name=".activity.SignUp" android:label="Last.fm: Sign Up">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+		</activity>
+		<activity android:name=".activity.Metadata">
+			<intent-filter>
+			</intent-filter>
+		</activity>
+       	<receiver android:name=".scrobbler.MusicIntentReceiver">
+    		<intent-filter>
+    			<action android:name="com.android.music.playstatechanged"/>
+    			<action android:name="com.android.music.playbackcomplete"/>
+    			<action android:name="fm.last.android.metachanged"/>
+    			<action android:name="fm.last.android.playstatechanged"/>
+    			<action android:name="fm.last.android.playbackcomplete"/>
+    			<action android:name="fm.last.android.LOVE"/>
+    			<action android:name="fm.last.android.BAN"/>
+    		</intent-filter>
+    	</receiver>
+		<service android:name=".player.RadioPlayerService" android:process=":player" />
+		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>
+    </application>
 </manifest> 

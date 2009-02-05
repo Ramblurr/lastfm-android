@@ -5,7 +5,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -56,7 +55,6 @@ public class RadioPlayerService extends Service
 	private int bufferPercent;
 	private WSError mError = null;
 	private String currentStationURL = null;
-	private AudioscrobblerService scrobbler;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
 	private final int STATE_STOPPED = 0;
@@ -69,7 +67,6 @@ public class RadioPlayerService extends Service
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
 	private Bitmap mAlbumArt;
-	private boolean isLoved;
 
 	/**
 	 * Tracks whether there are activities currently bound to the service so
@@ -81,8 +78,8 @@ public class RadioPlayerService extends Service
 //	private static final int SCROBBLE_HANDSHAKE = 1;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
-	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackfinished";
-	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playbackstatechanged";
+	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
+	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playstatechanged";
 	public static final String STATION_CHANGED = "fm.last.android.stationchanged";
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
 	public static final String UNKNOWN = "fm.last.android.unknown";
@@ -200,7 +197,6 @@ public class RadioPlayerService extends Service
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
 		nm.notify( NOTIFY_ID, notification );
-		new NowPlayingTask(currentTrack).execute(scrobbler);
 	}
 
 	private void playTrack( RadioTrack track )
@@ -212,7 +208,6 @@ public class RadioPlayerService extends Service
 			
 			currentTrack = track;
 			mAlbumArt = null;
-			isLoved = false;
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
 			mp.reset();
 			mp.setDataSource( track.getLocationUrl() );
@@ -221,7 +216,6 @@ public class RadioPlayerService extends Service
 
 				public void onCompletion( MediaPlayer mp )
 				{
-					new SubmitTrackTask(currentTrack, currentStartTime, isLoved ? "L" : "", isLoved).execute(scrobbler);
 					new NextTrackTask().execute((Void)null);
 				}
 			} );
@@ -298,7 +292,6 @@ public class RadioPlayerService extends Service
 	{
 		if (mState == STATE_PLAYING) {
 			mp.stop();
-			new SubmitTrackTask(currentTrack, currentStartTime, "S", isLoved).execute(scrobbler);
 		}
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
@@ -437,6 +430,8 @@ public class RadioPlayerService extends Service
 			i.putExtra( "artist", currentTrack.getCreator() );
 			i.putExtra( "album", currentTrack.getAlbum() );
 			i.putExtra( "track", currentTrack.getTitle() );
+			i.putExtra( "duration", currentTrack.getDuration());
+			i.putExtra( "trackAuth", currentTrack.getTrackAuth());
 		}
 		i.putExtra( "station", currentStation );
 		sendBroadcast( i );
@@ -469,80 +464,6 @@ public class RadioPlayerService extends Service
 			currentStationURL = null;
 			wakeLock.release();
 			wifiLock.release();
-		}
-
-		if (scrobbler == null) {
-			String version = "0.1";
-			try {
-				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
-			} catch (NameNotFoundException e) {
-			}
-			scrobbler = server.createAudioscrobbler( currentSession, version );
-		}
-	}
-
-	private class NowPlayingTask extends UserTask<AudioscrobblerService, Void, Boolean> {
-		RadioTrack mTrack;
-		
-		public NowPlayingTask(RadioTrack track) {
-			mTrack = track;
-		}
-
-		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
-			boolean success = false;
-			try
-			{
-				scrobbler[0].nowPlaying(mTrack);
-				success = true;
-			}
-			catch ( Exception e )
-			{
-				success = false;
-			}
-			return success;
-		}
-
-		@Override
-		public void onPostExecute(Boolean result) {
-		}
-	}
-
-	private class SubmitTrackTask extends UserTask<AudioscrobblerService, Void, Boolean> {
-		RadioTrack mTrack;
-		String mRating;
-		long mTime;
-		boolean mLoved;
-		
-		public SubmitTrackTask(RadioTrack track, long time, String rating, boolean loved) {
-			mTrack = track;
-			mRating = rating;
-			mTime = time;
-			mLoved = loved;
-		}
-
-		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
-			boolean success = false;
-			try
-			{
-				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				if(mRating.equals("L") || mLoved) {
-					server.loveTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
-				}
-				if(mRating.equals("B")) {
-					server.banTrack(mTrack.getCreator(), mTrack.getTitle(), currentSession.getKey());
-				}
-				scrobbler[0].submit(mTrack, mTime, mRating);
-				success = true;
-			}
-			catch ( Exception e )
-			{
-				success = false;
-			}
-			return success;
-		}
-
-		@Override
-		public void onPostExecute(Boolean result) {
 		}
 	}
 
@@ -635,11 +556,6 @@ public class RadioPlayerService extends Service
 		public void stop() throws DeadObjectException
 		{
 			RadioPlayerService.this.stop();
-			long playTime = (System.currentTimeMillis() / 1000) - currentStartTime; 
-			boolean played = playTime > (currentTrack.getDuration() / 2000) || playTime > 240;
-			if (played || isLoved) {
-				new SubmitTrackTask(currentTrack, currentStartTime, "", isLoved).execute(scrobbler);
-			}
 		}
 
 		public boolean tune( String url, Session session ) throws DeadObjectException, WSError
@@ -675,24 +591,7 @@ public class RadioPlayerService extends Service
 			if(Looper.myLooper() == null)
 				Looper.prepare();
 			
-			long playTime = (System.currentTimeMillis() / 1000) - currentStartTime; 
-			boolean played = playTime > (currentTrack.getDuration() / 2000) || playTime > 240;
-				
-			new SubmitTrackTask(currentTrack, currentStartTime, played ? "" : "S", isLoved).execute(scrobbler);
 			new NextTrackTask().execute((Void)null);
-		}
-
-		public void love() throws RemoteException
-		{
-			isLoved = true;
-		}
-
-		public void ban() throws RemoteException
-		{
-			if(Looper.myLooper() == null)
-				Looper.prepare();
-			new SubmitTrackTask(currentTrack, currentStartTime, "B", false).execute(scrobbler);
-			nextSong();
 		}
 
 		public String getAlbumName() throws RemoteException
@@ -792,10 +691,6 @@ public class RadioPlayerService extends Service
 
 		public void setAlbumArt(Bitmap art) throws RemoteException {
 			mAlbumArt = art;
-		}
-
-		public void resetScrobbler() throws RemoteException {
-			scrobbler = null;
 		}
 	};
 

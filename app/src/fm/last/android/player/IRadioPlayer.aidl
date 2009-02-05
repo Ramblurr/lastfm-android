@@ -7,10 +7,7 @@ interface IRadioPlayer {
 	void pause();
 	void stop();
 	void startRadio();
-	void resetScrobbler();	// temporary (while the scrobbler lives in the radio service)
 
-	void love();
-	void ban();
 	void skip(); 
 	
 	String getArtistName();

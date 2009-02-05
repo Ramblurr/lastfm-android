@@ -11,6 +11,7 @@ import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.Album;
 import fm.last.api.Event;
@@ -261,14 +262,10 @@ public class Player extends Activity {
 
 			if (LastFMApplication.getInstance().player == null)
 				return;
-			try {
-				LastFMApplication.getInstance().player.love();
-				Toast.makeText(Player.this, "Track has been marked as loved",
-						Toast.LENGTH_SHORT).show();
-			} catch (RemoteException ex) {
-				System.out.println(ex.getMessage());
-			}
-		}
+			Intent i = new Intent(ScrobblerService.LOVE);
+			sendBroadcast(i);
+			Toast.makeText(Player.this, "Track has been marked as loved",
+					Toast.LENGTH_SHORT).show();		}
 	};
 
 	private View.OnClickListener mBanListener = new View.OnClickListener() {
@@ -277,10 +274,13 @@ public class Player extends Activity {
 
 			if (LastFMApplication.getInstance().player == null)
 				return;
+			Intent i = new Intent(ScrobblerService.BAN);
+			sendBroadcast(i);
 			try {
-				LastFMApplication.getInstance().player.ban();
-			} catch (RemoteException ex) {
-				System.out.println(ex.getMessage());
+				LastFMApplication.getInstance().player.skip();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	};
