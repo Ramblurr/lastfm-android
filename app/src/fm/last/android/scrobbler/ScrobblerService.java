@@ -3,6 +3,11 @@
  */
 package fm.last.android.scrobbler;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.android.music.IMediaPlaybackService;
@@ -21,6 +26,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -36,6 +42,13 @@ import android.util.Log;
  * and other 3rd party apps that broadcast fm.last.android.metachanged notifications.  We can't
  * rely on com.android.music.metachanged due to a bug in the built-in media player that does not
  * broadcast this notification when playing the first track, only when starting the next track.
+ * 
+ * Scrobbles and Now Playing data are serialized between launches, and will be sent when the track or
+ * network state changes.  This service has a very short lifetime and is only started for a few seconds at
+ * a time when there's work to be done.  This server is started when music state or network state change.
+ * 
+ * Scrobbles are submitted to the server after Now Playing info is sent, or when a network connection becomes
+ * available.
  * 
  * Sample code for a 3rd party to integrate with us:
  * 
@@ -60,27 +73,11 @@ public class ScrobblerService extends Service {
 	public static final String LOVE = "fm.last.android.LOVE";
 	public static final String BAN = "fm.last.android.BAN";
 	AudioscrobblerService mScrobbler;
-	
-	private class ScrobblerQueueEntry {
-		public String artist;
-		public String title;
-		public String album;
-		public long startTime;
-		public int duration;
-		public String trackAuth = "";
-		public String rating = "";
-		
-		public RadioTrack toRadioTrack() {
-			return new RadioTrack("", title, "", album, artist, new Integer(duration).toString(), "", trackAuth);
-		}
-	}
-	
+	SubmitTracksTask mSubmissionTask = null;
+	NowPlayingTask mNowPlayingTask = null;
 	ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
 	ScrobblerQueueEntry mCurrentTrack = null;
 	
-	/*
-	 * TODO: Serialize mCurrentTrack and mQueue when shutting down, and deserialize them on startup
-	 */
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -98,17 +95,79 @@ public class ScrobblerService extends Service {
 			} catch (NameNotFoundException e) {
 			}
 			mScrobbler = server.createAudioscrobbler( mSession, version );
+        } else {
+        	//User not authenticated, shutting down...
+        	stopSelf();
         }
-		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        
+        try {
+            FileInputStream fileStream = openFileInput("currentTrack.dat");
+            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+            Object obj = objectStream.readObject();
+            if(obj instanceof ScrobblerQueueEntry) {
+            	mCurrentTrack = (ScrobblerQueueEntry)obj;
+            }
+            objectStream.close();
+            fileStream.close();
+        } catch (Exception e) {
+        	mCurrentTrack = null;
+        }
+
+        try {
+            FileInputStream fileStream = openFileInput("queue.dat");
+            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+            Object obj = objectStream.readObject();
+            if(obj instanceof ArrayBlockingQueue) {
+            	mQueue = (ArrayBlockingQueue<ScrobblerQueueEntry>)obj;
+            }
+            objectStream.close();
+            fileStream.close();
+        } catch (Exception e) {
+            mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        }
 	}
 
+	public void onDestroy() {
+		super.onDestroy();
+
+		try {
+			if(getFileStreamPath("currentTrack.dat").exists())
+				deleteFile("currentTrack.dat");
+			if(mCurrentTrack != null) {
+				FileOutputStream filestream = openFileOutput("currentTrack.dat", 0);
+				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
+				objectstream.writeObject(mCurrentTrack);
+				objectstream.close();
+				filestream.close();
+			}
+		} catch (Exception e) {
+			if(getFileStreamPath("currentTrack.dat").exists())
+				deleteFile("currentTrack.dat");
+			Log.e("LastFm", "Unable to save current track state");
+			e.printStackTrace();
+		}
+
+		try {
+			if(getFileStreamPath("queue.dat").exists())
+				deleteFile("queue.dat");
+			if(mQueue.size() > 0) {
+				FileOutputStream filestream = openFileOutput("queue.dat", 0);
+				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
+				objectstream.writeObject(mQueue);
+				objectstream.close();
+				filestream.close();
+			}
+		} catch (Exception e) {
+			if(getFileStreamPath("queue.dat").exists())
+				deleteFile("queue.dat");
+			Log.e("LastFm", "Unable to save queue state");
+			e.printStackTrace();
+		}
+	}
+	
 	/*
 	 * This will check the distance between the start time and the current time to determine
 	 * whether this is a skip or a played track, and will add it to our scrobble queue.
-	 * It will then start the task to submit the queue.
-	 * 
-	 * TODO: The submission task needs to lock the queue variable so it does not get modified
-	 * while submitting tracks.
 	 */
 	public void enqueueCurrentTrack() {
 		long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
@@ -121,7 +180,6 @@ public class ScrobblerService extends Service {
 			Log.i("LastFm", "Enqueuing track");
 	   		mQueue.add(mCurrentTrack);
 	   		mCurrentTrack = null;
-	   		new SubmitTracksTask().execute(mScrobbler);
 		}
 	}
 	
@@ -137,8 +195,7 @@ public class ScrobblerService extends Service {
 		if(intent.getAction().equals("com.android.music.playstatechanged") &&
 				intent.getIntExtra("id", -1) != -1) {
 			Log.i("LastFm", "Got PLAYBACK_STATE_CHANGED from Andriod media player, checking playing status...");
-            bindService(new Intent().setClassName(
-                    "com.android.music", "com.android.music.MediaPlaybackService"),
+            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
                     new ServiceConnection() {
                     public void onServiceConnected(ComponentName comp, IBinder binder) {
                             IMediaPlaybackService s =
@@ -152,12 +209,13 @@ public class ScrobblerService extends Service {
 									handleIntent(i);
 								} else { //Media player was paused
 									mCurrentTrack = null;
-									mDeferredStopHandler.deferredStopSelf();
+									stopSelf();
 								}
 							} catch (RemoteException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+							unbindService(this);
                     }
 
                     public void onServiceDisconnected(ComponentName comp) {}
@@ -169,8 +227,6 @@ public class ScrobblerService extends Service {
     
     public void handleIntent(Intent intent) {
         if(intent.getAction().equals(RadioPlayerService.META_CHANGED)) {
-			mDeferredStopHandler.cancelStopSelf();
-
         	if(mCurrentTrack != null) {
         		enqueueCurrentTrack();
         	}
@@ -190,12 +246,11 @@ public class ScrobblerService extends Service {
 			if(auth != null && auth.length() > 0) {
 				mCurrentTrack.trackAuth = auth;
 			}
-			new NowPlayingTask(mCurrentTrack.toRadioTrack()).execute(mScrobbler);
+			mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+			mNowPlayingTask.execute(mScrobbler);
 		}
 		if(intent.getAction().equals(RadioPlayerService.PLAYBACK_FINISHED)) {
 			enqueueCurrentTrack();
-			if(mQueue.size() == 0)
-				mDeferredStopHandler.deferredStopSelf();
 		}
 		if(intent.getAction().equals(LOVE)) {
 			mCurrentTrack.rating = "L";
@@ -203,6 +258,28 @@ public class ScrobblerService extends Service {
 		if(intent.getAction().equals(BAN)) {
 			mCurrentTrack.rating = "B";
 		}
+		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
+				Log.i("LastFm", "Network connection lost, stopping scrobbler service");
+				stopSelf();
+			} else {
+				Log.i("LastFm", "Network connection available!");
+				if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
+					mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+					mNowPlayingTask.execute(mScrobbler);
+				}
+		   		if(mQueue.size() > 0 && mSubmissionTask == null) {
+			   		mSubmissionTask = new SubmitTracksTask();
+			   		mSubmissionTask.execute(mScrobbler);
+		   		}
+			}
+		}
+		stopIfReady();
+    }
+    
+    public void stopIfReady() {
+		if(mSubmissionTask == null && mNowPlayingTask == null)
+			stopSelf();
     }
     
     /* We don't currently offer any bindable functions.  Perhaps in the future we can add
@@ -236,6 +313,14 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPostExecute(Boolean result) {
+			mCurrentTrack.postedNowPlaying = result;
+			mNowPlayingTask = null;
+			/* If we have any scrobbles in the queue, try to send them now */
+	   		if(mSubmissionTask == null && mQueue.size() > 0) {
+		   		mSubmissionTask = new SubmitTracksTask();
+		   		mSubmissionTask.execute(mScrobbler);
+	   		}
+	   		stopIfReady();
 		}
 	}
 
@@ -262,8 +347,6 @@ public class ScrobblerService extends Service {
 			}
 			catch ( Exception e )
 			{
-				Log.e("LastFm", "Unable to submit tracks: " + e);
-				e.printStackTrace();
 				success = false;
 			}
 			return success;
@@ -271,59 +354,8 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPostExecute(Boolean result) {
-			/*
-			 * TODO: check mQueue.size(), if it has tracks then schedule a retry to occur in
-			 * 30 seconds.
-			 */
-			if(mCurrentTrack == null)
-				mDeferredStopHandler.deferredStopSelf();
+			mSubmissionTask = null;
+			stopIfReady();
 		}
 	}
-	
-	/**
-	 * Deferred stop implementation from the five music player for android:
-	 * http://code.google.com/p/five/ (C) 2008 jasta00
-	 */
-	private final DeferredStopHandler mDeferredStopHandler = new DeferredStopHandler();
-
-	private class DeferredStopHandler extends Handler
-	{
-
-		/* Wait 1 minute before vanishing. */
-		public static final long DEFERRAL_DELAY = 1 * ( 60 * 1000 );
-
-		private static final int DEFERRED_STOP = 0;
-
-		public void handleMessage( Message msg )
-		{
-
-			switch ( msg.what )
-			{
-			case DEFERRED_STOP:
-				stopSelf();
-				break;
-			default:
-				super.handleMessage( msg );
-			}
-		}
-
-		public void deferredStopSelf()
-		{
-
-			Log.i( "Lastfm", "Service stop scheduled "
-					+ ( DEFERRAL_DELAY / 1000 / 60 ) + " minutes from now." );
-			sendMessageDelayed( obtainMessage( DEFERRED_STOP ), DEFERRAL_DELAY );
-		}
-
-		public void cancelStopSelf()
-		{
-
-			if ( hasMessages( DEFERRED_STOP ) == true )
-			{
-				Log.i( "Lastfm", "Service stop cancelled." );
-				removeMessages( DEFERRED_STOP );
-			}
-		}
-	};
-
 }

@@ -65,6 +65,7 @@
     			<action android:name="fm.last.android.playbackcomplete"/>
     			<action android:name="fm.last.android.LOVE"/>
     			<action android:name="fm.last.android.BAN"/>
+    			<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
     		</intent-filter>
     	</receiver>
 		<service android:name=".player.RadioPlayerService" android:process=":player" />
