@@ -1,0 +1,12 @@
+In order to build this source, you will need to obtain an API key from
+http://www.last.fm/api/
+
+Once you have a key, create a new file in src/fm/last/android called PrivateAPPIKey containing
+the following:
+
+package fm.last.android;
+
+public class PrivateAPIKey {
+	public static final String KEY = "put your API key here";
+	public static final String SECRET = "put your API secret here";
+}

@@ -1,13 +1,29 @@
-/**
- * 
- */
+/***************************************************************************
+ *   Copyright 2005-2009 Last.fm Ltd.                                      *
+ *   Portions contributed by Casey Link, Lukasz Wisniewski,                *
+ *   Mike Jennings, and Michael Novak Jr.                                  *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
+ ***************************************************************************/
 package fm.last.android.scrobbler;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.android.music.IMediaPlaybackService;
@@ -27,9 +43,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -171,16 +185,15 @@ public class ScrobblerService extends Service {
 	 */
 	public void enqueueCurrentTrack() {
 		long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
-		boolean played = playTime > (mCurrentTrack.duration / 2000) || playTime > 240;
-		Log.i("LastFm", "Playtime: " + playTime + " / duration: " + mCurrentTrack.duration/1000);
-		if(!played && mCurrentTrack.rating == "" && mCurrentTrack.trackAuth != "") {
+		boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
+		if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
 			mCurrentTrack.rating = "S";
 		}
-		if(played || mCurrentTrack.rating != "") {
-			Log.i("LastFm", "Enqueuing track");
+		if(played || mCurrentTrack.rating.length() > 0) {
+			Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
 	   		mQueue.add(mCurrentTrack);
-	   		mCurrentTrack = null;
 		}
+   		mCurrentTrack = null;
 	}
 	
     @Override
@@ -194,7 +207,6 @@ public class ScrobblerService extends Service {
          */
 		if(intent.getAction().equals("com.android.music.playstatechanged") &&
 				intent.getIntExtra("id", -1) != -1) {
-			Log.i("LastFm", "Got PLAYBACK_STATE_CHANGED from Andriod media player, checking playing status...");
             bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
                     new ServiceConnection() {
                     public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -235,7 +247,6 @@ public class ScrobblerService extends Service {
         	mCurrentTrack.startTime = System.currentTimeMillis() / 1000;
         	long position = intent.getLongExtra("position", 0) / 1000;
         	if(position > 0) {
-        		Log.i("LastFm", "Resuming from position: " + position);
         		mCurrentTrack.startTime -= position;
         	}
         	mCurrentTrack.title = intent.getStringExtra("track");
@@ -260,10 +271,8 @@ public class ScrobblerService extends Service {
 		}
 		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
-				Log.i("LastFm", "Network connection lost, stopping scrobbler service");
 				stopSelf();
 			} else {
-				Log.i("LastFm", "Network connection available!");
 				if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
 					mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
 					mNowPlayingTask.execute(mScrobbler);
