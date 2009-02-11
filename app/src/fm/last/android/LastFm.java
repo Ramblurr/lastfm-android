@@ -23,6 +23,7 @@ package fm.last.android;
 import java.net.URL;
 
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
 import fm.last.android.utils.UserTask;
@@ -81,8 +82,15 @@ public class LastFm extends Activity
         
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
-            Intent intent = new Intent( LastFm.this, Profile.class );
-            startActivity( intent );
+            Intent intent = getIntent();
+            if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
+            	LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), false);
+                intent = new Intent( LastFm.this, Player.class );
+                startActivity( intent );
+            } else {
+                intent = new Intent( LastFm.this, Profile.class );
+                startActivity( intent );
+            }
             finish();
             return;
         }

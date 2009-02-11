@@ -414,10 +414,19 @@ public class Player extends Activity {
 				return;
 			String artistName = LastFMApplication.getInstance().player
 					.getArtistName();
-			mArtistName.setText(artistName);
-			mTrackName.setText(LastFMApplication.getInstance().player
-					.getTrackName());
-
+			String trackName = LastFMApplication.getInstance().player
+					.getArtistName();
+			if(artistName.equals(RadioPlayerService.UNKNOWN)) {
+				mArtistName.setText("");
+			} else {
+				mArtistName.setText(artistName);
+			}
+			if(trackName.equals(RadioPlayerService.UNKNOWN)) {
+				mTrackName.setText("");
+			} else {
+				mTrackName.setText(trackName);
+			}
+				
 			// fetching artist events (On Tour indicator)
 			new LoadEventsTask().execute((Void)null);
 
