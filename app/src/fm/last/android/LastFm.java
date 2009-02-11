@@ -34,6 +34,7 @@ import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -47,6 +48,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
@@ -263,17 +265,31 @@ public class LastFm extends Activity
             }
         	else if (e != null)
             {           	
-        		String one, two;
+        		AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
+        		d.setIcon(android.R.drawable.ic_dialog_alert);
+        		d.setNeutralButton("OK",
+        				new DialogInterface.OnClickListener() {
+        					public void onClick(DialogInterface dialog, int whichButton)
+        					{
+        					}
+        				});
             	if(e.getMessage().contains("code 403")) {
-            		one = getResources().getString(R.string.ERROR_AUTH_TITLE);
-    				two = getResources().getString(R.string.ERROR_AUTH);
+            		d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
+            		d.setMessage(getResources().getString(R.string.ERROR_AUTH));
     				((EditText)findViewById( R.id.password )).setText( "" );
+            		d.setNegativeButton("Forgot Password",
+            				new DialogInterface.OnClickListener() {
+            					public void onClick(DialogInterface dialog, int whichButton)
+            					{
+            		            	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword")); 
+            		                startActivity(myIntent);
+            					}
+            				});
             	} else {
-    				one = getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE);
-    				two = getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE);
+            		d.setTitle(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE));
+            		d.setMessage(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
             	}
-            	
-				LastFMApplication.getInstance().presentError( context, one, two );
+        		d.show();
             }
             
             mDialog.dismiss();
