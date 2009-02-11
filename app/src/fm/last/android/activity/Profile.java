@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.os.RemoteException;
+import android.preference.PreferenceActivity;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -1062,7 +1063,10 @@ public class Profile extends ListActivity
         MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
         logout.setIcon(R.drawable.logout);
 
-        MenuItem nowPlaying = menu.add(Menu.NONE, 1, Menu.NONE, "Now Playing");
+        MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, "Settings");
+        settings.setIcon(R.drawable.logout);
+
+        MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, "Now Playing");
 		nowPlaying.setIcon( R.drawable.view_artwork );
         return true;
     }
@@ -1076,19 +1080,25 @@ public class Profile extends ListActivity
 		} catch (RemoteException e) {
 		}
 		
-		menu.findItem(1).setEnabled( isPlaying );
+		menu.findItem(2).setEnabled( isPlaying );
 		
 		return super.onPrepareOptionsMenu(menu);
 	}
     
     
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	Intent intent;
         switch (item.getItemId()) {
         case 0:
-            logout();
-            return true;
+        	logout();
+        	finish();
+        	break;
         case 1:
-            Intent intent = new Intent( Profile.this, Player.class );
+            intent = new Intent( Profile.this, Preferences.class );
+            startActivity( intent );
+            return true;
+        case 2:
+            intent = new Intent( Profile.this, Player.class );
             startActivity( intent );
             return true;
         }

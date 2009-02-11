@@ -415,7 +415,7 @@ public class Player extends Activity {
 			String artistName = LastFMApplication.getInstance().player
 					.getArtistName();
 			String trackName = LastFMApplication.getInstance().player
-					.getArtistName();
+					.getTrackName();
 			if(artistName.equals(RadioPlayerService.UNKNOWN)) {
 				mArtistName.setText("");
 			} else {

@@ -30,6 +30,7 @@ import com.android.music.IMediaPlaybackService;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFm;
+import fm.last.android.R;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.AudioscrobblerService;
@@ -45,6 +46,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -95,13 +97,14 @@ public class ScrobblerService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
         String user = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
         String subscriber = settings.getString( "lastfm_subscriber", "0" );
-        if ( !user.equals( "" ) && !session_key.equals( "" ) ) {
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true) && !user.equals( "" ) && !session_key.equals( "" ) ) {
 	    	mSession = new Session(user, session_key, subscriber);
 			String version = "0.1";
 			try {
@@ -164,7 +167,7 @@ public class ScrobblerService extends Service {
 		try {
 			if(getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
-			if(mQueue.size() > 0) {
+			if(mQueue.peek() != null) {
 				FileOutputStream filestream = openFileOutput("queue.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
 				objectstream.writeObject(mQueue);
@@ -199,7 +202,11 @@ public class ScrobblerService extends Service {
     @Override
     public void onStart(Intent intent, int startId) {
     	final Intent i = intent;
-
+    	if(mScrobbler == null) {
+    		stopIfReady();
+    		return;
+    	}
+    	
     	/*
          * The Android media player doesn't send a META_CHANGED notification for the first track,
          * so we'll have to catch PLAYBACK_STATE_CHANGED and check to see whether the player
@@ -207,31 +214,38 @@ public class ScrobblerService extends Service {
          */
 		if(intent.getAction().equals("com.android.music.playstatechanged") &&
 				intent.getIntExtra("id", -1) != -1) {
-            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
-                    new ServiceConnection() {
-                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-                            IMediaPlaybackService s =
-                                    IMediaPlaybackService.Stub.asInterface(binder);
-                            
-                            try {
-								if(s.isPlaying()) {
-									i.setAction(RadioPlayerService.META_CHANGED);
-									i.putExtra("position", s.position());
-									i.putExtra("duration", (int)s.duration());
-									handleIntent(i);
-								} else { //Media player was paused
-									mCurrentTrack = null;
-									stopSelf();
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
+	                    new ServiceConnection() {
+	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+	                            IMediaPlaybackService s =
+	                                    IMediaPlaybackService.Stub.asInterface(binder);
+	                            
+	                            try {
+									if(s.isPlaying()) {
+										i.setAction(RadioPlayerService.META_CHANGED);
+										i.putExtra("position", s.position());
+										i.putExtra("duration", (int)s.duration());
+										handleIntent(i);
+									} else { //Media player was paused
+										mCurrentTrack = null;
+										stopSelf();
+									}
+								} catch (RemoteException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
-							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							unbindService(this);
-                    }
-
-                    public void onServiceDisconnected(ComponentName comp) {}
-            }, 0);			
+								unbindService(this);
+	                    }
+	
+	                    public void onServiceDisconnected(ComponentName comp) {}
+	            }, 0);
+			} else {
+				//Clear the current track in case the user has disabled scrobbling of the media player
+				//during the middle of this track.
+				mCurrentTrack = null;
+				stopIfReady();
+			}
 		} else {
 			handleIntent(i);
 		}
@@ -341,8 +355,8 @@ public class ScrobblerService extends Service {
 			{
 				Log.i("LastFm", "Going to submit " + mQueue.size() + " tracks");
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				while(mQueue.size() > 0) {
-					ScrobblerQueueEntry e = mQueue.element();
+				while(mQueue.peek() != null) {
+					ScrobblerQueueEntry e = mQueue.peek();
 					if(e.rating.equals("L")) {
 						server.loveTrack(e.artist, e.title, mSession.getKey());
 					}
@@ -356,6 +370,8 @@ public class ScrobblerService extends Service {
 			}
 			catch ( Exception e )
 			{
+				Log.e("LastFm", "Unable to submit track: " + e.toString());
+				e.printStackTrace();
 				success = false;
 			}
 			return success;

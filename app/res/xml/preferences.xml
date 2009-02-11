@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="Scrobbler"
+            android:summary="Penguin down now!">
+
+    <CheckBoxPreference
+            android:key="scrobble"
+            android:defaultValue="true"
+            android:title="Enable Scrobbling"
+            android:summary="Send the music you listen to in this application to your Last.fm profile" />
+
+    <CheckBoxPreference
+            android:key="scrobble_music_player"
+            android:defaultValue="true"
+            android:dependency="scrobble"
+            android:title="Scrobble Android player"
+            android:summary="Scrobble the built-in Android music player" />
+    </PreferenceCategory>
+</PreferenceScreen>
