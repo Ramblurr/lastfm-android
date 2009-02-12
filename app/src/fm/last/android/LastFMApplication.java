@@ -20,12 +20,15 @@
  ***************************************************************************/
 package fm.last.android;
 
+import java.io.IOException;
 import java.util.WeakHashMap;
 
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
+import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
@@ -85,12 +88,25 @@ public class LastFMApplication extends Application
 
         //Populate our Session object
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
-        String user = settings.getString( "lastfm_user", "" );
+        String username = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
         String subscriber = settings.getString( "lastfm_subscriber", "0" );
-        if ( !user.equals( "" ) && !session_key.equals( "" ) )
+        if ( !username.equals( "" ) && !session_key.equals( "" ) )
         {
-	    	Session session = new Session(user, session_key, subscriber);
+            LastFmServer server = AndroidLastFmServerFactory.getServer();
+            try {
+				User user = server.getUserInfo(session_key);
+				if(user != null) {
+					subscriber = user.getSubscriber();
+		            SharedPreferences.Editor editor = settings.edit();
+		            editor.putString( "lastfm_subscriber", subscriber);
+		            editor.commit();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	Session session = new Session(username, session_key, subscriber);
 	        this.map.put( "lastfm_session", session );
         }
     }

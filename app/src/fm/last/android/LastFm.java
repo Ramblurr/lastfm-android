@@ -246,7 +246,7 @@ public class LastFm extends Activity
         	mLoginTask = null;
         	
         	if (session != null)
-        	{	        	
+        	{
 	            SharedPreferences.Editor editor = getSharedPreferences( PREFS, 0 ).edit();
 	            editor.putString( "lastfm_user", session.getName() );
 	            editor.putString( "lastfm_session_key", session.getKey());
