@@ -1064,7 +1064,7 @@ public class Profile extends ListActivity
         logout.setIcon(R.drawable.logout);
 
         MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, "Settings");
-        settings.setIcon(R.drawable.logout);
+        settings.setIcon(android.R.drawable.ic_menu_preferences);
 
         MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, "Now Playing");
 		nowPlaying.setIcon( R.drawable.view_artwork );
