@@ -39,7 +39,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -66,10 +65,11 @@ public class RadioPlayerService extends Service
 {
 
 	private MediaPlayer mp = new MediaPlayer();
+	private MediaPlayer next_mp = null;
+	private boolean mNextPrepared = false;
 	private Station currentStation;
 	private Session currentSession;
 	private RadioTrack currentTrack;
-	private long currentStartTime;
 	private ArrayBlockingQueue<RadioTrack> currentQueue;
 	private NotificationManager nm = null;
 	private int bufferPercent;
@@ -95,7 +95,6 @@ public class RadioPlayerService extends Service
 	boolean mActive = false;
 
 	private static final int NOTIFY_ID = 1337;
-//	private static final int SCROBBLE_HANDSHAKE = 1;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
 	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
@@ -219,84 +218,99 @@ public class RadioPlayerService extends Service
 		nm.notify( NOTIFY_ID, notification );
 	}
 
-	private void playTrack( RadioTrack track )
+	private OnCompletionListener mOnCompletionListener = new OnCompletionListener()
+	{
+
+		public void onCompletion( MediaPlayer mp )
+		{
+			new NextTrackTask().execute((Void)null);
+		}
+	};
+
+	private OnBufferingUpdateListener mOnBufferingUpdateListener = new OnBufferingUpdateListener()
+	{
+
+		public void onBufferingUpdate( MediaPlayer mp, int percent )
+		{
+
+			bufferPercent = percent;
+			if(next_mp == null && percent == 100 && currentQueue.size() > 1) {
+				mNextPrepared = false;
+				next_mp = new MediaPlayer();
+				playTrack((RadioTrack)(currentQueue.toArray()[1]), next_mp);
+			}
+		}
+	};
+	
+	private OnPreparedListener mOnPreparedListener = new OnPreparedListener() {
+		public void onPrepared(MediaPlayer mp) {
+			if(mp == RadioPlayerService.this.mp) {
+				if (mState == STATE_PREPARING) {
+					mp.start();
+					playingNotify();
+					mState = STATE_PLAYING;
+					mAutoSkipCount = 0;
+				} else {
+					mp.stop();
+				}
+			} else {
+				mNextPrepared = true;
+			}
+		}
+	};
+	
+	private OnErrorListener mOnErrorListener = new OnErrorListener() {
+		public boolean onError(MediaPlayer mp, int what, int extra) {
+			if(mAutoSkipCount++ > 4) {
+				//If we weren't able to start playing after 3 attempts, bail out and notify
+				//the user.  This will bring us into a stopped state.
+				mState = STATE_STOPPED;
+				notifyChange(PLAYBACK_ERROR);
+				nm.cancel( NOTIFY_ID );
+				if( wakeLock.isHeld())
+					wakeLock.release();
+				
+				if( wifiLock.isHeld())
+					wifiLock.release();
+				mDeferredStopHandler.deferredStopSelf();
+			} else {
+				//Enter a state that will allow nextSong to do its thang
+				mState = STATE_PREPARING;
+				new NextTrackTask().execute((Void)null);
+			}
+			return true;
+		}
+	};
+	
+	private void playTrack( RadioTrack track, MediaPlayer p )
 	{
 		try
 		{
 			if (mState == STATE_STOPPED || mState == STATE_PREPARING)
 				return;
 			
-			currentTrack = track;
-			mAlbumArt = null;
+			if(p == mp) {
+				currentTrack = track;
+				mAlbumArt = null;
+			}
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
-			mp.reset();
-			mp.setDataSource( track.getLocationUrl() );
-			mp.setOnCompletionListener( new OnCompletionListener()
-			{
-
-				public void onCompletion( MediaPlayer mp )
-				{
-					new NextTrackTask().execute((Void)null);
-				}
-			} );
-
-			mp.setOnBufferingUpdateListener( new OnBufferingUpdateListener()
-			{
-
-				public void onBufferingUpdate( MediaPlayer mp, int percent )
-				{
-
-					bufferPercent = percent;
-				}
-			} );
-
-			mp.setOnPreparedListener(new OnPreparedListener() {
-
-				public void onPrepared(MediaPlayer mp) {
-					if (mState == STATE_PREPARING) {
-						mp.start();
-						playingNotify();
-						currentStartTime = System.currentTimeMillis() / 1000;
-						mState = STATE_PLAYING;
-						mAutoSkipCount = 0;
-					} else {
-						mp.stop();
-					}
-				}
-			});
-			
-			mp.setOnErrorListener(new OnErrorListener() {
-				public boolean onError(MediaPlayer mp, int what, int extra) {
-					if(mAutoSkipCount++ > 4) {
-						//If we weren't able to start playing after 3 attempts, bail out and notify
-						//the user.  This will bring us into a stopped state.
-						mState = STATE_STOPPED;
-						notifyChange(PLAYBACK_ERROR);
-						nm.cancel( NOTIFY_ID );
-						if( wakeLock.isHeld())
-							wakeLock.release();
-						
-						if( wifiLock.isHeld())
-							wifiLock.release();
-						mDeferredStopHandler.deferredStopSelf();
-					} else {
-						//Enter a state that will allow nextSong to do its thang
-						mState = STATE_PREPARING;
-						new NextTrackTask().execute((Void)null);
-					}
-					return true;
-				}
-			});
+			p.reset();
+			p.setDataSource( track.getLocationUrl() );
+			p.setOnCompletionListener( mOnCompletionListener );
+			p.setOnBufferingUpdateListener( mOnBufferingUpdateListener );
+			p.setOnPreparedListener( mOnPreparedListener );
+			p.setOnErrorListener( mOnErrorListener );
 			
 			mDeferredStopHandler.cancelStopSelf();
 
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a call.
 			// Leave this precaution here please.
-			mp.setVolume( 1.0f, 1.0f );
+			p.setVolume( 1.0f, 1.0f );
 			
-			mState = STATE_PREPARING;
-			mp.prepareAsync();
+			if(p == mp)
+				mState = STATE_PREPARING;
+			p.prepareAsync();
 		}
 		catch ( IllegalStateException e )
 		{
@@ -343,12 +357,26 @@ public class RadioPlayerService extends Service
 			}
 		}
 		
+		if(next_mp != null) {
+			mp.stop();
+			mp = next_mp;
+			next_mp = null;
+			mState = STATE_PREPARING;
+			currentTrack = currentQueue.poll();
+			mAlbumArt = null;
+			if(mNextPrepared) {
+				mOnPreparedListener.onPrepared(mp);
+			}
+			notifyChange( META_CHANGED );
+			return;
+		}
+		
 		// Check again, if size still == 0 then the playlist is empty.
 		if ( currentQueue.size() > 0 )
 		{
 			//playTrack will check if mStopping is true, and stop us if the user has
 			//pressed stop while we were fetching the playlist
-			playTrack( currentQueue.poll() );
+			playTrack( currentQueue.poll(), mp );
 			notifyChange( META_CHANGED );
 		}
 		else
