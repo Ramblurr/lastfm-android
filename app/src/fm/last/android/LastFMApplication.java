@@ -20,6 +20,7 @@
  ***************************************************************************/
 package fm.last.android;
 
+import java.util.Locale;
 import java.io.IOException;
 import java.util.WeakHashMap;
 
@@ -73,16 +74,20 @@ public class LastFMApplication extends Application
         super.onCreate();
         instance = this;
 
-		String version_with_spaces;
+		String version;
         try {
-        	version_with_spaces = " " + LastFMApplication.getInstance().getPackageManager().getPackageInfo("fm.last.android", 0).versionName + " ";
+        	version = "/" + LastFMApplication.getInstance().getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
         }
         catch( Exception e )
         {
-        	version_with_spaces = " ";
+        	version = "";
         }
-        UrlUtil.useragent = "Last.fm Client" + version_with_spaces + "(Android)";        
         
+        UrlUtil.useragent = "MobileLastFM" + version + " ("
+        				  + android.os.Build.MODEL + "; "
+        				  + Locale.getDefault().getCountry().toLowerCase() + "; " 
+        				  + "Android " + android.os.Build.VERSION.RELEASE + ")";        
+
         // construct an 'application global' object
         this.map = new WeakHashMap<String, Session>();
 
