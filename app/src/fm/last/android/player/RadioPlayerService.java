@@ -234,14 +234,26 @@ public class RadioPlayerService extends Service
 		{
 
 			bufferPercent = percent;
-			if(next_mp == null && percent == 100 && currentQueue.size() > 1) {
-				mNextPrepared = false;
-				next_mp = new MediaPlayer();
-				playTrack((RadioTrack)(currentQueue.toArray()[1]), next_mp);
+			if(next_mp == null && percent == 100) {
+				// Check if we're running low on tracks
+				if ( currentQueue.size() < 2 )
+				{
+					mPlaylistRetryCount = 0;
+					try {
+						//Please to be working?
+						refreshPlaylist();
+					} catch (WSError e) {
+					}
+				}
+				if(currentQueue.size() > 1) {
+					mNextPrepared = false;
+					next_mp = new MediaPlayer();
+					playTrack((RadioTrack)(currentQueue.peek()), next_mp);
+				}
 			}
 		}
 	};
-	
+
 	private OnPreparedListener mOnPreparedListener = new OnPreparedListener() {
 		public void onPrepared(MediaPlayer mp) {
 			if(mp == RadioPlayerService.this.mp) {
