@@ -168,6 +168,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (sk != null) {
 			params.put("sk", sk);
 		}
+		params.put("speed_multiplier", "2");
 		signParams(params);
 		return RadioFunctions.getRadioPlaylist(baseUrl, params);
 	}
