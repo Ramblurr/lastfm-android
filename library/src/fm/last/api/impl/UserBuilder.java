@@ -42,6 +42,7 @@ public class UserBuilder extends XMLBuilder<User> {
     String age = getText("age");
     String gender = getText("gender");
     String playcount = getText("playcount");
+    String subscriber = getText("subscriber");
     
     List<Node> imageNodes = getChildNodes("image");
     if (imageNodes.size() > 1)
@@ -51,7 +52,7 @@ public class UserBuilder extends XMLBuilder<User> {
     for (Node imageNode : imageNodes)
   		images[i++] = imageBuilder.build(imageNode);
     
-    return new User(name, url, images, country, age, gender, playcount);
+    return new User(name, url, images, country, age, gender, playcount, subscriber);
   }
   
   /**

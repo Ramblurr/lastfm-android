@@ -29,17 +29,18 @@ import java.io.Serializable;
 public class User implements Serializable {
 
   private static final long serialVersionUID = 2047407259337226913L;
-  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount) {
+  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String subscriber) {
     this.name = name;
     this.url = url;
     this.images = images;
     this.country = country;
     this.age = age;
     this.playcount = playcount;
+    this.subscriber = subscriber;
   }
   public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String realname, String joindate)
   {
-      this(name, url, images, country, age, gender, playcount);
+      this(name, url, images, country, age, gender, playcount, "");
       this.realname = realname;
       this.joindate = joindate;
   }
@@ -86,7 +87,12 @@ public class User implements Serializable {
   {
       return joindate;
   }
-
+  
+  public String getSubscriber()
+  {
+	  return subscriber;
+  }
+  
   private String name;
   private String url;
   private ImageUrl[] images;
@@ -96,5 +102,5 @@ public class User implements Serializable {
   private String playcount;
   private String realname;
   private String joindate;
-
+  private String subscriber;
 }
