@@ -4,7 +4,7 @@ http://www.last.fm/api/
 Once you have a key, create a new file in src/fm/last/android called PrivateAPPIKey containing
 the following:
 
-package fm.last.android;
+package fm.last.android.scrobbler;
 
 public class PrivateAPIKey {
 	public static final String KEY = "put your API key here";
