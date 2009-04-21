@@ -1,0 +1,8 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="300px"
+    android:minHeight="128px"
+    android:updatePeriodMillis="0"
+    android:initialLayout="@layout/widget"
+    android:configure="fm.last.android.scrobbler.Login"
+    >
+</appwidget-provider>

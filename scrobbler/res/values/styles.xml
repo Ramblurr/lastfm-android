@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="playback_info">
+		<item name="android:textSize">5pt</item>
+		<item name="android:textColor">#fff</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+	<style name="playback_time">
+		<item name="android:textSize">5pt</item>
+		<item name="android:textColor">#fff</item>
+		<item name="android:textStyle">bold</item>
+	</style>
+	<style name="LastFMButton">
+		<item name="android:background">@+drawable/player_controls</item>
+		<item name="android:layout_width">80dip</item>
+		<item name="android:layout_height">76dip</item>
+	</style>
+	<style name="LastFMButton.Love">
+		<item name="android:src">@+drawable/love</item>
+	</style>
+	<style name="LastFMButton.Ban">
+		<item name="android:src">@+drawable/ban</item>
+	</style>
+	<style name="LastFMButton.Menu">
+		<item name="android:src">@+drawable/cog</item>
+	</style>
+	<style name="LastFMButton.Stop">
+		<item name="android:src">@+drawable/stop</item>
+	</style>
+	<style name="LastFMButton.Skip">
+		<item name="android:src">@+drawable/skip</item>
+	</style>
+</resources>
