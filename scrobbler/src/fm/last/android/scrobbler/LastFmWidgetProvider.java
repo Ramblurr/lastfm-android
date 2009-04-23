@@ -5,10 +5,12 @@ package fm.last.android.scrobbler;
 
 import java.util.Formatter;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -52,6 +54,8 @@ public class LastFmWidgetProvider extends AppWidgetProvider {
 
     public static void updateAppWidget(Context context, String title, String artist, Bitmap artwork) {
         Log.d(TAG, "updateAppWidget");
+        Intent intent;
+        PendingIntent pendingIntent;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);        
         // Construct the RemoteViews object.  It takes the package name (in our case, it's our
         // package, but it needs this because on the other side it's the widget host inflating
@@ -59,6 +63,22 @@ public class LastFmWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         views.setTextViewText(R.id.track_title, title);
         views.setTextViewText(R.id.track_artist, artist);
+
+        //Hook up the buttons (this should really be done eslewhere but doesn't hurt here)
+        intent = new Intent(ScrobblerService.LOVE);
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.love, pendingIntent);
+
+        intent = new Intent(ScrobblerService.BAN);
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.ban, pendingIntent);
+
+        intent = new Intent(context, Metadata.class);
+        intent.putExtra("artist", artist);
+        intent.putExtra("track", title);
+        pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.menu, pendingIntent);
+
         if(artwork == null)
         	views.setImageViewResource(R.id.artwork, R.drawable.no_artwork);
         else

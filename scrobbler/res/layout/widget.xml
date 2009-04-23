@@ -34,7 +34,7 @@
 
 		<ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" />
 		<ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" />
-		<ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" />
+		<ImageButton android:id="@+id/menu" style="@+style/LastFMButton.Menu" />
 		<ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" />
 
 	</LinearLayout>

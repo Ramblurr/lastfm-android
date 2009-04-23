@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android" android:background="#eee">
+    <fm.last.android.scrobbler.RemoteImageView
+        android:background="@drawable/no_artwork"
+        android:gravity="center"
+        android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:id="@+id/poster" android:layout_alignParentLeft="true" android:layout_margin="8dip" android:layout_height="75dip" android:layout_width="75dip"/>
+<TextView android:layout_below="@id/poster" android:layout_height="wrap_content" android:text="Event Name" android:layout_toRightOf="@id/poster" android:layout_alignTop="@id/poster" android:layout_width="fill_parent" android:textColor="#000" android:textStyle="bold" android:id="@+id/title" android:textSize="8pt" android:maxLines="1"></TextView>
+<TextView android:layout_height="wrap_content" android:text="Artist 1, Artist 2, Artist 3" android:layout_toRightOf="@id/poster" android:layout_width="fill_parent" android:textStyle="bold" android:textColor="#888" android:id="@+id/artists" android:layout_below="@id/title" android:textSize="7pt" android:maxLines="2"></TextView>
+
+<LinearLayout android:layout_below="@id/poster" android:layout_margin="8dip" android:background="@drawable/event_calendar_sheet" android:orientation="vertical" android:id="@+id/calendar" android:layout_height="81dip" android:layout_width="75dip"><TextView android:layout_width="fill_parent" android:id="@+id/month" android:text="Month" android:textColor="#fff" android:textStyle="bold" android:gravity="center" android:layout_height="24dip"></TextView>
+<TextView android:layout_height="fill_parent" android:layout_width="fill_parent" android:id="@+id/day" android:text="20" android:textColor="#000" android:textStyle="bold" android:textSize="18pt" android:gravity="center"></TextView>
+</LinearLayout>
+<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="Venue Name" android:textColor="#000" android:textStyle="bold" android:layout_toRightOf="@id/calendar" android:layout_alignTop="@id/calendar" android:id="@+id/venue" android:textSize="8pt"></TextView>
+<TextView android:layout_below="@id/venue" android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_toRightOf="@id/calendar" android:text="123 Fake St., NY 12345" android:textColor="#888" android:id="@+id/street" android:textSize="6pt" android:lines="1" android:singleLine="true"></TextView>
+<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/showmap" android:layout_below="@id/street" android:layout_toRightOf="@id/calendar" android:textColor="#fff" android:textStyle="bold" android:textSize="8pt" android:background="@drawable/show_map_button" android:text="@string/event_showmap"></Button>
+<RadioGroup android:layout_below="@id/showmap" android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="#fff" android:layout_marginLeft="8dip" android:layout_marginRight="8dip" android:layout_marginTop="26dip" android:id="@+id/attend"><RadioButton android:layout_height="wrap_content" android:layout_width="fill_parent" android:textColor="#000" android:id="@+id/attending" android:textStyle="bold" android:text="@string/event_attending"></RadioButton>
+<RadioButton android:layout_height="wrap_content" android:id="@+id/maybe" android:text="@string/event_maybe" android:textColor="#000" android:textStyle="bold" android:layout_width="fill_parent"></RadioButton>
+<RadioButton android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/notattending" android:text="@string/event_notattending" android:textColor="#000" android:textStyle="bold"></RadioButton>
+</RadioGroup>
+
+<LinearLayout android:layout_height="wrap_content" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true" android:layout_width="wrap_content" android:layout_marginBottom="20dip"><Button android:id="@+id/cancel" android:text="@string/cancel" android:layout_width="130dip" android:layout_height="38dip" android:layout_marginRight="10dip" android:background="@drawable/black_button" android:textStyle="bold" android:textColor="#fff"></Button><Button android:text="@string/ok" android:layout_height="38dip" android:layout_width="130dip" android:layout_marginLeft="10dip" android:background="@drawable/black_button" android:textColor="#fff" android:textStyle="bold" android:id="@+id/ok"></Button>
+</LinearLayout>
+</RelativeLayout>
