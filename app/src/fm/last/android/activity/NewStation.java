@@ -144,23 +144,6 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 			
 		});
-		
-		if( icicle == null )
-			return;
-		
-		int selectedTab = icicle.getInt( "selected_tab", -1 );
-		if( selectedTab >= 0)
-		{
-			mTabBar.setActive( selectedTab );
-			tabChanged(selectedTab, TAB_ARTIST );
-			mListAdapter = (ListAdapter[]) icicle.getSerializable( "results" );
-			if( mListAdapter[selectedTab] == null )
-				return;
-			setListAdapter(mListAdapter[selectedTab]);
-			getListView().setVisibility(View.VISIBLE);
-
-    		findViewById(R.id.search_hint).setVisibility(View.GONE);
-		}
     }
 
     @Override
@@ -236,21 +219,18 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
             searching = SearchType.Artist;
             searchBar.setHint( "eg. Nirvana" );
             mHint.setText(getResources().getString(R.string.newstation_hint_artist));
-            setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_TAG )
         {
             searching = SearchType.Tag;
             searchBar.setHint( "eg. Rock" );
             mHint.setText(getResources().getString(R.string.newstation_hint_tag));
-            setListAdapter(mListAdapter[index]);
         }
         else if ( index == TAB_USER )
         {
             searching = SearchType.User;
             searchBar.setHint( "eg. Last.hq" );
             mHint.setText(getResources().getString(R.string.newstation_hint_user));
-            setListAdapter(mListAdapter[index]);
         }
         
         setListAdapter(mListAdapters[index]);
