@@ -1,8 +1,8 @@
 In order to build this source, you will need to obtain an API key from
 http://www.last.fm/api/
 
-Once you have a key, create a new file in src/fm/last/android called PrivateAPPIKey containing
-the following:
+Once you have a key, create a new file in src/fm/last/android called 
+PrivateAPIKey containing the following:
 
 package fm.last.android.scrobbler;
 
