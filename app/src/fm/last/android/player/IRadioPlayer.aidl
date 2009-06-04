@@ -20,6 +20,9 @@
  ***************************************************************************/
 package fm.last.android.player;
 
+import fm.last.api.Session;
+import fm.last.api.WSError;
+
 interface IRadioPlayer {
 	void setSession(in Session session);
 	boolean tune(in String url, in Session session);
