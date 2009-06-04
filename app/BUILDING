@@ -8,11 +8,11 @@ to build.  If you do a clean build, you will need to repeat this process.
 
 To build the scrobbler, you must symblink in the library:
 
-cd scrobbler/src/fm/last
+cd app/src/fm/last
 ln -s ../../../../library/src/fm/last/api api
 ln -s ../../../../library/src/fm/last/util util
 ln -s ../../../../library/src/fm/last/xml xml
 ln -s ../../../../../app/src/fm/last/android/utils android/utils
 
-You must also create a PrivateAPIKey.java in scrobbler/src/fm/last/android/scrobbler.
+You must also create a PrivateAPIKey.java in app/src/fm/last/android.
 See README.API_KEY for details.
