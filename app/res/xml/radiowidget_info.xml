@@ -1,0 +1,7 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="300px"
+    android:minHeight="64px"
+    android:updatePeriodMillis="1000"
+    android:initialLayout="@layout/widget"
+    >
+</appwidget-provider>
