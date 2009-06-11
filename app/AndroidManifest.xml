@@ -76,19 +76,17 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
-       	<receiver android:name=".scrobbler.MusicIntentReceiver">
-    		<intent-filter>
-    			<action android:name="com.android.music.playstatechanged"/>
-    			<action android:name="com.android.music.playbackcomplete"/>
-    			<action android:name="fm.last.android.metachanged"/>
-    			<action android:name="fm.last.android.playstatechanged"/>
-    			<action android:name="fm.last.android.playbackcomplete"/>
-    			<action android:name="fm.last.android.LOVE"/>
-    			<action android:name="fm.last.android.BAN"/>
-    			<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-    		</intent-filter>
-    	</receiver>
+		<receiver android:name="RadioWidgetProvider"
+		            android:label="Last.fm Radio"
+		            android:icon="@drawable/icon"
+		            >
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+		    </intent-filter>
+		    <meta-data android:name="android.appwidget.provider"
+		                android:resource="@xml/radiowidget_info"
+		                />
+		</receiver>
 		<service android:name=".player.RadioPlayerService" android:process=":player" />
-		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>
     </application>
 </manifest> 

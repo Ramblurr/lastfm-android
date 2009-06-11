@@ -30,7 +30,6 @@ import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.player.RadioPlayerService;
-import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.Album;
 import fm.last.api.Event;
@@ -281,7 +280,7 @@ public class Player extends Activity {
 
 			if (LastFMApplication.getInstance().player == null)
 				return;
-			Intent i = new Intent(ScrobblerService.LOVE);
+			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
 			Toast.makeText(Player.this, "Track has been marked as loved",
 					Toast.LENGTH_SHORT).show();		}
@@ -293,7 +292,7 @@ public class Player extends Activity {
 
 			if (LastFMApplication.getInstance().player == null)
 				return;
-			Intent i = new Intent(ScrobblerService.BAN);
+			Intent i = new Intent("fm.last.android.BAN");
 			sendBroadcast(i);
 			try {
 				LastFMApplication.getInstance().player.skip();

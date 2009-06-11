@@ -32,6 +32,7 @@ import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
 import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.RadioWidgetProvider;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -215,6 +216,9 @@ public class RadioPlayerService extends Service
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
+		RadioWidgetProvider p = RadioWidgetProvider.getInstance();
+		p.updateAppWidget(this, currentTrack.getTitle(), currentTrack.getCreator());
+		
 		nm.notify( NOTIFY_ID, notification );
 	}
 
