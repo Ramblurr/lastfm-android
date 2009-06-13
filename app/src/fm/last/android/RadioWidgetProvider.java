@@ -39,6 +39,48 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         return sInstance;
     }
     
+    @Override 
+    public void onReceive(Context context, Intent intent) { 
+        final String action = intent.getAction();
+        Log.d(TAG, action);
+        if (action.equals("fm.last.android.SKIP")) {
+    		if (LastFMApplication.getInstance().player == null)
+    			LastFMApplication.getInstance().bindPlayerService();
+    		if (LastFMApplication.getInstance().player != null) {
+				try {
+					// If the player is in a stopped state, call startRadio instead
+					// of skip
+					if (LastFMApplication.getInstance().player.isPlaying())
+						LastFMApplication.getInstance().player.skip();
+					else
+						LastFMApplication.getInstance().player.startRadio();
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+        } else if (action.equals("fm.last.android.STOP")) {
+       		if (LastFMApplication.getInstance().player == null)
+       			LastFMApplication.getInstance().bindPlayerService();
+       		if (LastFMApplication.getInstance().player != null) {
+   				try {
+   					// If the player is in a stopped state, call startRadio instead
+   					// of stop (we should change the icon to "Play")
+   					if (LastFMApplication.getInstance().player.isPlaying())
+   						LastFMApplication.getInstance().player.stop();
+   					else
+   						LastFMApplication.getInstance().player.startRadio();
+   				} catch (RemoteException e) {
+   					// TODO Auto-generated catch block
+   					e.printStackTrace();
+   				}
+            } 
+        } else { 
+        	super.onReceive(context, intent);
+        }
+    } 
+
+    
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.d(TAG, "onUpdate");
 		if (LastFMApplication.getInstance().player == null)
@@ -56,6 +98,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				} else {
 			        views.setTextViewText(R.id.currenttime,"--:--");
 			        views.setTextViewText(R.id.totaltime,"--:--");
+			        views.setTextViewText(R.id.widgettext, "");
 					//mProgress.setProgress(0);
 				}
 		        appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
@@ -103,6 +146,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         intent = new Intent("fm.last.android.BAN");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.ban, pendingIntent);
+
+        intent = new Intent("fm.last.android.SKIP");
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.skip, pendingIntent);
+
+        intent = new Intent("fm.last.android.STOP");
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.stop, pendingIntent);
 
         intent = new Intent(context, Metadata.class);
         intent.putExtra("artist", artist);

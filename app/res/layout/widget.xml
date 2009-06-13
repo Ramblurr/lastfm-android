@@ -48,7 +48,7 @@
 		<ImageButton android:id="@+id/menu" style="@+style/WidgetButton.Menu" />
 		<ImageButton android:id="@+id/love" style="@+style/WidgetButton.Love" />
 		<ImageButton android:id="@+id/ban" style="@+style/WidgetButton.Ban" />
-		<ImageButton android:id="@+id/ban" style="@+style/WidgetButton.Stop" />
+		<ImageButton android:id="@+id/stop" style="@+style/WidgetButton.Stop" />
 		<ImageButton android:id="@+id/skip" style="@+style/WidgetButton.Skip" />
 
 	</LinearLayout>
