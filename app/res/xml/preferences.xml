@@ -3,8 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-            android:title="Scrobbler"
-            android:summary="Penguin down now!">
+            android:title="Scrobbler">
 
     <CheckBoxPreference
             android:key="scrobble"
@@ -18,5 +17,14 @@
             android:dependency="scrobble"
             android:title="Scrobble Android player"
             android:summary="Scrobble the built-in Android music player" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="Player">
+    <CheckBoxPreference
+            android:key="highquality"
+            android:defaultValue="true"
+            android:title="High Quality Audio"
+            android:summary="Use high quality 128k audio insead of 64k" />
     </PreferenceCategory>
 </PreferenceScreen>

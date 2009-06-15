@@ -42,7 +42,6 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     @Override 
     public void onReceive(Context context, Intent intent) { 
         final String action = intent.getAction();
-        Log.d(TAG, action);
         if (action.equals("fm.last.android.SKIP")) {
     		if (LastFMApplication.getInstance().player == null)
     			LastFMApplication.getInstance().bindPlayerService();
@@ -82,7 +81,6 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
     
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d(TAG, "onUpdate");
 		if (LastFMApplication.getInstance().player == null)
 			LastFMApplication.getInstance().bindPlayerService();
 		if (LastFMApplication.getInstance().player != null) {
