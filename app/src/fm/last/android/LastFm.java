@@ -85,14 +85,8 @@ public class LastFm extends Activity
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
             Intent intent = getIntent();
-            if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
-            	LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), false);
-                intent = new Intent( LastFm.this, Player.class );
-                startActivity( intent );
-            } else {
-                intent = new Intent( LastFm.this, Profile.class );
-                startActivity( intent );
-            }
+            intent = new Intent( LastFm.this, Profile.class );
+            startActivity( intent );
             finish();
             return;
         }

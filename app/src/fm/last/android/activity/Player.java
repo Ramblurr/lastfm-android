@@ -25,6 +25,7 @@ import java.util.Formatter;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
@@ -126,6 +127,11 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_STATE_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
+
+		Intent intent = getIntent();
+        if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
+        	LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), false);
+        }
 	}
 
 	@Override

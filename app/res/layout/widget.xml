@@ -9,35 +9,43 @@
 		android:layout_height="28px"
 		android:background="@drawable/widget_top_panel"
 		android:paddingTop="10px"
-		android:paddingLeft="64px">
+		android:paddingLeft="74px">
+			<ProgressBar android:id="@android:id/progress"
+				android:background="#0000" android:layout_height="wrap_content"
+				android:indeterminateOnly="false" android:progressDrawable="@+drawable/widget_progress"
+				android:layout_width="fill_parent"/>
+			
 			<LinearLayout android:layout_width="fill_parent"
 				android:layout_height="wrap_content">
-
-				<TextView android:id="@+id/currenttime"
-					android:textSize="5pt"
-					android:textColor="#ddd"
-					android:layout_gravity="bottom"
-					android:layout_height="wrap_content" android:layout_width="40dip"
-					android:gravity="right" android:text="--:--"/>
 
 				<TextView android:id="@+id/widgettext"
 					android:textSize="5pt"
 					android:textColor="#fff"
 					android:textStyle="bold"
 					android:layout_gravity="bottom"
-					android:layout_height="wrap_content" android:layout_width="170dip"
-			        android:singleLine="true"
+					android:layout_height="wrap_content" android:singleLine="true"
 			        android:ellipsize="end"
-        			android:gravity="center" android:text=""/>
+        			android:gravity="left" android:text="" android:layout_width="200dip"/>
 
 				<TextView android:id="@+id/totaltime"
 					android:textSize="5pt"
 					android:textColor="#ddd"
 					android:layout_gravity="bottom"
 					android:layout_height="wrap_content" android:layout_width="40dip"
+					android:layout_marginLeft="4px" android:visibility="gone"
 					android:gravity="left" android:text="--:--"/>
-
-			</LinearLayout> -->
+					
+				<ProgressBar android:id="@+id/spinner"
+					android:layout_marginLeft="10px"
+					android:layout_width="20px"
+					android:layout_height="20px"
+					android:indeterminate="false"
+					android:layout_marginRight="2px"
+					android:indeterminateOnly="false"
+					android:progressDrawable="@+drawable/widget_progress"
+					android:indeterminateDrawable="@+drawable/widget_spinner"
+					android:layout_gravity="center_vertical|right"/>
+			</LinearLayout>
 	</RelativeLayout>
 
 	<LinearLayout android:id="@+id/playback_controls"

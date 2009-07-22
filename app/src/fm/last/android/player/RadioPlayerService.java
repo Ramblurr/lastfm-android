@@ -217,7 +217,7 @@ public class RadioPlayerService extends Service
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 		RadioWidgetProvider p = RadioWidgetProvider.getInstance();
-		p.updateAppWidget(this, currentTrack.getTitle(), currentTrack.getCreator());
+		p.updateAppWidget(this);
 		nm.notify( NOTIFY_ID, notification );
 	}
 

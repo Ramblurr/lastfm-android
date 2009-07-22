@@ -6,6 +6,7 @@ package fm.last.android;
 import java.util.Formatter;
 
 import fm.last.android.activity.Metadata;
+import fm.last.android.player.IRadioPlayer;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.RemoteException;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 /**
@@ -81,28 +83,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
     
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		if (LastFMApplication.getInstance().player == null)
-			LastFMApplication.getInstance().bindPlayerService();
-		if (LastFMApplication.getInstance().player != null) {
-			try {
-		        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-
-		        long duration = LastFMApplication.getInstance().player.getDuration();
-				long pos = LastFMApplication.getInstance().player.getPosition();
-				if ((pos >= 0) && (duration > 0) && (pos <= duration)) {
-			        views.setTextViewText(R.id.currenttime,makeTimeString(pos / 1000));
-			        views.setTextViewText(R.id.totaltime,makeTimeString(duration / 1000));
-					//mProgress.setProgress((int) (1000 * pos / mDuration));
-				} else {
-			        views.setTextViewText(R.id.currenttime,"--:--");
-			        views.setTextViewText(R.id.totaltime,"--:--");
-			        views.setTextViewText(R.id.widgettext, "");
-					//mProgress.setProgress(0);
-				}
-		        appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
-			} catch (RemoteException ex) {
-			}
-		}
+    	updateAppWidget(context);
     }
 
     public void onDeleted(Context context, int[] appWidgetIds) {
@@ -111,21 +92,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
     public void onEnabled(Context context) {
         Log.d(TAG, "onEnabled");
-		if (LastFMApplication.getInstance().player == null)
-			LastFMApplication.getInstance().bindPlayerService();
-		if (LastFMApplication.getInstance().player != null) {
-			try {
-				updateAppWidget(context, LastFMApplication.getInstance().player.getTrackName(), LastFMApplication.getInstance().player.getArtistName());
-			} catch (RemoteException ex) {
-			}
-		}
+		updateAppWidget(context);
     }
 
     public void onDisabled(Context context) {
         Log.d(TAG, "onDisabled");
     }
 
-    public static void updateAppWidget(Context context, String title, String artist) {
+    public static void updateAppWidget(Context context) {
         Log.d(TAG, "updateAppWidget");
         Intent intent;
         PendingIntent pendingIntent;
@@ -134,7 +108,6 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         // package, but it needs this because on the other side it's the widget host inflating
         // the layout from our package).
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-        views.setTextViewText(R.id.widgettext, artist + " - " + title);
 
         //Hook up the buttons (this should really be done eslewhere but doesn't hurt here)
         intent = new Intent("fm.last.android.LOVE");
@@ -153,12 +126,38 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.stop, pendingIntent);
 
-        intent = new Intent(context, Metadata.class);
-        intent.putExtra("artist", artist);
-        intent.putExtra("track", title);
-        pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        intent = new Intent("fm.last.android.ACTION");
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.menu, pendingIntent);
 
+		if (LastFMApplication.getInstance().player == null)
+			LastFMApplication.getInstance().bindPlayerService();
+		if (LastFMApplication.getInstance().player != null) {
+			IRadioPlayer player = LastFMApplication.getInstance().player;
+			try {
+				if(player.isPlaying()) {
+			        long duration = player.getDuration();
+					long pos = player.getPosition();
+					if ((pos >= 0) && (duration > 0) && (pos <= duration)) {
+						views.setViewVisibility(R.id.totaltime, View.VISIBLE);
+				        views.setTextViewText(R.id.totaltime,makeTimeString((duration - pos) / 1000));
+						views.setProgressBar(R.id.spinner, 1, 0, false);
+				        views.setProgressBar(android.R.id.progress, (int)duration, (int)pos, false);
+					} else {
+						views.setViewVisibility(R.id.totaltime, View.GONE);
+						views.setProgressBar(R.id.spinner, 1, 0, true);
+					}
+			        views.setTextViewText(R.id.widgettext, player.getArtistName() + " - " + player.getTrackName());
+				} else {
+					views.setViewVisibility(R.id.totaltime, View.GONE);
+			        views.setTextViewText(R.id.widgettext, player.getStationName());
+			        views.setProgressBar(android.R.id.progress, 1, 0, false);
+					views.setProgressBar(R.id.spinner, 1, 0, false);
+				}
+			} catch (RemoteException ex) {
+			}
+		}
+        
         appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
     }
 
