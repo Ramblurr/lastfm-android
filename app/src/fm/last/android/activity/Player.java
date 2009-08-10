@@ -32,6 +32,7 @@ import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
+import fm.last.android.widget.AdArea;
 import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
@@ -45,6 +46,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,11 +57,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -241,6 +245,28 @@ public class Player extends Activity {
 		paused = false;
 		long next = refreshNow();
 		queueNextRefresh(next);
+
+		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			LayoutParams params = mAlbum.getLayoutParams();
+			if(AdArea.adsEnabled(this)) {
+				params.width = 155;
+				params.height = 155;
+			} else {
+				params.width = 212;
+				params.height = 212;
+			}
+			mAlbum.setLayoutParams(params);
+		} else {
+			LayoutParams params = mAlbum.getLayoutParams();
+			if(AdArea.adsEnabled(this)) {
+				params.width = 240;
+				params.height = 240;
+			} else {
+				params.width = 300;
+				params.height = 300;
+			}
+			mAlbum.setLayoutParams(params);
+		}
 	}
 
 	@Override

@@ -24,16 +24,24 @@
 			android:layout_height="fill_parent"
 			xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
 
+			<fm.last.android.widget.AdArea
+				android:id="@+id/AdArea"
+				android:background="@drawable/adarea"
+				android:layout_width="fill_parent"
+				android:layout_height="54px"
+				android:padding="6px"/>
+				
 			<fm.last.android.RemoteImageView
 				android:id="@+id/album" lfm:unknownImage="@+drawable/no_artwork"
-				android:background="@drawable/no_artwork" android:gravity="center"
-				android:layout_alignParentTop="true" android:layout_marginTop="10px"
-				android:layout_centerHorizontal="true" android:layout_height="300px" android:layout_width="300px"/>
+				android:background="@drawable/no_artwork" android:gravity="center" android:layout_marginTop="10px"
+				android:layout_centerHorizontal="true" android:layout_height="300px" android:layout_width="300px"
+				android:layout_below="@id/AdArea"/>
 
 			<ImageButton android:id="@+id/ontour" android:layout_height="wrap_content"
-				android:layout_width="wrap_content" android:layout_alignParentTop="true" 
+				android:layout_width="wrap_content"
 				android:layout_alignParentRight="true" android:visibility="gone" 
-				android:src="@drawable/on_tour" android:background="@null"/>
+				android:src="@drawable/on_tour" android:background="@null"
+				android:layout_below="@id/AdArea"/>
 
 			<LinearLayout android:id="@+id/playback_controls"
 				android:orientation="horizontal" android:layout_gravity="bottom"
