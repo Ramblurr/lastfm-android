@@ -87,20 +87,16 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     }
 
     public void onDeleted(Context context, int[] appWidgetIds) {
-        Log.d(TAG, "onDeleted");
     }
 
     public void onEnabled(Context context) {
-        Log.d(TAG, "onEnabled");
 		updateAppWidget(context);
     }
 
     public void onDisabled(Context context) {
-        Log.d(TAG, "onDisabled");
     }
 
     public static void updateAppWidget(Context context) {
-        Log.d(TAG, "updateAppWidget");
         Intent intent;
         PendingIntent pendingIntent;
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);        

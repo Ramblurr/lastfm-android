@@ -71,6 +71,7 @@ import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
+import fm.last.android.widget.AdArea;
 import fm.last.android.widget.ProfileBubble;
 import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
