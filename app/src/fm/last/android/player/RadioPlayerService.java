@@ -46,6 +46,8 @@ import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
 import android.os.Handler;
@@ -470,7 +472,14 @@ public class RadioPlayerService extends Service
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		RadioPlayList playlist;
 		try {
-			String bitrate = "64";
+			String bitrate;
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni.getType() == ConnectivityManager.TYPE_MOBILE)
+				bitrate = "64";
+			else
+				bitrate = "128";
+			
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", true))
 				bitrate = "128";
 			Log.i("Last.fm", "Requesting bitrate: " + bitrate);
