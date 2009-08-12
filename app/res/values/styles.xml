@@ -47,9 +47,6 @@
 	</style>
 	<style name="WidgetButton">
 		<item name="android:background">@+drawable/widget_button_middle</item>
-		<item name="android:layout_width">61dip</item>
-		<item name="android:layout_height">72dip</item>
-		<item name="android:paddingBottom">8dip</item>
 	</style>
 	<style name="WidgetButton.Love">
 		<item name="android:src">@+drawable/love</item>
@@ -59,7 +56,6 @@
 	</style>
 	<style name="WidgetButton.Menu">
 		<item name="android:background">@+drawable/widget_button_left</item>
-		<item name="android:layout_width">69dip</item>
 		<item name="android:src">@+drawable/cog</item>
 	</style>
 	<style name="WidgetButton.Stop">
@@ -67,7 +63,6 @@
 	</style>
 	<style name="WidgetButton.Skip">
 		<item name="android:background">@+drawable/widget_button_right</item>
-		<item name="android:layout_width">68dip</item>
 		<item name="android:src">@+drawable/skip</item>
 	</style>
 </resources>
