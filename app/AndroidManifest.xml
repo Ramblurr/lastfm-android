@@ -88,6 +88,20 @@
 		                />
 		</receiver>
 		<service android:name=".player.RadioPlayerService" android:process=":player" />
+       	<receiver android:name=".scrobbler.MusicIntentReceiver">
+    		<intent-filter>
+    			<action android:name="com.android.music.playstatechanged"/>
+    			<action android:name="com.android.music.playbackcomplete"/>
+    			<action android:name="com.android.music.metachanged"/>
+    			<action android:name="fm.last.android.metachanged"/>
+    			<action android:name="fm.last.android.playstatechanged"/>
+    			<action android:name="fm.last.android.playbackcomplete"/>
+    			<action android:name="fm.last.android.LOVE"/>
+    			<action android:name="fm.last.android.BAN"/>
+    			<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+    		</intent-filter>
+    	</receiver>
+		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>
     </application>
 <uses-sdk android:minSdkVersion="3"></uses-sdk>
 </manifest>

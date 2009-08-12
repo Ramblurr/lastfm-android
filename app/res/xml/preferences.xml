@@ -9,7 +9,7 @@
             android:key="scrobble"
             android:defaultValue="true"
             android:title="Enable Scrobbling"
-            android:summary="Send the music you listen to in this application to your Last.fm profile" />
+            android:summary="Update your Last.fm profile as you listen to music" />
 
     <CheckBoxPreference
             android:key="scrobble_music_player"
@@ -23,8 +23,8 @@
             android:title="Player">
     <CheckBoxPreference
             android:key="highquality"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:title="High Quality Audio"
-            android:summary="Use high quality 128k audio insead of 64k" />
+            android:summary="Use high quality audio over cellular networks" />
     </PreferenceCategory>
 </PreferenceScreen>
