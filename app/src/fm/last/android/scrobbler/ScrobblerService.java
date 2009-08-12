@@ -117,17 +117,19 @@ public class ScrobblerService extends Service {
 		super.onCreate();
 
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
-	    	mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
+    	mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
+
+    	if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
 			String version = "0.1";
 			try {
-				version = getPackageManager().getPackageInfo("fm.last.android.scrobbler", 0).versionName;
+				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
 			} catch (NameNotFoundException e) {
 			}
 			mScrobbler = server.createAudioscrobbler( mSession, version );
         } else {
         	//User not authenticated, shutting down...
         	stopSelf();
+        	return;
         }
         
         try {
