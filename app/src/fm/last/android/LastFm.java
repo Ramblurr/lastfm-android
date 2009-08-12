@@ -23,7 +23,6 @@ package fm.last.android;
 import java.net.URL;
 
 import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
 import fm.last.android.utils.UserTask;
@@ -39,6 +38,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.appwidget.AppWidgetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -84,9 +84,21 @@ public class LastFm extends Activity
         
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
-            Intent intent = getIntent();
-            intent = new Intent( LastFm.this, Profile.class );
-            startActivity( intent );
+        	if(getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
+        		Intent intent = getIntent();
+        		Bundle extras = intent.getExtras();
+        		if (extras != null) {
+        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 
+        		            AppWidgetManager.INVALID_APPWIDGET_ID);
+            		Intent resultValue = new Intent();
+            		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            		setResult(RESULT_OK, resultValue);
+        		}
+        	} else {
+	            Intent intent = getIntent();
+	            intent = new Intent( LastFm.this, Profile.class );
+	            startActivity( intent );
+        	}
             finish();
             return;
         }
@@ -246,11 +258,23 @@ public class LastFm extends Activity
 	            editor.putString( "lastfm_session_key", session.getKey());
 	            editor.putString( "lastfm_subscriber", session.getSubscriber());
 	            editor.commit();
-	            
-	            LastFMApplication.getInstance().map.put( "lastfm_session", session );
-	            Intent intent = new Intent( LastFm.this, Profile.class );
-	            intent.putExtra("lastfm.profile.new_user", mNewUser );
-	            startActivity( intent );
+
+	        	if(getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
+	        		Intent intent = getIntent();
+	        		Bundle extras = intent.getExtras();
+	        		if (extras != null) {
+	        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 
+	        		            AppWidgetManager.INVALID_APPWIDGET_ID);
+	            		Intent resultValue = new Intent();
+	            		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+	            		setResult(RESULT_OK, resultValue);
+	        		}
+	        	} else {
+		            LastFMApplication.getInstance().map.put( "lastfm_session", session );
+		            Intent intent = new Intent( LastFm.this, Profile.class );
+		            intent.putExtra("lastfm.profile.new_user", mNewUser );
+		            startActivity( intent );
+	        	}
 	            finish();
         	}
         	else if (wse != null)

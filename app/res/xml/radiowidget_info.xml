@@ -3,5 +3,6 @@
     android:minHeight="64px"
     android:updatePeriodMillis="1000"
     android:initialLayout="@layout/widget"
+    android:configure="fm.last.android.LastFm"
     >
 </appwidget-provider>
