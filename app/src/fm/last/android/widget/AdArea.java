@@ -45,12 +45,14 @@ public class AdArea extends ImageButton {
 	public static boolean adsEnabled(Context context) {
 		Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
 		
-		if( session.getSubscriber().equals("1"))
+		if( session.getSubscriber().equals("1")) {
 			return false;
+		}
 		
 		TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
-		if(!tm.getNetworkCountryIso().equals("us"))
+		if(!tm.getNetworkCountryIso().equals("us")) {
 			return false;
+		}
 		
 		return getAdInfo();
 		
@@ -60,8 +62,9 @@ public class AdArea extends ImageButton {
 		
 		long currentTime = new Date().getTime();
 		//30 minutes - maybe this could be a lot longer..
-		if(  currentTime - slastAdCheck < 1800000 )
+		if(  currentTime - slastAdCheck < 1800000 ) {
 			return sCachedAdStatus;
+		}
 		
 		slastAdCheck = currentTime;
 		sCachedAdStatus = retrieveAdInfo();
@@ -71,7 +74,7 @@ public class AdArea extends ImageButton {
 	static boolean retrieveAdInfo() {
 		Document xml = null;
 		try {
-			String response = UrlUtil.doGet( new URL( "http://cdn.last.fm/mobile_ads/blackberry/blackberry.xml" ));
+			String response = UrlUtil.doGet( new URL( "http://static.last.fm/jono/blackberry.xml"/*"http://cdn.last.fm/mobile_ads/blackberry/blackberry.xml"*/ ));
 			xml = XMLUtil.stringToDocument(response);
 		} catch (Exception e) {
 			return false;
@@ -89,7 +92,6 @@ public class AdArea extends ImageButton {
 				for( int i = 0; i < nodes.size(); ++i ) {
 					Node trackerNode = (Node)nodes.get(i);
 					String trackerUrl = XMLUtil.getChildTextNodes(trackerNode);
-					Log.d("Last.fm", "Adding tracker URL:" + trackerUrl);
 					_trackerUrls.add(trackerUrl);
 				}
 			}
@@ -98,7 +100,6 @@ public class AdArea extends ImageButton {
 			{
 				Node urlNode = XMLUtil.findNamedElementNode( lfm, "url" );
 				_url = XMLUtil.getChildTextNodes( urlNode );
-				Log.d("Last.fm", "Adding target URL:" + _url);
 			}
 			
 			//Get image URLs
@@ -108,7 +109,6 @@ public class AdArea extends ImageButton {
 					Node imageNode = (Node)nodes.get(i);
 					String width = XMLUtil.getNodeAttribute( imageNode, "width" );
 					String url = XMLUtil.getChildTextNodes( imageNode );
-					Log.d("Last.fm", "Adding image URL:" + url + " for width " + width);
 					_imageTable.put(Integer.valueOf(width), url);
 				}
 			}
@@ -120,6 +120,8 @@ public class AdArea extends ImageButton {
 		super(context, attributeSet);
 		if(!adsEnabled(context))
 			setVisibility(View.GONE);
+		else
+			setVisibility(View.VISIBLE);
 		
 		setOnClickListener(mClickListener);
 	}
@@ -156,7 +158,6 @@ public class AdArea extends ImageButton {
         public Boolean doInBackground(Void...params) {
             boolean success = false;
     		try {
-    			Log.d("Last.fm", "Searching for image for width: " + (getWidth() - 10));
    				mBitmap = UrlUtil.getImage(new URL(_imageTable.get(Integer.valueOf(getWidth() - 10))));
 				for( int i = 0; i < _trackerUrls.size(); ++i ) {
 					URL url = UrlUtil.getRedirectedUrl( new URL( ((String)_trackerUrls.elementAt( i ) )) );
