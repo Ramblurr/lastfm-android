@@ -5,6 +5,8 @@ package fm.last.android;
 
 import java.util.Formatter;
 
+import fm.last.android.activity.Metadata;
+import fm.last.android.activity.PopupActionActivity;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
@@ -41,7 +43,28 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     @Override 
     public void onReceive(Context context, Intent intent) { 
         final String action = intent.getAction();
-        if (action.equals("fm.last.android.SKIP")) {
+        if (action.equals("fm.last.android.ACTION")) {
+       		if (LastFMApplication.getInstance().player == null)
+    			LastFMApplication.getInstance().bindPlayerService();
+    		if (LastFMApplication.getInstance().player != null) {
+				try {
+					// If the player is in a stopped state, call startRadio instead
+					// of skip
+					String track = LastFMApplication.getInstance().player.getTrackName();
+					String artist = LastFMApplication.getInstance().player.getArtistName();
+					if(!track.equals(RadioPlayerService.UNKNOWN)) {
+						Intent i = new Intent( context, PopupActionActivity.class );
+				        i.putExtra("lastfm.artist", artist);
+				        i.putExtra("lastfm.track", track);
+				        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				        context.startActivity( i );
+					}
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+        } else if (action.equals("fm.last.android.SKIP")) {
     		if (LastFMApplication.getInstance().player == null)
     			LastFMApplication.getInstance().bindPlayerService();
     		if (LastFMApplication.getInstance().player != null) {
@@ -114,7 +137,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         // the layout from our package).
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        //Hook up the buttons (this should really be done eslewhere but doesn't hurt here)
+        //Hook up the buttons (this should really be done elsewhere but doesn't hurt here)
         intent = new Intent("fm.last.android.LOVE");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.love, pendingIntent);
