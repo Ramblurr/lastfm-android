@@ -58,8 +58,8 @@
 		<item name="android:background">@+drawable/widget_button_left</item>
 		<item name="android:src">@+drawable/cog</item>
 	</style>
-	<style name="WidgetButton.Stop">
-		<item name="android:src">@+drawable/stop</item>
+	<style name="WidgetButton.Play">
+		<item name="android:src">@+drawable/play</item>
 	</style>
 	<style name="WidgetButton.Skip">
 		<item name="android:background">@+drawable/widget_button_right</item>

@@ -174,6 +174,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					} else {
 						views.setViewVisibility(R.id.totaltime, View.GONE);
 						views.setProgressBar(R.id.spinner, 1, 0, true);
+				        views.setProgressBar(android.R.id.progress, 1, 0, false);
 					}
 					if(player.getTrackName().equals(RadioPlayerService.UNKNOWN))
 				        views.setTextViewText(R.id.widgettext, player.getStationName());
