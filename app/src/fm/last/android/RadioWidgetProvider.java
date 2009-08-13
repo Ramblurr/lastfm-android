@@ -5,18 +5,17 @@ package fm.last.android;
 
 import java.util.Formatter;
 
-import fm.last.android.activity.Metadata;
 import fm.last.android.player.IRadioPlayer;
+import fm.last.android.player.RadioPlayerService;
+import fm.last.api.Session;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -25,14 +24,12 @@ import android.widget.RemoteViews;
  *
  */
 public class RadioWidgetProvider extends AppWidgetProvider {
-    // log tag
-    private static final String TAG = "LastFmRadioWidgetProvider";
-    
     static final ComponentName THIS_APPWIDGET =
         new ComponentName("fm.last.android",
                 "fm.last.android.RadioWidgetProvider");
     
     private static RadioWidgetProvider sInstance;
+    private static PendingIntent mAlarmIntent = null;
     
     public static synchronized RadioWidgetProvider getInstance() {
         if (sInstance == null) {
@@ -53,8 +50,13 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					// of skip
 					if (LastFMApplication.getInstance().player.isPlaying())
 						LastFMApplication.getInstance().player.skip();
-					else
+					else {
+						if(LastFMApplication.getInstance().player.getStationName() == null) {
+							Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+							LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+						}
 						LastFMApplication.getInstance().player.startRadio();
+					}
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -69,13 +71,20 @@ public class RadioWidgetProvider extends AppWidgetProvider {
    					// of stop (we should change the icon to "Play")
    					if (LastFMApplication.getInstance().player.isPlaying())
    						LastFMApplication.getInstance().player.stop();
-   					else
-   						LastFMApplication.getInstance().player.startRadio();
+   					else {
+						if(LastFMApplication.getInstance().player.getStationName() == null) {
+							Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+							LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+						}
+						LastFMApplication.getInstance().player.startRadio();
+   					}
    				} catch (RemoteException e) {
    					// TODO Auto-generated catch block
    					e.printStackTrace();
    				}
-            } 
+            }
+        } else if (action.equals("fm.last.android.UPDATEWIDGET")) {
+        	updateAppWidget(context);
         } else { 
         	super.onReceive(context, intent);
         }
@@ -143,12 +152,32 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						views.setViewVisibility(R.id.totaltime, View.GONE);
 						views.setProgressBar(R.id.spinner, 1, 0, true);
 					}
-			        views.setTextViewText(R.id.widgettext, player.getArtistName() + " - " + player.getTrackName());
+					if(player.getTrackName().equals(RadioPlayerService.UNKNOWN))
+				        views.setTextViewText(R.id.widgettext, player.getStationName());
+					else
+						views.setTextViewText(R.id.widgettext, player.getArtistName() + " - " + player.getTrackName());
+					views.setImageViewResource(R.id.stop, R.drawable.stop);
+					if(mAlarmIntent == null) {
+				        intent = new Intent("fm.last.android.UPDATEWIDGET");
+				        mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+				        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+				        am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+					}
 				} else {
 					views.setViewVisibility(R.id.totaltime, View.GONE);
-			        views.setTextViewText(R.id.widgettext, player.getStationName());
+					if(player.getStationName() != null) {
+						views.setTextViewText(R.id.widgettext, player.getStationName());
+					} else {
+						Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+						views.setTextViewText(R.id.widgettext, session.getName() + "'s Library");
+					}
 			        views.setProgressBar(android.R.id.progress, 1, 0, false);
 					views.setProgressBar(R.id.spinner, 1, 0, false);
+					views.setImageViewResource(R.id.stop, R.drawable.play);
+					if(mAlarmIntent != null) {
+				        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+				        am.cancel(mAlarmIntent);
+					}
 				}
 			} catch (RemoteException ex) {
 			}

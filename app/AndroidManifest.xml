@@ -84,6 +84,7 @@
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
     			<action android:name="fm.last.android.SKIP"/>
     			<action android:name="fm.last.android.STOP"/>
+    			<action android:name="fm.last.android.UPDATEWIDGET"/>
 		    </intent-filter>
 		    <meta-data android:name="android.appwidget.provider"
 		                android:resource="@xml/radiowidget_info"

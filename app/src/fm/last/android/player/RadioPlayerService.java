@@ -218,8 +218,7 @@ public class RadioPlayerService extends Service
 		notification.setLatestEventInfo( this, currentStation.getName(),
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
-		RadioWidgetProvider p = RadioWidgetProvider.getInstance();
-		p.updateAppWidget(this);
+		RadioWidgetProvider.updateAppWidget(this);
 		nm.notify( NOTIFY_ID, notification );
 	}
 
@@ -673,6 +672,8 @@ public class RadioPlayerService extends Service
 			//STOPPED state
 			if(mState == STATE_STOPPED)
 				mState = STATE_TUNING;
+			currentTrack = null;
+			RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
 			new NextTrackTask().execute((Void)null);
 		}
 

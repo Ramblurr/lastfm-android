@@ -84,7 +84,7 @@ public class LastFm extends Activity
         
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
-        	if(getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
+        	if(getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
         		Intent intent = getIntent();
         		Bundle extras = intent.getExtras();
         		if (extras != null) {
@@ -93,6 +93,7 @@ public class LastFm extends Activity
             		Intent resultValue = new Intent();
             		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             		setResult(RESULT_OK, resultValue);
+            		RadioWidgetProvider.updateAppWidget(this);
         		}
         	} else {
 	            Intent intent = getIntent();
@@ -268,6 +269,7 @@ public class LastFm extends Activity
 	            		Intent resultValue = new Intent();
 	            		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 	            		setResult(RESULT_OK, resultValue);
+	            		RadioWidgetProvider.updateAppWidget(LastFm.this);
 	        		}
 	        	} else {
 		            LastFMApplication.getInstance().map.put( "lastfm_session", session );
