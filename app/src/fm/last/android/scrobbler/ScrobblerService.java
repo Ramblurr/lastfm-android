@@ -314,10 +314,10 @@ public class ScrobblerService extends Service {
 			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 			nm.cancel( 1338 );
 		}
-		if(intent.getAction().equals(LOVE)) {
+		if(intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
 		}
-		if(intent.getAction().equals(BAN)) {
+		if(intent.getAction().equals(BAN) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "B";
 		}
 		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
