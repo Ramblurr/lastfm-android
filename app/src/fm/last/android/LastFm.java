@@ -260,6 +260,8 @@ public class LastFm extends Activity
 	            editor.putString( "lastfm_subscriber", session.getSubscriber());
 	            editor.commit();
 
+	            LastFMApplication.getInstance().map.put( "lastfm_session", session );
+
 	        	if(getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 	        		Intent intent = getIntent();
 	        		Bundle extras = intent.getExtras();
@@ -272,7 +274,6 @@ public class LastFm extends Activity
 	            		RadioWidgetProvider.updateAppWidget(LastFm.this);
 	        		}
 	        	} else {
-		            LastFMApplication.getInstance().map.put( "lastfm_session", session );
 		            Intent intent = new Intent( LastFm.this, Profile.class );
 		            intent.putExtra("lastfm.profile.new_user", mNewUser );
 		            startActivity( intent );
