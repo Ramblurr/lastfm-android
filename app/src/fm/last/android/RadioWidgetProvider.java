@@ -193,7 +193,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						views.setTextViewText(R.id.widgettext, player.getStationName());
 					} else {
 						Session session = LastFMApplication.getInstance().map.get("lastfm_session");
-						views.setTextViewText(R.id.widgettext, session.getName() + "'s Library");
+						if(session != null)
+							views.setTextViewText(R.id.widgettext, session.getName() + "'s Library");
 					}
 			        views.setProgressBar(android.R.id.progress, 1, 0, false);
 					views.setProgressBar(R.id.spinner, 1, 0, false);
