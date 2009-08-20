@@ -74,7 +74,7 @@ public class AdArea extends ImageButton {
 	static boolean retrieveAdInfo() {
 		Document xml = null;
 		try {
-			String response = UrlUtil.doGet( new URL( "http://static.last.fm/jono/blackberry.xml"/*"http://cdn.last.fm/mobile_ads/blackberry/blackberry.xml"*/ ));
+			String response = UrlUtil.doGet( new URL( "http://cdn.last.fm/mobile_ads/android/android.xml"/*"http://cdn.last.fm/mobile_ads/blackberry/blackberry.xml"*/ ));
 			xml = XMLUtil.stringToDocument(response);
 		} catch (Exception e) {
 			return false;
