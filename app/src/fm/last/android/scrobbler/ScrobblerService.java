@@ -145,17 +145,25 @@ public class ScrobblerService extends Service {
         	mCurrentTrack = null;
         }
 
+        mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        
         try {
             FileInputStream fileStream = openFileInput("queue.dat");
             ObjectInputStream objectStream = new ObjectInputStream(fileStream);
             Object obj = objectStream.readObject();
-            if(obj instanceof ArrayBlockingQueue) {
-            	mQueue = (ArrayBlockingQueue<ScrobblerQueueEntry>)obj;
+            if(obj instanceof Integer) {
+            	Integer count = (Integer)obj;
+            	for(int i = 0; i < count.intValue(); i++) {
+                    obj = objectStream.readObject();
+                    if(obj instanceof ScrobblerQueueEntry)
+                    	mQueue.add((ScrobblerQueueEntry)obj);
+            	}
             }
             objectStream.close();
             fileStream.close();
+            Log.i("Last.fm", "Loaded " + mQueue.size() + " queued tracks");
         } catch (Exception e) {
-            mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        	e.printStackTrace();
         }
 	}
 
@@ -182,10 +190,15 @@ public class ScrobblerService extends Service {
 		try {
 			if(getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
-			if(mQueue.peek() != null) {
+			if(mQueue.size() > 0) {
+				Log.i("Last.fm", "Writing " + mQueue.size() + " queued tracks");
 				FileOutputStream filestream = openFileOutput("queue.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
-				objectstream.writeObject(mQueue);
+				objectstream.writeObject(new Integer(mQueue.size()));
+				while(mQueue.size() > 0) {
+					ScrobblerQueueEntry e = mQueue.take();
+					objectstream.writeObject(e);
+				}
 				objectstream.close();
 				filestream.close();
 			}
@@ -227,8 +240,8 @@ public class ScrobblerService extends Service {
          * so we'll have to catch PLAYBACK_STATE_CHANGED and check to see whether the player
          * is currently playing.  We'll then send our own META_CHANGED intent to the scrobbler.
          */
-		if(intent.getAction().equals("com.android.music.playstatechanged") &&
-				intent.getIntExtra("id", -1) != -1) {
+		if((intent.getAction().equals("com.android.music.playstatechanged") &&
+				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.android.music.metachanged")) {
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
 	                    new ServiceConnection() {
@@ -269,7 +282,7 @@ public class ScrobblerService extends Service {
     }
     
     public void handleIntent(Intent intent) {
-        if(intent.getAction().equals(META_CHANGED) || intent.getAction().equals("com.android.music.metachanged")) {
+        if(intent.getAction().equals(META_CHANGED)) {
         	if(mCurrentTrack != null) {
         		enqueueCurrentTrack();
         	}
@@ -396,16 +409,18 @@ public class ScrobblerService extends Service {
 			{
 				Log.i("LastFm", "Going to submit " + mQueue.size() + " tracks");
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				while(mQueue.peek() != null) {
+				while(mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
-					if(e.rating.equals("L")) {
-						server.loveTrack(e.artist, e.title, mSession.getKey());
+					if(e != null) {
+						if(e.rating.equals("L")) {
+							server.loveTrack(e.artist, e.title, mSession.getKey());
+						}
+						if(e.rating.equals("B")) {
+							server.banTrack(e.artist, e.title, mSession.getKey());
+						}
+						scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
 					}
-					if(e.rating.equals("B")) {
-						server.banTrack(e.artist, e.title, mSession.getKey());
-					}
-					scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
-					mQueue.remove(e);
+					mQueue.take();
 				}
 				success = true;
 			}
