@@ -215,16 +215,18 @@ public class ScrobblerService extends Service {
 	 * whether this is a skip or a played track, and will add it to our scrobble queue.
 	 */
 	public void enqueueCurrentTrack() {
-		long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
-		boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
-		if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
-			mCurrentTrack.rating = "S";
+		if(mCurrentTrack != null) {
+			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
+			boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
+			if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
+				mCurrentTrack.rating = "S";
+			}
+			if(played || mCurrentTrack.rating.length() > 0) {
+				Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
+		   		mQueue.add(mCurrentTrack);
+			}
+	   		mCurrentTrack = null;
 		}
-		if(played || mCurrentTrack.rating.length() > 0) {
-			Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-	   		mQueue.add(mCurrentTrack);
-		}
-   		mCurrentTrack = null;
 	}
 	
     @Override
@@ -395,7 +397,8 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPostExecute(Boolean result) {
-			mCurrentTrack.postedNowPlaying = result;
+			if(mCurrentTrack != null)
+				mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
 	   		stopIfReady();
 		}
