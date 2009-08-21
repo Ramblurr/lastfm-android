@@ -71,7 +71,7 @@ public interface LastFmServer {
 	
 	public Station tuneToStation(String station, String sk) throws IOException;
 
-	public RadioPlayList getRadioPlayList(String sk) throws IOException;
+	public RadioPlayList getRadioPlayList(String bitrate, String sk) throws IOException;
 
 	public User getUserInfo(String sk) throws IOException;
 	public User getAnyUserInfo(String username) throws IOException;

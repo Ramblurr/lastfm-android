@@ -42,9 +42,11 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
 import fm.last.api.User;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -132,14 +134,67 @@ public class Metadata extends Activity {
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected( MenuItem item ) {
-		if( item.getItemId() == R.id.info_menu_item ) {
-			finish();
-			return true;
+	public boolean onPrepareOptionsMenu(Menu menu)  {
+		boolean isPlaying = false;
+		try {
+			if (LastFMApplication.getInstance().player != null)
+				isPlaying = LastFMApplication.getInstance().player.isPlaying();
+		} catch (RemoteException e) {
 		}
 		
-		if( Player.handleOptionItemSelected( this, item) )
-			return true;
+		menu.findItem(R.id.info_menu_item).setEnabled( isPlaying );
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected( MenuItem item ) {
+		Intent intent;
+		
+		switch (item.getItemId()) {
+		case R.id.info_menu_item:
+			finish();
+			break;
+		case R.id.buy_menu_item:
+			try {
+				intent = new Intent(Intent.ACTION_SEARCH);
+				intent.setComponent(new ComponentName("com.amazon.mp3",
+						"com.amazon.mp3.android.client.SearchActivity"));
+				intent
+						.putExtra("actionSearchString", mArtistName
+								+ " "
+								+ mTrackName);
+				intent.putExtra("actionSearchType", 0);
+				startActivity(intent);
+			} catch (Exception e) {
+				LastFMApplication
+						.getInstance()
+						.presentError(this, "Amazon Unavailable",
+								"The Amazon MP3 store is not currently available on this device.");
+			}
+			break;
+		case R.id.share_menu_item:
+			intent = new Intent(this, Share.class);
+			intent.putExtra(Share.INTENT_EXTRA_ARTIST, mArtistName);
+			intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackName);
+			startActivity(intent);
+			break;
+		case R.id.playlist_menu_item:
+			intent = new Intent(this, AddToPlaylist.class);
+			intent.putExtra(Share.INTENT_EXTRA_ARTIST, mArtistName);
+			intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackName);
+			startActivity(intent);
+			break;
+		case R.id.tag_menu_item:
+			intent = new Intent(this,
+					fm.last.android.activity.Tag.class);
+			intent.putExtra("lastfm.artist", mArtistName);
+			intent.putExtra("lastfm.track", mTrackName);
+			startActivity(intent);
+			break;
+		default:
+			break;
+		}
 		
 		return super.onOptionsItemSelected(item);
 	}

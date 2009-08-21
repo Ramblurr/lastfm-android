@@ -22,28 +22,39 @@ package fm.last.android.scrobbler;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import com.android.music.IMediaPlaybackService;
 
 import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFm;
+import fm.last.android.LastFMApplication;
 import fm.last.android.R;
-import fm.last.android.player.RadioPlayerService;
+import fm.last.android.RadioWidgetProvider;
+import fm.last.android.activity.Player;
 import fm.last.android.utils.UserTask;
+import fm.last.api.Album;
 import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioTrack;
 import fm.last.api.Session;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -94,18 +105,21 @@ public class ScrobblerService extends Service {
 	ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
 	ScrobblerQueueEntry mCurrentTrack = null;
 	
+	public static final String META_CHANGED = "fm.last.android.metachanged";
+	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
+	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playstatechanged";
+	public static final String STATION_CHANGED = "fm.last.android.stationchanged";
+	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
+	public static final String UNKNOWN = "fm.last.android.unknown";
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-        SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
-        String user = settings.getString( "lastfm_user", "" );
-        String session_key = settings.getString( "lastfm_session_key", "" );
-        String subscriber = settings.getString( "lastfm_subscriber", "0" );
-        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true) && !user.equals( "" ) && !session_key.equals( "" ) ) {
-	    	mSession = new Session(user, session_key, subscriber);
+    	mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
+
+    	if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
 			String version = "0.1";
 			try {
 				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
@@ -115,6 +129,7 @@ public class ScrobblerService extends Service {
         } else {
         	//User not authenticated, shutting down...
         	stopSelf();
+        	return;
         }
         
         try {
@@ -130,17 +145,25 @@ public class ScrobblerService extends Service {
         	mCurrentTrack = null;
         }
 
+        mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        
         try {
             FileInputStream fileStream = openFileInput("queue.dat");
             ObjectInputStream objectStream = new ObjectInputStream(fileStream);
             Object obj = objectStream.readObject();
-            if(obj instanceof ArrayBlockingQueue) {
-            	mQueue = (ArrayBlockingQueue<ScrobblerQueueEntry>)obj;
+            if(obj instanceof Integer) {
+            	Integer count = (Integer)obj;
+            	for(int i = 0; i < count.intValue(); i++) {
+                    obj = objectStream.readObject();
+                    if(obj instanceof ScrobblerQueueEntry)
+                    	mQueue.add((ScrobblerQueueEntry)obj);
+            	}
             }
             objectStream.close();
             fileStream.close();
+            Log.i("Last.fm", "Loaded " + mQueue.size() + " queued tracks");
         } catch (Exception e) {
-            mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+        	e.printStackTrace();
         }
 	}
 
@@ -167,10 +190,15 @@ public class ScrobblerService extends Service {
 		try {
 			if(getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
-			if(mQueue.peek() != null) {
+			if(mQueue.size() > 0) {
+				Log.i("Last.fm", "Writing " + mQueue.size() + " queued tracks");
 				FileOutputStream filestream = openFileOutput("queue.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
-				objectstream.writeObject(mQueue);
+				objectstream.writeObject(new Integer(mQueue.size()));
+				while(mQueue.size() > 0) {
+					ScrobblerQueueEntry e = mQueue.take();
+					objectstream.writeObject(e);
+				}
 				objectstream.close();
 				filestream.close();
 			}
@@ -212,8 +240,8 @@ public class ScrobblerService extends Service {
          * so we'll have to catch PLAYBACK_STATE_CHANGED and check to see whether the player
          * is currently playing.  We'll then send our own META_CHANGED intent to the scrobbler.
          */
-		if(intent.getAction().equals("com.android.music.playstatechanged") &&
-				intent.getIntExtra("id", -1) != -1) {
+		if((intent.getAction().equals("com.android.music.playstatechanged") &&
+				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.android.music.metachanged")) {
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
 	                    new ServiceConnection() {
@@ -223,12 +251,14 @@ public class ScrobblerService extends Service {
 	                            
 	                            try {
 									if(s.isPlaying()) {
-										i.setAction(RadioPlayerService.META_CHANGED);
+										i.setAction(META_CHANGED);
 										i.putExtra("position", s.position());
 										i.putExtra("duration", (int)s.duration());
 										handleIntent(i);
 									} else { //Media player was paused
 										mCurrentTrack = null;
+										NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+										nm.cancel( 1338 );
 										stopSelf();
 									}
 								} catch (RemoteException e) {
@@ -252,7 +282,7 @@ public class ScrobblerService extends Service {
     }
     
     public void handleIntent(Intent intent) {
-        if(intent.getAction().equals(RadioPlayerService.META_CHANGED)) {
+        if(intent.getAction().equals(META_CHANGED)) {
         	if(mCurrentTrack != null) {
         		enqueueCurrentTrack();
         	}
@@ -273,14 +303,34 @@ public class ScrobblerService extends Service {
 			}
 			mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
 			mNowPlayingTask.execute(mScrobbler);
+
+			if(auth == null) {
+				NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+				Notification notification = new Notification(
+						R.drawable.as_statusbar, "Scrobbling: "
+						+ mCurrentTrack.title + " by "
+						+ mCurrentTrack.artist, System.currentTimeMillis() );
+				Intent metaIntent = new Intent(this, fm.last.android.activity.Metadata.class);
+				metaIntent.putExtra("artist", mCurrentTrack.artist);
+				metaIntent.putExtra("track", mCurrentTrack.title);
+				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
+						metaIntent, 0 );
+				String info = mCurrentTrack.title + " - " + mCurrentTrack.artist;
+				notification.setLatestEventInfo( this, "Now Scrobbling",
+						info, contentIntent );
+				notification.flags |= Notification.FLAG_ONGOING_EVENT;
+				nm.notify( 1338, notification );
+			}
 		}
-		if(intent.getAction().equals(RadioPlayerService.PLAYBACK_FINISHED)) {
+		if(intent.getAction().equals(PLAYBACK_FINISHED) || intent.getAction().equals("com.android.music.playbackcomplete")) {
 			enqueueCurrentTrack();
+			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+			nm.cancel( 1338 );
 		}
-		if(intent.getAction().equals(LOVE)) {
+		if(intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
 		}
-		if(intent.getAction().equals(BAN)) {
+		if(intent.getAction().equals(BAN) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "B";
 		}
 		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
@@ -320,6 +370,15 @@ public class ScrobblerService extends Service {
 			mTrack = track;
 		}
 
+		@Override
+		public void onPreExecute() {
+			/* If we have any scrobbles in the queue, try to send them now */
+	   		if(mSubmissionTask == null && mQueue.size() > 0) {
+		   		mSubmissionTask = new SubmitTracksTask();
+		   		mSubmissionTask.execute(mScrobbler);
+	   		}
+		}
+		
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			try
@@ -338,11 +397,6 @@ public class ScrobblerService extends Service {
 		public void onPostExecute(Boolean result) {
 			mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
-			/* If we have any scrobbles in the queue, try to send them now */
-	   		if(mSubmissionTask == null && mQueue.size() > 0) {
-		   		mSubmissionTask = new SubmitTracksTask();
-		   		mSubmissionTask.execute(mScrobbler);
-	   		}
 	   		stopIfReady();
 		}
 	}
@@ -355,16 +409,18 @@ public class ScrobblerService extends Service {
 			{
 				Log.i("LastFm", "Going to submit " + mQueue.size() + " tracks");
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				while(mQueue.peek() != null) {
+				while(mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
-					if(e.rating.equals("L")) {
-						server.loveTrack(e.artist, e.title, mSession.getKey());
+					if(e != null) {
+						if(e.rating.equals("L")) {
+							server.loveTrack(e.artist, e.title, mSession.getKey());
+						}
+						if(e.rating.equals("B")) {
+							server.banTrack(e.artist, e.title, mSession.getKey());
+						}
+						scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
 					}
-					if(e.rating.equals("B")) {
-						server.banTrack(e.artist, e.title, mSession.getKey());
-					}
-					scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
-					mQueue.remove(e);
+					mQueue.take();
 				}
 				success = true;
 			}

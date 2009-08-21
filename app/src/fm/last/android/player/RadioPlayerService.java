@@ -32,6 +32,7 @@ import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
 import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.RadioWidgetProvider;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -45,6 +46,8 @@ import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
 import android.os.Handler;
@@ -53,6 +56,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -214,7 +218,7 @@ public class RadioPlayerService extends Service
 		notification.setLatestEventInfo( this, currentStation.getName(),
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
-
+		RadioWidgetProvider.updateAppWidget(this);
 		nm.notify( NOTIFY_ID, notification );
 	}
 
@@ -242,7 +246,7 @@ public class RadioPlayerService extends Service
 					try {
 						//Please to be working?
 						refreshPlaylist();
-					} catch (WSError e) {
+					} catch (Exception e) {
 					}
 				}
 				if(currentQueue.size() > 1) {
@@ -272,23 +276,28 @@ public class RadioPlayerService extends Service
 	};
 	
 	private OnErrorListener mOnErrorListener = new OnErrorListener() {
-		public boolean onError(MediaPlayer mp, int what, int extra) {
-			if(mAutoSkipCount++ > 4) {
-				//If we weren't able to start playing after 3 attempts, bail out and notify
-				//the user.  This will bring us into a stopped state.
-				mState = STATE_STOPPED;
-				notifyChange(PLAYBACK_ERROR);
-				nm.cancel( NOTIFY_ID );
-				if( wakeLock.isHeld())
-					wakeLock.release();
-				
-				if( wifiLock.isHeld())
-					wifiLock.release();
-				mDeferredStopHandler.deferredStopSelf();
+		public boolean onError(MediaPlayer p, int what, int extra) {
+			if(mp == p) {
+				if(mAutoSkipCount++ > 4) {
+					//If we weren't able to start playing after 3 attempts, bail out and notify
+					//the user.  This will bring us into a stopped state.
+					mState = STATE_STOPPED;
+					notifyChange(PLAYBACK_ERROR);
+					nm.cancel( NOTIFY_ID );
+					if( wakeLock.isHeld())
+						wakeLock.release();
+					
+					if( wifiLock.isHeld())
+						wifiLock.release();
+					mDeferredStopHandler.deferredStopSelf();
+				} else {
+					Log.i("LastFm", "Sadface: " + what + ", " + extra);
+					//Enter a state that will allow nextSong to do its thang
+					mState = STATE_PREPARING;
+					new NextTrackTask().execute((Void)null);
+				}
 			} else {
-				//Enter a state that will allow nextSong to do its thang
-				mState = STATE_PREPARING;
-				new NextTrackTask().execute((Void)null);
+				next_mp = null;
 			}
 			return true;
 		}
@@ -339,6 +348,7 @@ public class RadioPlayerService extends Service
 		if (mState == STATE_PLAYING) {
 			mp.stop();
 		}
+		next_mp = null;
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
 		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
@@ -348,12 +358,18 @@ public class RadioPlayerService extends Service
 		if( wifiLock.isHeld())
 			wifiLock.release();
 		mDeferredStopHandler.deferredStopSelf();
+		RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
 	}
 	
 	private void nextSong()
 	{
 		if(mState == STATE_SKIPPING || mState == STATE_STOPPED)
 			return;
+		
+		if(mState == STATE_PLAYING) {
+			currentTrack = null;
+			mp.stop();
+		}
 		
 		mState = STATE_SKIPPING;
 		// Check if we're running low on tracks
@@ -365,6 +381,8 @@ public class RadioPlayerService extends Service
 			} catch (WSError e) {
 				mError = e;
 				notifyChange( PLAYBACK_ERROR );
+				return;
+			} catch (Exception e) {
 				return;
 			}
 		}
@@ -447,14 +465,25 @@ public class RadioPlayerService extends Service
 		}
 	}
 
-	private void refreshPlaylist() throws WSError
+	private void refreshPlaylist() throws Exception
 	{
 		if ( currentStation == null )
 			return;
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		RadioPlayList playlist;
 		try {
-			playlist = server.getRadioPlayList( currentSession.getKey() );
+			String bitrate;
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni.getType() == ConnectivityManager.TYPE_MOBILE)
+				bitrate = "64";
+			else
+				bitrate = "128";
+			
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", true))
+				bitrate = "128";
+			Log.i("Last.fm", "Requesting bitrate: " + bitrate);
+			playlist = server.getRadioPlayList( bitrate, currentSession.getKey() );
 			if(playlist == null || playlist.getTracks().length == 0)
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
 
@@ -467,6 +496,7 @@ public class RadioPlayerService extends Service
 			if(e.getMessage().contains("code 503")) {
 				if(mPlaylistRetryCount++ < 4 ) {
 					Log.i("Last.fm", "Playlist service unavailable, retrying...");
+					Thread.currentThread().sleep(2000);
 					refreshPlaylist();
 				} else {
 					notifyChange( PLAYBACK_ERROR );
@@ -497,7 +527,7 @@ public class RadioPlayerService extends Service
 		sendBroadcast( i );
 	}
 
-	private void tune(String url, Session session) throws IOException, WSError
+	private void tune(String url, Session session) throws Exception, WSError
 	{
 		wakeLock.acquire();
 		wifiLock.acquire();
@@ -625,7 +655,7 @@ public class RadioPlayerService extends Service
 			try {
 				RadioPlayerService.this.tune( url, session );
 				return true;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (WSError e) {
@@ -643,6 +673,8 @@ public class RadioPlayerService extends Service
 			//STOPPED state
 			if(mState == STATE_STOPPED)
 				mState = STATE_TUNING;
+			currentTrack = null;
+			RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
 			new NextTrackTask().execute((Void)null);
 		}
 

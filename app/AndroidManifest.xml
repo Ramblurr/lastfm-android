@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="fm.last.android" android:versionCode="3" android:versionName="1.0.2">
+	package="fm.last.android" android:versionCode="5" android:versionName="1.1.1">
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
 	<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:name="LastFMApplication">
-		<activity android:name=".LastFm" android:label="@string/app_name" android:configChanges="keyboardHidden">
+		<activity android:name="LastFm" android:configChanges="keyboardHidden">
 			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 				<action android:name="android.intent.action.MAIN" />
-				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="lastfm" />
             </intent-filter>
 		</activity>
 		<activity android:name=".activity.Profile" android:label="Last.fm: Profile" android:configChanges="keyboardHidden">
@@ -31,7 +29,9 @@
 		<activity android:name=".activity.Player" android:label="Last.fm: Player" android:configChanges="keyboardHidden" android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
-				<category android:name="android.intent.category.DEFAULT"/>
+				<category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lastfm" />
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Event" android:label="Last.fm: Event" android:configChanges="keyboardHidden">
@@ -76,10 +76,33 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
+		<activity android:name=".activity.PopupActionActivity" android:theme="@android:style/Theme.Dialog">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+		</activity>
+		<receiver android:name="RadioWidgetProvider"
+		            android:label="Last.fm Radio"
+		            android:icon="@drawable/icon"
+		            >
+		    <intent-filter>
+		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+    			<action android:name="fm.last.android.SKIP"/>
+    			<action android:name="fm.last.android.STOP"/>
+    			<action android:name="fm.last.android.ACTION"/>
+    			<action android:name="fm.last.android.UPDATEWIDGET"/>
+		    </intent-filter>
+		    <meta-data android:name="android.appwidget.provider"
+		                android:resource="@xml/radiowidget_info"
+		                />
+		</receiver>
+		<service android:name=".player.RadioPlayerService" android:process=":player" />
        	<receiver android:name=".scrobbler.MusicIntentReceiver">
     		<intent-filter>
     			<action android:name="com.android.music.playstatechanged"/>
     			<action android:name="com.android.music.playbackcomplete"/>
+    			<action android:name="com.android.music.metachanged"/>
     			<action android:name="fm.last.android.metachanged"/>
     			<action android:name="fm.last.android.playstatechanged"/>
     			<action android:name="fm.last.android.playbackcomplete"/>
@@ -88,7 +111,7 @@
     			<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
     		</intent-filter>
     	</receiver>
-		<service android:name=".player.RadioPlayerService" android:process=":player" />
 		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>
     </application>
-</manifest> 
+<uses-sdk android:minSdkVersion="3"></uses-sdk>
+</manifest>

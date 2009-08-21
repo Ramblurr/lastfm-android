@@ -27,6 +27,8 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 /**
  * A collection of utility methods to manipulate URLs.
@@ -246,6 +248,13 @@ public class UrlUtil {
 				reader.close();
 			}
 		}
+	}
+
+	public static Bitmap getImage(URL url) throws IOException {
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		setUserAgent( conn );
+		conn.setRequestMethod("GET");
+		return BitmapFactory.decodeStream(conn.getInputStream());
 	}
 
 	private static String toString(BufferedReader reader) throws IOException {

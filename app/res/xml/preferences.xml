@@ -3,14 +3,13 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-            android:title="Scrobbler"
-            android:summary="Penguin down now!">
+            android:title="Scrobbler">
 
     <CheckBoxPreference
             android:key="scrobble"
             android:defaultValue="true"
             android:title="Enable Scrobbling"
-            android:summary="Send the music you listen to in this application to your Last.fm profile" />
+            android:summary="Update your Last.fm profile as you listen to music" />
 
     <CheckBoxPreference
             android:key="scrobble_music_player"
@@ -18,5 +17,14 @@
             android:dependency="scrobble"
             android:title="Scrobble Android player"
             android:summary="Scrobble the built-in Android music player" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="Player">
+    <CheckBoxPreference
+            android:key="highquality"
+            android:defaultValue="false"
+            android:title="High Quality Audio"
+            android:summary="Use high quality audio over cellular networks" />
     </PreferenceCategory>
 </PreferenceScreen>

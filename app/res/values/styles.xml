@@ -45,4 +45,24 @@
 	<style name="LastFMButton.Skip">
 		<item name="android:src">@+drawable/skip</item>
 	</style>
+	<style name="WidgetButton">
+		<item name="android:background">@+drawable/widget_button_middle</item>
+	</style>
+	<style name="WidgetButton.Love">
+		<item name="android:src">@+drawable/love</item>
+	</style>
+	<style name="WidgetButton.Ban">
+		<item name="android:src">@+drawable/ban</item>
+	</style>
+	<style name="WidgetButton.Menu">
+		<item name="android:background">@+drawable/widget_button_left</item>
+		<item name="android:src">@+drawable/cog</item>
+	</style>
+	<style name="WidgetButton.Play">
+		<item name="android:src">@+drawable/play</item>
+	</style>
+	<style name="WidgetButton.Skip">
+		<item name="android:background">@+drawable/widget_button_right</item>
+		<item name="android:src">@+drawable/skip</item>
+	</style>
 </resources>
