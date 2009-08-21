@@ -357,13 +357,15 @@ public class Profile extends ListActivity
         @Override
         public void onPostExecute(Boolean result) {
             Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
-            if( !isAuthenticatedUser ) {
-                mProfileBubble.setUser(Profile.this.mUser);
-                SetupCommonArtists(tasteometer);
+            if(session != null) {
+	            if( !isAuthenticatedUser ) {
+	                mProfileBubble.setUser(Profile.this.mUser);
+	                SetupCommonArtists(tasteometer);
+	            }
+	            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
+	            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
+	            mMainAdapter.notifyDataSetChanged();
             }
-            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
-            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
-            mMainAdapter.notifyDataSetChanged();
         }
     }
     
@@ -414,30 +416,33 @@ public class Profile extends ListActivity
     
     @Override
     public void onResume() {
-		registerReceiver( mStatusListener, mIntentFilter );
-		//We need to bind the player so we can see whether it's playing or not
-		//in order to properly display the Now Playing indicator if we've been
-		//relaunched after being killed.
-	
-		if(LastFMApplication.getInstance().player == null)
-			LastFMApplication.getInstance().bindPlayerService();
+    	if(LastFMApplication.getInstance().map.get("lastfm_session") == null) {
+    		finish(); //We shouldn't really get here, but sometimes the window stack keeps us around
+    	} else {
+			registerReceiver( mStatusListener, mIntentFilter );
+			//We need to bind the player so we can see whether it's playing or not
+			//in order to properly display the Now Playing indicator if we've been
+			//relaunched after being killed.
 		
-    	SetupRecentStations();
-    	RebuildMainMenu();
-    	mMainAdapter.disableLoadBar();
-
-    	for( ListView list : mProfileLists )
-    	{
-    		try { 
-    			((ListAdapter)list.getAdapter()).disableLoadBar();
-    		} catch (Exception e) { 
-    			// FIXME: this is ugly, but sometimes adapters aren't the shape we expect.
-    		}
+			if(LastFMApplication.getInstance().player == null)
+				LastFMApplication.getInstance().bindPlayerService();
+			
+	    	SetupRecentStations();
+	    	RebuildMainMenu();
+	    	mMainAdapter.disableLoadBar();
+	
+	    	for( ListView list : mProfileLists )
+	    	{
+	    		try { 
+	    			((ListAdapter)list.getAdapter()).disableLoadBar();
+	    		} catch (Exception e) { 
+	    			// FIXME: this is ugly, but sometimes adapters aren't the shape we expect.
+	    		}
+	    	}
+	
+	        if( mDialogAdapter != null )
+	        	mDialogAdapter.disableLoadBar();
     	}
-
-        if( mDialogAdapter != null )
-        	mDialogAdapter.disableLoadBar();
-        
 		super.onResume();
     }
     
@@ -1296,6 +1301,7 @@ public class Profile extends ListActivity
         editor.remove( "lastfm_session_key" );
         editor.remove( "lastfm_subscriber" );
         editor.commit();
+        LastFMApplication.getInstance().map.remove("lastfm_session");
         SQLiteDatabase db = null;
         try
         {

@@ -43,74 +43,74 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     @Override 
     public void onReceive(Context context, Intent intent) { 
         final String action = intent.getAction();
-        if (action.equals("fm.last.android.ACTION")) {
-       		if (LastFMApplication.getInstance().player == null)
-    			LastFMApplication.getInstance().bindPlayerService();
-    		if (LastFMApplication.getInstance().player != null) {
-				try {
-					// If the player is in a stopped state, call startRadio instead
-					// of skip
-					String track = LastFMApplication.getInstance().player.getTrackName();
-					String artist = LastFMApplication.getInstance().player.getArtistName();
-					if(!track.equals(RadioPlayerService.UNKNOWN)) {
-						Intent i = new Intent( context, PopupActionActivity.class );
-				        i.putExtra("lastfm.artist", artist);
-				        i.putExtra("lastfm.track", track);
-				        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				        context.startActivity( i );
-					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-        } else if (action.equals("fm.last.android.SKIP")) {
-    		if (LastFMApplication.getInstance().player == null)
-    			LastFMApplication.getInstance().bindPlayerService();
-    		if (LastFMApplication.getInstance().player != null) {
-				try {
-					// If the player is in a stopped state, call startRadio instead
-					// of skip
-					if (LastFMApplication.getInstance().player.isPlaying())
-						LastFMApplication.getInstance().player.skip();
-					else {
-						if(LastFMApplication.getInstance().player.getStationName() == null) {
-							Session session = LastFMApplication.getInstance().map.get("lastfm_session");
-							LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+		Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+		if(session != null) {
+	        if (action.equals("fm.last.android.ACTION")) {
+	       		if (LastFMApplication.getInstance().player == null)
+	    			LastFMApplication.getInstance().bindPlayerService();
+	    		if (LastFMApplication.getInstance().player != null) {
+					try {
+						// If the player is in a stopped state, call startRadio instead
+						// of skip
+						String track = LastFMApplication.getInstance().player.getTrackName();
+						String artist = LastFMApplication.getInstance().player.getArtistName();
+						if(!track.equals(RadioPlayerService.UNKNOWN)) {
+							Intent i = new Intent( context, PopupActionActivity.class );
+					        i.putExtra("lastfm.artist", artist);
+					        i.putExtra("lastfm.track", track);
+					        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					        context.startActivity( i );
 						}
-						LastFMApplication.getInstance().player.startRadio();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-        } else if (action.equals("fm.last.android.STOP")) {
-       		if (LastFMApplication.getInstance().player == null)
-       			LastFMApplication.getInstance().bindPlayerService();
-       		if (LastFMApplication.getInstance().player != null) {
-   				try {
-   					// If the player is in a stopped state, call startRadio instead
-   					// of stop (we should change the icon to "Play")
-   					if (LastFMApplication.getInstance().player.isPlaying())
-   						LastFMApplication.getInstance().player.stop();
-   					else {
-						if(LastFMApplication.getInstance().player.getStationName() == null) {
-							Session session = LastFMApplication.getInstance().map.get("lastfm_session");
-							LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+	    		}
+	        } else if (action.equals("fm.last.android.SKIP")) {
+	    		if (LastFMApplication.getInstance().player == null)
+	    			LastFMApplication.getInstance().bindPlayerService();
+	    		if (LastFMApplication.getInstance().player != null) {
+					try {
+						// If the player is in a stopped state, call startRadio instead
+						// of skip
+						if (LastFMApplication.getInstance().player.isPlaying())
+							LastFMApplication.getInstance().player.skip();
+						else {
+							if(LastFMApplication.getInstance().player.getStationName() == null) {
+								LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+							}
+							LastFMApplication.getInstance().player.startRadio();
 						}
-						LastFMApplication.getInstance().player.startRadio();
-   					}
-   				} catch (RemoteException e) {
-   					// TODO Auto-generated catch block
-   					e.printStackTrace();
-   				}
-            }
-        } else if (action.equals("fm.last.android.UPDATEWIDGET")) {
-        	updateAppWidget(context);
-        } else { 
-        	super.onReceive(context, intent);
-        }
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    		}
+	        } else if (action.equals("fm.last.android.STOP")) {
+	       		if (LastFMApplication.getInstance().player == null)
+	       			LastFMApplication.getInstance().bindPlayerService();
+	       		if (LastFMApplication.getInstance().player != null) {
+	   				try {
+	   					// If the player is in a stopped state, call startRadio instead
+	   					// of stop (we should change the icon to "Play")
+	   					if (LastFMApplication.getInstance().player.isPlaying())
+	   						LastFMApplication.getInstance().player.stop();
+	   					else {
+							if(LastFMApplication.getInstance().player.getStationName() == null) {
+								LastFMApplication.getInstance().player.tune("lastfm://user/"+session.getName()+"/personal", session);
+							}
+							LastFMApplication.getInstance().player.startRadio();
+	   					}
+	   				} catch (RemoteException e) {
+	   					// TODO Auto-generated catch block
+	   					e.printStackTrace();
+	   				}
+	            }
+	        } else if (action.equals("fm.last.android.UPDATEWIDGET")) {
+	        	updateAppWidget(context);
+	        }
+		}
+    	super.onReceive(context, intent);
     } 
 
     
