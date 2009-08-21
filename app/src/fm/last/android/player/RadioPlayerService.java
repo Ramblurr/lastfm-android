@@ -348,6 +348,8 @@ public class RadioPlayerService extends Service
 		if (mState == STATE_PLAYING) {
 			mp.stop();
 		}
+		if(next_mp != null)
+			next_mp.stop();
 		next_mp = null;
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
