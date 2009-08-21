@@ -1302,19 +1302,16 @@ public class Profile extends ListActivity
         editor.remove( "lastfm_subscriber" );
         editor.commit();
         LastFMApplication.getInstance().map.remove("lastfm_session");
-        SQLiteDatabase db = null;
         try
         {
-            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
-            db.execSQL( "DROP TABLE IF EXISTS "
-                            + LastFm.DB_TABLE_RECENTSTATIONS );
-            db.close();
-
             IRadioPlayer player = LastFMApplication.getInstance().player;
             if(player != null) {
         		player.stop();
         		//player.resetScrobbler();
             }
+        	deleteDatabase(LastFm.DB_NAME);
+            deleteFile("currentTrack.dat");
+            deleteFile("queue.dat");
         }
         catch ( Exception e )
         {
