@@ -22,26 +22,10 @@ package fm.last.android.scrobbler;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URL;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.android.music.IMediaPlaybackService;
-
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.RadioWidgetProvider;
-import fm.last.android.activity.Player;
-import fm.last.android.utils.UserTask;
-import fm.last.api.Album;
-import fm.last.api.AudioscrobblerService;
-import fm.last.api.LastFmServer;
-import fm.last.api.RadioTrack;
-import fm.last.api.Session;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -49,16 +33,23 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.android.music.IMediaPlaybackService;
+
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.utils.UserTask;
+import fm.last.api.AudioscrobblerService;
+import fm.last.api.LastFmServer;
+import fm.last.api.RadioTrack;
+import fm.last.api.Session;
 
 /**
  * A Last.fm scrobbler for Android
