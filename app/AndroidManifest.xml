@@ -91,6 +91,8 @@
     			<action android:name="fm.last.android.SKIP"/>
     			<action android:name="fm.last.android.STOP"/>
     			<action android:name="fm.last.android.ACTION"/>
+    			<action android:name="fm.last.android.LOVE"/>
+    			<action android:name="fm.last.android.BAN"/>
     			<action android:name="fm.last.android.UPDATEWIDGET"/>
 		    </intent-filter>
 		    <meta-data android:name="android.appwidget.provider"

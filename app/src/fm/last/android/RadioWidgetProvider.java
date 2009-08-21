@@ -7,6 +7,7 @@ import java.util.Formatter;
 
 import fm.last.android.activity.Metadata;
 import fm.last.android.activity.PopupActionActivity;
+import fm.last.android.activity.Share;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
@@ -20,6 +21,7 @@ import android.content.Intent;
 import android.os.RemoteException;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 /**
  * @author sam
@@ -106,6 +108,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	   					e.printStackTrace();
 	   				}
 	            }
+	        } else if (action.equals("fm.last.android.LOVE")) {
+            	Toast.makeText(context, "The track was marked as Loved.", Toast.LENGTH_SHORT).show();
+	        } else if (action.equals("fm.last.android.BAN")) {
+            	Toast.makeText(context, "The track was marked as Banned.", Toast.LENGTH_SHORT).show();
 	        } else if (action.equals("fm.last.android.UPDATEWIDGET")) {
 	        	updateAppWidget(context);
 	        }
