@@ -262,7 +262,7 @@ public class LastFm extends Activity
 
 	            LastFMApplication.getInstance().map.put( "lastfm_session", session );
 
-	        	if(getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
+	        	if(getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 	        		Intent intent = getIntent();
 	        		Bundle extras = intent.getExtras();
 	        		if (extras != null) {
