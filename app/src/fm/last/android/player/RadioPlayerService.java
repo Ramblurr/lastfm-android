@@ -359,6 +359,7 @@ public class RadioPlayerService extends Service
 		
 		if( wifiLock.isHeld())
 			wifiLock.release();
+		currentQueue.clear();
 		mDeferredStopHandler.deferredStopSelf();
 		RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
 	}
