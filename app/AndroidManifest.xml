@@ -88,10 +88,12 @@
 		            >
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-    			<action android:name="fm.last.android.SKIP"/>
-    			<action android:name="fm.last.android.STOP"/>
-    			<action android:name="fm.last.android.ACTION"/>
-    			<action android:name="fm.last.android.UPDATEWIDGET"/>
+    			<action android:name="fm.last.android.widget.SKIP"/>
+    			<action android:name="fm.last.android.widget.STOP"/>
+    			<action android:name="fm.last.android.widget.ACTION"/>
+    			<action android:name="fm.last.android.widget.LOVE"/>
+    			<action android:name="fm.last.android.widget.BAN"/>
+    			<action android:name="fm.last.android.widget.UPDATE"/>
 		    </intent-filter>
 		    <meta-data android:name="android.appwidget.provider"
 		                android:resource="@xml/radiowidget_info"
@@ -100,15 +102,18 @@
 		<service android:name=".player.RadioPlayerService" android:process=":player" />
        	<receiver android:name=".scrobbler.MusicIntentReceiver">
     		<intent-filter>
-    			<action android:name="com.android.music.playstatechanged"/>
-    			<action android:name="com.android.music.playbackcomplete"/>
-    			<action android:name="com.android.music.metachanged"/>
-    			<action android:name="fm.last.android.metachanged"/>
-    			<action android:name="fm.last.android.playstatechanged"/>
-    			<action android:name="fm.last.android.playbackcomplete"/>
-    			<action android:name="fm.last.android.LOVE"/>
-    			<action android:name="fm.last.android.BAN"/>
-    			<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+				<action android:name="com.android.music.playstatechanged"/>
+				<action android:name="com.android.music.playbackcomplete"/>
+				<action android:name="com.android.music.metachanged"/>
+				<action android:name="com.htc.music.metachanged" />
+				<action android:name="com.htc.music.playbackcomplete" />
+				<action android:name="com.htc.music.playstatechanged" />
+				<action android:name="fm.last.android.metachanged"/>
+				<action android:name="fm.last.android.playstatechanged"/>
+				<action android:name="fm.last.android.playbackcomplete"/>
+				<action android:name="fm.last.android.LOVE"/>
+				<action android:name="fm.last.android.BAN"/>
+				<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
     		</intent-filter>
     	</receiver>
 		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>

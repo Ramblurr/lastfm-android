@@ -153,6 +153,8 @@ public class Metadata extends Activity {
 		
 		switch (item.getItemId()) {
 		case R.id.info_menu_item:
+   			Intent i = new Intent( this, Player.class );
+   			startActivity( i );
 			finish();
 			break;
 		case R.id.buy_menu_item:

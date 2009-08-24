@@ -7,6 +7,7 @@ import java.util.Formatter;
 
 import fm.last.android.activity.Metadata;
 import fm.last.android.activity.PopupActionActivity;
+import fm.last.android.activity.Share;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
@@ -20,6 +21,7 @@ import android.content.Intent;
 import android.os.RemoteException;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 /**
  * @author sam
@@ -45,7 +47,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         final String action = intent.getAction();
 		Session session = LastFMApplication.getInstance().map.get("lastfm_session");
 		if(session != null) {
-	        if (action.equals("fm.last.android.ACTION")) {
+	        if (action.equals("fm.last.android.widget.ACTION")) {
 	       		if (LastFMApplication.getInstance().player == null)
 	    			LastFMApplication.getInstance().bindPlayerService();
 	    		if (LastFMApplication.getInstance().player != null) {
@@ -66,7 +68,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						e.printStackTrace();
 					}
 	    		}
-	        } else if (action.equals("fm.last.android.SKIP")) {
+	        } else if (action.equals("fm.last.android.widget.SKIP")) {
 	    		if (LastFMApplication.getInstance().player == null)
 	    			LastFMApplication.getInstance().bindPlayerService();
 	    		if (LastFMApplication.getInstance().player != null) {
@@ -86,7 +88,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						e.printStackTrace();
 					}
 	    		}
-	        } else if (action.equals("fm.last.android.STOP")) {
+	        } else if (action.equals("fm.last.android.widget.STOP")) {
 	       		if (LastFMApplication.getInstance().player == null)
 	       			LastFMApplication.getInstance().bindPlayerService();
 	       		if (LastFMApplication.getInstance().player != null) {
@@ -106,7 +108,26 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	   					e.printStackTrace();
 	   				}
 	            }
-	        } else if (action.equals("fm.last.android.UPDATEWIDGET")) {
+	        } else if (action.equals("fm.last.android.widget.LOVE")) {
+				Intent i = new Intent("fm.last.android.LOVE");
+				context.sendBroadcast(i);
+				Toast.makeText(context, "The track was marked as Loved.", Toast.LENGTH_SHORT).show();
+	        } else if (action.equals("fm.last.android.widget.BAN")) {
+				Intent i = new Intent("fm.last.android.BAN");
+				context.sendBroadcast(i);
+            	Toast.makeText(context, "The track was marked as Banned.", Toast.LENGTH_SHORT).show();
+	    		if (LastFMApplication.getInstance().player == null)
+	    			LastFMApplication.getInstance().bindPlayerService();
+	    		if (LastFMApplication.getInstance().player != null) {
+					try {
+						if (LastFMApplication.getInstance().player.isPlaying())
+							LastFMApplication.getInstance().player.skip();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	    		}
+	        } else if (action.equals("fm.last.android.widget.UPDATE")) {
 	        	updateAppWidget(context);
 	        }
 		}
@@ -138,29 +159,33 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
         //Hook up the buttons (this should really be done elsewhere but doesn't hurt here)
-        intent = new Intent("fm.last.android.LOVE");
+        intent = new Intent("fm.last.android.widget.LOVE");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.love, pendingIntent);
 
-        intent = new Intent("fm.last.android.BAN");
+        intent = new Intent("fm.last.android.widget.BAN");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.ban, pendingIntent);
 
-        intent = new Intent("fm.last.android.SKIP");
+        intent = new Intent("fm.last.android.widget.SKIP");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.skip, pendingIntent);
 
-        intent = new Intent("fm.last.android.STOP");
+        intent = new Intent("fm.last.android.widget.STOP");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.stop, pendingIntent);
 
-        intent = new Intent("fm.last.android.ACTION");
+        intent = new Intent("fm.last.android.widget.ACTION");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.menu, pendingIntent);
 
-		if (LastFMApplication.getInstance().player == null)
+		if (LastFMApplication.getInstance().player == null) {
 			LastFMApplication.getInstance().bindPlayerService();
-		if (LastFMApplication.getInstance().player != null) {
+			//Try again in 1 second if the player service wasn't running
+	        intent = new Intent("fm.last.android.widget.UPDATE");
+	        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+	        am.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, PendingIntent.getBroadcast(context, 0, intent, 0));
+		} else {
 			IRadioPlayer player = LastFMApplication.getInstance().player;
 			try {
 				if(player.isPlaying()) {
@@ -182,7 +207,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						views.setTextViewText(R.id.widgettext, player.getArtistName() + " - " + player.getTrackName());
 					views.setImageViewResource(R.id.stop, R.drawable.stop);
 					if(mAlarmIntent == null) {
-				        intent = new Intent("fm.last.android.UPDATEWIDGET");
+				        intent = new Intent("fm.last.android.widget.UPDATE");
 				        mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 				        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				        am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
@@ -202,12 +227,12 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					if(mAlarmIntent != null) {
 				        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 				        am.cancel(mAlarmIntent);
+				        mAlarmIntent = null;
 					}
 				}
 			} catch (RemoteException ex) {
 			}
-		}
-        
+		}        
         appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
     }
 

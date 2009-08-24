@@ -124,14 +124,16 @@ public class ScrobblerService extends Service {
         }
         
         try {
-            FileInputStream fileStream = openFileInput("currentTrack.dat");
-            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-            Object obj = objectStream.readObject();
-            if(obj instanceof ScrobblerQueueEntry) {
-            	mCurrentTrack = (ScrobblerQueueEntry)obj;
-            }
-            objectStream.close();
-            fileStream.close();
+			if(getFileStreamPath("currentTrack.dat").exists()) {
+	            FileInputStream fileStream = openFileInput("currentTrack.dat");
+	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+	            Object obj = objectStream.readObject();
+	            if(obj instanceof ScrobblerQueueEntry) {
+	            	mCurrentTrack = (ScrobblerQueueEntry)obj;
+	            }
+	            objectStream.close();
+	            fileStream.close();
+			}
         } catch (Exception e) {
         	mCurrentTrack = null;
         }
@@ -139,20 +141,22 @@ public class ScrobblerService extends Service {
         mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
         
         try {
-            FileInputStream fileStream = openFileInput("queue.dat");
-            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-            Object obj = objectStream.readObject();
-            if(obj instanceof Integer) {
-            	Integer count = (Integer)obj;
-            	for(int i = 0; i < count.intValue(); i++) {
-                    obj = objectStream.readObject();
-                    if(obj instanceof ScrobblerQueueEntry)
-                    	mQueue.add((ScrobblerQueueEntry)obj);
-            	}
-            }
-            objectStream.close();
-            fileStream.close();
-            Log.i("Last.fm", "Loaded " + mQueue.size() + " queued tracks");
+			if(getFileStreamPath("queue.dat").exists()) {
+	            FileInputStream fileStream = openFileInput("queue.dat");
+	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+	            Object obj = objectStream.readObject();
+	            if(obj instanceof Integer) {
+	            	Integer count = (Integer)obj;
+	            	for(int i = 0; i < count.intValue(); i++) {
+	                    obj = objectStream.readObject();
+	                    if(obj instanceof ScrobblerQueueEntry)
+	                    	mQueue.add((ScrobblerQueueEntry)obj);
+	            	}
+	            }
+	            objectStream.close();
+	            fileStream.close();
+	            Log.i("Last.fm", "Loaded " + mQueue.size() + " queued tracks");
+			}
         } catch (Exception e) {
         	e.printStackTrace();
         }
@@ -206,16 +210,18 @@ public class ScrobblerService extends Service {
 	 * whether this is a skip or a played track, and will add it to our scrobble queue.
 	 */
 	public void enqueueCurrentTrack() {
-		long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
-		boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
-		if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
-			mCurrentTrack.rating = "S";
+		if(mCurrentTrack != null) {
+			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
+			boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
+			if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
+				mCurrentTrack.rating = "S";
+			}
+			if(played || mCurrentTrack.rating.length() > 0) {
+				Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
+		   		mQueue.add(mCurrentTrack);
+			}
+	   		mCurrentTrack = null;
 		}
-		if(played || mCurrentTrack.rating.length() > 0) {
-			Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-	   		mQueue.add(mCurrentTrack);
-		}
-   		mCurrentTrack = null;
 	}
 	
     @Override
@@ -237,14 +243,53 @@ public class ScrobblerService extends Service {
 	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
 	                    new ServiceConnection() {
 	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-	                            IMediaPlaybackService s =
-	                                    IMediaPlaybackService.Stub.asInterface(binder);
+	                            com.android.music.IMediaPlaybackService s =
+	                                    com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 	                            
 	                            try {
 									if(s.isPlaying()) {
 										i.setAction(META_CHANGED);
 										i.putExtra("position", s.position());
 										i.putExtra("duration", (int)s.duration());
+										handleIntent(i);
+									} else { //Media player was paused
+										mCurrentTrack = null;
+										NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+										nm.cancel( 1338 );
+										stopSelf();
+									}
+								} catch (RemoteException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								unbindService(this);
+	                    }
+	
+	                    public void onServiceDisconnected(ComponentName comp) {}
+	            }, 0);
+			} else {
+				//Clear the current track in case the user has disabled scrobbling of the media player
+				//during the middle of this track.
+				mCurrentTrack = null;
+				stopIfReady();
+			}
+		} else if((intent.getAction().equals("com.htc.music.playstatechanged") &&
+				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.htc.music.metachanged")) {
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+	            bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"),
+	                    new ServiceConnection() {
+	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+	                            com.htc.music.IMediaPlaybackService s =
+	                                    com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+	                            
+	                            try {
+									if(s.isPlaying()) {
+										i.setAction(META_CHANGED);
+										i.putExtra("position", s.position());
+										i.putExtra("duration", (int)s.duration());
+										i.putExtra("track", s.getTrackName());
+										i.putExtra("artist", s.getArtistName());
+										i.putExtra("album", s.getAlbumName());
 										handleIntent(i);
 									} else { //Media player was paused
 										mCurrentTrack = null;
@@ -386,7 +431,8 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPostExecute(Boolean result) {
-			mCurrentTrack.postedNowPlaying = result;
+			if(mCurrentTrack != null)
+				mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
 	   		stopIfReady();
 		}
