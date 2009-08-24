@@ -359,7 +359,9 @@ public class ScrobblerService extends Service {
 				nm.notify( 1338, notification );
 			}
 		}
-		if(intent.getAction().equals(PLAYBACK_FINISHED) || intent.getAction().equals("com.android.music.playbackcomplete")) {
+		if(intent.getAction().equals(PLAYBACK_FINISHED) 
+				|| intent.getAction().equals("com.android.music.playbackcomplete") 
+				|| intent.getAction().equals("com.htc.music.playbackcomplete")) {
 			enqueueCurrentTrack();
 			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 			nm.cancel( 1338 );
