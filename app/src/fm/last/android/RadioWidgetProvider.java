@@ -111,11 +111,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        } else if (action.equals("fm.last.android.widget.LOVE")) {
 				Intent i = new Intent("fm.last.android.LOVE");
 				context.sendBroadcast(i);
-				Toast.makeText(context, "The track was marked as Loved.", Toast.LENGTH_SHORT).show();
 	        } else if (action.equals("fm.last.android.widget.BAN")) {
 				Intent i = new Intent("fm.last.android.BAN");
 				context.sendBroadcast(i);
-            	Toast.makeText(context, "The track was marked as Banned.", Toast.LENGTH_SHORT).show();
 	    		if (LastFMApplication.getInstance().player == null)
 	    			LastFMApplication.getInstance().bindPlayerService();
 	    		if (LastFMApplication.getInstance().player != null) {

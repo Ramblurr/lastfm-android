@@ -39,6 +39,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.music.IMediaPlaybackService;
 
@@ -365,9 +366,11 @@ public class ScrobblerService extends Service {
 		}
 		if(intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
+			Toast.makeText(this, "The track was marked as Loved.", Toast.LENGTH_SHORT).show();
 		}
 		if(intent.getAction().equals(BAN) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "B";
+        	Toast.makeText(this, "The track was marked as Banned.", Toast.LENGTH_SHORT).show();
 		}
 		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {

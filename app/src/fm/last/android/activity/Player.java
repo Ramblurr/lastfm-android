@@ -314,8 +314,7 @@ public class Player extends Activity {
 				return;
 			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
-			Toast.makeText(Player.this, "Track has been marked as loved",
-					Toast.LENGTH_SHORT).show();		}
+		}
 	};
 
 	private View.OnClickListener mBanListener = new View.OnClickListener() {
