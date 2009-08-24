@@ -334,6 +334,11 @@ public class ScrobblerService extends Service {
         	mCurrentTrack.artist = intent.getStringExtra("artist");
         	mCurrentTrack.album = intent.getStringExtra("album");
         	mCurrentTrack.duration = intent.getIntExtra("duration", 0);
+        	if(mCurrentTrack.title == null || mCurrentTrack.artist == null) {
+        		mCurrentTrack = null;
+        		stopIfReady();
+        		return;
+        	}
         	String auth = intent.getStringExtra("trackAuth");
 			if(auth != null && auth.length() > 0) {
 				mCurrentTrack.trackAuth = auth;
@@ -453,7 +458,7 @@ public class ScrobblerService extends Service {
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
 				while(mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
-					if(e != null) {
+					if(e != null && e.title != null && e.artist != null) {
 						if(e.rating.equals("L")) {
 							server.loveTrack(e.artist, e.title, mSession.getKey());
 						}
