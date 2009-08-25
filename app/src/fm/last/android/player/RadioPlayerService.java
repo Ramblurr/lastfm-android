@@ -140,47 +140,49 @@ public class RadioPlayerService extends Service
 			@Override
 			public void onCallStateChanged(int state, String incomingNumber) 
 			{
-				if (mFadeVolumeTask != null)
-					mFadeVolumeTask.cancel();
-				
-				if (state == TelephonyManager.CALL_STATE_IDLE)  // fade music in to 100%
-				{
-					mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000)
-					{
-						@Override
-						public void onPreExecute() {
-							if (mState == STATE_PAUSED)
-								RadioPlayerService.this.pause();
-						}
-
-						@Override
-						public void onPostExecute() {
-							mFadeVolumeTask = null;
-						}
-					};
-				} else { // fade music out to silence
-					if (mState == STATE_PAUSED) {
-						// this particular state of affairs should be impossible, seeing as we are the only
-						// component that dares the pause the radio. But we cater to it just in case
-						mp.setVolume( 0.0f, 0.0f );
-						return;
-					}
-
-					// fade out faster if making a call, this feels more natural
-					int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
+				if (mState != STATE_STOPPED) {
+					if (mFadeVolumeTask != null)
+						mFadeVolumeTask.cancel();
 					
-					mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration)
+					if (state == TelephonyManager.CALL_STATE_IDLE)  // fade music in to 100%
 					{
-						@Override
-						public void onPreExecute() {
+						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000)
+						{
+							@Override
+							public void onPreExecute() {
+								if (mState == STATE_PAUSED)
+									RadioPlayerService.this.pause();
+							}
+	
+							@Override
+							public void onPostExecute() {
+								mFadeVolumeTask = null;
+							}
+						};
+					} else { // fade music out to silence
+						if (mState == STATE_PAUSED) {
+							// this particular state of affairs should be impossible, seeing as we are the only
+							// component that dares the pause the radio. But we cater to it just in case
+							mp.setVolume( 0.0f, 0.0f );
+							return;
 						}
-
-						@Override
-						public void onPostExecute() {
-							RadioPlayerService.this.pause();
-							mFadeVolumeTask = null;
-						}
-					};
+	
+						// fade out faster if making a call, this feels more natural
+						int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
+						
+						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration)
+						{
+							@Override
+							public void onPreExecute() {
+							}
+	
+							@Override
+							public void onPostExecute() {
+								RadioPlayerService.this.pause();
+								mFadeVolumeTask = null;
+							}
+						};
+					}
 				}
 				super.onCallStateChanged(state, incomingNumber);
 			}
