@@ -347,11 +347,14 @@ public class RadioPlayerService extends Service
 
 	private void stop()
 	{
-		if (mState == STATE_PLAYING) {
+		if(mp != null) {
 			mp.stop();
+			mp.release();
 		}
-		if(next_mp != null)
+		if(next_mp != null) {
 			next_mp.stop();
+			next_mp.release();
+		}
 		next_mp = null;
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
@@ -371,7 +374,7 @@ public class RadioPlayerService extends Service
 		if(mState == STATE_SKIPPING || mState == STATE_STOPPED)
 			return;
 		
-		if(mState == STATE_PLAYING) {
+		if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
 			mp.stop();
 		}
@@ -394,6 +397,7 @@ public class RadioPlayerService extends Service
 		
 		if(next_mp != null) {
 			mp.stop();
+			mp.release();
 			mp = next_mp;
 			next_mp = null;
 			mState = STATE_PREPARING;
