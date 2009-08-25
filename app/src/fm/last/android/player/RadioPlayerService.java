@@ -348,10 +348,18 @@ public class RadioPlayerService extends Service
 	private void stop()
 	{
 		if(mp != null) {
-			mp.stop();
+			try {
+				mp.stop();
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
 		}
 		if(next_mp != null) {
-			next_mp.stop();
+			try {
+				next_mp.stop();
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
 			next_mp.release();
 		}
 		next_mp = null;
