@@ -349,7 +349,6 @@ public class RadioPlayerService extends Service
 	{
 		if(mp != null) {
 			mp.stop();
-			mp.release();
 		}
 		if(next_mp != null) {
 			next_mp.stop();
