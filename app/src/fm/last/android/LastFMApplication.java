@@ -95,24 +95,8 @@ public class LastFMApplication extends Application
         String username = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
         String subscriber = settings.getString( "lastfm_subscriber", "0" );
-        if ( !username.equals( "" ) && !session_key.equals( "" ) )
-        {
-            LastFmServer server = AndroidLastFmServerFactory.getServer();
-            try {
-				User user = server.getUserInfo(session_key);
-				if(user != null) {
-					subscriber = user.getSubscriber();
-		            SharedPreferences.Editor editor = settings.edit();
-		            editor.putString( "lastfm_subscriber", subscriber);
-		            editor.commit();
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	    	Session session = new Session(username, session_key, subscriber);
-	        this.map.put( "lastfm_session", session );
-        }
+    	Session session = new Session(username, session_key, subscriber);
+        this.map.put( "lastfm_session", session );
     }
     
 	private ServiceConnection mConnection = new ServiceConnection()

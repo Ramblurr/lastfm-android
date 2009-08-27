@@ -156,7 +156,25 @@ public class Profile extends ListActivity
         mUsername = getIntent().getStringExtra("lastfm.profile.username");
         if( mUsername == null ) {
             mUsername = session.getName();
+            String subscriber = session.getSubscriber();
             isAuthenticatedUser = true;
+            //Check our subscriber status
+            LastFmServer server = AndroidLastFmServerFactory.getServer();
+            try {
+				User user = server.getUserInfo(session.getKey());
+				if(user != null) {
+					subscriber = user.getSubscriber();
+			        SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
+		            SharedPreferences.Editor editor = settings.edit();
+		            editor.putString( "lastfm_subscriber", subscriber);
+		            editor.commit();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	session = new Session(session.getName(), session.getKey(), subscriber);
+	        LastFMApplication.getInstance().map.put( "lastfm_session", session );
         } 
         else 
             isAuthenticatedUser = false;
