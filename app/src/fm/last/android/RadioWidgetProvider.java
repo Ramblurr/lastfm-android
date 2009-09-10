@@ -84,8 +84,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        						else {
 	        							if(player.getStationName() == null) {
 	        								player.tune("lastfm://user/"+session.getName()+"/personal", session);
+	        							} else {
+	        								player.startRadio();
 	        							}
-	        							player.startRadio();
 	        						}
 	        					} catch (RemoteException e) {
 	        						// TODO Auto-generated catch block
