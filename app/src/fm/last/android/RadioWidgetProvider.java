@@ -161,8 +161,13 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     }
 
     public void onEnabled(Context context) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);        
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+    	updateAppWidget(context);
+    }
+
+    public void onDisabled(Context context) {
+    }
+
+    private static void bindButtonIntents(Context context, RemoteViews views) {
         PendingIntent pendingIntent;
         Intent intent;
 
@@ -185,17 +190,13 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         intent = new Intent("fm.last.android.widget.ACTION");
         pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.menu, pendingIntent);
-        appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
-
-    	updateAppWidget(context);
     }
-
-    public void onDisabled(Context context) {
-    }
-
+    
     public static void updateAppWidget_idle(Context context, String stationName, boolean tuning) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+        bindButtonIntents(context, views);
+        
 		views.setViewVisibility(R.id.totaltime, View.GONE);
 		if(stationName != null) {
 			views.setTextViewText(R.id.widgettext, stationName);
@@ -229,6 +230,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+        bindButtonIntents(context, views);
 
         if(buffering) {
 			views.setViewVisibility(R.id.totaltime, View.GONE);

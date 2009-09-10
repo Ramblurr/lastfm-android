@@ -288,6 +288,9 @@ public class Player extends Activity {
 	@Override
 	protected void onPause() {
 		unregisterReceiver(mStatusListener);
+		mHandler.removeMessages(REFRESH);
+		if (LastFMApplication.getInstance().player != null)
+			LastFMApplication.getInstance().unbindPlayerService();
 		super.onPause();
 	}
 
@@ -388,6 +391,7 @@ public class Player extends Activity {
 				return;
 			try {
 				LastFMApplication.getInstance().player.stop();
+				LastFMApplication.getInstance().unbindPlayerService();
 			} catch (RemoteException ex) {
 				System.out.println(ex.getMessage());
 			}

@@ -128,6 +128,11 @@ public class LastFMApplication extends Application
 		}
 	}
 	
+	public void unbindPlayerService() {
+		unbindService( mConnection );
+		player = null;
+	}
+	
 	public void playRadioStation(String url, boolean showPlayer)
 	{
 		Session s = map.get( "lastfm_session" );
