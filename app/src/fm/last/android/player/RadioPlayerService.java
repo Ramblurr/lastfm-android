@@ -333,9 +333,9 @@ public class RadioPlayerService extends Service
 			if(p == mp) {
 				currentTrack = track;
 				mAlbumArt = null;
+				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
 			}
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
-			RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
 			p.reset();
 			p.setDataSource( track.getLocationUrl() );
 			p.setOnCompletionListener( mOnCompletionListener );
