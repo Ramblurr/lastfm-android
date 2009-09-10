@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -343,8 +344,13 @@ public class ScrobblerService extends Service {
 			if(auth != null && auth.length() > 0) {
 				mCurrentTrack.trackAuth = auth;
 			}
-			mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-			mNowPlayingTask.execute(mScrobbler);
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+			if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
+				mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+				mNowPlayingTask.execute(mScrobbler);
+			}
 
 			if(auth == null) {
 				NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
@@ -383,14 +389,18 @@ public class ScrobblerService extends Service {
 			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
 				stopSelf();
 			} else {
-				if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
-					mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-					mNowPlayingTask.execute(mScrobbler);
+				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+				NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+				if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
+					if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
+						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+						mNowPlayingTask.execute(mScrobbler);
+					}
+			   		if(mQueue.size() > 0 && mSubmissionTask == null) {
+				   		mSubmissionTask = new SubmitTracksTask();
+				   		mSubmissionTask.execute(mScrobbler);
+			   		}
 				}
-		   		if(mQueue.size() > 0 && mSubmissionTask == null) {
-			   		mSubmissionTask = new SubmitTracksTask();
-			   		mSubmissionTask.execute(mScrobbler);
-		   		}
 			}
 		}
 		stopIfReady();

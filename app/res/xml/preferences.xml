@@ -17,6 +17,14 @@
             android:dependency="scrobble"
             android:title="Scrobble Android player"
             android:summary="Scrobble the built-in Android music player" />
+            
+    <CheckBoxPreference
+            android:key="scrobble_wifi_only"
+            android:defaultValue="false"
+            android:dependency="scrobble_music_player"
+            android:title="Scrobble only on Wi-Fi"
+            android:summary="Queue media player scrobbles when not connected to Wi-Fi" />
+            
     </PreferenceCategory>
 
     <PreferenceCategory
