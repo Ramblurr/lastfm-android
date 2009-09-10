@@ -354,7 +354,7 @@ public class Metadata extends Activity {
 							int position, long id) {
 						Artist artist = (Artist)mSimilarAdapter.getItem(position);
 						mSimilarAdapter.enableLoadBar(position);
-						LastFMApplication.getInstance().playRadioStation(Metadata.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
+						LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", false);
 					}
 
 				});
@@ -455,7 +455,7 @@ public class Metadata extends Activity {
 					public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 						Tag tag = (Tag) mTagAdapter.getItem(position);
 						mTagAdapter.enableLoadBar(position);
-						LastFMApplication.getInstance().playRadioStation(Metadata.this, "lastfm://globaltags/"+Uri.encode(tag.getName()), false);
+						LastFMApplication.getInstance().playRadioStation("lastfm://globaltags/"+Uri.encode(tag.getName()), false);
 					}
 
 				});

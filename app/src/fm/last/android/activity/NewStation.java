@@ -125,12 +125,12 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 				if( getListAdapter() == mListAdapters[TAB_ARTIST])
 				{
 					Artist artist = (Artist)getListAdapter().getItem(position);
-					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+					LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", true);
 				}
 				else if( getListAdapter() == mListAdapters[TAB_TAG])
 				{
 					Tag tag = (Tag)getListAdapter().getItem(position);
-					LastFMApplication.getInstance().playRadioStation(NewStation.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+					LastFMApplication.getInstance().playRadioStation("lastfm://globaltags/"+Uri.encode(tag.getName()), true);
 				}
 				else if( getListAdapter() == mListAdapters[TAB_USER])
 				{

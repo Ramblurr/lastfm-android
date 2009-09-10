@@ -582,7 +582,7 @@ public class Profile extends ListActivity
 	        
 	    	l.setEnabled(false);
 	    	mMainAdapter.enableLoadBar(position-1);
-	    	LastFMApplication.getInstance().playRadioStation(this, adapter_station);
+	    	LastFMApplication.getInstance().playRadioStation(adapter_station, true);
 	    }
 	    catch (RemoteException e)
 	    {
@@ -668,7 +668,7 @@ public class Profile extends ListActivity
 	            Artist artist = (Artist)l.getAdapter().getItem(position);
 	        	ListAdapter la = (ListAdapter) l.getAdapter();
 	        	la.enableLoadBar(position);
-	            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists");
+	            LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", true);
 			} catch (ClassCastException e) {
 				// fine.
 			}
@@ -716,9 +716,9 @@ public class Profile extends ListActivity
 	        	la.enableLoadBar(position);
 	        	
 				if(session.getSubscriber().equals("1"))
-					LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()));
+					LastFMApplication.getInstance().playRadioStation("lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()), true);
 				else
-					LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://globaltags/"+Uri.encode(tag.getName()));
+					LastFMApplication.getInstance().playRadioStation("lastfm://globaltags/"+Uri.encode(tag.getName()), true);
 			} catch (ClassCastException e) {
 				// when the list item is not a tag
 			}
@@ -1281,7 +1281,7 @@ public class Profile extends ListActivity
         }
         
         if( artist != null)
-            LastFMApplication.getInstance().playRadioStation(Profile.this, "lastfm://artist/"+Uri.encode(artist)+"/similarartists");
+            LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist)+"/similarartists", true);
 //        dismissDialog(type);
         
     }

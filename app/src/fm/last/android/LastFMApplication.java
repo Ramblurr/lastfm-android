@@ -26,6 +26,7 @@ import java.util.WeakHashMap;
 
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
@@ -47,6 +48,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -58,7 +60,6 @@ public class LastFMApplication extends Application
 	public fm.last.android.player.IRadioPlayer player = null;
 
     private static LastFMApplication instance;
-    private Context mCtx;
     
     private String mTuningStation = "";
     private boolean mShowPlayer;
@@ -105,10 +106,6 @@ public class LastFMApplication extends Application
 		public void onServiceConnected( ComponentName className, IBinder service )
 		{
 			player = fm.last.android.player.IRadioPlayer.Stub.asInterface( service );
-			if(mTuningStation.length() > 0) {
-				new TuneRadioTask(mShowPlayer).execute(new String[] {mTuningStation});
-				mTuningStation = "";
-			}
 		}
 
 		public void onServiceDisconnected( ComponentName className )
@@ -117,17 +114,11 @@ public class LastFMApplication extends Application
 		}
 	};
 	
-	public void playRadioStation(Context ctx, String url)
-	{
-		playRadioStation(ctx,url,true);
-	}
-
 	public void bindPlayerService() {
         // start our media player service
 		Intent mpIntent = new Intent(
 				this,
 				fm.last.android.player.RadioPlayerService.class );
-		startService(mpIntent);
 		boolean b = bindService( mpIntent, mConnection, BIND_AUTO_CREATE );
 		if ( !b )
 		{
@@ -137,17 +128,21 @@ public class LastFMApplication extends Application
 		}
 	}
 	
-	public void playRadioStation(Context ctx, String url, boolean showPlayer)
+	public void playRadioStation(String url, boolean showPlayer)
 	{
-		mCtx = ctx;
-
-		if ( LastFMApplication.getInstance().player == null ) {
-			bindPlayerService();
-			mTuningStation = url;
-			mShowPlayer = showPlayer;
-		} else {
-			new TuneRadioTask(showPlayer).execute(new String[] {url});
-		}
+		Session s = map.get( "lastfm_session" );
+        if ( s != null && s.getKey().length() > 0 ) {
+	        final Intent out = new Intent(this, RadioPlayerService.class);
+	        out.setAction("fm.last.android.PLAY");
+	        out.putExtra("station", url);
+	        out.putExtra("session", (Parcelable)s);
+	        startService(out);
+	        if(showPlayer) {
+       			Intent i = new Intent( this, Player.class );
+       			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+       			startActivity( i );
+	        }
+        }
 	}
 	
 	public WeakHashMap<String, String> getRecentStations()
@@ -185,7 +180,7 @@ public class LastFMApplication extends Application
         return results;
 	}
 	
-	private void appendRecentStation( String url, String name )
+	public void appendRecentStation( String url, String name )
 	{
 
 		SQLiteDatabase db = null;
@@ -297,80 +292,5 @@ public class LastFMApplication extends Application
 					}
 				});
 		d.show();
-    }
-
-    private class TuneRadioTask extends UserTask<String, Integer, Boolean> {
-    	boolean showPlayer = true;
-    	
-    	public TuneRadioTask(boolean showPlayer) {
-    		this.showPlayer = showPlayer;
-    	}
-    	
-    	
-        private BroadcastReceiver mStatusListener = new BroadcastReceiver()
-        {
-            @Override
-            public void onReceive( Context context, Intent intent )
-            {
-                String action = intent.getAction();
-                if ( action.equals( RadioPlayerService.STATION_CHANGED ) )
-                {
-           			Intent i = new Intent( mCtx, Player.class );
-           			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-           			startActivity( i );
-                }
-            }
-        };
-    	
-    	public void onPreExecute() {
-    		if(showPlayer) {
-                IntentFilter f = new IntentFilter();
-                f.addAction( RadioPlayerService.STATION_CHANGED );
-                registerReceiver( mStatusListener, f );
-    		}
-    	}
-    	
-        public Boolean doInBackground(String... urls) {
-            boolean success = false;
-    		try
-    		{
-    			Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
-    			LastFMApplication.getInstance().player.setSession( session );
-    			if(LastFMApplication.getInstance().player.tune( urls[0], session )) {
-    				LastFMApplication.getInstance().player.startRadio();
-        			appendRecentStation( LastFMApplication.getInstance().player.getStationUrl(), LastFMApplication.getInstance().player.getStationName() );
-        			success = true;
-    			} 
-    		}
-    		catch ( Exception e )
-    		{
-    			Log.d( "LastFMPlayer", "couldn't start playback: " + e );
-				e.printStackTrace();
-    		}
-            return success;
-        }
-
-        @Override
-        public void onPostExecute(Boolean result) {
-        	if(showPlayer)
-        		unregisterReceiver( mStatusListener );
-        	
-            if (!result) {
-				try {
-					if(LastFMApplication.getInstance().player == null)
-						return;
-					
-					WSError error = LastFMApplication.getInstance().player.getError();
-					if(error != null)
-						LastFMApplication.getInstance().presentError(mCtx, error);
-					else
-						LastFMApplication.getInstance().presentError(mCtx, getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
-								getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-        }
     }
 }

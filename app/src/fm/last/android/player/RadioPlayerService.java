@@ -32,6 +32,7 @@ import fm.last.api.RadioTrack;
 import fm.last.api.RadioPlayList;
 import fm.last.api.WSError;
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
 import fm.last.android.RadioWidgetProvider;
 
 import android.app.Notification;
@@ -81,22 +82,16 @@ public class RadioPlayerService extends Service
 	private String currentStationURL = null;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
-	private final int STATE_STOPPED = 0;
-	private final int STATE_TUNING = 1;
-	private final int STATE_PREPARING = 2;
-	private final int STATE_PLAYING = 3;
-	private final int STATE_SKIPPING = 4;
-	private final int STATE_PAUSED = 5;
+	public static final int STATE_STOPPED = 0;
+	public static final int STATE_TUNING = 1;
+	public static final int STATE_PREPARING = 2;
+	public static final int STATE_PLAYING = 3;
+	public static final int STATE_SKIPPING = 4;
+	public static final int STATE_PAUSED = 5;
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
 	private Bitmap mAlbumArt;
-
-	/**
-	 * Tracks whether there are activities currently bound to the service so
-	 * that we can determine when it would be safe to call stopSelf().
-	 */
-	boolean mActive = false;
 
 	private static final int NOTIFY_ID = 1337;
 
@@ -189,12 +184,33 @@ public class RadioPlayerService extends Service
 		}, PhoneStateListener.LISTEN_CALL_STATE);
 
 	}
+    @Override
+    public void onStart(Intent intent, int startId) {
+    	if(intent.getAction().equals("fm.last.android.PLAY")) {
+    		String stationURL = intent.getStringExtra("station");
+    		Session session = intent.getParcelableExtra("session");
+    		if(stationURL.length() > 0 && session != null) {
+				try {
+					tune(stationURL, session);
+					currentTrack = null;
+					nextSong();
+				} catch (Exception e) {
+					if(mError != null)
+						LastFMApplication.getInstance().presentError(this, mError);
+					else
+						LastFMApplication.getInstance().presentError(this, getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
+								getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
+				}
+    		}
+    	}
+    }
 
 	@Override
 	public void onDestroy()
 	{
-
-		mp.stop();
+		Log.i("Last.fm", "Player service shutting down");
+		if(mp.isPlaying())
+			mp.stop();
 		mp.release();
 		nm.cancel( NOTIFY_ID );
 	}
@@ -291,7 +307,7 @@ public class RadioPlayerService extends Service
 					
 					if( wifiLock.isHeld())
 						wifiLock.release();
-					mDeferredStopHandler.deferredStopSelf();
+					stopSelf();
 				} else {
 					Log.i("LastFm", "Sadface: " + what + ", " + extra);
 					//Enter a state that will allow nextSong to do its thang
@@ -309,14 +325,17 @@ public class RadioPlayerService extends Service
 	{
 		try
 		{
-			if (mState == STATE_STOPPED || mState == STATE_PREPARING)
+			if (mState == STATE_STOPPED || mState == STATE_PREPARING) {
+				Log.e("Last.fm", "playTrack() called from wrong state!");
 				return;
+			}
 			
 			if(p == mp) {
 				currentTrack = track;
 				mAlbumArt = null;
 			}
 			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
+			RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
 			p.reset();
 			p.setDataSource( track.getLocationUrl() );
 			p.setOnCompletionListener( mOnCompletionListener );
@@ -324,8 +343,6 @@ public class RadioPlayerService extends Service
 			p.setOnPreparedListener( mOnPreparedListener );
 			p.setOnErrorListener( mOnErrorListener );
 			
-			mDeferredStopHandler.cancelStopSelf();
-
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a call.
 			// Leave this precaution here please.
@@ -372,14 +389,16 @@ public class RadioPlayerService extends Service
 		if( wifiLock.isHeld())
 			wifiLock.release();
 		currentQueue.clear();
-		mDeferredStopHandler.deferredStopSelf();
-		RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
+		RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
+		stopSelf();
 	}
 	
 	private void nextSong()
 	{
-		if(mState == STATE_SKIPPING || mState == STATE_STOPPED)
+		if(mState == STATE_SKIPPING || mState == STATE_STOPPED) {
+			Log.e("Last.fm", "nextSong() called in wrong state: " + mState);
 			return;
+		}
 		
 		if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
@@ -403,6 +422,7 @@ public class RadioPlayerService extends Service
 		}
 		
 		if(next_mp != null) {
+			Log.i("Last.fm", "Skipping to pre-buffered track");
 			mp.stop();
 			mp.release();
 			mp = next_mp;
@@ -432,6 +452,8 @@ public class RadioPlayerService extends Service
 			nm.cancel( NOTIFY_ID );
 			wakeLock.release();
 			wifiLock.release();
+			mState = STATE_STOPPED;
+			stopSelf();
 		}
 	}
 
@@ -445,8 +467,6 @@ public class RadioPlayerService extends Service
 
 		if ( mState != STATE_PAUSED)
 		{
-			if ( mActive == false )
-				mDeferredStopHandler.deferredStopSelf();
 			Notification notification = new Notification(
 					R.drawable.stop, "Last.fm Paused", System
 					.currentTimeMillis() );
@@ -560,12 +580,14 @@ public class RadioPlayerService extends Service
 		currentSession = session;
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		currentStation = server.tuneToStation(url, session.getKey());
+		RadioWidgetProvider.updateAppWidget_idle(RadioPlayerService.this, currentStation.getName(), true);
 		if(currentStation != null) {
 			Log.i("Last.fm","Station name: " + currentStation.getName());
 			mPlaylistRetryCount = 0;
 			refreshPlaylist();
 			currentStationURL = url;
 			notifyChange( STATION_CHANGED );
+			LastFMApplication.getInstance().appendRecentStation(currentStation.getUrl(), currentStation.getName());
 		} else {
 			currentStationURL = null;
 			wakeLock.release();
@@ -600,52 +622,6 @@ public class RadioPlayerService extends Service
 			}
 		}
 	}
-
-	/**
-	 * Deferred stop implementation from the five music player for android:
-	 * http://code.google.com/p/five/ (C) 2008 jasta00
-	 */
-	private final DeferredStopHandler mDeferredStopHandler = new DeferredStopHandler();
-
-	private class DeferredStopHandler extends Handler
-	{
-
-		/* Wait 1 minute before vanishing. */
-		public static final long DEFERRAL_DELAY = 1 * ( 60 * 1000 );
-
-		private static final int DEFERRED_STOP = 0;
-
-		public void handleMessage( Message msg )
-		{
-
-			switch ( msg.what )
-			{
-			case DEFERRED_STOP:
-				stopSelf();
-				break;
-			default:
-				super.handleMessage( msg );
-			}
-		}
-
-		public void deferredStopSelf()
-		{
-
-			Log.i( "Lastfm", "Service stop scheduled "
-					+ ( DEFERRAL_DELAY / 1000 / 60 ) + " minutes from now." );
-			sendMessageDelayed( obtainMessage( DEFERRED_STOP ), DEFERRAL_DELAY );
-		}
-
-		public void cancelStopSelf()
-		{
-
-			if ( hasMessages( DEFERRED_STOP ) == true )
-			{
-				Log.i( "Lastfm", "Service stop cancelled." );
-				removeMessages( DEFERRED_STOP );
-			}
-		}
-	};
 
 	private final IRadioPlayer.Stub mBinder = new IRadioPlayer.Stub()
 	{
@@ -805,37 +781,7 @@ public class RadioPlayerService extends Service
 	@Override
 	public IBinder onBind( Intent intent )
 	{
-
-		mActive = true;
-		if(mState != STATE_STOPPED) {
-			notifyChange(META_CHANGED);
-		}
 		return mBinder;
-	}
-
-	@Override
-	public void onRebind( Intent intent )
-	{
-
-		mActive = true;
-		mDeferredStopHandler.cancelStopSelf();
-		if(mState != STATE_STOPPED) {
-			notifyChange(META_CHANGED);
-		}
-		super.onRebind( intent );
-	}
-
-	@Override
-	public boolean onUnbind( Intent intent )
-	{
-
-		mActive = false;
-
-		if ( mState != STATE_STOPPED ) // || mResumeAfterCall == true)
-			return true;
-
-		mDeferredStopHandler.deferredStopSelf();
-		return true;
 	}
 
 	/**
