@@ -23,6 +23,7 @@ package fm.last.api.impl;
 import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.RadioPlayList;
+import fm.last.api.Station;
 import fm.last.api.Tag;
 import fm.last.api.Artist;
 import fm.last.api.Track;
@@ -194,6 +195,41 @@ public class UserFunctions {
 			}
 	
 			return playlists;
+	    }
+	}
+	
+	public static Station[] getUserRecentStations(String baseUrl,
+			Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doPost(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node playlistsNode = XMLUtil.findNamedElementNode(lfmNode, "recentstations");
+			
+			List<Node> stationNodes = XMLUtil.findNamedElementNodes(playlistsNode, "station");
+			StationBuilder stationBuilder = new StationBuilder();
+			Station[] stations = new Station[stationNodes.size()];
+			int i = 0;
+			for(Node stationNode : stationNodes){
+				stations[i++] = stationBuilder.build(stationNode);
+			}
+	
+			return stations;
 	    }
 	}
 	

@@ -20,6 +20,9 @@
  ***************************************************************************/
 package fm.last.android;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.io.IOException;
 import java.util.WeakHashMap;
@@ -30,6 +33,7 @@ import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.Station;
 import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -150,10 +154,46 @@ public class LastFMApplication extends Application
         }
 	}
 	
-	public WeakHashMap<String, String> getRecentStations()
+	public Station[] getRecentStations()
 	{
-	    WeakHashMap<String, String> results = new WeakHashMap<String, String>();
 	    SQLiteDatabase db = null;
+        try
+        {
+            db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
+            Cursor c = db.rawQuery( "SELECT * FROM "
+                    + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null );
+            int urlColumn = c.getColumnIndex( "Url" );
+            int nameColumn = c.getColumnIndex( "Name" );
+            Station[] stations = new Station[c.getCount()];
+            if ( c.getCount() > 0 )
+            {
+                c.moveToFirst();
+                int i = 0;
+                // Loop through all Results
+                do
+                {
+                    String name = c.getString( nameColumn );
+                    String url = c.getString( urlColumn );
+                    stations[i] = new Station(name, "", url, "");
+                    i++;
+                }
+                while ( c.moveToNext() );
+            }
+            c.close();
+            db.close();
+            return stations;
+        }
+        catch ( Exception e )
+        {
+            System.out.println( e.getMessage() );
+        }
+        return null;
+	}
+	
+	public Station getLastStation()
+	{
+	    SQLiteDatabase db = null;
+	    Station result = null;
         try
         {
             db = this.openOrCreateDatabase( LastFm.DB_NAME, MODE_PRIVATE, null );
@@ -164,16 +204,9 @@ public class LastFMApplication extends Application
             if ( c.getCount() > 0 )
             {
                 c.moveToFirst();
-                int i = 0;
-                // Loop through all Results
-                do
-                {
-                    i++;
-                    String name = c.getString( nameColumn );
-                    String url = c.getString( urlColumn );
-                    results.put(name, url);
-                }
-                while ( c.moveToNext() );
+                String name = c.getString( nameColumn );
+                String url = c.getString( urlColumn );
+                new Station(name, "", url, "");
             }
             c.close();
             db.close();
@@ -182,7 +215,7 @@ public class LastFMApplication extends Application
         {
             System.out.println( e.getMessage() );
         }
-        return results;
+        return result;
 	}
 	
 	public void appendRecentStation( String url, String name )
@@ -208,6 +241,32 @@ public class LastFMApplication extends Application
 		}
 	}
 
+	public void fetchRecentStations()
+	{
+		Session session = map.get("lastfm_session");
+        LastFmServer server = AndroidLastFmServerFactory.getServer();
+
+        //Is it worth it?
+		if(session != null) {
+			try {
+				//Let me work it
+				Station stations[] = server.getUserRecentStations(session.getName(), session.getKey());
+				if(stations != null && stations.length > 0) {
+					//I put my thing down, flip it, and reverse it
+					List<Station> list = Arrays.asList(stations);
+					Collections.reverse(list);
+					stations = (Station[])list.toArray();
+					this.deleteDatabase(LastFm.DB_NAME);
+					for(Station station : stations) {
+						appendRecentStation( station.getUrl(), station.getName() );
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 	
     public void onTerminate()
     {

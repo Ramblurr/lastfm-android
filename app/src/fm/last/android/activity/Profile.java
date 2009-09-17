@@ -82,6 +82,7 @@ import fm.last.api.Event;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
+import fm.last.api.Station;
 import fm.last.api.Tag;
 import fm.last.api.Tasteometer;
 import fm.last.api.Track;
@@ -349,6 +350,8 @@ public class Profile extends ListActivity
         	RadioPlayList[] playlists;
             boolean success = false;
             Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+            LastFMApplication.getInstance().fetchRecentStations();
+            SetupRecentStations();
     		try {
     		    if( mUsername == null) {
     				mUser = mServer.getUserInfo( session.getKey() );
@@ -502,20 +505,17 @@ public class Profile extends ListActivity
 		}
 	};
 	
-	@SuppressWarnings("unchecked")
     private void SetupRecentStations()
     {
         if(!isAuthenticatedUser)
             return;
         mMyRecentAdapter.resetList();
-        WeakHashMap<String, String> stations = LastFMApplication.getInstance().getRecentStations();
+        Station[] stations = LastFMApplication.getInstance().getRecentStations();
 
-        Iterator kvp = stations.entrySet().iterator();
-        for (int i = 0; i < stations.size(); i++)
+        for (Station station : stations)
         {
-            WeakHashMap.Entry<String, String> entry = (WeakHashMap.Entry<String, String>) kvp.next();
-            String name = entry.getKey();
-            String url = entry.getValue();
+            String name = station.getName();
+            String url = station.getUrl();
             mMyRecentAdapter.putStation( name, url );
         }
 

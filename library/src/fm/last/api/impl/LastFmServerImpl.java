@@ -471,6 +471,15 @@ final class LastFmServerImpl implements LastFmServer {
         //This returns the same XML response as user.getPlaylists
         return UserFunctions.getUserPlaylists(baseUrl, params);
     }
+
+    public Station[] getUserRecentStations(String user, String sk) throws IOException {
+        Map<String, String> params = createParams("user.getRecentStations");
+        params.put("user", user);
+        params.put("sk", sk);
+        signParams(params);
+        //This returns the same XML response as user.getPlaylists
+        return UserFunctions.getUserRecentStations(baseUrl, params);
+    }
     
     public void signUp(String username, String password, String email) throws IOException {
     	Map<String, String> params = createParams("user.signUp");
