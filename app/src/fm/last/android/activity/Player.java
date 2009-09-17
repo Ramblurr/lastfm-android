@@ -30,6 +30,7 @@ import fm.last.android.R;
 import fm.last.android.RemoteImageHandler;
 import fm.last.android.RemoteImageView;
 import fm.last.android.Worker;
+import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.AdArea;
@@ -46,10 +47,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.view.Menu;
@@ -82,7 +85,8 @@ public class Player extends Activity {
 	private ProgressBar mProgress;
 	private long mDuration;
 	private boolean paused;
-	private ProgressDialog mProgressDialog;
+	private ProgressDialog mBufferingDialog;
+	private ProgressDialog mTuningDialog;
 
 	private static final int REFRESH = 1;
 
@@ -91,7 +95,7 @@ public class Player extends Activity {
 	private Worker mAlbumArtWorker;
 	private RemoteImageHandler mAlbumArtHandler;
 	private IntentFilter mIntentFilter;
-
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 
@@ -443,43 +447,55 @@ public class Player extends Activity {
 	};
 
 	private void updateTrackInfo() {
-		try {
-			if (LastFMApplication.getInstance().player == null)
-				return;
-			String artistName = LastFMApplication.getInstance().player
-					.getArtistName();
-			String trackName = LastFMApplication.getInstance().player
-					.getTrackName();
-			if(artistName.equals(RadioPlayerService.UNKNOWN)) {
-				mArtistName.setText("");
-			} else {
-				mArtistName.setText(artistName);
-			}
-			if(trackName.equals(RadioPlayerService.UNKNOWN)) {
-				mTrackName.setText("");
-			} else {
-				mTrackName.setText(trackName);
-			}
-				
-			// fetching artist events (On Tour indicator)
-			new LoadEventsTask().execute((Void)null);
+        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                new ServiceConnection() {
+                public void onServiceConnected(ComponentName comp, IBinder binder) {
+                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+    					try {
+    						String artistName = player.getArtistName();
+		    				String trackName = player.getTrackName();
+		    				if(artistName.equals(RadioPlayerService.UNKNOWN)) {
+		    					mArtistName.setText("");
+		    				} else {
+		    					mArtistName.setText(artistName);
+		    				}
+		    				if(trackName.equals(RadioPlayerService.UNKNOWN)) {
+		    					mTrackName.setText("");
+		    				} else {
+		    					mTrackName.setText(trackName);
+		    				}
+		    				
+							if (mTuningDialog != null && player.getState() == RadioPlayerService.STATE_TUNING) {
+								mTuningDialog = ProgressDialog.show(Player.this, "",
+										"Tuning", true, false);
+								mTuningDialog
+										.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
+								mTuningDialog.setCancelable(true);
+							}
 
-			Bitmap art = LastFMApplication.getInstance().player.getAlbumArt();
-			mAlbum.setArtwork(art);
-			mAlbum.invalidate();
-			if (art == null)
-				 new LoadAlbumArtTask().execute((Void) null);
+		    				// fetching artist events (On Tour indicator)
+		    				new LoadEventsTask().execute((Void)null);
+		
+		    				Bitmap art = player.getAlbumArt();
+		    				mAlbum.setArtwork(art);
+		    				mAlbum.invalidate();
+		    				if (art == null)
+		    					 new LoadAlbumArtTask().execute((Void) null);
+    					} catch (java.util.concurrent.RejectedExecutionException e) {
+    						e.printStackTrace();
+    					} catch (RemoteException e) {
+    						// TODO Auto-generated catch block
+    						e.printStackTrace();
+    					}
+    					LastFMApplication.getInstance().unbindService(this);
+                }
 
-		} catch (java.util.concurrent.RejectedExecutionException e) {
-			e.printStackTrace();
-		} catch (RemoteException ex) {
-			// FIXME why do we finish() ?????
-			finish();
-		}
+                public void onServiceDisconnected(ComponentName comp) {
+                }
+        }, Context.BIND_AUTO_CREATE);
 	}
 
 	private void queueNextRefresh(long delay) {
-
 		if (!paused) {
 			Message msg = mHandler.obtainMessage(REFRESH);
 			mHandler.removeMessages(REFRESH);
@@ -488,78 +504,88 @@ public class Player extends Activity {
 	}
 
 	private long refreshNow() {
+        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                new ServiceConnection() {
+                public void onServiceConnected(ComponentName comp, IBinder binder) {
+                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+    					try {
+    						mDuration = player.getDuration();
+    						long pos = player.getPosition();
+    						if ((pos >= 0) && (mDuration > 0) && (pos <= mDuration)) {
+    							mCurrentTime.setText(makeTimeString(Player.this, pos / 1000));
+    							mTotalTime.setText(makeTimeString(Player.this, mDuration / 1000));
+    							mProgress.setProgress((int) (1000 * pos / mDuration));
+    							if (mBufferingDialog != null) {
+    								mBufferingDialog.dismiss();
+    								mBufferingDialog = null;
+    							}
+    							if (mTuningDialog != null) {
+    								mTuningDialog.dismiss();
+    								mTuningDialog = null;
+    							}
+    						} else {
+    							mCurrentTime.setText("--:--");
+    							mTotalTime.setText("--:--");
+    							mProgress.setProgress(0);
+    							if (mBufferingDialog == null && player.isPlaying()) {
+        							if (mTuningDialog != null) {
+        								mTuningDialog.dismiss();
+        								mTuningDialog = null;
+        							}
+    								mBufferingDialog = ProgressDialog.show(Player.this, "",
+    										"Buffering", true, false);
+    								mBufferingDialog
+    										.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
+    								mBufferingDialog.setCancelable(true);
+    							}
+    						}
+    						// return the number of milliseconds until the next full second, so
+    						// the counter can be updated at just the right time
+    					} catch (RemoteException e) {
+    						// TODO Auto-generated catch block
+    						e.printStackTrace();
+    					}
+    					LastFMApplication.getInstance().unbindService(this);
+                }
 
-		if (LastFMApplication.getInstance().player == null)
-			return 500;
-		try {
-			mDuration = LastFMApplication.getInstance().player.getDuration();
-			long pos = LastFMApplication.getInstance().player.getPosition();
-			long remaining = 1000 - (pos % 1000);
-			if ((pos >= 0) && (mDuration > 0) && (pos <= mDuration)) {
-				mCurrentTime.setText(makeTimeString(this, pos / 1000));
-				mTotalTime.setText(makeTimeString(this, mDuration / 1000));
-				mProgress.setProgress((int) (1000 * pos / mDuration));
-				if (mProgressDialog != null) {
-					mProgressDialog.dismiss();
-					mProgressDialog = null;
-				}
-			} else {
-				mCurrentTime.setText("--:--");
-				mTotalTime.setText("--:--");
-				mProgress.setProgress(0);
-				if (mProgressDialog == null
-						&& LastFMApplication.getInstance().player.isPlaying()) {
-					mProgressDialog = ProgressDialog.show(this, "",
-							"Buffering", true, false);
-					mProgressDialog
-							.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
-					mProgressDialog.setCancelable(true);
-				}
-			}
-			// return the number of milliseconds until the next full second, so
-			// the counter can be updated at just the right time
-			return remaining;
-		} catch (RemoteException ex) {
-		}
+                public void onServiceDisconnected(ComponentName comp) {
+                }
+        }, Context.BIND_AUTO_CREATE);
+
 		return 500;
 	}
 
 	private final Handler mHandler = new Handler() {
 
 		public void handleMessage(Message msg) {
-
+			final Message m = msg;
 			switch (msg.what) {
 			case RemoteImageHandler.REMOTE_IMAGE_DECODED:
 				mAlbum.setArtwork((Bitmap) msg.obj);
 				mAlbum.invalidate();
-				try {
-					if (LastFMApplication.getInstance().player != null)
-						LastFMApplication.getInstance().player
-								.setAlbumArt((Bitmap) msg.obj);
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+		        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+		                new ServiceConnection() {
+		                public void onServiceConnected(ComponentName comp, IBinder binder) {
+		                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+		    					try {
+		    						if(m.obj != null && m.obj.getClass() == Bitmap.class)
+		    							player.setAlbumArt((Bitmap) m.obj);
+		    					} catch (RemoteException e) {
+		    						// TODO Auto-generated catch block
+		    						e.printStackTrace();
+		    					}
+		    					LastFMApplication.getInstance().unbindService(this);
+		                }
+
+		                public void onServiceDisconnected(ComponentName comp) {
+		                }
+		        }, Context.BIND_AUTO_CREATE);
 				break;
 
 			case REFRESH:
 				long next = refreshNow();
 				queueNextRefresh(next);
 				break;
-
-			/*
-			 * case QUIT: // This can be moved back to onCreate once the bug
-			 * that prevents // Dialogs from being started from
-			 * onCreate/onResume is fixed. new
-			 * AlertDialog.Builder(MediaPlaybackActivity.this)
-			 * .setTitle(R.string.service_start_error_title)
-			 * .setMessage(R.string.service_start_error_msg)
-			 * .setPositiveButton(R.string.service_start_error_button, new
-			 * DialogInterface.OnClickListener() { public void
-			 * onClick(DialogInterface dialog, int whichButton) { finish(); } })
-			 * .setCancelable(false) .show(); break;
-			 */
-
 			default:
 				break;
 			}

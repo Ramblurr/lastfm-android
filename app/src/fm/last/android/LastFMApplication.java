@@ -29,12 +29,9 @@ import java.util.WeakHashMap;
 
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
-import fm.last.android.scrobbler.ScrobblerService;
-import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
-import fm.last.api.User;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
@@ -50,12 +47,8 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.Parcelable;
-import android.os.RemoteException;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 public class LastFMApplication extends Application
 {
@@ -65,9 +58,6 @@ public class LastFMApplication extends Application
 
     private static LastFMApplication instance;
     
-    private String mTuningStation = "";
-    private boolean mShowPlayer;
-
     public static LastFMApplication getInstance()
     {
 
@@ -147,9 +137,25 @@ public class LastFMApplication extends Application
 	        out.putExtra("session", (Parcelable)s);
 	        startService(out);
 	        if(showPlayer) {
-       			Intent i = new Intent( this, Player.class );
-       			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-       			startActivity( i );
+	        	IntentFilter intentFilter = new IntentFilter();
+	    		intentFilter.addAction(RadioPlayerService.STATION_CHANGED);
+
+	        	
+	        	BroadcastReceiver statusListener = new BroadcastReceiver() {
+
+	        		@Override
+	        		public void onReceive(Context context, Intent intent) {
+
+	        			String action = intent.getAction();
+	        			if (action.equals(RadioPlayerService.STATION_CHANGED)) {
+	        	        	Intent i = new Intent( LastFMApplication.this, Player.class );
+	               			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	               			startActivity( i );
+	               			unregisterReceiver(this);
+	        			}
+	        		}
+	        	};
+	    		registerReceiver(statusListener, intentFilter);
 	        }
         }
 	}

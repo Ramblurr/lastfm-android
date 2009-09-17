@@ -24,8 +24,14 @@ import java.util.ArrayList;
 
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.player.IRadioPlayer;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,8 +55,8 @@ public class LastFMStreamAdapter extends BaseAdapter
 	    public int icon()
 	    {
 	        try {
-	        	if(LastFMApplication.getInstance().player != null && LastFMApplication.getInstance().player.isPlaying()) {
-		        	String current = LastFMApplication.getInstance().player.getStationUrl();
+	        	if(player != null && player.isPlaying()) {
+		        	String current = player.getStationUrl();
 					if (current != null && mStationUrl.compareTo(current) == 0) {
 						// now playing is always the same (focus or not) 
 						return R.drawable.now_playing;
@@ -69,6 +75,7 @@ public class LastFMStreamAdapter extends BaseAdapter
 	ArrayList<Stream> mItems;
     Activity context;
     private int mLoadingBar = -1;
+	IRadioPlayer player = null;
 
     /**
 	 * Enables load bar at given position,
@@ -88,6 +95,24 @@ public class LastFMStreamAdapter extends BaseAdapter
 	public void disableLoadBar(){
 		this.mLoadingBar = -1;
 		notifyDataSetChanged();
+	}
+
+	/**
+	 * Binds to the player service, refreshes our list, then unbinds the player service
+	 */
+	public void updateNowPlaying(){
+        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                new ServiceConnection() {
+                public void onServiceConnected(ComponentName comp, IBinder binder) {
+					player = IRadioPlayer.Stub.asInterface(binder);
+					notifyDataSetChanged();
+					LastFMApplication.getInstance().unbindService(this);
+                }
+
+                public void onServiceDisconnected(ComponentName comp) {
+                	player = null;
+                }
+        }, Context.BIND_AUTO_CREATE);
 	}
 
     public LastFMStreamAdapter( Activity context )

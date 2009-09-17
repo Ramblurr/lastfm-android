@@ -35,13 +35,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.os.RemoteException;
 import android.preference.PreferenceActivity;
@@ -145,6 +148,8 @@ public class Profile extends ListActivity
 	
 	private IntentFilter mIntentFilter;
     
+	private boolean mIsPlaying = false;
+	
     @Override
     public void onCreate( Bundle icicle )
     {
@@ -259,7 +264,7 @@ public class Profile extends ListActivity
         
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
-		mIntentFilter.addAction( RadioPlayerService.META_CHANGED );
+		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
 		
 		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
 			startActivity( new Intent( Profile.this, NewStation.class ) );
@@ -421,6 +426,12 @@ public class Profile extends ListActivity
             	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
             }
         }
+        if(mMyStationsAdapter != null && mMyStationsAdapter.getCount() > 0)
+        	mMyStationsAdapter.updateNowPlaying();
+        if(mMyRecentAdapter != null && mMyRecentAdapter.getCount() > 0)
+        	mMyRecentAdapter.updateNowPlaying();
+        if(mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
+        	mMyPlaylistsAdapter.updateNowPlaying();
         setListAdapter( mMainAdapter );
         mMainAdapter.notifyDataSetChanged();
     }
@@ -441,13 +452,7 @@ public class Profile extends ListActivity
     		finish(); //We shouldn't really get here, but sometimes the window stack keeps us around
     	} else {
 			registerReceiver( mStatusListener, mIntentFilter );
-			//We need to bind the player so we can see whether it's playing or not
-			//in order to properly display the Now Playing indicator if we've been
-			//relaunched after being killed.
 		
-			if(LastFMApplication.getInstance().player == null)
-				LastFMApplication.getInstance().bindPlayerService();
-			
 	    	SetupRecentStations();
 	    	RebuildMainMenu();
 	    	mMainAdapter.disableLoadBar();
@@ -463,6 +468,26 @@ public class Profile extends ListActivity
 	
 	        if( mDialogAdapter != null )
 	        	mDialogAdapter.disableLoadBar();
+	        
+	        mIsPlaying = false;
+	        
+            LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                    new ServiceConnection() {
+                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+        					try {
+        						mIsPlaying = player.isPlaying();
+        					} catch (RemoteException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					LastFMApplication.getInstance().unbindService(this);
+                    }
+
+                    public void onServiceDisconnected(ComponentName comp) {
+                    }
+            }, Context.BIND_AUTO_CREATE);
+
     	}
 		super.onResume();
     }
@@ -496,7 +521,7 @@ public class Profile extends ListActivity
 		        if( mDialogAdapter != null )
 		        	mDialogAdapter.disableLoadBar();
 			}
-			else if( action.equals( RadioPlayerService.META_CHANGED))
+			else if( action.equals( RadioPlayerService.STATION_CHANGED))
 			{
 				//Update now playing buttons after the service is re-bound
 		    	SetupRecentStations();
@@ -552,10 +577,12 @@ public class Profile extends ListActivity
         mMyStationsAdapter.updateModel();
     }
 
-    public void onListItemClick( ListView l, View v, int position, long id )
+    public void onListItemClick( ListView l, View v, int p, long id )
     {
     	// mMainAdapter seems to want position-1 :-/
-
+    	final ListView list = l;
+    	final int position = p;
+    	
         if( !mMainAdapter.isEnabled( position-1 ))
         	return;
         
@@ -566,30 +593,31 @@ public class Profile extends ListActivity
             return;
         }
         
-        try
-        {
-        	String adapter_station = mMainAdapter.getStation(position-1);
-	        
-        	if ( LastFMApplication.getInstance().player != null && LastFMApplication.getInstance().player.isPlaying() ) {
-		        String current_station = LastFMApplication.getInstance().player.getStationUrl();
-		
-		        if( adapter_station.equals( current_station ) ) {
-		            Intent intent = new Intent( Profile.this, Player.class );
-		            startActivity( intent );
-		            return;
-		        }
-        	}
-	        
-	    	l.setEnabled(false);
-	    	mMainAdapter.enableLoadBar(position-1);
-	    	LastFMApplication.getInstance().playRadioStation(adapter_station, true);
-	    }
-	    catch (RemoteException e)
-	    {
-	    	Log.e( "Last.fm", e.getMessage() );
-	    }
-	    catch (Exception e) //:P
-	    {}
+        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                new ServiceConnection() {
+                public void onServiceConnected(ComponentName comp, IBinder binder) {
+                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+    					try {
+			            	String adapter_station = mMainAdapter.getStation(position-1);
+					        String current_station = player.getStationUrl();
+    			        	if ( player.isPlaying() && adapter_station.equals( current_station ) ) {
+					            Intent intent = new Intent( Profile.this, Player.class );
+					            startActivity( intent );
+    			        	} else {
+    			        		list.setEnabled(false);
+    			        		mMainAdapter.enableLoadBar(position-1);
+    			        		LastFMApplication.getInstance().playRadioStation(adapter_station, true);
+    			        	}
+    					} catch (Exception e) {
+    						// TODO Auto-generated catch block
+    						e.printStackTrace();
+    					}
+    					LastFMApplication.getInstance().unbindService(this);
+                }
+
+                public void onServiceDisconnected(ComponentName comp) {
+                }
+        }, Context.BIND_AUTO_CREATE);
     }
         
     public boolean onKeyDown(int keyCode, KeyEvent event)
@@ -1099,14 +1127,7 @@ public class Profile extends ListActivity
     
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
-		boolean isPlaying = false;
-		try {
-			if (LastFMApplication.getInstance().player != null)
-				isPlaying = LastFMApplication.getInstance().player.isPlaying();
-		} catch (RemoteException e) {
-		}
-		
-		menu.findItem(2).setEnabled( isPlaying );
+		menu.findItem(2).setEnabled( mIsPlaying );
 		
 		return super.onPrepareOptionsMenu(menu);
 	}

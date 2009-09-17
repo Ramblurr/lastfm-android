@@ -587,7 +587,7 @@ public class RadioPlayerService extends Service
 			refreshPlaylist();
 			currentStationURL = url;
 			notifyChange( STATION_CHANGED );
-			LastFMApplication.getInstance().appendRecentStation(currentStation.getUrl(), currentStation.getName());
+			LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
 		} else {
 			currentStationURL = null;
 			wakeLock.release();
