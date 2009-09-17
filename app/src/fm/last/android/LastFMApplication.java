@@ -206,7 +206,7 @@ public class LastFMApplication extends Application
                 c.moveToFirst();
                 String name = c.getString( nameColumn );
                 String url = c.getString( urlColumn );
-                new Station(name, "", url, "");
+                result = new Station(name, "", url, "");
             }
             c.close();
             db.close();

@@ -9,6 +9,7 @@ import fm.last.android.activity.PopupActionActivity;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
+import fm.last.api.Station;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -82,10 +83,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        						if (player.isPlaying())
 	        							player.skip();
 	        						else {
-	        							if(player.getStationName() == null) {
+	        							if(LastFMApplication.getInstance().getLastStation() == null) {
 	        								player.tune("lastfm://user/"+session.getName()+"/personal", session);
 	        							} else {
-	        								player.startRadio();
+	        								player.tune(LastFMApplication.getInstance().getLastStation().getUrl(), session);
 	        							}
 	        						}
 	        					} catch (RemoteException e) {
@@ -108,10 +109,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        						if (player.isPlaying())
 	        							player.stop();
 	        						else {
-	        							if(player.getStationName() == null) {
-	        								LastFMApplication.getInstance().playRadioStation("lastfm://user/"+session.getName()+"/personal", false);
+	        							if(LastFMApplication.getInstance().getLastStation() == null) {
+	        								player.tune("lastfm://user/"+session.getName()+"/personal", session);
 	        							} else {
-	        								player.startRadio();
+	        								player.tune(LastFMApplication.getInstance().getLastStation().getUrl(), session);
 	        							}
 	        						}
 	        					} catch (RemoteException e) {
@@ -159,6 +160,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     }
 
     public void onDeleted(Context context, int[] appWidgetIds) {
+        Intent intent = new Intent("fm.last.android.widget.UPDATE");
+        mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(mAlarmIntent);
+        mAlarmIntent = null;
     }
 
     public void onEnabled(Context context) {
@@ -219,11 +225,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
         } else {
 			views.setProgressBar(R.id.spinner, 1, 0, false);
 			views.setImageViewResource(R.id.stop, R.drawable.play);
-			if(mAlarmIntent != null) {
-		        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		        am.cancel(mAlarmIntent);
-		        mAlarmIntent = null;
-			}
+	        Intent intent = new Intent("fm.last.android.widget.UPDATE");
+	        mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+	        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+	        am.cancel(mAlarmIntent);
+	        mAlarmIntent = null;
         }
         appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
     }
@@ -277,7 +283,13 @@ public class RadioWidgetProvider extends AppWidgetProvider {
             					else
             						updateAppWidget_playing(ctx, player.getTrackName(), player.getArtistName(), pos, duration, buffering);
             				} else {
-            					updateAppWidget_idle(ctx, player.getStationName(), player.getState() == RadioPlayerService.STATE_TUNING);
+            					String stationName = player.getStationName();
+            					if(stationName == null) {
+            						Station station = LastFMApplication.getInstance().getLastStation();
+            						if(station != null)
+            							stationName = station.getName();
+            					}
+            					updateAppWidget_idle(ctx, stationName, player.getState() == RadioPlayerService.STATE_TUNING);
             				}
             			} catch (RemoteException ex) {
             			}
