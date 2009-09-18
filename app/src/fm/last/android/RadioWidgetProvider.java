@@ -84,9 +84,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        							player.skip();
 	        						else {
 	        							if(LastFMApplication.getInstance().getLastStation() == null) {
-	        								player.tune("lastfm://user/"+session.getName()+"/personal", session);
+	        								LastFMApplication.getInstance().playRadioStation("lastfm://user/"+session.getName()+"/personal", false);
 	        							} else {
-	        								player.tune(LastFMApplication.getInstance().getLastStation().getUrl(), session);
+	        								LastFMApplication.getInstance().playRadioStation(LastFMApplication.getInstance().getLastStation().getUrl(), false);
 	        							}
 	        						}
 	        					} catch (RemoteException e) {
@@ -110,9 +110,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        							player.stop();
 	        						else {
 	        							if(LastFMApplication.getInstance().getLastStation() == null) {
-	        								player.tune("lastfm://user/"+session.getName()+"/personal", session);
+	        								LastFMApplication.getInstance().playRadioStation("lastfm://user/"+session.getName()+"/personal", false);
 	        							} else {
-	        								player.tune(LastFMApplication.getInstance().getLastStation().getUrl(), session);
+	        								LastFMApplication.getInstance().playRadioStation(LastFMApplication.getInstance().getLastStation().getUrl(), false);
 	        							}
 	        						}
 	        					} catch (RemoteException e) {
