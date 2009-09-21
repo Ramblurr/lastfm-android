@@ -536,14 +536,14 @@ public class Profile extends ListActivity
             return;
         mMyRecentAdapter.resetList();
         Station[] stations = LastFMApplication.getInstance().getRecentStations();
-
-        for (Station station : stations)
-        {
-            String name = station.getName();
-            String url = station.getUrl();
-            mMyRecentAdapter.putStation( name, url );
+        if(stations != null) {
+	        for (Station station : stations)
+	        {
+	            String name = station.getName();
+	            String url = station.getUrl();
+	            mMyRecentAdapter.putStation( name, url );
+	        }
         }
-
         mMyRecentAdapter.updateModel();
 
     }
