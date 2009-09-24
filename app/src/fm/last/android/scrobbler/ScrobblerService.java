@@ -26,11 +26,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -41,8 +43,6 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.android.music.IMediaPlaybackService;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -166,8 +166,16 @@ public class ScrobblerService extends Service {
 
 	public void onDestroy() {
 		super.onDestroy();
-
+		
 		try {
+	        Intent intent = new Intent("fm.last.android.scrobbler.FLUSH");
+	        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+	        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+	        am.cancel(alarmIntent); //cancel any pending alarm intents
+			if(mQueue.size() > 0) {
+		        //schedule an alarm to wake the device and try again in an hour
+		        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
+			}
 			if(getFileStreamPath("currentTrack.dat").exists())
 				deleteFile("currentTrack.dat");
 			if(mCurrentTrack != null) {
@@ -344,12 +352,15 @@ public class ScrobblerService extends Service {
 			if(auth != null && auth.length() > 0) {
 				mCurrentTrack.trackAuth = auth;
 			}
-			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-			NetworkInfo ni = cm.getActiveNetworkInfo();
-			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-			if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
-				mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-				mNowPlayingTask.execute(mScrobbler);
+			boolean scrobbleRealtime = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_realtime", true);
+			if(scrobbleRealtime) {
+				ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+				NetworkInfo ni = cm.getActiveNetworkInfo();
+				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+				if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
+					mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+					mNowPlayingTask.execute(mScrobbler);
+				}
 			}
 
 			if(auth == null) {
@@ -401,6 +412,17 @@ public class ScrobblerService extends Service {
 				   		mSubmissionTask.execute(mScrobbler);
 			   		}
 				}
+			}
+		}
+		if(intent.getAction().equals("fm.last.android.scrobbler.FLUSH")) {
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+			if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
+		   		if(mQueue.size() > 0 && mSubmissionTask == null) {
+			   		mSubmissionTask = new SubmitTracksTask();
+			   		mSubmissionTask.execute(mScrobbler);
+		   		}
 			}
 		}
 		stopIfReady();

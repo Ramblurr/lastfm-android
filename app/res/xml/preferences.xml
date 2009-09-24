@@ -12,6 +12,13 @@
             android:summary="Update your Last.fm profile as you listen to music" />
 
     <CheckBoxPreference
+            android:key="scrobble_realtime"
+            android:defaultValue="true"
+            android:dependency="scrobble"
+            android:title="Scrobble in real-time"
+            android:summary="Sends now-playing information and uploads scrobbles immediately after a song has been played.  Otherwise, scrobbles will be queued for up to an hour before being transmitted." />
+
+    <CheckBoxPreference
             android:key="scrobble_music_player"
             android:defaultValue="true"
             android:dependency="scrobble"
