@@ -698,10 +698,12 @@ public class RadioPlayerService extends Service
 
 		public long getDuration() throws RemoteException
 		{
-			if( mp != null && mp.isPlaying() )
-				return mp.getDuration();
-			else
-				return 0;
+			try {
+				if( mp != null && mp.isPlaying() )
+					return mp.getDuration();
+			} catch (Exception e) {
+			}
+			return 0;
 		}
 
 		public String getTrackName() throws RemoteException
@@ -721,10 +723,12 @@ public class RadioPlayerService extends Service
 
 		public long getPosition() throws RemoteException
 		{
-			if( mp != null && mp.isPlaying() )
-				return mp.getCurrentPosition();
-			else
-				return 0;
+			try {
+				if( mp != null && mp.isPlaying() )
+					return mp.getCurrentPosition();
+			} catch (Exception e) {
+			}
+			return 0;
 		}
 
 		public String getArtUrl() throws RemoteException

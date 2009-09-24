@@ -391,13 +391,14 @@ public class Player extends Activity {
 
 		public void onClick(View v) {
 
-			if (LastFMApplication.getInstance().player == null)
-				return;
-			try {
-				LastFMApplication.getInstance().player.stop();
-				LastFMApplication.getInstance().unbindPlayerService();
-			} catch (RemoteException ex) {
-				System.out.println(ex.getMessage());
+			if (LastFMApplication.getInstance().player != null) {
+				try {
+					if(LastFMApplication.getInstance().player.isPlaying())
+						LastFMApplication.getInstance().player.stop();
+					LastFMApplication.getInstance().unbindPlayerService();
+				} catch (RemoteException ex) {
+					System.out.println(ex.getMessage());
+				}
 			}
 			finish();
 		}

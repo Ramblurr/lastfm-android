@@ -32,6 +32,7 @@ import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
+import fm.last.android.player.IRadioPlayer;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.TabBar;
@@ -43,14 +44,18 @@ import fm.last.api.Tag;
 import fm.last.api.User;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -76,6 +81,7 @@ public class Metadata extends Activity {
 	
 	private ImageCache mImageCache;
 	private EventActivityResult mOnEventActivityResult;
+	private boolean mIsPlaying = false;
 	
 	TextView mTextView;
 	TabBar mTabBar;
@@ -95,7 +101,8 @@ public class Metadata extends Activity {
 	@Override
 	public void onCreate( Bundle icicle ) {
 		super.onCreate( icicle );
-		
+
+		requestWindowFeature( Window.FEATURE_NO_TITLE );
 		setContentView( R.layout.metadata );
 		
 		mArtistName = getIntent().getStringExtra( "artist" );
@@ -120,6 +127,26 @@ public class Metadata extends Activity {
 
 		if( getIntent().hasExtra( "show_events" ) )
 			mTabBar.setActive( R.drawable.events );
+		
+        mIsPlaying = false;
+        
+        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
+                new ServiceConnection() {
+                public void onServiceConnected(ComponentName comp, IBinder binder) {
+                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+    					try {
+    						mIsPlaying = player.isPlaying();
+    					} catch (RemoteException e) {
+    						// TODO Auto-generated catch block
+    						e.printStackTrace();
+    					}
+    					LastFMApplication.getInstance().unbindService(this);
+                }
+
+                public void onServiceDisconnected(ComponentName comp) {
+                }
+        }, Context.BIND_AUTO_CREATE);
+
 	}
 	
 	@Override
@@ -135,14 +162,7 @@ public class Metadata extends Activity {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
-		boolean isPlaying = false;
-		try {
-			if (LastFMApplication.getInstance().player != null)
-				isPlaying = LastFMApplication.getInstance().player.isPlaying();
-		} catch (RemoteException e) {
-		}
-		
-		menu.findItem(R.id.info_menu_item).setEnabled( isPlaying );
+		menu.findItem(R.id.info_menu_item).setEnabled( mIsPlaying );
 		
 		return super.onPrepareOptionsMenu(menu);
 	}
