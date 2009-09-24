@@ -353,7 +353,7 @@ public class ScrobblerService extends Service {
 				mCurrentTrack.trackAuth = auth;
 			}
 			boolean scrobbleRealtime = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_realtime", true);
-			if(scrobbleRealtime) {
+			if(scrobbleRealtime || auth != null) {
 				ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 				NetworkInfo ni = cm.getActiveNetworkInfo();
 				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
