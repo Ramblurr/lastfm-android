@@ -49,13 +49,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class LastFMApplication extends Application
 {
 
     public WeakHashMap<String, Session> map;
 	public fm.last.android.player.IRadioPlayer player = null;
-
+	private Context mCtx;
+	
     private static LastFMApplication instance;
     
     public static LastFMApplication getInstance()
@@ -127,8 +129,9 @@ public class LastFMApplication extends Application
 		player = null;
 	}
 	
-	public void playRadioStation(String url, boolean showPlayer)
+	public void playRadioStation(Context ctx, String url, boolean showPlayer)
 	{
+		mCtx = ctx;
 		Session s = map.get( "lastfm_session" );
         if ( s != null && s.getKey().length() > 0 ) {
 	        final Intent out = new Intent(this, RadioPlayerService.class);
@@ -139,7 +142,7 @@ public class LastFMApplication extends Application
 	        if(showPlayer) {
 	        	IntentFilter intentFilter = new IntentFilter();
 	    		intentFilter.addAction(RadioPlayerService.STATION_CHANGED);
-
+	    		intentFilter.addAction("fm.last.android.ERROR");
 	        	
 	        	BroadcastReceiver statusListener = new BroadcastReceiver() {
 
@@ -151,8 +154,12 @@ public class LastFMApplication extends Application
 	        	        	Intent i = new Intent( LastFMApplication.this, Player.class );
 	               			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	               			startActivity( i );
-	               			unregisterReceiver(this);
+	        			} else if(action.equals("fm.last.android.ERROR")) {
+	        				WSError e = intent.getParcelableExtra("error");
+	        				Log.e("Last.fm", "Tuning error: " + e.getMessage());
+	        				presentError(mCtx, e);
 	        			}
+               			unregisterReceiver(this);
 	        		}
 	        	};
 	    		registerReceiver(statusListener, intentFilter);

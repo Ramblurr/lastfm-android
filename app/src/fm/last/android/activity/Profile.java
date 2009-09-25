@@ -91,6 +91,7 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
+import fm.last.api.WSError;
 
 //TODO: refactor all the UserTasks
 
@@ -247,6 +248,7 @@ public class Profile extends ListActivity
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction( RadioPlayerService.PLAYBACK_ERROR );
 		mIntentFilter.addAction( RadioPlayerService.STATION_CHANGED );
+		mIntentFilter.addAction( "fm.last.android.ERROR" );
 		
 		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
 			startActivity( new Intent( Profile.this, NewStation.class ) );
@@ -505,7 +507,7 @@ public class Profile extends ListActivity
 		{
 
 			String action = intent.getAction();
-			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR ) )
+			if ( action.equals( RadioPlayerService.PLAYBACK_ERROR )  || action.equals("fm.last.android.ERROR"))
 			{
 				// see also repeated code one page above in OnResume
 				RebuildMainMenu();
@@ -605,7 +607,7 @@ public class Profile extends ListActivity
     			        	} else {
     			        		list.setEnabled(false);
     			        		mMainAdapter.enableLoadBar(position-1);
-    			        		LastFMApplication.getInstance().playRadioStation(adapter_station, true);
+    			        		LastFMApplication.getInstance().playRadioStation(Profile.this,adapter_station, true);
     			        	}
     					} catch (Exception e) {
     						// TODO Auto-generated catch block
@@ -695,7 +697,7 @@ public class Profile extends ListActivity
 	            Artist artist = (Artist)l.getAdapter().getItem(position);
 	        	ListAdapter la = (ListAdapter) l.getAdapter();
 	        	la.enableLoadBar(position);
-	            LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", true);
+	            LastFMApplication.getInstance().playRadioStation(Profile.this,"lastfm://artist/"+Uri.encode(artist.getName())+"/similarartists", true);
 			} catch (ClassCastException e) {
 				// fine.
 			}
@@ -743,9 +745,9 @@ public class Profile extends ListActivity
 	        	la.enableLoadBar(position);
 	        	
 				if(session.getSubscriber().equals("1"))
-					LastFMApplication.getInstance().playRadioStation("lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()), true);
+					LastFMApplication.getInstance().playRadioStation(Profile.this,"lastfm://usertags/"+mUsername+"/"+Uri.encode(tag.getName()), true);
 				else
-					LastFMApplication.getInstance().playRadioStation("lastfm://globaltags/"+Uri.encode(tag.getName()), true);
+					LastFMApplication.getInstance().playRadioStation(Profile.this,"lastfm://globaltags/"+Uri.encode(tag.getName()), true);
 			} catch (ClassCastException e) {
 				// when the list item is not a tag
 			}
@@ -1301,7 +1303,7 @@ public class Profile extends ListActivity
         }
         
         if( artist != null)
-            LastFMApplication.getInstance().playRadioStation("lastfm://artist/"+Uri.encode(artist)+"/similarartists", true);
+            LastFMApplication.getInstance().playRadioStation(Profile.this,"lastfm://artist/"+Uri.encode(artist)+"/similarartists", true);
 //        dismissDialog(type);
         
     }

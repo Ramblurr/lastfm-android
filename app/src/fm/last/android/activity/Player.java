@@ -138,7 +138,7 @@ public class Player extends Activity {
 
 		Intent intent = getIntent();
         if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
-        	LastFMApplication.getInstance().playRadioStation(intent.getData().toString(), false);
+        	LastFMApplication.getInstance().playRadioStation(Player.this,intent.getData().toString(), false);
         }
 	}
 

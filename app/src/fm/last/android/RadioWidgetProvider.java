@@ -44,7 +44,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     }
     
     @Override 
-    public void onReceive(Context context, Intent intent) { 
+    public void onReceive(Context context, Intent intent) {
+    	final Context ctx = context;
         final String action = intent.getAction();
 		final Session session = LastFMApplication.getInstance().map.get("lastfm_session");
 		if(session != null) {
@@ -84,10 +85,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        							player.skip();
 	        						else {
 	        							if(LastFMApplication.getInstance().getLastStation() == null) {
-	        								LastFMApplication.getInstance().playRadioStation("lastfm://user/"+session.getName()+"/personal", false);
+	        								LastFMApplication.getInstance().playRadioStation(ctx,"lastfm://user/"+session.getName()+"/personal", false);
 	        								updateAppWidget_idle(LastFMApplication.getInstance(),null,true);
 	        							} else {
-	        								LastFMApplication.getInstance().playRadioStation(LastFMApplication.getInstance().getLastStation().getUrl(), false);
+	        								LastFMApplication.getInstance().playRadioStation(ctx,LastFMApplication.getInstance().getLastStation().getUrl(), false);
 	        								updateAppWidget_idle(LastFMApplication.getInstance(),LastFMApplication.getInstance().getLastStation().getName(),true);
 	        							}
 	        						}
@@ -112,10 +113,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        							player.stop();
 	        						else {
 	        							if(LastFMApplication.getInstance().getLastStation() == null) {
-	        								LastFMApplication.getInstance().playRadioStation("lastfm://user/"+session.getName()+"/personal", false);
+	        								LastFMApplication.getInstance().playRadioStation(ctx,"lastfm://user/"+session.getName()+"/personal", false);
 	        								updateAppWidget_idle(LastFMApplication.getInstance(),null,true);
 	        							} else {
-	        								LastFMApplication.getInstance().playRadioStation(LastFMApplication.getInstance().getLastStation().getUrl(), false);
+	        								LastFMApplication.getInstance().playRadioStation(ctx,LastFMApplication.getInstance().getLastStation().getUrl(), false);
 	        								updateAppWidget_idle(LastFMApplication.getInstance(),LastFMApplication.getInstance().getLastStation().getName(),true);
 	        							}
 	        						}

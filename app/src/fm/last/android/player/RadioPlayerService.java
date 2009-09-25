@@ -55,6 +55,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -194,12 +195,15 @@ public class RadioPlayerService extends Service
 					tune(stationURL, session);
 					currentTrack = null;
 					nextSong();
+				} catch (WSError e) {
+					mError = e;
+					currentStationURL = null;
+					Intent i = new Intent("fm.last.android.ERROR");
+					i.putExtra("error", (Parcelable)e);
+					sendBroadcast(i);
+					Log.e("Last.fm", "Tuning error: " + e.getMessage());
 				} catch (Exception e) {
-					if(mError != null)
-						LastFMApplication.getInstance().presentError(this, mError);
-					else
-						LastFMApplication.getInstance().presentError(this, getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE),
-								getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
+					e.printStackTrace();
 				}
     		}
     	}
@@ -579,20 +583,20 @@ public class RadioPlayerService extends Service
 		currentQueue.clear();
 		currentSession = session;
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-		currentStation = server.tuneToStation(url, session.getKey());
-		RadioWidgetProvider.updateAppWidget_idle(RadioPlayerService.this, currentStation.getName(), true);
-		if(currentStation != null) {
-			Log.i("Last.fm","Station name: " + currentStation.getName());
-			mPlaylistRetryCount = 0;
-			refreshPlaylist();
-			currentStationURL = url;
-			notifyChange( STATION_CHANGED );
-			LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
-		} else {
-			currentStationURL = null;
-			wakeLock.release();
-			wifiLock.release();
-		}
+			currentStation = server.tuneToStation(url, session.getKey());
+			RadioWidgetProvider.updateAppWidget_idle(RadioPlayerService.this, currentStation.getName(), true);
+			if(currentStation != null) {
+				Log.i("Last.fm","Station name: " + currentStation.getName());
+				mPlaylistRetryCount = 0;
+				refreshPlaylist();
+				currentStationURL = url;
+				notifyChange( STATION_CHANGED );
+				LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
+			} else {
+				currentStationURL = null;
+				wakeLock.release();
+				wifiLock.release();
+			}
 	}
 
 	private class NextTrackTask extends UserTask<Void, Void, Boolean> {
