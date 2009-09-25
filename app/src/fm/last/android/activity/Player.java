@@ -247,8 +247,6 @@ public class Player extends Activity {
 	public void onStart() {
 		super.onStart();
 		paused = false;
-		long next = refreshNow();
-		queueNextRefresh(next);
 
 		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			LayoutParams params = mAlbum.getLayoutParams();
@@ -457,33 +455,35 @@ public class Player extends Activity {
     					try {
     						String artistName = player.getArtistName();
 		    				String trackName = player.getTrackName();
-		    				if(artistName.equals(RadioPlayerService.UNKNOWN)) {
-		    					mArtistName.setText("");
-		    				} else {
-		    					mArtistName.setText(artistName);
+		    				if(!mArtistName.getText().equals(artistName) || !mTrackName.getText().equals(trackName)) {
+			    				if(artistName.equals(RadioPlayerService.UNKNOWN)) {
+			    					mArtistName.setText("");
+			    				} else {
+			    					mArtistName.setText(artistName);
+			    				}
+			    				if(trackName.equals(RadioPlayerService.UNKNOWN)) {
+			    					mTrackName.setText("");
+			    				} else {
+			    					mTrackName.setText(trackName);
+			    				}
+			    				
+								if (mTuningDialog != null && player.getState() == RadioPlayerService.STATE_TUNING) {
+									mTuningDialog = ProgressDialog.show(Player.this, "",
+											"Tuning", true, false);
+									mTuningDialog
+											.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
+									mTuningDialog.setCancelable(true);
+								}
+	
+			    				// fetching artist events (On Tour indicator)
+			    				new LoadEventsTask().execute((Void)null);
+			
+			    				Bitmap art = player.getAlbumArt();
+			    				mAlbum.setArtwork(art);
+			    				mAlbum.invalidate();
+			    				if (art == null)
+			    					 new LoadAlbumArtTask().execute((Void) null);
 		    				}
-		    				if(trackName.equals(RadioPlayerService.UNKNOWN)) {
-		    					mTrackName.setText("");
-		    				} else {
-		    					mTrackName.setText(trackName);
-		    				}
-		    				
-							if (mTuningDialog != null && player.getState() == RadioPlayerService.STATE_TUNING) {
-								mTuningDialog = ProgressDialog.show(Player.this, "",
-										"Tuning", true, false);
-								mTuningDialog
-										.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
-								mTuningDialog.setCancelable(true);
-							}
-
-		    				// fetching artist events (On Tour indicator)
-		    				new LoadEventsTask().execute((Void)null);
-		
-		    				Bitmap art = player.getAlbumArt();
-		    				mAlbum.setArtwork(art);
-		    				mAlbum.invalidate();
-		    				if (art == null)
-		    					 new LoadAlbumArtTask().execute((Void) null);
     					} catch (java.util.concurrent.RejectedExecutionException e) {
     						e.printStackTrace();
     					} catch (RemoteException e) {
