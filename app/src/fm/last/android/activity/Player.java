@@ -304,6 +304,8 @@ public class Player extends Activity {
 		if (LastFMApplication.getInstance().player == null)
 			LastFMApplication.getInstance().bindPlayerService();
 		updateTrackInfo();
+		long next = refreshNow();
+		queueNextRefresh(next);
 		super.onResume();
 	}
 
