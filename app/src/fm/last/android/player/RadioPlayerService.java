@@ -39,8 +39,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -51,10 +53,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.os.Parcelable;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -89,6 +89,8 @@ public class RadioPlayerService extends Service
 	public static final int STATE_PLAYING = 3;
 	public static final int STATE_SKIPPING = 4;
 	public static final int STATE_PAUSED = 5;
+	public static final int STATE_NODATA = 6;
+	public static final int STATE_ERROR = -1;
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
@@ -183,9 +185,51 @@ public class RadioPlayerService extends Service
 				super.onCallStateChanged(state, incomingNumber);
 			}
 		}, PhoneStateListener.LISTEN_CALL_STATE);
-
+		
+    	IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		registerReceiver(connectivityListener, intentFilter);
 	}
-    @Override
+
+	BroadcastReceiver connectivityListener = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
+				if(mState != STATE_STOPPED) {
+					Log.i("Last.fm", "Data connection lost! Stopping player...");
+					if(mp != null) {
+						try {
+							mp.stop();
+						} catch ( Exception e ) {
+							e.printStackTrace();
+						}
+					}
+					if(next_mp != null) {
+						try {
+							next_mp.stop();
+						} catch ( Exception e ) {
+							e.printStackTrace();
+						}
+						next_mp.release();
+					}
+					next_mp = null;
+					nm.cancel( NOTIFY_ID );
+					mState = STATE_NODATA;
+					currentQueue.clear();
+				}
+			} else if(ni.getState() == NetworkInfo.State.CONNECTED) {
+				if(mState == STATE_NODATA || mState == STATE_PLAYING) {
+					Log.i("Last.fm", "Data connection attached! Skipping to next track");
+					mState = STATE_TUNING;
+					nextSong();
+				}
+			}
+		}
+	};
+	
+	@Override
     public void onStart(Intent intent, int startId) {
     	if(intent.getAction().equals("fm.last.android.PLAY")) {
     		String stationURL = intent.getStringExtra("station");
@@ -217,6 +261,7 @@ public class RadioPlayerService extends Service
 			mp.stop();
 		mp.release();
 		nm.cancel( NOTIFY_ID );
+		unregisterReceiver(connectivityListener);
 	}
 
 	public IBinder getBinder()
@@ -314,8 +359,10 @@ public class RadioPlayerService extends Service
 					stopSelf();
 				} else {
 					Log.i("LastFm", "Sadface: " + what + ", " + extra);
+					//ditch our playlist and fetch a new one, in case our IP changed
+					currentQueue.clear();
 					//Enter a state that will allow nextSong to do its thang
-					mState = STATE_PREPARING;
+					mState = STATE_ERROR;
 					new NextTrackTask().execute((Void)null);
 				}
 			} else {
@@ -329,7 +376,7 @@ public class RadioPlayerService extends Service
 	{
 		try
 		{
-			if (mState == STATE_STOPPED || mState == STATE_PREPARING) {
+			if (mState == STATE_STOPPED || mState == STATE_PREPARING || mState == STATE_NODATA) {
 				Log.e("Last.fm", "playTrack() called from wrong state!");
 				return;
 			}
@@ -399,7 +446,7 @@ public class RadioPlayerService extends Service
 	
 	private void nextSong()
 	{
-		if(mState == STATE_SKIPPING || mState == STATE_STOPPED) {
+		if(mState == STATE_SKIPPING || mState == STATE_STOPPED || mState == STATE_NODATA) {
 			Log.e("Last.fm", "nextSong() called in wrong state: " + mState);
 			return;
 		}
