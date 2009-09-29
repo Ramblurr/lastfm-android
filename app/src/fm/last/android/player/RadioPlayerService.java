@@ -520,7 +520,7 @@ public class RadioPlayerService extends Service
 			else
 				bitrate = "128";
 			
-			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", true))
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", false))
 				bitrate = "128";
 			Log.i("Last.fm", "Requesting bitrate: " + bitrate);
 			playlist = server.getRadioPlayList( bitrate, currentSession.getKey() );
