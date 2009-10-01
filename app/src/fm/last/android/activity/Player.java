@@ -48,6 +48,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -142,6 +143,25 @@ public class Player extends Activity {
         }
 	}
 
+	private boolean isAmazonInstalled() {
+		PackageManager pm = getPackageManager();
+		boolean result = false;
+		try {
+			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
+			result = true;
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu)  {
+		menu.findItem(R.id.buy_menu_item).setEnabled( isAmazonInstalled() );
+		
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
