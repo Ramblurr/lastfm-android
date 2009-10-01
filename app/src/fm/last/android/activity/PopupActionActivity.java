@@ -3,10 +3,16 @@
  */
 package fm.last.android.activity;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import fm.last.android.LastFMApplication;
+import fm.last.api.Station;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -17,14 +23,33 @@ import android.widget.ListView;
  *
  */
 public class PopupActionActivity extends ListActivity {
-	private String[] actions={"View Info", "Share", "Tag", "Add To Playlist", "Buy on Amazon.com"};
 	private String mArtistName;
 	private String mTrackName;
+	
+	private boolean isAmazonInstalled() {
+		PackageManager pm = getPackageManager();
+		boolean result = false;
+		try {
+			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
+			result = true;
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
 	
 	public void onCreate(Bundle icicle) { 
 	    super.onCreate(icicle); 
 	    mArtistName = getIntent().getStringExtra("lastfm.artist");
 	    mTrackName = getIntent().getStringExtra("lastfm.track");
+		String[] actions = new String[isAmazonInstalled()?5:4];
+		actions[0] = "View Info";
+		actions[1] = "Share";
+		actions[2] = "Tag";
+		actions[3] = "Add To Playlist";
+	    if(isAmazonInstalled()) {
+	    	actions[4] = "Buy on Amazon.com";
+	    }
 	    this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actions)); 
 	}
 
