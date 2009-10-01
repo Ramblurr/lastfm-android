@@ -38,6 +38,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -1308,6 +1309,18 @@ public class Profile extends ListActivity
         
     }
     
+	private boolean isAmazonInstalled() {
+		PackageManager pm = getPackageManager();
+		boolean result = false;
+		try {
+			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
+			result = true;
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
+
     ArrayList<ListEntry> prepareProfileActions(int type)
     {
         ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>(); 
@@ -1326,9 +1339,10 @@ public class Profile extends ListActivity
             iconifiedEntries.add(entry);
         }
 
-        entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
-        iconifiedEntries.add(entry);
-            
+        if(isAmazonInstalled()) {
+        	entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
+        	iconifiedEntries.add(entry);
+        }
         return iconifiedEntries;        
     }
     
