@@ -301,25 +301,26 @@ public class RadioPlayerService extends Service
 	private OnBufferingUpdateListener mOnBufferingUpdateListener = new OnBufferingUpdateListener()
 	{
 
-		public void onBufferingUpdate( MediaPlayer mp, int percent )
+		public void onBufferingUpdate( MediaPlayer p, int percent )
 		{
-
-			bufferPercent = percent;
-			if(next_mp == null && percent == 100) {
-				// Check if we're running low on tracks
-				if ( currentQueue.size() < 2 )
-				{
-					mPlaylistRetryCount = 0;
-					try {
-						//Please to be working?
-						refreshPlaylist();
-					} catch (Exception e) {
+			if(p == mp) {
+				bufferPercent = percent;
+				if(next_mp == null && percent == 100) {
+					// Check if we're running low on tracks
+					if ( currentQueue.size() < 2 )
+					{
+						mPlaylistRetryCount = 0;
+						try {
+							//Please to be working?
+							refreshPlaylist();
+						} catch (Exception e) {
+						}
 					}
-				}
-				if(currentQueue.size() > 1) {
-					mNextPrepared = false;
-					next_mp = new MediaPlayer();
-					playTrack((RadioTrack)(currentQueue.peek()), next_mp);
+					if(currentQueue.size() > 1) {
+						mNextPrepared = false;
+						next_mp = new MediaPlayer();
+						playTrack((RadioTrack)(currentQueue.peek()), next_mp);
+					}
 				}
 			}
 		}
