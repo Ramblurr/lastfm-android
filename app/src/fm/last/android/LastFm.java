@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -330,7 +331,10 @@ public class LastFm extends Activity
             try {
             	URL url = new URL("http://cdn.last.fm/client/android/"+getPackageManager().getPackageInfo("fm.last.android", 0).versionName+".txt" );
             	mUpdateURL = UrlUtil.doGet(url);
-            	success = true;
+            	if(mUpdateURL.startsWith("market://") || mUpdateURL.startsWith("http://")) {
+	            	success = true;
+	            	Log.i("Last.fm", "Update URL: " + mUpdateURL);
+            	}
             } catch (Exception e) {
             	// No updates available! Yay!
             }
