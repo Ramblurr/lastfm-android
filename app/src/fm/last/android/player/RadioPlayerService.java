@@ -73,6 +73,7 @@ public class RadioPlayerService extends Service
 	private MediaPlayer mp = new MediaPlayer();
 	private MediaPlayer next_mp = null;
 	private boolean mNextPrepared = false;
+	private boolean mNextFullyBuffered = false;
 	private Station currentStation;
 	private Session currentSession;
 	private RadioTrack currentTrack;
@@ -215,6 +216,8 @@ public class RadioPlayerService extends Service
 						next_mp.release();
 					}
 					next_mp = null;
+					mNextPrepared = false;
+					mNextFullyBuffered = false;
 					nm.cancel( NOTIFY_ID );
 					mState = STATE_NODATA;
 					currentQueue.clear();
@@ -318,10 +321,14 @@ public class RadioPlayerService extends Service
 					}
 					if(currentQueue.size() > 1) {
 						mNextPrepared = false;
+						mNextFullyBuffered = false;
 						next_mp = new MediaPlayer();
 						playTrack((RadioTrack)(currentQueue.peek()), next_mp);
 					}
 				}
+			}
+			if(p == next_mp && percent == 100) {
+				mNextFullyBuffered = true;
 			}
 		}
 	};
@@ -368,6 +375,8 @@ public class RadioPlayerService extends Service
 				}
 			} else {
 				next_mp = null;
+				mNextPrepared = false;
+				mNextFullyBuffered = false;
 			}
 			return true;
 		}
@@ -432,6 +441,8 @@ public class RadioPlayerService extends Service
 			next_mp.release();
 		}
 		next_mp = null;
+		mNextPrepared = false;
+		mNextFullyBuffered = false;
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
 		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
@@ -485,6 +496,11 @@ public class RadioPlayerService extends Service
 			if(mNextPrepared) {
 				mOnPreparedListener.onPrepared(mp);
 			}
+			if(mNextFullyBuffered) {
+				mOnBufferingUpdateListener.onBufferingUpdate(mp, 100);
+			}
+			mNextPrepared = false;
+			mNextFullyBuffered = false;
 			notifyChange( META_CHANGED );
 			return;
 		}
