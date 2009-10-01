@@ -47,6 +47,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -160,8 +161,21 @@ public class Metadata extends Activity {
 		return super.onCreateOptionsMenu(menu);
 	}
 	
+	private boolean isAmazonInstalled() {
+		PackageManager pm = getPackageManager();
+		boolean result = false;
+		try {
+			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
+			result = true;
+		} catch (Exception e) {
+			result = false;
+		}
+		return result;
+	}
+
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
+		menu.findItem(R.id.buy_menu_item).setEnabled( isAmazonInstalled() );
 		menu.findItem(R.id.info_menu_item).setEnabled( mIsPlaying );
 		
 		return super.onPrepareOptionsMenu(menu);
