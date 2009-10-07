@@ -248,7 +248,8 @@ public class ScrobblerService extends Service {
          * is currently playing.  We'll then send our own META_CHANGED intent to the scrobbler.
          */
 		if((intent.getAction().equals("com.android.music.playstatechanged") &&
-				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.android.music.metachanged")) {
+				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.android.music.metachanged")
+				|| intent.getAction().equals("com.android.music.queuechanged")) {
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
 	                    new ServiceConnection() {
@@ -329,18 +330,30 @@ public class ScrobblerService extends Service {
     
     public void handleIntent(Intent intent) {
         if(intent.getAction().equals(META_CHANGED)) {
+        	long startTime = System.currentTimeMillis() / 1000;
+        	long position = intent.getLongExtra("position", 0) / 1000;
+        	if(position > 0) {
+        		startTime -= position;
+        	}
+        	
+        	String title = intent.getStringExtra("track");
+        	String artist = intent.getStringExtra("artist");
+        	
         	if(mCurrentTrack != null) {
+        		if(startTime < (mCurrentTrack.startTime + mCurrentTrack.duration) 
+        				&& mCurrentTrack.title.equals(title)
+        				&& mCurrentTrack.artist.equals(artist)) {
+        			Log.i("Last.fm", "Ignoring duplicate scrobble");
+        			stopIfReady();
+        			return;
+        		}
         		enqueueCurrentTrack();
         	}
         	mCurrentTrack = new ScrobblerQueueEntry();
         	
-        	mCurrentTrack.startTime = System.currentTimeMillis() / 1000;
-        	long position = intent.getLongExtra("position", 0) / 1000;
-        	if(position > 0) {
-        		mCurrentTrack.startTime -= position;
-        	}
-        	mCurrentTrack.title = intent.getStringExtra("track");
-        	mCurrentTrack.artist = intent.getStringExtra("artist");
+        	mCurrentTrack.startTime = startTime;
+        	mCurrentTrack.title = title;
+        	mCurrentTrack.artist = artist;
         	mCurrentTrack.album = intent.getStringExtra("album");
         	mCurrentTrack.duration = intent.getIntExtra("duration", 0);
         	if(mCurrentTrack.title == null || mCurrentTrack.artist == null) {

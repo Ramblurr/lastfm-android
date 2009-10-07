@@ -105,6 +105,7 @@
 				<action android:name="com.android.music.playstatechanged"/>
 				<action android:name="com.android.music.playbackcomplete"/>
 				<action android:name="com.android.music.metachanged"/>
+				<action android:name="com.android.music.queuechanged"/>
 				<action android:name="com.htc.music.metachanged" />
 				<action android:name="com.htc.music.playbackcomplete" />
 				<action android:name="com.htc.music.playstatechanged" />
