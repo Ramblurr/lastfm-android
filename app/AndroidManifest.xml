@@ -40,7 +40,7 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Share" android:label="Last.fm: Share" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.Share" android:label="Last.fm: Share With A Friend" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
 				<category android:name="android.intent.category.DEFAULT"/>

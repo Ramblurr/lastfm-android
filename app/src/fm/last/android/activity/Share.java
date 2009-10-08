@@ -57,10 +57,8 @@ import android.widget.AdapterView.OnItemClickListener;
  * @author Sam Steele <sam@last.fm>
  */
 public class Share extends Activity {
-	private TabBar mTabBar;
 	private ListView mFriendsList;
 	private ListAdapter mFriendsAdapter;
-	private ViewFlipper mViewFlipper;
 	private ImageCache mImageCache;
 	ListView mDialogList;
 	private Dialog mDialog;
@@ -72,34 +70,8 @@ public class Share extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature( Window.FEATURE_NO_TITLE );
 		setContentView(R.layout.share);
 		
-		mViewFlipper = (ViewFlipper)findViewById(R.id.ViewFlipper);
-		mTabBar = (TabBar)findViewById(R.id.TabBar);
-		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Email" );
-		mTabBar.addTab("Friends" );
-
-		
-		findViewById(R.id.email_button).setOnClickListener( new OnClickListener()
-		{
-			public void onClick( View v )
-			{
-				EditText edit = (EditText)findViewById(R.id.email);
-				String text = edit.getText().toString();
-				
-				if (text == null || text.length() == 0)
-					return;
-				
-				findViewById(R.id.email_button).setEnabled( false );
-				
-                String artist = getIntent().getStringExtra(INTENT_EXTRA_ARTIST);
-                String track = getIntent().getStringExtra(INTENT_EXTRA_TRACK);
-                new ShareTrackTask(artist, track, text).execute((Void)null);			
-			}
-		} );
-
 		mFriendsList = (ListView)findViewById(R.id.friends_list_view);
 		new LoadFriendsTask().execute((Void)null);
 	}
@@ -151,7 +123,6 @@ public class Share extends Activity {
             	Toast.makeText(Share.this, "The track was shared.", Toast.LENGTH_SHORT).show();
         	} else {
         		Toast.makeText(Share.this, "An error occurred when sharing. Please try again.", Toast.LENGTH_SHORT).show();
-        		findViewById(R.id.email_button).setEnabled( true );
         	}
         }
     }
