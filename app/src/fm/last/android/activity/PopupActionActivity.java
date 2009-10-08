@@ -65,7 +65,7 @@ public class PopupActionActivity extends ListActivity {
 	        startActivity( intent );
 			break;
 		case 1:
-	        intent = new Intent( this, Share.class );
+	        intent = new Intent( this, ShareResolverActivity.class );
 	        intent.putExtra("lastfm.artist", mArtistName);
 	        intent.putExtra("lastfm.track", mTrackName);
 	        startActivity( intent );

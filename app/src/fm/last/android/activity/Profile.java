@@ -1252,10 +1252,10 @@ public class Profile extends ListActivity
     }
     
     void shareItem() {
-        Intent intent = new Intent( this, Share.class );
+        Intent intent = new Intent( this, ShareResolverActivity.class );
         intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
         intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
-        startActivity( intent );
+        startActivity(intent);
     }
     
     void addItemToPlaylist() {

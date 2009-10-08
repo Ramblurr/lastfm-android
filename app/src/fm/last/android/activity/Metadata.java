@@ -210,7 +210,7 @@ public class Metadata extends Activity {
 			}
 			break;
 		case R.id.share_menu_item:
-			intent = new Intent(this, Share.class);
+	        intent = new Intent( this, ShareResolverActivity.class );
 			intent.putExtra(Share.INTENT_EXTRA_ARTIST, mArtistName);
 			intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackName);
 			startActivity(intent);

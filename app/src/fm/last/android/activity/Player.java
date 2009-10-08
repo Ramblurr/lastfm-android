@@ -210,7 +210,7 @@ public class Player extends Activity {
 			try {
 				if (LastFMApplication.getInstance().player == null)
 					return false;
-				Intent intent = new Intent(c, Share.class);
+		        Intent intent = new Intent( c, ShareResolverActivity.class );
 				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication
 						.getInstance().player.getArtistName());
 				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication
