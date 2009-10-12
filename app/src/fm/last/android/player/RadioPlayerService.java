@@ -197,36 +197,38 @@ public class RadioPlayerService extends Service
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
-				if(mState != STATE_STOPPED) {
-					Log.i("Last.fm", "Data connection lost! Stopping player...");
-					if(mp != null) {
-						try {
-							mp.stop();
-						} catch ( Exception e ) {
-							e.printStackTrace();
+			if(bufferPercent < 100) {
+				if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
+					if(mState != STATE_STOPPED) {
+						Log.i("Last.fm", "Data connection lost! Stopping player...");
+						if(mp != null) {
+							try {
+								mp.stop();
+							} catch ( Exception e ) {
+								e.printStackTrace();
+							}
 						}
-					}
-					if(next_mp != null) {
-						try {
-							next_mp.stop();
-						} catch ( Exception e ) {
-							e.printStackTrace();
+						if(next_mp != null) {
+							try {
+								next_mp.stop();
+							} catch ( Exception e ) {
+								e.printStackTrace();
+							}
+							next_mp.release();
 						}
-						next_mp.release();
+						next_mp = null;
+						mNextPrepared = false;
+						mNextFullyBuffered = false;
+						nm.cancel( NOTIFY_ID );
+						mState = STATE_NODATA;
+						currentQueue.clear();
 					}
-					next_mp = null;
-					mNextPrepared = false;
-					mNextFullyBuffered = false;
-					nm.cancel( NOTIFY_ID );
-					mState = STATE_NODATA;
-					currentQueue.clear();
-				}
-			} else if(ni.getState() == NetworkInfo.State.CONNECTED) {
-				if(mState == STATE_NODATA || mState == STATE_PLAYING) {
-					Log.i("Last.fm", "Data connection attached! Skipping to next track");
-					mState = STATE_TUNING;
-					nextSong();
+				} else if(ni.getState() == NetworkInfo.State.CONNECTED) {
+					if(mState == STATE_NODATA || mState == STATE_PLAYING) {
+						Log.i("Last.fm", "Data connection attached! Skipping to next track");
+						mState = STATE_TUNING;
+						nextSong();
+					}
 				}
 			}
 		}
