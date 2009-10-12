@@ -223,7 +223,7 @@ public class RadioPlayerService extends Service
 					}
 				}
 			} else if(ni.getState() == NetworkInfo.State.CONNECTED) {
-				if(mState == STATE_NODATA || mState == STATE_PLAYING) {
+				if(mState == STATE_NODATA || ni.isFailover()) {
 					Log.i("Last.fm", "Data connection attached! Skipping to next track");
 					mState = STATE_TUNING;
 					nextSong();
