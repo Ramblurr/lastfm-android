@@ -1358,11 +1358,22 @@ public class Profile extends ListActivity
         LastFMApplication.getInstance().map.remove("lastfm_session");
         try
         {
-            IRadioPlayer player = LastFMApplication.getInstance().player;
-            if(player != null) {
-        		player.stop();
-        		//player.resetScrobbler();
-            }
+			LastFMApplication.getInstance().bindService(new Intent(this,fm.last.android.player.RadioPlayerService.class ),
+                    new ServiceConnection() {
+                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+        					try {
+        						if (player.isPlaying())
+        							player.stop();
+        					} catch (RemoteException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					LastFMApplication.getInstance().unbindService(this);
+                    }
+
+                    public void onServiceDisconnected(ComponentName comp) {}
+            }, 0);
         	deleteDatabase(LastFm.DB_NAME);
             deleteFile("currentTrack.dat");
             deleteFile("queue.dat");
