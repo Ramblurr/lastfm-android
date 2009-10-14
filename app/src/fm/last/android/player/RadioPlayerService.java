@@ -48,6 +48,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
+import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -197,6 +198,7 @@ public class RadioPlayerService extends Service
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+
 			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
 				if(mState != STATE_STOPPED) {
 					Log.i("Last.fm", "Data connection lost! Stopping player...");
@@ -222,9 +224,9 @@ public class RadioPlayerService extends Service
 						mNextFullyBuffered = false;
 					}
 				}
-			} else if(ni.getState() == NetworkInfo.State.CONNECTED) {
-				if(mState == STATE_NODATA || ni.isFailover()) {
-					Log.i("Last.fm", "Data connection attached! Skipping to next track");
+			} else if(ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
+				if(mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
+					Log.i("Last.fm", "New data connection attached! Skipping to next track");
 					mState = STATE_TUNING;
 					nextSong();
 				}
@@ -334,15 +336,15 @@ public class RadioPlayerService extends Service
 	};
 
 	private OnPreparedListener mOnPreparedListener = new OnPreparedListener() {
-		public void onPrepared(MediaPlayer mp) {
-			if(mp == RadioPlayerService.this.mp) {
+		public void onPrepared(MediaPlayer p) {
+			if(p == mp) {
 				if (mState == STATE_PREPARING) {
-					mp.start();
+					p.start();
 					playingNotify();
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
 				} else {
-					mp.stop();
+					p.stop();
 				}
 			} else {
 				mNextPrepared = true;
@@ -366,12 +368,14 @@ public class RadioPlayerService extends Service
 						wifiLock.release();
 					stopSelf();
 				} else {
-					Log.i("LastFm", "Sadface: " + what + ", " + extra);
-					//ditch our playlist and fetch a new one, in case our IP changed
-					currentQueue.clear();
-					//Enter a state that will allow nextSong to do its thang
-					mState = STATE_ERROR;
-					new NextTrackTask().execute((Void)null);
+					if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
+						Log.i("LastFm", "Sadface: " + what + ", " + extra);
+						//ditch our playlist and fetch a new one, in case our IP changed
+						currentQueue.clear();
+						//Enter a state that will allow nextSong to do its thang
+						mState = STATE_ERROR;
+						new NextTrackTask().execute((Void)null);
+					}
 				}
 			} else {
 				next_mp = null;
