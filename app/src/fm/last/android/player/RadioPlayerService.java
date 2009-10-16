@@ -135,6 +135,8 @@ public class RadioPlayerService extends Service
 			e.printStackTrace();
 		}
 
+		logger.info("Player service started");
+		
 		nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 		bufferPercent = 0;
 		setForeground( true ); // we dont want the service to be killed while
@@ -163,6 +165,7 @@ public class RadioPlayerService extends Service
 					
 					if (state == TelephonyManager.CALL_STATE_IDLE)  // fade music in to 100%
 					{
+						logger.info("Call ended, fading music back in");
 						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000)
 						{
 							@Override
@@ -177,6 +180,7 @@ public class RadioPlayerService extends Service
 							}
 						};
 					} else { // fade music out to silence
+						logger.info("Incoming call, fading music out");
 						if (mState == STATE_PAUSED) {
 							// this particular state of affairs should be impossible, seeing as we are the only
 							// component that dares the pause the radio. But we cater to it just in case
@@ -243,7 +247,7 @@ public class RadioPlayerService extends Service
 				}
 			} else if(ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
 				if(mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
-					logger.info("New data connection attached! Skipping to next track");
+					logger.info("New data connection (" + ni.getType() + ") attached! Skipping to next track");
 					mState = STATE_TUNING;
 					nextSong();
 				}
