@@ -42,4 +42,15 @@
             android:title="High Quality Audio"
             android:summary="Use high quality audio over cellular networks" />
     </PreferenceCategory>
+    
+    <PreferenceCategory
+    		android:title="Feedback">
+    <fm.last.android.activity.BugReport 
+		android:title="Report a bug"
+		android:summary="Email a bug report to Last.fm"
+		android:dialogLayout="@layout/bugreport"
+		android:positiveButtonText="Send"
+		android:negativeButtonText="Cancel"/>
+    		
+    </PreferenceCategory>
 </PreferenceScreen>
