@@ -24,6 +24,10 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
@@ -113,10 +117,23 @@ public class RadioPlayerService extends Service
 	 */
 	private TelephonyManager mTelephonyManager;
 
+	private Logger logger;
+	
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
+    	logger = Logger.getLogger("fm.last.android.player");
+		try {
+			if(logger.getHandlers().length < 1) {
+				FileHandler handler = new FileHandler(getFilesDir().getAbsolutePath() + "/player.log", 4096, 1, true);
+		        handler.setFormatter(new SimpleFormatter());
+		        logger.addHandler(handler);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 		bufferPercent = 0;
@@ -201,7 +218,7 @@ public class RadioPlayerService extends Service
 
 			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
 				if(mState != STATE_STOPPED) {
-					Log.i("Last.fm", "Data connection lost! Stopping player...");
+					logger.info("Data connection lost! Stopping player...");
 					if(mp != null && bufferPercent < 100) {
 						try {
 							mp.stop();
@@ -226,7 +243,7 @@ public class RadioPlayerService extends Service
 				}
 			} else if(ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
 				if(mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
-					Log.i("Last.fm", "New data connection attached! Skipping to next track");
+					logger.info("New data connection attached! Skipping to next track");
 					mState = STATE_TUNING;
 					nextSong();
 				}
@@ -250,7 +267,7 @@ public class RadioPlayerService extends Service
 					Intent i = new Intent("fm.last.android.ERROR");
 					i.putExtra("error", (Parcelable)e);
 					sendBroadcast(i);
-					Log.e("Last.fm", "Tuning error: " + e.getMessage());
+					logger.severe("Tuning error: " + e.getMessage());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -261,7 +278,7 @@ public class RadioPlayerService extends Service
 	@Override
 	public void onDestroy()
 	{
-		Log.i("Last.fm", "Player service shutting down");
+		logger.info("Player service shutting down");
 		if(mp.isPlaying())
 			mp.stop();
 		mp.release();
@@ -369,7 +386,7 @@ public class RadioPlayerService extends Service
 					stopSelf();
 				} else {
 					if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
-						Log.i("LastFm", "Sadface: " + what + ", " + extra);
+						logger.severe("Playback error: " + what + ", " + extra);
 						//ditch our playlist and fetch a new one, in case our IP changed
 						currentQueue.clear();
 						//Enter a state that will allow nextSong to do its thang
@@ -391,7 +408,7 @@ public class RadioPlayerService extends Service
 		try
 		{
 			if (mState == STATE_STOPPED || mState == STATE_PREPARING || mState == STATE_NODATA) {
-				Log.e("Last.fm", "playTrack() called from wrong state!");
+				logger.severe("playTrack() called from wrong state!");
 				return;
 			}
 			
@@ -400,7 +417,7 @@ public class RadioPlayerService extends Service
 				mAlbumArt = null;
 				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
 			}
-			Log.i("Last.fm", "Streaming: " + track.getLocationUrl());
+			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
 			p.setDataSource( track.getLocationUrl() );
 			p.setOnCompletionListener( mOnCompletionListener );
@@ -419,11 +436,11 @@ public class RadioPlayerService extends Service
 		}
 		catch ( IllegalStateException e )
 		{
-			Log.e( getString( R.string.app_name ), e.toString() );
+			logger.severe(e.toString() );
 		}
 		catch ( IOException e )
 		{
-			Log.e( getString( R.string.app_name ), e.getMessage() );
+			logger.severe(e.getMessage() );
 		}
 	}
 
@@ -463,7 +480,7 @@ public class RadioPlayerService extends Service
 	private void nextSong()
 	{
 		if(mState == STATE_SKIPPING || mState == STATE_STOPPED || mState == STATE_NODATA) {
-			Log.e("Last.fm", "nextSong() called in wrong state: " + mState);
+			logger.severe("nextSong() called in wrong state: " + mState);
 			return;
 		}
 		
@@ -489,7 +506,7 @@ public class RadioPlayerService extends Service
 		}
 		
 		if(next_mp != null) {
-			Log.i("Last.fm", "Skipping to pre-buffered track");
+			logger.info("Skipping to pre-buffered track");
 			mp.stop();
 			mp.release();
 			mp = next_mp;
@@ -590,7 +607,7 @@ public class RadioPlayerService extends Service
 			
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", false))
 				bitrate = "128";
-			Log.i("Last.fm", "Requesting bitrate: " + bitrate);
+			logger.info("Requesting bitrate: " + bitrate);
 			playlist = server.getRadioPlayList( bitrate, currentSession.getKey() );
 			if(playlist == null || playlist.getTracks().length == 0)
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
@@ -603,7 +620,7 @@ public class RadioPlayerService extends Service
 			// TODO Auto-generated catch block
 			if(e.getMessage().contains("code 503")) {
 				if(mPlaylistRetryCount++ < 4 ) {
-					Log.i("Last.fm", "Playlist service unavailable, retrying...");
+					logger.warning("Playlist service unavailable, retrying...");
 					Thread.currentThread().sleep(2000);
 					refreshPlaylist();
 				} else {
@@ -642,7 +659,7 @@ public class RadioPlayerService extends Service
 		
 		currentStationURL = url;
 		
-		Log.i("Last.fm","Tuning to station: " + url);
+		logger.info("Tuning to station: " + url);
 		if(mState == STATE_PLAYING) {
 			nm.cancel( NOTIFY_ID );
 			mp.stop();
@@ -654,7 +671,7 @@ public class RadioPlayerService extends Service
 			currentStation = server.tuneToStation(url, session.getKey());
 			RadioWidgetProvider.updateAppWidget_idle(RadioPlayerService.this, currentStation.getName(), true);
 			if(currentStation != null) {
-				Log.i("Last.fm","Station name: " + currentStation.getName());
+				logger.info("Station name: " + currentStation.getName());
 				mPlaylistRetryCount = 0;
 				refreshPlaylist();
 				currentStationURL = url;

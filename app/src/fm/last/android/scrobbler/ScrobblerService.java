@@ -22,9 +22,13 @@ package fm.last.android.scrobbler;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -105,10 +109,24 @@ public class ScrobblerService extends Service {
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
 	public static final String UNKNOWN = "fm.last.android.unknown";
 	
+	private Logger logger;
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
+    	logger = Logger.getLogger("fm.last.android.scrobbler");
+		try {
+			if(logger.getHandlers().length < 1) {
+				FileHandler handler = new FileHandler(getFilesDir().getAbsolutePath() + "/scrobbler.log", 4096, 1, true);
+		        handler.setFormatter(new SimpleFormatter());
+		        logger.addHandler(handler);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
     	mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
 
@@ -157,7 +175,7 @@ public class ScrobblerService extends Service {
 	            }
 	            objectStream.close();
 	            fileStream.close();
-	            Log.i("Last.fm", "Loaded " + mQueue.size() + " queued tracks");
+	            logger.info("Loaded " + mQueue.size() + " queued tracks");
 			}
         } catch (Exception e) {
         	e.printStackTrace();
@@ -188,7 +206,7 @@ public class ScrobblerService extends Service {
 		} catch (Exception e) {
 			if(getFileStreamPath("currentTrack.dat").exists())
 				deleteFile("currentTrack.dat");
-			Log.e("LastFm", "Unable to save current track state");
+			logger.severe("Unable to save current track state");
 			e.printStackTrace();
 		}
 
@@ -196,7 +214,7 @@ public class ScrobblerService extends Service {
 			if(getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
 			if(mQueue.size() > 0) {
-				Log.i("Last.fm", "Writing " + mQueue.size() + " queued tracks");
+				logger.info("Writing " + mQueue.size() + " queued tracks");
 				FileOutputStream filestream = openFileOutput("queue.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
 				objectstream.writeObject(new Integer(mQueue.size()));
@@ -210,7 +228,7 @@ public class ScrobblerService extends Service {
 		} catch (Exception e) {
 			if(getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
-			Log.e("LastFm", "Unable to save queue state");
+			logger.severe("Unable to save queue state");
 			e.printStackTrace();
 		}
 	}
@@ -227,7 +245,7 @@ public class ScrobblerService extends Service {
 				mCurrentTrack.rating = "S";
 			}
 			if(played || mCurrentTrack.rating.length() > 0) {
-				Log.i("LastFm", "Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
+				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
 		   		mQueue.add(mCurrentTrack);
 			}
 	   		mCurrentTrack = null;
@@ -343,7 +361,7 @@ public class ScrobblerService extends Service {
         		if(startTime < (mCurrentTrack.startTime + mCurrentTrack.duration) 
         				&& mCurrentTrack.title.equals(title)
         				&& mCurrentTrack.artist.equals(artist)) {
-        			Log.i("Last.fm", "Ignoring duplicate scrobble");
+        			logger.warning("Ignoring duplicate scrobble");
         			stopIfReady();
         			return;
         		}
@@ -499,7 +517,7 @@ public class ScrobblerService extends Service {
 			boolean success = false;
 			try
 			{
-				Log.i("LastFm", "Going to submit " + mQueue.size() + " tracks");
+				logger.info("Going to submit " + mQueue.size() + " tracks");
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
 				while(mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
@@ -518,7 +536,7 @@ public class ScrobblerService extends Service {
 			}
 			catch ( Exception e )
 			{
-				Log.e("LastFm", "Unable to submit track: " + e.toString());
+				logger.severe("Unable to submit track: " + e.toString());
 				e.printStackTrace();
 				success = false;
 			}

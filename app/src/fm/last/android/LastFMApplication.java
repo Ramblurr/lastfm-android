@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Locale;
 import java.io.IOException;
 import java.util.WeakHashMap;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
