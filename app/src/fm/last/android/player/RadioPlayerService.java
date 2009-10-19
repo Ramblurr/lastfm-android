@@ -221,7 +221,7 @@ public class RadioPlayerService extends Service
 
 			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
 				if(mState != STATE_STOPPED) {
-					logger.info("Data connection lost! Stopping player...");
+					logger.info("Data connection lost! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo() + " Reason: " + ni.getReason());
 					if(mp != null && bufferPercent < 100) {
 						try {
 							mp.stop();
@@ -246,7 +246,7 @@ public class RadioPlayerService extends Service
 				}
 			} else if(ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
 				if(mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
-					logger.info("New data connection (" + ni.getType() + ") attached! Skipping to next track");
+					logger.info("New data connection attached! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo() + " Reason: " + ni.getReason());
 					mState = STATE_TUNING;
 					nextSong();
 				}
