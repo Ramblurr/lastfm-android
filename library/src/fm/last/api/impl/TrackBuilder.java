@@ -34,7 +34,6 @@ import fm.last.xml.XMLBuilder;
  */
 public class TrackBuilder extends XMLBuilder<Track> {
   private ArtistBuilder artistBuilder = new ArtistBuilder();
-//  private AlbumBuilder albumBuilder = new AlbumBuilder();
   private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
 
   public Track build(Node trackNode) {
@@ -47,7 +46,14 @@ public class TrackBuilder extends XMLBuilder<Track> {
     String streamable = getText("streamable");
     String listeners = getText("listeners");
     String playcount = getText("playcount");
+    Artist artist;
     Node artistNode = getChildNode("artist");
+    if(artistNode.getChildNodes().getLength() > 1) {
+	    artist = artistBuilder.build(artistNode);
+    } else {
+        String artistName = getText("artist");
+    	artist = new Artist(artistName, "", "", "", null, "", "", "");
+    }
     
     List<Node> imageNodes = getChildNodes("image");
     ImageUrl[] images = new ImageUrl[imageNodes.size()];
@@ -56,9 +62,6 @@ public class TrackBuilder extends XMLBuilder<Track> {
       images[i++] =imageBuilder.build(imageNode);
     }
     
-    Artist artist = artistBuilder.build(artistNode);
-//    Node albumNode = getChildNode("album");
-//    Album album = albumBuilder.build(albumNode);
     return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images);
   }
 }
