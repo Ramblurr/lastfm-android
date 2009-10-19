@@ -100,7 +100,6 @@ public class RadioPlayerService extends Service
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
-	private Bitmap mAlbumArt;
 
 	private static final int NOTIFY_ID = 1337;
 
@@ -418,7 +417,6 @@ public class RadioPlayerService extends Service
 			
 			if(p == mp) {
 				currentTrack = track;
-				mAlbumArt = null;
 				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
@@ -517,7 +515,6 @@ public class RadioPlayerService extends Service
 			next_mp = null;
 			mState = STATE_PREPARING;
 			currentTrack = currentQueue.poll();
-			mAlbumArt = null;
 			if(mNextPrepared) {
 				mOnPreparedListener.onPrepared(mp);
 			}
@@ -865,13 +862,6 @@ public class RadioPlayerService extends Service
 			WSError error = mError;
 			mError = null;
 			return error;
-		}
-		public Bitmap getAlbumArt() throws RemoteException {
-			return mAlbumArt;
-		}
-
-		public void setAlbumArt(Bitmap art) throws RemoteException {
-			mAlbumArt = art;
 		}
 	};
 

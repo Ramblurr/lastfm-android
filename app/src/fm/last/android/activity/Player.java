@@ -87,6 +87,10 @@ public class Player extends Activity {
 	private ProgressDialog mBufferingDialog;
 	private ProgressDialog mTuningDialog;
 
+	private String mCachedArtist = null;
+	private String mCachedTrack = null;
+	private Bitmap mCachedBitmap = null;
+	
 	private static final int REFRESH = 1;
 
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
@@ -132,6 +136,12 @@ public class Player extends Activity {
 		Intent intent = getIntent();
         if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
         	LastFMApplication.getInstance().playRadioStation(Player.this,intent.getData().toString(), false);
+        }
+        
+        if(icicle != null) {
+	       	mCachedArtist = icicle.getString("artist");
+	       	mCachedTrack = icicle.getString("track");
+	       	mCachedBitmap = icicle.getParcelable("artwork");
         }
 	}
 
@@ -279,8 +289,10 @@ public class Player extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-
 		outState.putBoolean("configchange", getChangingConfigurations() != 0);
+		outState.putString("artist", mArtistName.getText().toString());
+		outState.putString("track", mTrackName.getText().toString());
+		outState.putParcelable("artwork", mAlbum.getBitmap());
 		super.onSaveInstanceState(outState);
 	}
 
@@ -475,7 +487,14 @@ public class Player extends Activity {
 			    				// fetching artist events (On Tour indicator)
 			    				new LoadEventsTask().execute((Void)null);
 			
-			    				new LoadAlbumArtTask().execute((Void) null);
+			    				if(mCachedArtist != null && mCachedArtist.equals(artistName) && 
+			    						mCachedTrack != null && mCachedTrack.equals(trackName) &&
+			    						mCachedBitmap != null) {
+			    					mAlbum.setImageBitmap(mCachedBitmap);
+			    					mCachedBitmap = null;
+			    				} else {
+			    					new LoadAlbumArtTask().execute((Void) null);
+			    				}
 		    				}
     					} catch (java.util.concurrent.RejectedExecutionException e) {
     						e.printStackTrace();
@@ -624,6 +643,8 @@ public class Player extends Activity {
 		public void onPostExecute(Boolean result) {
 			if (artUrl != RadioPlayerService.UNKNOWN) {
 				mAlbum.fetch(artUrl);
+			} else {
+				mAlbum.setDefaultImageResource(R.drawable.no_artwork);
 			}
 		}
 	}

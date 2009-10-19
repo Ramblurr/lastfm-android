@@ -9,6 +9,7 @@ import fm.last.android.utils.UserTask;
 import fm.last.util.UrlUtil;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
 
@@ -18,14 +19,24 @@ import android.graphics.Bitmap;
  */
 public class AlbumArt extends ImageView {
 	
-	private FetchAdTask _fetchTask;
-	private String _artURL;
+	private FetchArtTask _fetchTask;
 	private int _defaultImageResource = R.drawable.no_artwork;
+	private Bitmap _bitmap;
 	
 	public AlbumArt(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		
 		setImageResource(_defaultImageResource);
+	}
+	
+	public Bitmap getBitmap() {
+		return _bitmap;
+	}
+	
+	@Override
+	public void setImageBitmap(Bitmap bmp) {
+		super.setImageBitmap(bmp);
+		_bitmap = bmp;
 	}
 	
 	public void cancel() {
@@ -42,13 +53,20 @@ public class AlbumArt extends ImageView {
 		if(_fetchTask != null)
 			_fetchTask.cancel(true);
 		
-		_artURL = URL;
-		_fetchTask = new FetchAdTask();
+		_fetchTask = new FetchArtTask(URL);
 		_fetchTask.execute((Void)null);
 	}
 	
-    private class FetchAdTask extends UserTask<Void, Void, Boolean> {
+    private class FetchArtTask extends UserTask<Void, Void, Boolean> {
     	Bitmap mBitmap = null;
+    	String mURL = null;
+    	
+    	public FetchArtTask(String url) {
+    		super();
+    		
+    		mURL = url;
+    		Log.i("LastFm", "Fetching: " + mURL);
+    	}
     	
         @Override
     	public void onPreExecute() {
@@ -59,7 +77,7 @@ public class AlbumArt extends ImageView {
         public Boolean doInBackground(Void...params) {
             boolean success = false;
     		try {
-   				mBitmap = UrlUtil.getImage(new URL(_artURL));
+   				mBitmap = UrlUtil.getImage(new URL(mURL));
     			success = true;
     		} catch (Exception e) {
     			e.printStackTrace();

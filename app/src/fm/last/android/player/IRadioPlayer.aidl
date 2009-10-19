@@ -45,8 +45,6 @@ interface IRadioPlayer {
 	int getState();
 	String getStationName();
 	String getStationUrl();
-	Bitmap getAlbumArt();
-	void setAlbumArt(in Bitmap art);
 	
 	WSError getError();
 } 
