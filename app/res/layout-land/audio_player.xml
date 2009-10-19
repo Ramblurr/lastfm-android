@@ -29,7 +29,7 @@
 				android:id="@+id/AdArea"
 				android:background="@drawable/adarea"
 				android:layout_width="fill_parent"
-				android:layout_height="54dip"
+				android:layout_height="54px"
 				android:padding="6dip"/>
 
            <LinearLayout

@@ -4,8 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical"
     xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android" android:background="#eee">
-    <fm.last.android.RemoteImageView lfm:unknownImage="@+drawable/no_artwork"
-        android:background="@drawable/no_artwork"
+    <fm.last.android.widget.AlbumArt
         android:gravity="center"
         android:layout_alignParentTop="true" android:layout_centerHorizontal="true" android:id="@+id/poster" android:layout_alignParentLeft="true" android:layout_margin="8dip" android:layout_height="75dip" android:layout_width="75dip"/>
 <TextView android:layout_below="@id/poster" android:layout_height="wrap_content" android:text="Event Name" android:layout_toRightOf="@id/poster" android:layout_alignTop="@id/poster" android:layout_width="fill_parent" android:textColor="#000" android:textStyle="bold" android:id="@+id/title" android:textSize="8pt" android:maxLines="1"></TextView>
