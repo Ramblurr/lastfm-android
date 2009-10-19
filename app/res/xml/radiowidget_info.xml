@@ -1,5 +1,5 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/widget"
     android:configure="fm.last.android.LastFm"
-    android:minHeight="64px" android:minWidth="290px">
+    android:minHeight="64dip" android:minWidth="290dip">
 </appwidget-provider>

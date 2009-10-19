@@ -24,8 +24,8 @@
 	android:background="@drawable/list_entry_fullwidth">
 	<ImageView android:id="@+id/row_icon"
 		android:adjustViewBounds="false"
-		android:layout_height="44px"
-		android:layout_width="44px"
+		android:layout_height="44dip"
+		android:layout_width="44dip"
 		android:layout_gravity="center_vertical|left"
 		android:scaleType="centerCrop"
 		android:visibility="gone"/>
@@ -35,7 +35,7 @@
 		android:orientation="vertical"
 		android:layout_weight="1"
 		android:layout_gravity="center_vertical"
-		android:layout_marginLeft="4px">
+		android:layout_marginLeft="4dip">
 		<TextView android:id="@+id/row_label" 
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content" 
@@ -57,15 +57,15 @@
 		android:layout_width="wrap_content" android:layout_gravity="center"
 		android:layout_height="wrap_content" android:visibility="gone">
 		<ImageView android:id="@+id/row_disclosure_icon" 
-		    android:paddingLeft="2px" 
+		    android:paddingLeft="2dip" 
 			android:src="@drawable/list_icon_arrow"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_gravity="center_vertical|right"/>
-		<ProgressBar android:layout_width="30px"
-			android:layout_height="30px"
+		<ProgressBar android:layout_width="30dip"
+			android:layout_height="30dip"
 			android:indeterminate="true"
-			android:layout_marginRight="2px"
+			android:layout_marginRight="2dip"
 			android:indeterminateDrawable="@+drawable/spinner_small"
 			android:layout_gravity="center_vertical|right"/>
 	</ViewSwitcher>

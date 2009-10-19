@@ -30,7 +30,7 @@
 		<LinearLayout android:id="@+id/TabBarSpacer"
 			android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
 			android:layout_height="5dip" android:layout_below="@id/TabBar"
-			android:layout_marginBottom="1px" />
+			android:layout_marginBottom="1dip" />
 
 		<ListView android:id="@+id/TagList"
 			android:layout_width="fill_parent"

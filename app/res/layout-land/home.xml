@@ -8,16 +8,16 @@
 		android:id="@+id/AdArea"
 		android:background="@drawable/adarea"
 		android:layout_width="fill_parent"
-		android:layout_height="54px"
-		android:padding="6px"/>
+		android:layout_height="54dip"
+		android:padding="6dip"/>
 
 	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
 		android:layout_below="@id/AdArea" android:id="@+id/TabBarContainer">
 		<fm.last.android.widget.TabBar
 			android:id="@+id/TabBar" android:layout_width="fill_parent"
-			android:layout_marginTop="5px"
-			android:layout_marginLeft="4px"
-			android:layout_marginRight="11px"
+			android:layout_marginTop="5dip"
+			android:layout_marginLeft="4dip"
+			android:layout_marginRight="11dip"
 			android:layout_height="60dip"/>
 	</LinearLayout>
 	<LinearLayout android:id="@+id/TabBarSpacer"

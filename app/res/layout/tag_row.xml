@@ -21,14 +21,14 @@
 	android:orientation="horizontal"
 	android:id="@+id/station_row"
 	android:background="@drawable/list_entry_fullwidth"
-	android:layout_margin="0px">
+	android:layout_margin="0dip">
 	<LinearLayout 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
 		android:orientation="vertical"
 		android:layout_gravity="center_vertical"
 		android:layout_weight="1"
-		android:layout_marginLeft="12px">
+		android:layout_marginLeft="12dip">
 		<TextView android:id="@+id/row_label"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content" 

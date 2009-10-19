@@ -25,14 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fm.last.android.R;
-import fm.last.android.RemoteImageHandler;
-import fm.last.android.RemoteImageView;
-import fm.last.android.Worker;
 import fm.last.api.User;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
@@ -43,9 +37,7 @@ public class ProfileBubble extends LinearLayout {
     User mUser;
     TextView mFirst;
     TextView mSecond;
-    RemoteImageView mAvatar;
-    private Worker mProfileImageWorker;
-    private RemoteImageHandler mProfileImageHandler;
+    AlbumArt mAvatar;
 
     public ProfileBubble(Context context) {
         super(context);
@@ -65,15 +57,14 @@ public class ProfileBubble extends LinearLayout {
 
         mFirst  = (TextView) findViewById(R.id.profile_username);
         mSecond = (TextView) findViewById(R.id.profile_meta);
-        mAvatar = (RemoteImageView) findViewById(R.id.profile_avatar);
+        mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
+        mAvatar.setDefaultImageResource( R.drawable.profile_unknown );
 
         mSecond.setText("Loading profile...");
     }
 
     public void setUser(User user) {
         mUser = user;
-
-        mAvatar.setDefaultImage( R.drawable.profile_unknown );
         
         if(user.getRealName() == null)
             mFirst.setText(user.getName());
@@ -100,30 +91,7 @@ public class ProfileBubble extends LinearLayout {
         mSecond.setText(second + plays);
 
         if( mUser.getImages().length > 0 ) {
-            mProfileImageWorker = new Worker("profile image worker");
-            mProfileImageHandler = new RemoteImageHandler(mProfileImageWorker.getLooper(), mHandler);
-            mProfileImageHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-            mProfileImageHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE,
-                    mUser.getImages()[0].getUrl()).sendToTarget();
+        	mAvatar.fetch(mUser.getImages()[0].getUrl());
         }
     }
-
-    private final Handler mHandler = new Handler()
-    {
-        public void handleMessage(Message msg)
-        {
-            switch (msg.what)
-            {
-            case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-                mProfileImageWorker.quit();
-                if (mAvatar != null) {
-                    mAvatar.setArtwork((Bitmap) msg.obj);
-                    mAvatar.invalidate();
-                }
-                break;
-            default:
-                break;
-            }
-        }
-    };
 }

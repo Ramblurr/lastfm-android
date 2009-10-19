@@ -4,10 +4,10 @@
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<fm.last.android.widget.TabBar
 		android:id="@+id/TabBar" android:layout_width="fill_parent"
-		android:layout_height="59dip" android:layout_marginTop="5px" 
+		android:layout_height="59dip" android:layout_marginTop="5dip" 
 		android:background="#000"
-		android:layout_marginLeft="3px"
-		android:layout_marginRight="8px"/>
+		android:layout_marginLeft="3dip"
+		android:layout_marginRight="8dip"/>
 	<LinearLayout android:id="@+id/SearchBar" 
 		android:background="@drawable/tab_bar_rest"
 		android:layout_width="fill_parent"
@@ -19,20 +19,20 @@
 		android:textSize="18sp"
 		android:layout_alignParentLeft="true"  android:layout_alignLeft="@+id/station_search"
 		android:layout_weight="1" android:singleLine="true" 
-		android:layout_marginLeft="7px"
-        android:layout_marginBottom="3px"
-        android:layout_marginTop="4px"/>	
+		android:layout_marginLeft="7dip"
+        android:layout_marginBottom="3dip"
+        android:layout_marginTop="4dip"/>	
         
 	<Button android:id="@+id/search"
 		android:text="@string/search"
 		android:textColor="#fff" android:gravity="center"
 		android:layout_height="fill_parent" android:layout_width="wrap_content"
-		android:layout_marginLeft="8px"
-		android:layout_marginRight="8px"
-		android:layout_marginBottom="9px"
-		android:layout_marginTop="7px"
-		android:paddingLeft="20px"
-		android:paddingRight="20px"
+		android:layout_marginLeft="8dip"
+		android:layout_marginRight="8dip"
+		android:layout_marginBottom="9dip"
+		android:layout_marginTop="7dip"
+		android:paddingLeft="20dip"
+		android:paddingRight="20dip"
 		android:background="@drawable/black_button"/>
 	</LinearLayout>
 	
@@ -51,8 +51,8 @@
 			android:textStyle="bold" 
 			android:layout_width="fill_parent" 
 			android:layout_marginTop="32dip"
-			android:paddingLeft="12px"
-			android:paddingRight="12px"
+			android:paddingLeft="12dip"
+			android:paddingRight="12dip"
 			android:textColor="#494848" />
 	</LinearLayout>
 	<ListView android:id="@android:id/list" android:layout_width="fill_parent"

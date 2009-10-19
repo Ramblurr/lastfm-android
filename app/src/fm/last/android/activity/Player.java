@@ -27,13 +27,11 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
-import fm.last.android.RemoteImageHandler;
-import fm.last.android.RemoteImageView;
-import fm.last.android.Worker;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.AdArea;
+import fm.last.android.widget.AlbumArt;
 import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
@@ -78,7 +76,7 @@ public class Player extends Activity {
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
 	private ImageButton mOntourButton;
-	private RemoteImageView mAlbum;
+	private AlbumArt mAlbum;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
 	private TextView mArtistName;
@@ -93,8 +91,6 @@ public class Player extends Activity {
 
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
-	private Worker mAlbumArtWorker;
-	private RemoteImageHandler mAlbumArtHandler;
 	private IntentFilter mIntentFilter;
 	
 	@Override
@@ -110,7 +106,7 @@ public class Player extends Activity {
 		mTotalTime = (TextView) findViewById(R.id.totaltime);
 		mProgress = (ProgressBar) findViewById(android.R.id.progress);
 		mProgress.setMax(1000);
-		mAlbum = (RemoteImageView) findViewById(R.id.album);
+		mAlbum = (AlbumArt) findViewById(R.id.album);
 		mArtistName = (TextView) findViewById(R.id.track_artist);
 		mTrackName = (TextView) findViewById(R.id.track_title);
 
@@ -125,10 +121,6 @@ public class Player extends Activity {
 		mNextButton.setOnClickListener(mNextListener);
 		mOntourButton = (ImageButton) findViewById(R.id.ontour);
 		mOntourButton.setOnClickListener(mOntourListener);
-
-		mAlbumArtWorker = new Worker("album art worker");
-		mAlbumArtHandler = new RemoteImageHandler(mAlbumArtWorker.getLooper(),
-				mHandler);
 
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(RadioPlayerService.META_CHANGED);
@@ -268,27 +260,12 @@ public class Player extends Activity {
 		super.onStart();
 		paused = false;
 
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			LayoutParams params = mAlbum.getLayoutParams();
-			if(AdArea.adsEnabled(this)) {
-				params.width = 155;
-				params.height = 155;
-			} else {
-				params.width = 212;
-				params.height = 212;
-			}
-			mAlbum.setLayoutParams(params);
-		} else {
-			LayoutParams params = mAlbum.getLayoutParams();
-			if(AdArea.adsEnabled(this)) {
-				params.width = 240;
-				params.height = 240;
-			} else {
-				params.width = 300;
-				params.height = 300;
-			}
-			mAlbum.setLayoutParams(params);
+		LayoutParams params = mAlbum.getLayoutParams();
+		if(AdArea.adsEnabled(this)) {
+			params.width -= 54;
+			params.height -= 54;
 		}
+		mAlbum.setLayoutParams(params);
 	}
 
 	@Override
@@ -329,7 +306,7 @@ public class Player extends Activity {
 
 	@Override
 	public void onDestroy() {
-		mAlbumArtWorker.quit();
+		mAlbum.cancel();
 		super.onDestroy();
 	}
 
@@ -498,11 +475,7 @@ public class Player extends Activity {
 			    				// fetching artist events (On Tour indicator)
 			    				new LoadEventsTask().execute((Void)null);
 			
-			    				Bitmap art = player.getAlbumArt();
-			    				mAlbum.setArtwork(art);
-			    				mAlbum.invalidate();
-			    				if (art == null)
-			    					 new LoadAlbumArtTask().execute((Void) null);
+			    				new LoadAlbumArtTask().execute((Void) null);
 		    				}
     					} catch (java.util.concurrent.RejectedExecutionException e) {
     						e.printStackTrace();
@@ -583,28 +556,6 @@ public class Player extends Activity {
 		public void handleMessage(Message msg) {
 			final Message m = msg;
 			switch (msg.what) {
-			case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-				mAlbum.setArtwork((Bitmap) msg.obj);
-				mAlbum.invalidate();
-		        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
-		                new ServiceConnection() {
-		                public void onServiceConnected(ComponentName comp, IBinder binder) {
-		                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-		    					try {
-		    						if(m.obj != null && m.obj.getClass() == Bitmap.class)
-		    							player.setAlbumArt((Bitmap) m.obj);
-		    					} catch (RemoteException e) {
-		    						// TODO Auto-generated catch block
-		    						e.printStackTrace();
-		    					}
-		    					LastFMApplication.getInstance().unbindService(this);
-		                }
-
-		                public void onServiceDisconnected(ComponentName comp) {
-		                }
-		        }, Context.BIND_AUTO_CREATE);
-				break;
-
 			case REFRESH:
 				long next = refreshNow();
 				queueNextRefresh(next);
@@ -672,11 +623,7 @@ public class Player extends Activity {
 		@Override
 		public void onPostExecute(Boolean result) {
 			if (artUrl != RadioPlayerService.UNKNOWN) {
-				mAlbumArtHandler
-						.removeMessages(RemoteImageHandler.GET_REMOTE_IMAGE);
-				mAlbumArtHandler.obtainMessage(
-						RemoteImageHandler.GET_REMOTE_IMAGE, artUrl)
-						.sendToTarget();
+				mAlbum.fetch(artUrl);
 			}
 		}
 	}

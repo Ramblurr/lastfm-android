@@ -38,9 +38,7 @@ import android.widget.TextView;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
-import fm.last.android.RemoteImageHandler;
-import fm.last.android.RemoteImageView;
-import fm.last.android.Worker;
+import fm.last.android.widget.AlbumArt;
 import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
 import fm.last.api.WSError;
@@ -54,9 +52,7 @@ public class Event extends Activity {
 	private TextView mMonth;
 	private TextView mDay;
 	private RadioGroup mAttendance;
-	private Worker mPosterImageWorker;
-	private RemoteImageView mPosterImage;
-	private RemoteImageHandler mPosterImageHandler;
+	private AlbumArt mPosterImage;
 
 	public interface EventActivityResult
 	{
@@ -106,13 +102,8 @@ public class Event extends Activity {
         mDay = (TextView)findViewById(R.id.day);
         mDay.setText(getIntent().getStringExtra("lastfm.event.day"));
         
-        mPosterImage = (RemoteImageView)findViewById(R.id.poster);
-        mPosterImageWorker = new Worker( "poster image worker" );
-        mPosterImageHandler = new RemoteImageHandler( mPosterImageWorker
-                .getLooper(), mHandler );
-        mPosterImageHandler.removeMessages( RemoteImageHandler.GET_REMOTE_IMAGE );
-        mPosterImageHandler.obtainMessage( RemoteImageHandler.GET_REMOTE_IMAGE,
-                getIntent().getStringExtra("lastfm.event.poster") ).sendToTarget();
+        mPosterImage = (AlbumArt)findViewById(R.id.poster);
+        mPosterImage.fetch(getIntent().getStringExtra("lastfm.event.poster"));
         
         int statusResource;
         try {
@@ -175,30 +166,9 @@ public class Event extends Activity {
         });
     }
 
-    private final Handler mHandler = new Handler()
-    {
-
-        public void handleMessage( Message msg )
-        {
-
-            switch ( msg.what )
-            {
-            case RemoteImageHandler.REMOTE_IMAGE_DECODED:
-            	if(mPosterImage != null) {
-                    mPosterImage.setArtwork( ( Bitmap ) msg.obj );
-                    mPosterImage.invalidate();
-            	}
-                break;
-
-            default:
-                break;
-            }
-        }
-    };
-
 	@Override
 	protected void onStop() {
-		mPosterImageWorker.quit();
+		mPosterImage.cancel();
 		super.onStop();
 	}
     

@@ -21,11 +21,11 @@
 	android:layout_height="wrap_content"
 	android:textColor="#fff"
 	android:gravity="bottom|center_horizontal"
-	android:textSize="6pt"
+	android:textSize="14sp"
 	android:textStyle="bold"
 	android:background="@drawable/tab"
-	android:paddingLeft="2px"
-	android:paddingRight="2px"
-	android:paddingTop="10px"
-	android:paddingBottom="1px">
+	android:paddingLeft="2dip"
+	android:paddingRight="2dip"
+	android:paddingTop="10dip"
+	android:paddingBottom="1dip">
 </TextView>
