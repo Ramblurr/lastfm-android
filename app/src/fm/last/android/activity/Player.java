@@ -142,6 +142,8 @@ public class Player extends Activity {
 	       	mCachedArtist = icicle.getString("artist");
 	       	mCachedTrack = icicle.getString("track");
 	       	mCachedBitmap = icicle.getParcelable("artwork");
+	       	if(icicle.getBoolean("isOnTour", false))
+				mOntourButton.setVisibility(View.VISIBLE);
         }
 	}
 
@@ -293,6 +295,7 @@ public class Player extends Activity {
 		outState.putString("artist", mArtistName.getText().toString());
 		outState.putString("track", mTrackName.getText().toString());
 		outState.putParcelable("artwork", mAlbum.getBitmap());
+		outState.putBoolean("isOnTour", mOntourButton.getVisibility() == View.VISIBLE);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -484,17 +487,18 @@ public class Player extends Activity {
 									mTuningDialog.setCancelable(true);
 								}
 	
-			    				// fetching artist events (On Tour indicator)
-			    				new LoadEventsTask().execute((Void)null);
-			
 			    				if(mCachedArtist != null && mCachedArtist.equals(artistName) && 
-			    						mCachedTrack != null && mCachedTrack.equals(trackName) &&
-			    						mCachedBitmap != null) {
-			    					mAlbum.setImageBitmap(mCachedBitmap);
-			    					mCachedBitmap = null;
-			    				} else {
+			    						mCachedTrack != null && mCachedTrack.equals(trackName)) {
+		    						if(mCachedBitmap != null) {
+				    					mAlbum.setImageBitmap(mCachedBitmap);
+				    					mCachedBitmap = null;
+				    				} else {
+				    					new LoadAlbumArtTask().execute((Void) null);
+				    				}
+    							} else {
+    			    				new LoadEventsTask().execute((Void)null);
 			    					new LoadAlbumArtTask().execute((Void) null);
-			    				}
+    							}
 		    				}
     					} catch (java.util.concurrent.RejectedExecutionException e) {
     						e.printStackTrace();
