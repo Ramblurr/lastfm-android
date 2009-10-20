@@ -26,6 +26,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -37,7 +38,11 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Session s = LastFMApplication.getInstance().map.get( "lastfm_session" );
-        if ( s != null && s.getKey().length() > 0 ) {
+        if ( s != null && s.getKey().length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble", true)) {
+        	if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_music_player", true) &&
+        			intent.getAction().startsWith("com.")) {
+        		return;
+        	}
         	Log.i("Last.fm", "Action: " + intent.getAction());
 	        final Intent out = new Intent(context, ScrobblerService.class);
 	        out.setAction(intent.getAction());
