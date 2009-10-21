@@ -435,25 +435,24 @@ public class Player extends Activity {
 			} else if (action.equals(RadioPlayerService.PLAYBACK_ERROR)) {
 				// TODO add a skip counter and try to skip 3 times before
 				// display an error message
-				try {
-					if (LastFMApplication.getInstance().player == null)
-						return;
-					WSError error = LastFMApplication.getInstance().player
-							.getError();
-					if (error != null) {
-						LastFMApplication.getInstance().presentError(context,
-								error);
-					} else {
-						LastFMApplication.getInstance().presentError(
-								context,
-								getResources().getString(
-										R.string.ERROR_PLAYBACK_FAILED_TITLE),
-								getResources().getString(
-										R.string.ERROR_PLAYBACK_FAILED));
-					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (mBufferingDialog != null) {
+					mBufferingDialog.dismiss();
+					mBufferingDialog = null;
+				}
+				if (mTuningDialog != null) {
+					mTuningDialog.dismiss();
+					mTuningDialog = null;
+				}
+				WSError error = intent.getParcelableExtra("error");
+				if (error != null) {
+					LastFMApplication.getInstance().presentError(Player.this, error);
+				} else {
+					LastFMApplication.getInstance().presentError(
+							Player.this,
+							getResources().getString(
+									R.string.ERROR_PLAYBACK_FAILED_TITLE),
+							getResources().getString(
+									R.string.ERROR_PLAYBACK_FAILED));
 				}
 			}
 		}

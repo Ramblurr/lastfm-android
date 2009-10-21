@@ -70,6 +70,7 @@ import android.util.Log;
 
 import fm.last.android.R;
 import fm.last.android.activity.Player;
+import fm.last.android.activity.Profile;
 import fm.last.android.utils.UserTask;
 
 public class RadioPlayerService extends Service
@@ -338,6 +339,8 @@ public class RadioPlayerService extends Service
 						try {
 							//Please to be working?
 							refreshPlaylist();
+						} catch (WSError e) {
+							logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
 						} catch (Exception e) {
 						}
 					}
@@ -378,7 +381,7 @@ public class RadioPlayerService extends Service
 				if(mAutoSkipCount++ > 4) {
 					//If we weren't able to start playing after 3 attempts, bail out and notify
 					//the user.  This will bring us into a stopped state.
-					mState = STATE_STOPPED;
+					mState = STATE_ERROR;
 					notifyChange(PLAYBACK_ERROR);
 					nm.cancel( NOTIFY_ID );
 					if( wakeLock.isHeld())
@@ -468,7 +471,7 @@ public class RadioPlayerService extends Service
 		mNextFullyBuffered = false;
 		nm.cancel( NOTIFY_ID );
 		mState = STATE_STOPPED;
-		RadioPlayerService.this.notifyChange(PLAYBACK_FINISHED);
+		notifyChange(PLAYBACK_FINISHED);
 		if( wakeLock.isHeld())
 			wakeLock.release();
 		
@@ -493,14 +496,22 @@ public class RadioPlayerService extends Service
 		
 		mState = STATE_SKIPPING;
 		// Check if we're running low on tracks
-		if ( currentQueue.size() < 2 )
+		if ( currentQueue.size() < 1 )
 		{
 			mPlaylistRetryCount = 0;
 			try {
 				refreshPlaylist();
 			} catch (WSError e) {
 				mError = e;
+				nm.cancel( NOTIFY_ID );
 				notifyChange( PLAYBACK_ERROR );
+				mState = STATE_ERROR;
+				Notification notification = new Notification(
+						R.drawable.as_statusbar, "An error occured during playback", System.currentTimeMillis() );
+				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
+						new Intent( this, Profile.class ), 0 );
+				notification.setLatestEventInfo( this, "Insufficient Content", "Please try another station.", contentIntent );
+				nm.notify( NOTIFY_ID, notification );
 				return;
 			} catch (Exception e) {
 				return;
@@ -601,6 +612,7 @@ public class RadioPlayerService extends Service
 			String bitrate;
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
+			logger.info("Current network type: " + ni.getTypeName());
 			if(ni.getType() == ConnectivityManager.TYPE_MOBILE)
 				bitrate = "64";
 			else
@@ -614,6 +626,7 @@ public class RadioPlayerService extends Service
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
 
 			RadioTrack[] tracks = playlist.getTracks();
+			logger.info("Got " + tracks.length + " track(s)");
 			for( int i=0; i < tracks.length; i++ ) {
 				currentQueue.add(tracks[i]);
 			}
@@ -625,13 +638,11 @@ public class RadioPlayerService extends Service
 					Thread.currentThread().sleep(2000);
 					refreshPlaylist();
 				} else {
-					notifyChange( PLAYBACK_ERROR );
-					nm.cancel( NOTIFY_ID );
+					throw e;
 				}
 			}
 		} catch (WSError e) {
-			notifyChange( PLAYBACK_ERROR );
-			nm.cancel( NOTIFY_ID );
+			logger.severe("Web service error: " + e.getMessage());
 			mError = e;
 			throw e;
 		}
@@ -648,6 +659,9 @@ public class RadioPlayerService extends Service
 			i.putExtra( "track", currentTrack.getTitle() );
 			i.putExtra( "duration", currentTrack.getDuration());
 			i.putExtra( "trackAuth", currentTrack.getTrackAuth());
+		}
+		if (what.equals(PLAYBACK_ERROR) && mError != null) {
+			i.putExtra( "error", (Parcelable)mError);
 		}
 		i.putExtra( "station", currentStation );
 		sendBroadcast( i );
@@ -709,6 +723,7 @@ public class RadioPlayerService extends Service
 		public void onPostExecute(Boolean result) {
 			if(!result) {
 				notifyChange( PLAYBACK_ERROR );
+				mState = STATE_ERROR;
 			}
 		}
 	}
@@ -743,7 +758,8 @@ public class RadioPlayerService extends Service
 			} catch (WSError e) {
 				mError = e;
 			}
-			notifyChange(RadioPlayerService.PLAYBACK_ERROR);
+			notifyChange(PLAYBACK_ERROR);
+			mState = STATE_ERROR;
 			return false;
 		}
 
@@ -808,7 +824,7 @@ public class RadioPlayerService extends Service
 		public boolean isPlaying() throws RemoteException
 		{
 
-			return mState != STATE_STOPPED;
+			return mState != STATE_STOPPED && mState != STATE_ERROR;
 		}
 
 		public long getPosition() throws RemoteException
