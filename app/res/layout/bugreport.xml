@@ -5,6 +5,6 @@
 		<TextView android:text="Please describe the bug:" 
 					android:layout_width="fill_parent" android:layout_height="wrap_content"/>
 
-		<EditText android:text="" android:id="@+id/bug" android:layout_width="fill_parent" 
-					android:layout_height="64dip" android:gravity="top"/>
+		<EditText android:text="" android:id="@+id/bug" android:layout_width="280dip" android:scrollbars="vertical" 
+					android:layout_height="80dip" android:gravity="top"/>
 </LinearLayout>
