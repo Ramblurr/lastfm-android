@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 /**
  * @author sam
@@ -20,13 +21,13 @@ import android.graphics.Bitmap;
 public class AlbumArt extends ImageView {
 	
 	private FetchArtTask _fetchTask;
-	private int _defaultImageResource = R.drawable.no_artwork;
+	private Bitmap _defaultImage;
 	private Bitmap _bitmap;
 	
 	public AlbumArt(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		
-		setImageResource(_defaultImageResource);
+		setDefaultImageResource(R.drawable.no_artwork);
 	}
 	
 	public Bitmap getBitmap() {
@@ -39,18 +40,24 @@ public class AlbumArt extends ImageView {
 		_bitmap = bmp;
 	}
 	
+	public void clear() {
+		setImageBitmap(_defaultImage);
+	}
+	
 	public void cancel() {
 		if(_fetchTask != null)
 			_fetchTask.cancel(true);
 	}
 	
 	public void setDefaultImageResource(int res) {
-		_defaultImageResource = res;
-		setImageResource(_defaultImageResource);
+		_defaultImage = BitmapFactory.decodeResource(getResources(), res);
+		setImageBitmap(_defaultImage);
 	}
 	
 	public void fetch(String URL) {
-		if(_fetchTask != null)
+    	setImageBitmap(_defaultImage);
+    	
+    	if(_fetchTask != null)
 			_fetchTask.cancel(true);
 		
 		_fetchTask = new FetchArtTask(URL);
@@ -65,13 +72,7 @@ public class AlbumArt extends ImageView {
     		super();
     		
     		mURL = url;
-    		Log.i("LastFm", "Fetching: " + mURL);
     	}
-    	
-        @Override
-    	public void onPreExecute() {
-        	setImageResource(_defaultImageResource);
-        }
     	
         @Override
         public Boolean doInBackground(Void...params) {

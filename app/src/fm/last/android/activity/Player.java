@@ -608,6 +608,7 @@ public class Player extends Activity {
 
 		@Override
 		public void onPreExecute() {
+			mAlbum.clear();
 		}
 
 		@Override
