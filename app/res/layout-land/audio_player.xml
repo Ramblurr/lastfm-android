@@ -73,7 +73,7 @@
 	                        android:layout_width="fill_parent"
 	                        android:layout_gravity="left"
 	                        android:textStyle="bold"
-	                        android:textSize="8pt"/>
+	                        android:textSize="18sp"/>
 	                </TableRow>
 					
 					<TableRow
@@ -85,7 +85,7 @@
 							style="@style/playback_info"
 							android:layout_height="wrap_content"
 							android:textStyle="bold" 
-							android:textSize="8pt"/>
+							android:textSize="18sp"/>
 					</TableRow>
 				</TableLayout>
             
@@ -97,6 +97,7 @@
 	            
 		            <TextView android:id="@+id/currenttime"
 		                style="@style/playback_time"
+		                android:textSize="10sp"
 		                android:layout_height="wrap_content"
 		                android:gravity="left" 
 		                android:textStyle="bold"
@@ -117,6 +118,7 @@
 		
 		            <TextView android:id="@+id/totaltime"
 		                style="@style/playback_time"
+		                android:textSize="10sp"
 		                android:layout_gravity="bottom"
 		                android:layout_height="wrap_content"
 		                android:textStyle="bold"

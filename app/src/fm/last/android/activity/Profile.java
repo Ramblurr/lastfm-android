@@ -173,7 +173,7 @@ public class Profile extends ListActivity
             Button b = mNewStationButton = new Button(this);
             b.setBackgroundResource( R.drawable.start_a_new_station_button );
             b.setTextColor(0xffffffff);
-    		b.setTextSize(TypedValue.COMPLEX_UNIT_PT, 7);
+    		b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
     		b.setFocusable( false ); //essential!
     		b.setClickable( false ); // getListView() clicklistener handles this as the other routes had bugs
     		b.setGravity( 3 | 16 ); //sorry not to use constants, I got lame and couldn't figure it out

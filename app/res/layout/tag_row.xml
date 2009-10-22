@@ -36,7 +36,7 @@
 			android:layout_weight="1"
 			android:layout_gravity="center"
 			android:gravity="left|center_vertical"
-			android:textSize="7pt"
+			android:textSize="14sp"
 			android:textStyle="bold"
 			android:textColor="@drawable/list_entry_color"/>
 	</LinearLayout>

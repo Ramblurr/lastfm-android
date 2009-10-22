@@ -47,7 +47,7 @@
 			android:layout_height="fill_parent" 
 			android:gravity="center"
 			android:text="@string/newstation_hint_artist" 
-			android:textSize="8pt" 
+			android:textSize="16sp" 
 			android:textStyle="bold" 
 			android:layout_width="fill_parent" 
 			android:layout_marginTop="32dip"

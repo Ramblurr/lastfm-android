@@ -33,7 +33,7 @@
 			android:layout_gravity="center" android:layout_marginTop="32dip"></ImageView>
 		<TextView android:id="@+id/search_hint"
 			android:layout_height="fill_parent" android:gravity="center"
-			android:text="@string/newstation_hint_artist" android:textSize="8pt"
+			android:text="@string/newstation_hint_artist" android:textSize="18sp"
 			android:textStyle="bold" android:layout_width="fill_parent"
 			android:layout_marginTop="16dip"
             android:textColor="#494848" ></TextView>

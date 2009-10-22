@@ -41,7 +41,7 @@
 			android:layout_height="wrap_content" 
 			android:layout_gravity="center"
 			android:gravity="left|center_vertical"
-			android:textSize="7pt"
+			android:textSize="16sp"
 			android:textStyle="bold"
 			android:textColor="@drawable/list_entry_color"/>
 		<TextView android:id="@+id/row_label_second"
