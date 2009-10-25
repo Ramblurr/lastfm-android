@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">Last.fm</string>
-	<string name="main_cancel">Cancel</string>
-	<string name="main_username">Username</string>
-	<string name="main_password">Pasword</string>
-	<string name="main_login">Log in</string>
-	<string name="main_setup">Setup</string>
-	<string name="main_signup">Sign up</string>
-	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
+	<string name="main_cancel">Abbrechen</string>
+	<string name="main_username">Benutzername</string>
+	<string name="main_password">Paswort</string>
+	<string name="main_login">Anmelden</string>
+	<string name="main_setup">Einstellungen</string>
+	<string name="main_signup">Registrieren</string>
+	<string name="main_newaccount">&quot;Hast du noch keinen Account?&quot;</string>
 	
-	<string name="signup_create_account">Create Account</string>
-	<string name="signup_username">Username</string>
-	<string name="signup_password">Password</string>
-	<string name="signup_email">Your email</string>
-
-	<string name="home_logout">Log out</string>
-	<string name="home_tracksplayed">plays</string>
-	<string name="home_newstation">Start a New Station</string>
-	<string name="home_myrecs">Recommended by Last.fm</string>
-	<string name="home_myneighborhood">Your Neighborhood</string>
-	<string name="home_myloved">Your Loved Tracks</string>
-	<string name="home_mylibrary">Your Library</string>
-	<string name="home_mystations">Your Stations</string>
-	<string name="home_recentstations">Recent Stations</string>
-	<string name="home_commonartists">Common Artists</string>
+	<string name="signup_create_account">Registriere dich</string>
+	<string name="signup_username">Benutzername</string>
+	<string name="signup_password">Passwort</string>
+	<string name="signup_email">Deine E-Mail</string>
+	
+	<string name="home_logout">Abmelden</string>
+	<string name="home_tracksplayed">spielt</string>
+	<string name="home_newstation">Starte eine neue Station</string>
+	<string name="home_myrecs">Empfohlen von Last.fm</string>
+	<string name="home_myneighborhood">Deine Nachbarn</string>
+	<string name="home_myloved">Deine Lieblingslieder</string>
+	<string name="home_mylibrary">Deine Musiksammlung</string>
+	<string name="home_mystations">Deine Stationen</string>
+	<string name="home_recentstations">Zuletzt gehörte Stationen</string>
+	<string name="home_commonartists">Gemeinsame Künstler</string>
 	
 	<string name="radio">Radio</string>
-	<string name="profile">Profile</string>
+	<string name="profile">Profil</string>
 	<string name="fans">Fans</string>
 	
-	<string name="dialog_amazon">Buy on Amazon</string>
-	<string name="dialog_similar">Listen to Similar Artists</string>
-	<string name="dialog_tagalbum">Tag Album</string>
-	<string name="dialog_tagartist">Tag Artist</string>
-	<string name="dialog_tagtrack">Tag Track</string>
-	<string name="dialog_share">Share</string>
-	<string name="dialog_addlibrary">Add to Library</string>
-	<string name="dialog_addplaylist">Add to Playlist</string>
-	<string name="dialog_love">Love</string>
-	<string name="dialog_ban">Ban</string>
+	<string name="dialog_amazon">Bei Amazon kaufen</string>
+	<string name="dialog_similar">Ähnliche Künstler anhören</string>
+	<string name="dialog_tagalbum">Tagge Album</string>
+	<string name="dialog_tagartist">Tagge Künstler</string>
+	<string name="dialog_tagtrack">Tagge Titel</string>
+	<string name="dialog_share">Weiterleiten</string>
+	<string name="dialog_addlibrary">Zur Musiksammlung hinzufügen</string>
+	<string name="dialog_addplaylist">Zur Playlist hinzufügen</string>
+	<string name="dialog_love">Lieben</string>
+	<string name="dialog_ban">Bannen</string>
 	
 
-	<string name="search">Search</string>
-	<string name="newstation_artist">Artist</string>
+	<string name="search">Suche</string>
+	<string name="newstation_artist">Künstler</string>
 	<string name="newstation_tag">Tag</string>
-	<string name="newstation_user">User</string>
+	<string name="newstation_user">Benutzer</string>
 	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
 	<string name="newstation_hint_user">Type in a username\n to get started.</string>
 
-	<string name="event_showmap">Show Map</string>
-	<string name="event_attending">I\'m attending</string>
-	<string name="event_notattending">I\'m not attending</string>
-	<string name="event_maybe">I might attend</string>
+	<string name="event_showmap">Karte anzeigen</string>
+	<string name="event_attending">Ich gehe hin</string>
+	<string name="event_notattending">Ich gehe nich hin</string>
+	<string name="event_maybe">Ich gehe vielleicht hin</string>
 
 	<string name="durationformat">
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
-	<string name="logout">Logout</string>
-	<string name="cancel">Cancel</string>
+	<string name="logout">Ausloggen</string>
+	<string name="cancel">Abbrechen</string>
 	<string name="ok">OK</string>
-	<string name="add">Add</string>
-	<string name="done">Done</string>
+	<string name="add">Hinzufügen</string>
+	<string name="done">Fertig</string>
 	<string name="tag">Tag</string>
-	<string name="tag_hint">Type tags here, or choose from below</string>
-	<string name="tagarea_hint">Enter a tag above,\nor choose one from below</string>
+	<string name="tag_hint">Hier Tags eingeben oder unten auswählen</string>
+	<string name="tagarea_hint">Gib oben einen Tag ein\noder wähle unten einen aus</string>
 	
-	<string name="home_mytags">My Tags</string>
+	<string name="home_mytags">Meine Tags</string>
 
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
-	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>
+	<string name="ERROR_AUTH_TITLE">Anmeldung fehlgeschlagen</string>
 	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
 	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT">There is not enough content available to play this station.  Please try another station.</string>
@@ -77,8 +77,8 @@
 	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>
 	<string name="ERROR_INSUFFICIENT_MEMBERS">There are not enough members in this group to play this station.  Please try another group.</string>
 	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Your musical neighborhood hasn't been calculated yet.  Try listening to more music and try again in a few days.&quot;</string>
-	<string name="ERROR_MISSINGINFO">&quot;You must have a valid Last.fm username and password.  If you don't have an account, click the Sign Up button.&quot;</string>
-	<string name="ERROR_MISSINGINFO_TITLE">Missing Information</string>
+	<string name="ERROR_MISSINGINFO">&quot;Du must einen gültigen Benutzernamen und Passwort eingeben. Wenn du keinen Account hast, klicke auf \'Registrieren\'.&quot;</string>
+	<string name="ERROR_MISSINGINFO_TITLE">Fehlende Information</string>
 	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
 	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
 	<string name="ERROR_PLAYBACK_FAILED">An error occurred while trying to play this track.  Please try again shortly.</string>
@@ -94,6 +94,6 @@
 	<string name="ERROR_NOSUCHUSER">Unable to find a user with this username.  Please check the spelling and try again</string>
 	<string name="ERROR_NOSUCHUSER_TITLE">User Not Found</string>
 	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
-	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>	
-	<string name="ERROR_SIGNUP_TITLE">Could not signup</string>
+	<string name="ERROR_UPGRADE_TITLE">Aktualisierung notwendig</string>
+	<string name="ERROR_SIGNUP_TITLE">Registrierung fehlgeschlagen</string>
 </resources>
