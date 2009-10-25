@@ -39,6 +39,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -198,11 +199,11 @@ public class Profile extends ListActivity
 		
 		mTabBar.setViewFlipper(mViewFlipper);
 		if(isAuthenticatedUser) {
-		    mTabBar.addTab("Radio", R.drawable.radio);
-		    mTabBar.addTab("Profile", R.drawable.profile);
+		    mTabBar.addTab("Radio", R.drawable.radio);		    
+		    mTabBar.addTab(this.getString(R.string.profile), R.drawable.profile);
 		} else {
 		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio);
-            mTabBar.addTab(mUsername + "'s Profile", R.drawable.profile);
+            mTabBar.addTab(mUsername + this.getString(R.string.profile_unauthenticated), R.drawable.profile);
 		}
        
         mMyRecentAdapter = new LastFMStreamAdapter( this );
@@ -213,7 +214,14 @@ public class Profile extends ListActivity
         RebuildMainMenu();
         
         mProfileList = (ListView)findViewById(R.id.profile_list_view);
-    	String[] mStrings = new String[]{"Top Artists", "Top Albums", "Top Tracks", "Recently Played", "Events", "Friends", "Tags"}; // this order must match the ProfileActions enum
+    	String[] mStrings = new String[]{
+        		this.getString(R.string.profile_topartists), 
+    			this.getString(R.string.profile_topalbums),
+    			this.getString(R.string.profile_toptracks),
+    			this.getString(R.string.profile_recentlyplayed),
+    			this.getString(R.string.profile_events),
+    			this.getString(R.string.profile_friends),
+    			this.getString(R.string.profile_tags)}; // this order must match the ProfileActions enum
         mProfileAdapter = new ListAdapter(Profile.this, mStrings);
         mProfileList.setAdapter(mProfileAdapter); 
         mProfileList.setOnItemClickListener(mProfileClickListener);

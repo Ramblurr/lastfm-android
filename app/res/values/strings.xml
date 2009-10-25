@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">Last.fm</string>
-	<string name="main_cancel">Cancel</string>
+	
 	<string name="main_username">Username</string>
 	<string name="main_password">Pasword</string>
 	<string name="main_login">Log in</string>
@@ -13,6 +13,27 @@
 	<string name="signup_username">Username</string>
 	<string name="signup_password">Password</string>
 	<string name="signup_email">Your email</string>
+	
+	<string name="menu_viewinfo">View Info</string>
+	
+	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
+	<string name="prefs_scrobble_title">Enable Scrobbling</string>
+	<string name="prefs_scrobble_summary">Update your Last.fm profile as you listen to music</string>
+	<string name="prefs_scrobble_music_player_title">Scrobble Android player</string>
+	<string name="prefs_scrobble_music_player_summary">Scrobble the built-in Android music player</string>
+	<string name="prefs_scrobble_realtime_title">Scrobble in real-time</string>
+	<string name="prefs_scrobble_realtime_summary">Sends now-playing information and uploads scrobbles immediately.</string>
+	<string name="prefs_scrobble_wifi_only_title">Scrobble only on Wi-Fi</string>
+	<string name="prefs_scrobble_wifi_only_summary">Queue media player scrobbles when not connected to Wi-Fi</string>
+	<string name="prefs_cat_player_title">Player</string>
+	<string name="prefs_highquality_title">High Quality Audio</string>
+	<string name="prefs_highquality_summary">Use high quality audio over cellular networks</string>
+	<string name="prefs_cat_feedback_title">Feedback</string>
+	<string name="prefs_bugreport_title">Report a bug</string>
+	<string name="prefs_bugreport_summary">Email a bug report to Last.fm</string>
+	<string name="prefs_bugreport_send">Send</string>
+	
+	<string name="bugreport_description">Please describe the bug:</string>
 
 	<string name="home_logout">Log out</string>
 	<string name="home_tracksplayed">plays</string>
@@ -28,6 +49,15 @@
 	<string name="radio">Radio</string>
 	<string name="profile">Profile</string>
 	<string name="fans">Fans</string>
+	
+	<string name="profile_unauthenticated">\'s Profile</string>
+	<string name="profile_topartists">Top Artists</string>
+	<string name="profile_topalbums">Top Albums</string>
+	<string name="profile_toptracks">Top Tracks</string>
+	<string name="profile_recentlyplayed">Recently Played</string>
+	<string name="profile_events">Events</string>
+	<string name="profile_friends">Friends</string>
+	<string name="profile_tags">Tags</string>
 	
 	<string name="dialog_amazon">Buy on Amazon</string>
 	<string name="dialog_similar">Listen to Similar Artists</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-	<string name="app_name">Last.fm</string>
-	<string name="main_cancel">Abbrechen</string>
+	
 	<string name="main_username">Benutzername</string>
 	<string name="main_password">Paswort</string>
 	<string name="main_login">Anmelden</string>
@@ -13,6 +12,27 @@
 	<string name="signup_username">Benutzername</string>
 	<string name="signup_password">Passwort</string>
 	<string name="signup_email">Deine E-Mail</string>
+	
+	<string name="menu_viewinfo">Info anzeigen</string>
+		
+	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
+	<string name="prefs_scrobble_title">Scrobbeln aktivieren</string>
+	<string name="prefs_scrobble_summary">Aktualisiere dein Last.fm Profil während du Musik hörst</string>
+	<string name="prefs_scrobble_music_player_title">Scrobbel Android Player</string>
+	<string name="prefs_scrobble_music_player_summary">Scrobbel den Android Musik-Player</string>
+	<string name="prefs_scrobble_realtime_title">Scrobbel in Echtzeit</string>
+	<string name="prefs_scrobble_realtime_summary">Sendet \'Hört gerade\' Informationen und scrobbelt sofort.</string>
+	<string name="prefs_scrobble_wifi_only_title">Scrobbel nur bei W-LAN</string>
+	<string name="prefs_scrobble_wifi_only_summary">Sammlelt gespielte Titel, wenn keine W-LAN-Verbindung besteht</string>
+	<string name="prefs_cat_player_title">Player</string>
+	<string name="prefs_highquality_title">High-Quality-Audio</string>
+	<string name="prefs_highquality_summary">Verwende High-Quality-Audio über Handy</string>
+	<string name="prefs_cat_feedback_title">Feedback</string>
+	<string name="prefs_bugreport_title">Melde einen Bug</string>
+	<string name="prefs_bugreport_summary">Sende E-Mail an Last.fm</string>
+	<string name="prefs_bugreport_send">Senden</string>
+	
+	<string name="bugreport_description">Bitte beschreibe den Fehler:</string>
 	
 	<string name="home_logout">Abmelden</string>
 	<string name="home_tracksplayed">spielt</string>
@@ -29,6 +49,15 @@
 	<string name="profile">Profil</string>
 	<string name="fans">Fans</string>
 	
+	<string name="profile_unauthenticated">s Profil</string>
+	<string name="profile_topartists">Top Künstler</string>
+	<string name="profile_topalbums">Top Albuen</string>
+	<string name="profile_toptracks">Top Titel</string>
+	<string name="profile_recentlyplayed">Kürzlich gespielt</string>
+	<string name="profile_events">Events</string>
+	<string name="profile_friends">Freunde</string>
+	<string name="profile_tags">Tags</string>
+	
 	<string name="dialog_amazon">Bei Amazon kaufen</string>
 	<string name="dialog_similar">Ähnliche Künstler anhören</string>
 	<string name="dialog_tagalbum">Tagge Album</string>
@@ -39,13 +68,12 @@
 	<string name="dialog_addplaylist">Zur Playlist hinzufügen</string>
 	<string name="dialog_love">Lieben</string>
 	<string name="dialog_ban">Bannen</string>
-	
 
 	<string name="search">Suche</string>
 	<string name="newstation_artist">Künstler</string>
 	<string name="newstation_tag">Tag</string>
 	<string name="newstation_user">Benutzer</string>
-	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
+	<string name="newstation_hint_artist">Gib einen Künstler an,\n um Musik zu hören.</string>
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
 	<string name="newstation_hint_user">Type in a username\n to get started.</string>
 
@@ -72,27 +100,27 @@
 	<string name="ERROR_AUTH_TITLE">Anmeldung fehlgeschlagen</string>
 	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
 	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
-	<string name="ERROR_INSUFFICIENT_CONTENT">There is not enough content available to play this station.  Please try another station.</string>
-	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Insufficient Content</string>
-	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>
-	<string name="ERROR_INSUFFICIENT_MEMBERS">There are not enough members in this group to play this station.  Please try another group.</string>
-	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Your musical neighborhood hasn't been calculated yet.  Try listening to more music and try again in a few days.&quot;</string>
+	<string name="ERROR_INSUFFICIENT_CONTENT">Es steht nicht genügend Inhalt zu Verfügung, um die Station abzuspielen.  Bitte versuche es mit einer anderen Station.</string>
+	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Unzureichender Inhalt</string>
+	<string name="ERROR_INSUFFICIENT_FANS">Dieser Künstler hat nicht genug Fans, um die Station abzuspielen.  Bitte versuche einen anderen Künstler.</string>
+	<string name="ERROR_INSUFFICIENT_MEMBERS">Die Gruppe hat nicht genug Mitglieder, um die Station abzuspielen.  Bitte versuche eine andere Gruppe.</string>
+	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Deine Nachbarn konnten noch nicht berechnet werden.  Höre mehr Musik und versuch es in ein paar Tagen noch einmal.&quot;</string>
 	<string name="ERROR_MISSINGINFO">&quot;Du must einen gültigen Benutzernamen und Passwort eingeben. Wenn du keinen Account hast, klicke auf \'Registrieren\'.&quot;</string>
 	<string name="ERROR_MISSINGINFO_TITLE">Fehlende Information</string>
-	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
-	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
-	<string name="ERROR_PLAYBACK_FAILED">An error occurred while trying to play this track.  Please try again shortly.</string>
-	<string name="ERROR_PLAYBACK_FAILED_TITLE">Playback Failed</string>
-	<string name="ERROR_REGFAILURE_TITLE">Account Creation Failed</string>
-	<string name="ERROR_SERVER_UNAVAILABLE">There was a problem communicating with the Last.fm servers.  Please try again shortly.</string>
-	<string name="ERROR_SERVER_UNAVAILABLE_TITLE">Communication Error</string>
-	<string name="ERROR_SESSION">This application is no longer linked with your Last.fm account.  Please log in again.</string>
-	<string name="ERROR_SESSION_TITLE">Invalid Session</string>
-	<string name="ERROR_STATION_TITLE">Station Not Available</string>
-	<string name="ERROR_SUBSCRIPTION">Please check your subscription status at the Last.fm website.</string>
-	<string name="ERROR_SUBSCRIPTION_TITLE">Subscribers Only</string>
-	<string name="ERROR_NOSUCHUSER">Unable to find a user with this username.  Please check the spelling and try again</string>
-	<string name="ERROR_NOSUCHUSER_TITLE">User Not Found</string>
+	<string name="ERROR_NONETWORK">Diese Funktion benötigt eine aktive Internetverbindung.  Bitte aktiviere die Internetverbindung und versuch es noch einmal.</string>
+	<string name="ERROR_NONETWORK_TITLE">Keine Netzwerkverbindung</string>
+	<string name="ERROR_PLAYBACK_FAILED">Während des Abspielens des Titels trat ein Fehler auf.  Bitte versuch es in Kürze noch einmal.</string>
+	<string name="ERROR_PLAYBACK_FAILED_TITLE">Abspielen fehlgeschlagen</string>
+	<string name="ERROR_REGFAILURE_TITLE">Registrierung fehlgeschlagen</string>
+	<string name="ERROR_SERVER_UNAVAILABLE">Es gab ein Problem bei der Kommunikation mit dem Last.fm-Server.  Bitte versuch es in Kürze noch einmal.</string>
+	<string name="ERROR_SERVER_UNAVAILABLE_TITLE">Kommunikationsfehler</string>
+	<string name="ERROR_SESSION">Diese Anwendung ist nicht mehr mit Last.fm verbunden.  Bitte melde dich erneut an.</string>
+	<string name="ERROR_SESSION_TITLE">Ungültige Sitzung</string>
+	<string name="ERROR_STATION_TITLE">Station nicht verfügbar</string>
+	<string name="ERROR_SUBSCRIPTION">Bitte überprüfe dein Abonnement bei Last.fm.</string>
+	<string name="ERROR_SUBSCRIPTION_TITLE">Nur für Abonnementen</string>
+	<string name="ERROR_NOSUCHUSER">Es konnte kein Benutzer mit diesem Namen gefunden werden.  Bitte überprüfe die Schreibweise und versuch es noch einmal.</string>
+	<string name="ERROR_NOSUCHUSER_TITLE">Benutzer nicht gefunden</string>
 	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
 	<string name="ERROR_UPGRADE_TITLE">Aktualisierung notwendig</string>
 	<string name="ERROR_SIGNUP_TITLE">Registrierung fehlgeschlagen</string>
