@@ -5,7 +5,6 @@
 	<string name="main_username">Username</string>
 	<string name="main_password">Pasword</string>
 	<string name="main_login">Log in</string>
-	<string name="main_setup">Setup</string>
 	<string name="main_signup">Sign up</string>
 	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
 	
@@ -38,6 +37,7 @@
 	<string name="home_logout">Log out</string>
 	<string name="home_tracksplayed">plays</string>
 	<string name="home_newstation">Start a New Station</string>
+	<string name="home_mytags">My Tags</string>
 	<string name="home_myrecs">Recommended by Last.fm</string>
 	<string name="home_myneighborhood">Your Neighborhood</string>
 	<string name="home_myloved">Your Loved Tracks</string>
@@ -45,6 +45,12 @@
 	<string name="home_mystations">Your Stations</string>
 	<string name="home_recentstations">Recent Stations</string>
 	<string name="home_commonartists">Common Artists</string>
+	<string name="home_userneighborhood">\'s Neighborhood</string>
+    <string name="home_userloved">\'s Loved Tracks</string>
+    <string name="home_userlibrary">\'s Library</string>
+    <string name="home_userstations">\'s Stations</string>
+    <string name="home_userplaylists">\'s Playlists</string>
+    <string name="home_myplaylists">Your Playlists</string>
 	
 	<string name="radio">Radio</string>
 	<string name="profile">Profile</string>
@@ -59,6 +65,23 @@
 	<string name="profile_friends">Friends</string>
 	<string name="profile_tags">Tags</string>
 	
+	<string name="share_trackshared">The track was shared.</string>
+	<string name="share_error">An error occurred when sharing. Please try again.</string>
+	<string name="share_nofriends">No Friends :(</string>
+	<string name="share_selectapplication">Share track using:</string>
+	<string name="share_friendslist">Friends List</string>
+	
+	<string name="metadata_bio">Bio</string>
+	<string name="metadata_similar">Similar</string>
+	<string name="metadata_tags">Tags</string>
+	<string name="metadata_events">Events</string>
+	<string name="metadata_Fans">Fans</string>
+	<string name="metadata_nobio">Unable to fetch bio</string>
+	<string name="metadata_nosimilar">No Similar Artists</string>
+	<string name="metadata_notags">No Tags</string>
+	<string name="metadata_noevents">No Upcoming Events</string>
+	<string name="metadata_nofans">No Top Listeners</string>
+	
 	<string name="dialog_amazon">Buy on Amazon</string>
 	<string name="dialog_similar">Listen to Similar Artists</string>
 	<string name="dialog_tagalbum">Tag Album</string>
@@ -69,7 +92,6 @@
 	<string name="dialog_addplaylist">Add to Playlist</string>
 	<string name="dialog_love">Love</string>
 	<string name="dialog_ban">Ban</string>
-	
 
 	<string name="search">Search</string>
 	<string name="newstation_artist">Artist</string>
@@ -88,6 +110,9 @@
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
 	<string name="logout">Logout</string>
+	<string name="settings">Settings</string>
+	<string name="loading">Loading...</string>
+	<string name="nowplaying">Now Playing</string>
 	<string name="cancel">Cancel</string>
 	<string name="ok">OK</string>
 	<string name="add">Add</string>
@@ -95,8 +120,6 @@
 	<string name="tag">Tag</string>
 	<string name="tag_hint">Type tags here, or choose from below</string>
 	<string name="tagarea_hint">Enter a tag above,\nor choose one from below</string>
-	
-	<string name="home_mytags">My Tags</string>
 
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
 	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>

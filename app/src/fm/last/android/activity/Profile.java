@@ -23,9 +23,7 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Stack;
-import java.util.WeakHashMap;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -37,20 +35,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.os.RemoteException;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -78,7 +69,6 @@ import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
-import fm.last.android.widget.AdArea;
 import fm.last.android.widget.ProfileBubble;
 import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
@@ -93,7 +83,6 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
-import fm.last.api.WSError;
 
 //TODO: refactor all the UserTasks
 
@@ -427,13 +416,13 @@ public class Profile extends ListActivity
             if(mMyRecentAdapter.getCount() > 0)
             	mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
             if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-            	mMainAdapter.addSection( "Your Playlists", mMyPlaylistsAdapter);
+            	mMainAdapter.addSection( getString(R.string.home_myplaylists), mMyPlaylistsAdapter);
             }
         } else {
-            mMainAdapter.addSection( mUsername + "'s Stations", mMyStationsAdapter );        
+            mMainAdapter.addSection( mUsername + getString(R.string.home_userstations), mMyStationsAdapter );        
             mMainAdapter.addSection( getString(R.string.home_commonartists), mMyRecentAdapter );
             if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
+            	mMainAdapter.addSection( mUsername + getString(R.string.home_userplaylists), mMyPlaylistsAdapter);
             }
         }
         if(mMyStationsAdapter != null && mMyStationsAdapter.getCount() > 0)
@@ -573,14 +562,14 @@ public class Profile extends ListActivity
 	        mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         } else {
-	        mMyStationsAdapter.putStation( mUsername + "'s Library", 
+	        mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userlibrary), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
 	        if(session.getSubscriber().equals("1"))
-	        	mMyStationsAdapter.putStation( mUsername + "'s Loved Tracks", 
+	        	mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userloved), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
 	        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
-	        mMyStationsAdapter.putStation( mUsername + "'s Neighbourhood", 
+	        mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userneighborhood), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         }
         
@@ -1124,13 +1113,13 @@ public class Profile extends ListActivity
         // group -- Not used here.
         // id -- Used only when you want to handle and identify the click yourself.
         // title
-        MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, "Logout");
+        MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.logout));
         logout.setIcon(R.drawable.logout);
 
-        MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, "Settings");
+        MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.settings));
         settings.setIcon(android.R.drawable.ic_menu_preferences);
 
-        MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, "Now Playing");
+        MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.nowplaying));
 		nowPlaying.setIcon( R.drawable.view_artwork );
         return true;
     }

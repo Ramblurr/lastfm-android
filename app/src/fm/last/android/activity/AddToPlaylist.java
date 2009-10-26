@@ -172,7 +172,8 @@ public class AddToPlaylist extends Activity {
     private class LoadPlaylistsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	@Override
     	public void onPreExecute() {
-        	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+        	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE,
+        			getString(R.string.loading)));
     	}
     	
         @Override

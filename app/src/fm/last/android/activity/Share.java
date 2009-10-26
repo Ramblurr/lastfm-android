@@ -30,7 +30,6 @@ import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
-import fm.last.android.widget.TabBar;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.User;
@@ -39,13 +38,9 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 
 /**
@@ -120,9 +115,9 @@ public class Share extends Activity {
         	}
         	if(result) {
             	Share.this.finish();
-            	Toast.makeText(Share.this, "The track was shared.", Toast.LENGTH_SHORT).show();
+            	Toast.makeText(Share.this, getString(R.string.share_trackshared), Toast.LENGTH_SHORT).show();
         	} else {
-        		Toast.makeText(Share.this, "An error occurred when sharing. Please try again.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(Share.this, getString(R.string.share_error), Toast.LENGTH_SHORT).show();
         	}
         }
     }
@@ -130,7 +125,8 @@ public class Share extends Activity {
     private class LoadFriendsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
     	@Override
     	public void onPreExecute() {
-        	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+        	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, 
+        			getString(R.string.loading)));
         	mFriendsList.setOnItemClickListener(null);
     	}
     	
@@ -175,7 +171,8 @@ public class Share extends Activity {
                     }
                 });
             } else {
-            	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.INFO_MODE, "No Friends :(")); 
+            	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.INFO_MODE,
+            			getString(R.string.share_nofriends))); 
             }
         }
     }

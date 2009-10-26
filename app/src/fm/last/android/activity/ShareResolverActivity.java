@@ -61,7 +61,7 @@ public class ShareResolverActivity extends ListActivity {
 	    String URL = "http://www.last.fm/music/" + Uri.encode(artist) + "/_/" + Uri.encode(track);
         i.putExtra(Intent.EXTRA_TEXT, URL);
 
-	    onCreate(icicle, i, "Share track using:");
+	    onCreate(icicle, i, getString(R.string.share_selectapplication));
 	}
     
     protected void onCreate(Bundle savedInstanceState, Intent intent,
@@ -148,7 +148,8 @@ public class ShareResolverActivity extends ListActivity {
                 
                 List<ResolveInfo> lfmInfoQuery = mPm.queryIntentActivities(new Intent(ShareResolverActivity.this, Share.class), PackageManager.MATCH_DEFAULT_ONLY);
                 ResolveInfo lfmInfo = lfmInfoQuery.get(0);
-                mList.add(new DisplayResolveInfo(lfmInfo,"Last.fm", "Friends List"));
+                mList.add(new DisplayResolveInfo(lfmInfo,getString(R.string.app_name), 
+                		getString(R.string.share_friendslist)));
                 
                 r0 = rList.get(0);
                 int start = 0;

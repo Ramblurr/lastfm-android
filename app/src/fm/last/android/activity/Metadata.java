@@ -118,11 +118,11 @@ public class Metadata extends Activity {
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 
 		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab("Bio", R.drawable.bio);
-		mTabBar.addTab("Similar", R.drawable.similar_artists);
-		mTabBar.addTab("Tags", R.drawable.tags);
-		mTabBar.addTab("Events", R.drawable.events);
-		mTabBar.addTab("Fans", R.drawable.top_listeners);
+		mTabBar.addTab(getString(R.string.metadata_bio), R.drawable.bio);
+		mTabBar.addTab(getString(R.string.metadata_similar), R.drawable.similar_artists);
+		mTabBar.addTab(getString(R.string.metadata_tags), R.drawable.tags);
+		mTabBar.addTab(getString(R.string.metadata_events), R.drawable.events);
+		mTabBar.addTab(getString(R.string.metadata_Fans), R.drawable.top_listeners);
 		
 		populateMetadata();
 
@@ -156,7 +156,7 @@ public class Metadata extends Activity {
 		inflater.inflate(R.menu.player, menu);
 		
 		MenuItem changeView = menu.findItem(R.id.info_menu_item);
-		changeView.setTitle( "Now Playing" );
+		changeView.setTitle( getString(R.string.nowplaying) );
 		changeView.setIcon( R.drawable.view_artwork );
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -266,7 +266,7 @@ public class Metadata extends Activity {
 	private class LoadBioTask extends UserTask<Void, Void, Boolean> {
 		@Override
 		public void onPreExecute() {
-			mWebView.loadData("Loading...", "text/html", "utf-8");
+			mWebView.loadData(getString(R.string.loading), "text/html", "utf-8");
 		}
 
 		@Override
@@ -340,7 +340,7 @@ public class Metadata extends Activity {
 					e.printStackTrace();
 				}
 			}
-			mWebView.loadData("Unable to fetch bio", "text/html", "utf-8");
+			mWebView.loadData(getString(R.string.metadata_nobio), "text/html", "utf-8");
 		}
 	}
 	
@@ -349,7 +349,8 @@ public class Metadata extends Activity {
 		@Override
 		public void onPreExecute() {
 			mSimilarList.setOnItemClickListener(null);
-			mSimilarList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, "Loading...")); 
+			mSimilarList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
+					getString(R.string.loading))); 
 		}
 
 		@Override
@@ -393,7 +394,8 @@ public class Metadata extends Activity {
 
 				});
 			} else {
-				mSimilarList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, "No Similar Artists")); 
+				mSimilarList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, 
+						getString(R.string.metadata_nosimilar))); 
 			}
 		}
 	}
@@ -402,7 +404,8 @@ public class Metadata extends Activity {
 
 		@Override
 		public void onPreExecute() {
-			mFanList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			mFanList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
+					getString(R.string.loading)));
 			mFanList.setOnItemClickListener(null);
 		}
 
@@ -444,7 +447,8 @@ public class Metadata extends Activity {
 					}
 				});
 			} else {
-				mFanList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, "No Top Listeners")); 
+				mFanList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, 
+						getString(R.string.metadata_nofans))); 
 			}
 		}
 	}
@@ -453,7 +457,8 @@ public class Metadata extends Activity {
 
 		@Override
 		public void onPreExecute() {
-			mTagList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			mTagList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
+					getString(R.string.loading)));
 			mTagList.setOnItemClickListener(null);
 		}
 
@@ -494,7 +499,8 @@ public class Metadata extends Activity {
 
 				});
 			} else {
-				mTagList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, "No Tags"));
+				mTagList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, 
+						getString(R.string.metadata_notags)));
 			}
 		}
 	}
@@ -519,7 +525,8 @@ public class Metadata extends Activity {
 		@Override
 		public void onPreExecute() {
 			mEventList.setOnItemClickListener(null);
-			mEventList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, "Loading..."));
+			mEventList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
+					getString(R.string.loading)));
 		}
 
 		@Override
@@ -539,7 +546,8 @@ public class Metadata extends Activity {
 			}
 			
 			if(!result){
-				mNewEventAdapter = new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, "No Upcoming Events");
+				mNewEventAdapter = new NotificationAdapter(Metadata.this, NotificationAdapter.INFO_MODE, 
+						getString(R.string.metadata_noevents));
 				mEventList.setOnItemClickListener(null);
 			}
 			

@@ -4,7 +4,6 @@
 	<string name="main_username">Benutzername</string>
 	<string name="main_password">Paswort</string>
 	<string name="main_login">Anmelden</string>
-	<string name="main_setup">Einstellungen</string>
 	<string name="main_signup">Registrieren</string>
 	<string name="main_newaccount">&quot;Hast du noch keinen Account?&quot;</string>
 	
@@ -36,7 +35,8 @@
 	
 	<string name="home_logout">Abmelden</string>
 	<string name="home_tracksplayed">spielt</string>
-	<string name="home_newstation">Starte eine neue Station</string>
+	<string name="home_newstation">Starte eine neue Station</string>   
+	<string name="home_mytags">Meine Tags</string>
 	<string name="home_myrecs">Empfohlen von Last.fm</string>
 	<string name="home_myneighborhood">Deine Nachbarn</string>
 	<string name="home_myloved">Deine Lieblingslieder</string>
@@ -44,6 +44,12 @@
 	<string name="home_mystations">Deine Stationen</string>
 	<string name="home_recentstations">Zuletzt gehörte Stationen</string>
 	<string name="home_commonartists">Gemeinsame Künstler</string>
+	<string name="home_userneighborhood">s Nachbarn</string>
+    <string name="home_userloved">s Lieblingslieder</string>
+    <string name="home_userlibrary">s Musiksammlung</string>
+    <string name="home_userstations">s Stationen</string>
+    <string name="home_userplaylists">s Playlisten</string>
+    <string name="home_myplaylists">Deine Playlisten</string>
 	
 	<string name="radio">Radio</string>
 	<string name="profile">Profil</string>
@@ -51,12 +57,29 @@
 	
 	<string name="profile_unauthenticated">s Profil</string>
 	<string name="profile_topartists">Top Künstler</string>
-	<string name="profile_topalbums">Top Albuen</string>
+	<string name="profile_topalbums">Top Alben</string>
 	<string name="profile_toptracks">Top Titel</string>
 	<string name="profile_recentlyplayed">Kürzlich gespielt</string>
 	<string name="profile_events">Events</string>
 	<string name="profile_friends">Freunde</string>
 	<string name="profile_tags">Tags</string>
+	
+    <string name="share_trackshared">Der Titel wurde weitergeleitet.</string>
+    <string name="share_error">Beim Weiterleiten traten Fehler auf. Bitte versuch es nochmal.</string>
+    <string name="share_nofriends">Keine Freunde :(</string>
+    <string name="share_selectapplication">Leite Titel weiter mit:</string>
+    <string name="share_friendslist">Freunde</string>
+	
+    <string name="metadata_bio">Bio</string>
+    <string name="metadata_similar">Ähnlich</string>
+    <string name="metadata_tags">Tags</string>
+    <string name="metadata_events">Events</string>
+    <string name="metadata_Fans">Fans</string>
+    <string name="metadata_nobio">Bio konnte nicht geladen werden</string>
+    <string name="metadata_nosimilar">Keine ähnlichen Künstler</string>
+    <string name="metadata_notags">Keine Tags</string>
+    <string name="metadata_noevents">Keine zukünftigen Events</string>
+    <string name="metadata_nofans">Keine Top-Hörer</string>
 	
 	<string name="dialog_amazon">Bei Amazon kaufen</string>
 	<string name="dialog_similar">Ähnliche Künstler anhören</string>
@@ -86,6 +109,9 @@
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
 	<string name="logout">Ausloggen</string>
+	<string name="settings">Einstellungen</string>
+	<string name="loading">Lade...</string>
+	<string name="nowplaying">Spielt gerade</string>
 	<string name="cancel">Abbrechen</string>
 	<string name="ok">OK</string>
 	<string name="add">Hinzufügen</string>
@@ -94,8 +120,6 @@
 	<string name="tag_hint">Hier Tags eingeben oder unten auswählen</string>
 	<string name="tagarea_hint">Gib oben einen Tag ein\noder wähle unten einen aus</string>
 	
-	<string name="home_mytags">Meine Tags</string>
-
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
 	<string name="ERROR_AUTH_TITLE">Anmeldung fehlgeschlagen</string>
 	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>

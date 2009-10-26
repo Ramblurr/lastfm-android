@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import fm.last.android.LastFMApplication;
+import fm.last.android.R;
 import fm.last.api.Station;
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -43,12 +44,12 @@ public class PopupActionActivity extends ListActivity {
 	    mArtistName = getIntent().getStringExtra("lastfm.artist");
 	    mTrackName = getIntent().getStringExtra("lastfm.track");
 		String[] actions = new String[isAmazonInstalled()?5:4];
-		actions[0] = "View Info";
-		actions[1] = "Share";
-		actions[2] = "Tag";
-		actions[3] = "Add To Playlist";
+		actions[0] = getString(R.string.menu_viewinfo);
+		actions[1] = getString(R.string.dialog_share);
+		actions[2] = getString(R.string.tag);
+		actions[3] = getString(R.string.dialog_addplaylist);
 	    if(isAmazonInstalled()) {
-	    	actions[4] = "Buy on Amazon.com";
+	    	actions[4] = getString(R.string.dialog_amazon);
 	    }
 	    this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actions)); 
 	}
