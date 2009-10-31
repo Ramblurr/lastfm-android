@@ -74,22 +74,7 @@ import fm.last.api.Session;
  * Scrobbles are submitted to the server after Now Playing info is sent, or when a network connection becomes
  * available.
  * 
- * Sample code for a 3rd party to integrate with us:
- * 
- * Intent i = new Intent("fm.last.android.metachanged");
- * i.putExtra("artist", {artist name});
- * i.putExtra("album", {album name});
- * i.putExtra("track", {track name});
- * i.putExtra("duration", {track duration in milliseconds});
- * sendBroadcast(i);
- * 
- * To love the currently-playing track:
- * Intent i = new Intent("fm.last.android.LOVE");
- * sendBroadcast(i);
- * 
- * To ban the currently-playing track:
- * Intent i = new Intent("fm.last.android.BAN");
- * sendBroadcast(i);
+ * Sample code for a 3rd party to integrate with us is located at http://wiki.github.com/c99koder/lastfm-android/scrobbler-interface
  *
  */
 public class ScrobblerService extends Service {
@@ -107,6 +92,7 @@ public class ScrobblerService extends Service {
 	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playstatechanged";
 	public static final String STATION_CHANGED = "fm.last.android.stationchanged";
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
+	public static final String PLAYBACK_PAUSED = "fm.last.android.playbackpaused";
 	public static final String UNKNOWN = "fm.last.android.unknown";
 	
 	private Logger logger;
@@ -416,6 +402,11 @@ public class ScrobblerService extends Service {
 				|| intent.getAction().equals("com.android.music.playbackcomplete") 
 				|| intent.getAction().equals("com.htc.music.playbackcomplete")) {
 			enqueueCurrentTrack();
+			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+			nm.cancel( 1338 );
+		}
+		if(intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
+			mCurrentTrack = null;
 			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 			nm.cancel( 1338 );
 		}

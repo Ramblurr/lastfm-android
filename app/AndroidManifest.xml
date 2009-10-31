@@ -120,6 +120,7 @@
 				<action android:name="fm.last.android.metachanged"/>
 				<action android:name="fm.last.android.playstatechanged"/>
 				<action android:name="fm.last.android.playbackcomplete"/>
+				<action android:name="fm.last.android.playbackpaused"/>
 				<action android:name="fm.last.android.LOVE"/>
 				<action android:name="fm.last.android.BAN"/>
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
