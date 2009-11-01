@@ -157,7 +157,7 @@ public class Metadata extends Activity {
 		inflater.inflate(R.menu.player, menu);
 		
 		MenuItem changeView = menu.findItem(R.id.info_menu_item);
-		changeView.setTitle( getString(R.string.nowplaying) );
+		changeView.setTitle( getString(R.string.action_nowplaying) );
 		changeView.setIcon( R.drawable.view_artwork );
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -206,8 +206,8 @@ public class Metadata extends Activity {
 			} catch (Exception e) {
 				LastFMApplication
 						.getInstance()
-						.presentError(this, "Amazon Unavailable",
-								"The Amazon MP3 store is not currently available on this device.");
+						.presentError(this, getString(R.string.ERROR_AMAZON_TITLE),
+								getString(R.string.ERROR_AMAZON));
 			}
 			break;
 		case R.id.share_menu_item:
@@ -267,7 +267,7 @@ public class Metadata extends Activity {
 	private class LoadBioTask extends UserTask<Void, Void, Boolean> {
 		@Override
 		public void onPreExecute() {
-			mWebView.loadData(getString(R.string.loading), "text/html", "utf-8");
+			mWebView.loadData(getString(R.string.common_loading), "text/html", "utf-8");
 		}
 
 		@Override
@@ -310,9 +310,9 @@ public class Metadata extends Activity {
 					 + "</span><br/>"
 					 + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>"
 					 + listeners
-					 + " listeners<br/>"
+					 + " "+getString(R.string.metadata_listeners)+"<br/>"
 					 + plays
-					 + " plays</span></div>"
+					 + " "+getString(R.string.metadata_plays)+"</span></div>"
 					 + "<br style='clear:both;'/>"
 					 + formatBio(artist.getBio().getContent())
 					 + "</div></body></html>";
@@ -355,7 +355,7 @@ public class Metadata extends Activity {
 		public void onPreExecute() {
 			mSimilarList.setOnItemClickListener(null);
 			mSimilarList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
-					getString(R.string.loading))); 
+					getString(R.string.common_loading))); 
 		}
 
 		@Override
@@ -410,7 +410,7 @@ public class Metadata extends Activity {
 		@Override
 		public void onPreExecute() {
 			mFanList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
-					getString(R.string.loading)));
+					getString(R.string.common_loading)));
 			mFanList.setOnItemClickListener(null);
 		}
 
@@ -463,7 +463,7 @@ public class Metadata extends Activity {
 		@Override
 		public void onPreExecute() {
 			mTagList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
-					getString(R.string.loading)));
+					getString(R.string.common_loading)));
 			mTagList.setOnItemClickListener(null);
 		}
 
@@ -531,7 +531,7 @@ public class Metadata extends Activity {
 		public void onPreExecute() {
 			mEventList.setOnItemClickListener(null);
 			mEventList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, 
-					getString(R.string.loading)));
+					getString(R.string.common_loading)));
 		}
 
 		@Override

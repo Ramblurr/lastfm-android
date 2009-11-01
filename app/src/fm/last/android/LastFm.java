@@ -211,7 +211,8 @@ public class LastFm extends Activity
     		this.context = c;
     		mLoginButton.setEnabled( false );
     		
-			mDialog = ProgressDialog.show( c , "", "Authenticating", true, false );
+			mDialog = ProgressDialog.show( c , "", getString(R.string.main_authenticating),
+					true, false );
 			mDialog.setCancelable( true );
     	}
     	    	
@@ -289,7 +290,7 @@ public class LastFm extends Activity
             {           	
         		AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
         		d.setIcon(android.R.drawable.ic_dialog_alert);
-        		d.setNeutralButton("OK",
+        		d.setNeutralButton(getString(R.string.common_ok),
         				new DialogInterface.OnClickListener() {
         					public void onClick(DialogInterface dialog, int whichButton)
         					{
@@ -299,7 +300,7 @@ public class LastFm extends Activity
             		d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
             		d.setMessage(getResources().getString(R.string.ERROR_AUTH));
     				((EditText)findViewById( R.id.password )).setText( "" );
-            		d.setNegativeButton("Forgot Password",
+            		d.setNegativeButton(getString(R.string.main_forgotpassword),
             				new DialogInterface.OnClickListener() {
             					public void onClick(DialogInterface dialog, int whichButton)
             					{
@@ -345,12 +346,12 @@ public class LastFm extends Activity
         public void onPostExecute(Boolean result) {
         	if(result) {
         		NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-        		Notification notification = new Notification(
-        				R.drawable.as_statusbar, "A new version of Last.fm is available", System.currentTimeMillis() );
+        		Notification notification = new Notification( R.drawable.as_statusbar, 
+        				getString(R.string.newversion_ticker_text), System.currentTimeMillis() );
         		PendingIntent contentIntent = PendingIntent.getActivity( LastFm.this, 0,
         				new Intent( Intent.ACTION_VIEW, Uri.parse(mUpdateURL)), 0 );
-        		notification.setLatestEventInfo( LastFm.this, "New version available",
-        				"Click here to download the update", contentIntent );
+        		notification.setLatestEventInfo( LastFm.this, getString(R.string.newversion_info_title),
+        				getString(R.string.newversion_info_text), contentIntent );
 
         		nm.notify( 12345, notification );
         	}

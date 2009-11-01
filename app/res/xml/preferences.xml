@@ -41,7 +41,7 @@
 		android:title="@string/prefs_bugreport_title"
 		android:summary="@string/prefs_bugreport_summary"
 		android:dialogLayout="@layout/bugreport"
-		android:negativeButtonText="@string/cancel" android:positiveButtonText="@string/prefs_bugreport_send"/>
+		android:negativeButtonText="@string/common_cancel" android:positiveButtonText="@string/prefs_bugreport_send"/>
     		
     </PreferenceCategory>
 </PreferenceScreen>

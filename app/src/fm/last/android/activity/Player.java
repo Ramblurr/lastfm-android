@@ -25,7 +25,6 @@ import java.util.Formatter;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
@@ -47,7 +46,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -65,9 +63,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class Player extends Activity {
 
@@ -206,8 +202,8 @@ public class Player extends Activity {
 			} catch (Exception e) {
 				LastFMApplication
 						.getInstance()
-						.presentError(c, "Amazon Unavailable",
-								"The Amazon MP3 store is not currently available on this device.");
+						.presentError(c, c.getString(R.string.ERROR_AMAZON_TITLE),
+								c.getString(R.string.ERROR_AMAZON));
 			}
 			break;
 		case R.id.share_menu_item:
@@ -480,7 +476,7 @@ public class Player extends Activity {
 			    				
 								if (mTuningDialog != null && player.getState() == RadioPlayerService.STATE_TUNING) {
 									mTuningDialog = ProgressDialog.show(Player.this, "",
-											"Tuning", true, false);
+											getString(R.string.player_tuning), true, false);
 									mTuningDialog
 											.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
 									mTuningDialog.setCancelable(true);
@@ -551,7 +547,7 @@ public class Player extends Activity {
         								mTuningDialog = null;
         							}
     								mBufferingDialog = ProgressDialog.show(Player.this, "",
-    										"Buffering", true, false);
+    										getString(R.string.player_buffering), true, false);
     								mBufferingDialog
     										.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
     								mBufferingDialog.setCancelable(true);
@@ -576,7 +572,6 @@ public class Player extends Activity {
 	private final Handler mHandler = new Handler() {
 
 		public void handleMessage(Message msg) {
-			final Message m = msg;
 			switch (msg.what) {
 			case REFRESH:
 				long next = refreshNow();

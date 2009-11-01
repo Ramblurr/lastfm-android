@@ -116,8 +116,8 @@ public class Tag extends Activity implements TabBarListener {
 		mTagLayout.setAnimationsEnabled(true);
 		
 		// configure the tabs
-		mTabBar.addTab("Suggested Tags", R.drawable.list_add_to_playlist);
-		mTabBar.addTab("Your Tags", R.drawable.profile);
+		mTabBar.addTab(getString(R.string.tag_suggestedtags), R.drawable.list_add_to_playlist);
+		mTabBar.addTab(getString(R.string.tag_mytags), R.drawable.profile);
 		mTabBar.setListener( this );
 		
 		// restoring or creatingData
@@ -432,7 +432,8 @@ public class Tag extends Activity implements TabBarListener {
 		@Override
 		public void onPreExecute() {
 			if(mLoadDialog == null){
-				mLoadDialog = ProgressDialog.show(Tag.this, "", "Loading tags", true, false);
+				mLoadDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_loading),
+						true, false);
 				mLoadDialog.setCancelable(true);
 			}
 		}
@@ -471,7 +472,8 @@ public class Tag extends Activity implements TabBarListener {
 		@Override
 		public void onPreExecute() {
 			if(mSaveDialog == null){
-				mSaveDialog = ProgressDialog.show(Tag.this, "", "Saving tags", true, false);
+				mSaveDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_saving),
+						true, false);
 				mSaveDialog.setCancelable(true);
 			}
 		}

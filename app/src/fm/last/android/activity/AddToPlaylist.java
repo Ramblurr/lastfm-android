@@ -164,7 +164,7 @@ public class AddToPlaylist extends Activity {
         	if(result) {
             	AddToPlaylist.this.finish();
         	} else {
-        		Toast.makeText(AddToPlaylist.this, "An error occured while adding track to playlist. Please try again.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(AddToPlaylist.this, getString(R.string.addtoplaylist_adding_error), Toast.LENGTH_SHORT).show();
         	}
         }
     }
@@ -173,7 +173,7 @@ public class AddToPlaylist extends Activity {
     	@Override
     	public void onPreExecute() {
         	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE,
-        			getString(R.string.loading)));
+        			getString(R.string.common_loading)));
     	}
     	
         @Override
@@ -206,7 +206,8 @@ public class AddToPlaylist extends Activity {
                 adaptor.setSourceIconified(iconifiedEntries);
                 mPlaylistsList.setAdapter(adaptor);
             } else {
-            	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.INFO_MODE, "No Playlists")); 
+            	mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this,
+            			NotificationAdapter.INFO_MODE, getString(R.string.addtoplaylist_noplaylists))); 
             }
         }
     }
@@ -221,7 +222,8 @@ public class AddToPlaylist extends Activity {
     	@Override
     	public void onPreExecute() {
         	mNewPlaylist.setEnabled(false);
-    		Toast.makeText(AddToPlaylist.this, "Creating playlist", Toast.LENGTH_LONG).show();
+    		Toast.makeText(AddToPlaylist.this, getString(R.string.addtoplaylist_creating),
+    				Toast.LENGTH_LONG).show();
     	}
     	
         @Override
@@ -262,7 +264,8 @@ public class AddToPlaylist extends Activity {
                 adapter.setSourceIconified(iconifiedEntries);
                 mPlaylistsList.setAdapter(adapter);
             } else {
-        		Toast.makeText(AddToPlaylist.this, "An error occurred while creating the playlist. Please try again.", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(AddToPlaylist.this, getString(R.string.addtoplaylist_creating_error),
+        				Toast.LENGTH_SHORT).show();
             }
         	mNewPlaylist.setEnabled(true);
         }

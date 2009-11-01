@@ -17,7 +17,7 @@
 			android:layout_alignLeft="@+id/station_search" android:layout_weight="1"
 			android:singleLine="true" android:layout_marginLeft="7dip"
 			android:layout_marginBottom="3dip" android:layout_marginTop="4dip" />
-		<Button android:id="@+id/search" android:text="@string/search"
+		<Button android:id="@+id/search" android:text="@string/newstation_search"
 			android:textColor="#fff" android:gravity="center"
 			android:layout_height="fill_parent" android:layout_width="wrap_content"
 			android:layout_marginLeft="8dip" android:layout_marginRight="8dip"

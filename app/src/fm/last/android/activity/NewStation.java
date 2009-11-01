@@ -107,9 +107,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
 		mTabBar = (TabBar) findViewById(R.id.TabBar);
 		mTabBar.setListener(this);
-		mTabBar.addTab("Artist", R.drawable.similar_artists).setId(TAB_ARTIST);
-		mTabBar.addTab("Tag", R.drawable.tags).setId(TAB_TAG);
-		mTabBar.addTab("User", R.drawable.top_listeners).setId(TAB_USER);
+		mTabBar.addTab(getString(R.string.newstation_artist), R.drawable.similar_artists).setId(TAB_ARTIST);
+		mTabBar.addTab(getString(R.string.newstation_tag), R.drawable.tags).setId(TAB_TAG);
+		mTabBar.addTab(getString(R.string.newstation_user), R.drawable.top_listeners).setId(TAB_USER);
 		tabChanged(TAB_ARTIST, TAB_ARTIST);
         
 
@@ -217,20 +217,20 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         if ( index == TAB_ARTIST )
         {
             searching = SearchType.Artist;
-            searchBar.setHint( "eg. Nirvana" );
-            mHint.setText(getResources().getString(R.string.newstation_hint_artist));
+            searchBar.setHint( getString(R.string.newstation_edithint_artist) );
+            mHint.setText(getString(R.string.newstation_hint_artist));
         }
         else if ( index == TAB_TAG )
         {
             searching = SearchType.Tag;
-            searchBar.setHint( "eg. Rock" );
-            mHint.setText(getResources().getString(R.string.newstation_hint_tag));
+            searchBar.setHint( getString(R.string.newstation_edithint_tag) );
+            mHint.setText(getString(R.string.newstation_hint_tag));
         }
         else if ( index == TAB_USER )
         {
             searching = SearchType.User;
-            searchBar.setHint( "eg. Last.hq" );
-            mHint.setText(getResources().getString(R.string.newstation_hint_user));
+            searchBar.setHint( getString(R.string.newstation_edithint_user) );
+            mHint.setText(getString(R.string.newstation_hint_user));
         }
         
         setListAdapter(mListAdapters[index]);
@@ -267,7 +267,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
             
         	searchBar.setEnabled(false);
         	mSearchButton.setEnabled(false);
-            Toast.makeText( NewStation.this, "Searching...", Toast.LENGTH_LONG ).show();
+            Toast.makeText( NewStation.this, getString(R.string.newstation_searching),
+            		Toast.LENGTH_LONG ).show();
         }
     };
     
@@ -301,7 +302,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
                 setListAdapter( mListAdapters[TAB_TAG] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No tags found", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(NewStation.this, getString(R.string.newstation_notags),
+        				Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
@@ -346,7 +348,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
                 setListAdapter( mListAdapters[TAB_ARTIST] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No artists found", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(NewStation.this, getString(R.string.newstation_noartist),
+        				Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}
@@ -387,7 +390,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
                 setListAdapter( mListAdapters[TAB_USER] );
         		findViewById(R.id.search_hint).setVisibility(View.GONE);
         	} else {
-        		Toast.makeText(NewStation.this, "No users found", Toast.LENGTH_SHORT).show();
+        		Toast.makeText(NewStation.this, getString(R.string.newstation_nousers),
+        				Toast.LENGTH_SHORT).show();
         		getListView().setVisibility(View.GONE);
         		findViewById(R.id.search_hint).setVisibility(View.VISIBLE);
         	}

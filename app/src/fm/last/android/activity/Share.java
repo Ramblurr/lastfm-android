@@ -126,7 +126,7 @@ public class Share extends Activity {
     	@Override
     	public void onPreExecute() {
         	mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, 
-        			getString(R.string.loading)));
+        			getString(R.string.common_loading)));
         	mFriendsList.setOnItemClickListener(null);
     	}
     	

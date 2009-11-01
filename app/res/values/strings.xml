@@ -2,19 +2,61 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">Last.fm</string>
 	
+	<!-- all actions not specific to an activity -->
+	<string name="action_viewinfo">View Info</string>
+	<string name="action_logout">Logout</string>
+	<string name="action_settings">Settings</string>
+	<string name="action_nowplaying">Now Playing</string>
+	<string name="action_amazon">Buy on Amazon</string>
+	<string name="action_share">Share</string>
+	<string name="action_addplaylist">Add to Playlist</string>
+	<string name="action_tagtrack">Tag Track</string>
+    <string name="action_similar">Listen to Similar Artists</string>
+    <string name="action_addlibrary">Add to Library</string>
+    <string name="action_tag">Tag</string>
+    
+	<!-- LastFm main activity -->
 	<string name="main_username">Username</string>
 	<string name="main_password">Pasword</string>
 	<string name="main_login">Log in</string>
 	<string name="main_signup">Sign up</string>
 	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
+	<string name="main_authenticating">Authenticating</string>
+	<string name="main_forgotpassword">Forgot Password</string>
 	
+	<!-- notification for new version -->
+	<string name="newversion_ticker_text">A new version of Last.fm is available</string>
+	<string name="newversion_info_title">New version available</string>
+	<string name="newversion_info_text">Click here to download the update</string>
+	
+	<!-- SignUp activity -->
+	<string name="signup_label">Last.fm: Sign Up</string>
 	<string name="signup_create_account">Create Account</string>
 	<string name="signup_username">Username</string>
 	<string name="signup_password">Password</string>
 	<string name="signup_email">Your email</string>
 	
-	<string name="menu_viewinfo">View Info</string>
+	<!-- AddToPlaylist activity -->
+	<string name="addtoplaylist_label">Last.fm: Add To Playlist</string>
+	<string name="addtoplaylist_newplaylist">New Playlist</string>
+	<string name="addtoplaylist_createplaylist">Create</string>
+	<string name="addtoplaylist_creating">Creating playlist</string>
+	<string name="addtoplaylist_creating_error">An error occurred while creating the playlist. Please try again.</string>
+	<string name="addtoplaylist_adding_error">An error occured while adding track to playlist. Please try again.</string>
+	<string name="addtoplaylist_noplaylists">No Playlists</string>
 	
+	<!-- Tag activity -->
+	<string name="tag_label">Last.fm: Tag</string>
+	<string name="tagarea_hint">Enter a tag above,\nor choose one from below</string>
+	<string name="tag_hint">Type tags here, or choose from below</string>
+	<string name="tag_suggestedtags">Suggested Tags</string>
+	<string name="tag_mytags">Your Tags</string>
+	<string name="tag_loading">Loading tags</string>
+	<string name="tag_saving">Saving tags</string>
+	<string name="tag_add">Add</string>
+	
+	<!-- Preferences activity -->
+	<string name="prefs_label">Last.fm: Preferences</string>
 	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
 	<string name="prefs_scrobble_title">Enable Scrobbling</string>
 	<string name="prefs_scrobble_summary">Update your Last.fm profile as you listen to music</string>
@@ -32,45 +74,57 @@
 	<string name="prefs_bugreport_summary">Email a bug report to Last.fm</string>
 	<string name="prefs_bugreport_send">Send</string>
 	
+	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
-
-	<string name="home_logout">Log out</string>
-	<string name="home_tracksplayed">plays</string>
-	<string name="home_newstation">Start a New Station</string>
-	<string name="home_mytags">My Tags</string>
-	<string name="home_myrecs">Recommended by Last.fm</string>
-	<string name="home_myneighborhood">Your Neighborhood</string>
-	<string name="home_myloved">Your Loved Tracks</string>
-	<string name="home_mylibrary">Your Library</string>
-	<string name="home_mystations">Your Stations</string>
-	<string name="home_recentstations">Recent Stations</string>
-	<string name="home_commonartists">Common Artists</string>
-	<string name="home_userneighborhood">\'s Neighborhood</string>
-    <string name="home_userloved">\'s Loved Tracks</string>
-    <string name="home_userlibrary">\'s Library</string>
-    <string name="home_userstations">\'s Stations</string>
-    <string name="home_userplaylists">\'s Playlists</string>
-    <string name="home_myplaylists">Your Playlists</string>
 	
-	<string name="radio">Radio</string>
-	<string name="profile">Profile</string>
-	<string name="fans">Fans</string>
-	
-	<string name="profile_unauthenticated">\'s Profile</string>
+	<!-- Profile activity -->
+	<string name="profile_label">Last.fm: Profile</string>
+	<string name="profile_myradio">Radio</string>
+    <string name="profile_userradio">%s\'s Radio</string>	
+	<string name="profile_myprofile">Profile</string>
+	<string name="profile_userprofile">%s\'s Profile</string>
+	<string name="profile_tracksplayed">plays</string>
+    <string name="profile_newstation">Start a New Station</string>
+    <string name="profile_mytags">My Tags</string>
+    <string name="profile_myrecs">Recommended by Last.fm</string>
+    <string name="profile_myneighborhood">Your Neighborhood</string>
+    <string name="profile_myloved">Your Loved Tracks</string>
+    <string name="profile_mylibrary">Your Library</string>
+    <string name="profile_mystations">Your Stations</string>
+    <string name="profile_recentstations">Recent Stations</string>
+    <string name="profile_commonartists">Common Artists</string>
+    <string name="profile_userneighborhood">%s\'s Neighborhood</string>
+    <string name="profile_userloved">%s\'s Loved Tracks</string>
+    <string name="profile_userlibrary">%s\'s Library</string>
+    <string name="profile_userstations">%s\'s Stations</string>
+    <string name="profile_userplaylists">%s\'s Playlists</string>
+    <string name="profile_myplaylists">Your Playlists</string>		
 	<string name="profile_topartists">Top Artists</string>
+	<string name="profile_notopartists">No Top Artists</string>
 	<string name="profile_topalbums">Top Albums</string>
+	<string name="profile_notopalbums">No Top Albums</string>
 	<string name="profile_toptracks">Top Tracks</string>
+	<string name="profile_notoptracks">No Top Tracks</string>
 	<string name="profile_recentlyplayed">Recently Played</string>
+	<string name="profile_norecenttracks">No Recent Tracks</string>
 	<string name="profile_events">Events</string>
+	<string name="profile_noevents">No Upcoming Events</string>
 	<string name="profile_friends">Friends</string>
+	<string name="profile_nofriends">No Friends Retrieved</string>
 	<string name="profile_tags">Tags</string>
+	<string name="profile_notags">No Tags</string>
+	<string name="profile_selectaction">Select Action</string>
 	
+	<!-- Share activity -->
+	<string name="share_label">Last.fm: Share With A Friend</string>
 	<string name="share_trackshared">The track was shared.</string>
 	<string name="share_error">An error occurred when sharing. Please try again.</string>
 	<string name="share_nofriends">No Friends :(</string>
 	<string name="share_selectapplication">Share track using:</string>
 	<string name="share_friendslist">Friends List</string>
 	
+	<!-- Metadata activity -->
+	<string name="metadata_label">Last.fm: Info</string>
 	<string name="metadata_bio">Bio</string>
 	<string name="metadata_similar">Similar</string>
 	<string name="metadata_tags">Tags</string>
@@ -81,46 +135,62 @@
 	<string name="metadata_notags">No Tags</string>
 	<string name="metadata_noevents">No Upcoming Events</string>
 	<string name="metadata_nofans">No Top Listeners</string>
+	<string name="metadata_plays">plays</string>
+	<string name="metadata_listeners">listeners</string>
 	
-	<string name="dialog_amazon">Buy on Amazon</string>
-	<string name="dialog_similar">Listen to Similar Artists</string>
-	<string name="dialog_tagalbum">Tag Album</string>
-	<string name="dialog_tagartist">Tag Artist</string>
-	<string name="dialog_tagtrack">Tag Track</string>
-	<string name="dialog_share">Share</string>
-	<string name="dialog_addlibrary">Add to Library</string>
-	<string name="dialog_addplaylist">Add to Playlist</string>
-	<string name="dialog_love">Love</string>
-	<string name="dialog_ban">Ban</string>
-
-	<string name="search">Search</string>
+	<!-- NewStation activity -->
+	<string name="newstation_label">Last.fm: Create a New Station</string>
+	<string name="newstation_search">Search</string>
 	<string name="newstation_artist">Artist</string>
 	<string name="newstation_tag">Tag</string>
 	<string name="newstation_user">User</string>
+	<string name="newstation_edithint_artist">eg. Nirvana</string>
 	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
+	<string name="newstation_edithint_tag">eg. Rock</string>	
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
+	<string name="newstation_edithint_user">eg. Last.hq</string>
 	<string name="newstation_hint_user">Type in a username\n to get started.</string>
+	<string name="newstation_searching">Searching...</string>
+	<string name="newstation_noartist">No artists found</string>
+	<string name="newstation_nousers">No users found</string>
+	<string name="newstation_notags">No tags found</string>
 
+    <!-- Event activity -->
+    <string name="event_label">Last.fm: Event</string>
 	<string name="event_showmap">Show Map</string>
 	<string name="event_attending">I\'m attending</string>
 	<string name="event_notattending">I\'m not attending</string>
 	<string name="event_maybe">I might attend</string>
+	
+	<!-- Player activity -->
+	<string name="player_label">Last.fm: Player</string>
+	<string name="player_tuning">Tuning</string>
+	<string name="player_buffering">Buffering</string>
+	
+	<!-- RadioPlayer service -->
+    <string name="playerservice_error_ticker_text">An error occured during playback</string>
+    <string name="playerservice_paused_ticker_text">Last.fm Paused</string>
+    <string name="playerservice_paused_info">%s by \n %s</string>
+    <string name="playerservice_paused">Paused</string>
+    <string name="playerservice_streaming_ticker_text">Streaming: %s by %s</string>
+    
+    <!-- Scrobbler service -->
+    <string name="scrobbler_ticker_text">Scrobbling: %s by %s</string>
+    <string name="scrobbler_info_title">Now Scrobbling</string>
+    <string name="scrobbler_trackloved">The track was marked as Loved.</string>
+    <string name="scrobbler_trackbanned">The track was marked as Banned.</string>  
 
 	<string name="durationformat">
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
-	<string name="logout">Logout</string>
-	<string name="settings">Settings</string>
-	<string name="loading">Loading...</string>
-	<string name="nowplaying">Now Playing</string>
-	<string name="cancel">Cancel</string>
-	<string name="ok">OK</string>
-	<string name="add">Add</string>
-	<string name="done">Done</string>
-	<string name="tag">Tag</string>
-	<string name="tag_hint">Type tags here, or choose from below</string>
-	<string name="tagarea_hint">Enter a tag above,\nor choose one from below</string>
+	
+	<!-- some strings common to different activities -->
+	<string name="common_loading">Loading...</string>	
+	<string name="common_cancel">Cancel</string>
+	<string name="common_ok">OK</string>
+	<string name="common_save">Save</string>
 
+    <!-- error message dialogs -->
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
 	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>
 	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
@@ -149,4 +219,6 @@
 	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
 	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>	
 	<string name="ERROR_SIGNUP_TITLE">Could not signup</string>
+	<string name="ERROR_AMAZON">The Amazon MP3 store is not currently available on this device.</string>
+	<string name="ERROR_AMAZON_TITLE">Amazon Unavailable</string>
 </resources>

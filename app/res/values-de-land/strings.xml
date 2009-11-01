@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    
+    <!-- Tag activity -->
 	<string name="tagarea_hint">Gib oben einen Tag ein oder wähle links einen aus</string>
+	
 </resources>

@@ -168,7 +168,7 @@ public class Profile extends ListActivity
     		b.setClickable( false ); // getListView() clicklistener handles this as the other routes had bugs
     		b.setGravity( 3 | 16 ); //sorry not to use constants, I got lame and couldn't figure it out
     		b.setTypeface( Typeface.create( Typeface.DEFAULT, Typeface.BOLD ) );
-    		b.setText(R.string.home_newstation);
+    		b.setText(R.string.profile_newstation);
    	 		b.setTag("header");
     		getListView().addHeaderView(b, null, true);
     		getListView().setItemsCanFocus( true );
@@ -188,11 +188,11 @@ public class Profile extends ListActivity
 		
 		mTabBar.setViewFlipper(mViewFlipper);
 		if(isAuthenticatedUser) {
-		    mTabBar.addTab("Radio", R.drawable.radio);		    
-		    mTabBar.addTab(this.getString(R.string.profile), R.drawable.profile);
+		    mTabBar.addTab(getString(R.string.profile_myradio), R.drawable.radio);		    
+		    mTabBar.addTab(getString(R.string.profile_myprofile), R.drawable.profile);
 		} else {
-		    mTabBar.addTab(mUsername + "'s Radio", R.drawable.radio);
-            mTabBar.addTab(mUsername + this.getString(R.string.profile_unauthenticated), R.drawable.profile);
+		    mTabBar.addTab(getString(R.string.profile_userradio,mUsername), R.drawable.radio);
+            mTabBar.addTab(getString(R.string.profile_userprofile,mUsername), R.drawable.profile);
 		}
        
         mMyRecentAdapter = new LastFMStreamAdapter( this );
@@ -388,7 +388,8 @@ public class Profile extends ListActivity
 	                SetupCommonArtists(tasteometer);
 	            }
 	            if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
-	            	mMainAdapter.addSection( mUsername + "'s Playlists", mMyPlaylistsAdapter);
+	            	mMainAdapter.addSection( getString(R.string.profile_userplaylists,mUsername),
+	            			mMyPlaylistsAdapter);
 	            mMainAdapter.notifyDataSetChanged();
             }
         }
@@ -412,17 +413,17 @@ public class Profile extends ListActivity
         Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMainAdapter = new SeparatedListAdapter(this);
         if(isAuthenticatedUser) {
-            mMainAdapter.addSection( getString(R.string.home_mystations), mMyStationsAdapter );
+            mMainAdapter.addSection( getString(R.string.profile_mystations), mMyStationsAdapter );
             if(mMyRecentAdapter.getCount() > 0)
-            	mMainAdapter.addSection( getString(R.string.home_recentstations), mMyRecentAdapter );
+            	mMainAdapter.addSection( getString(R.string.profile_recentstations), mMyRecentAdapter );
             if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-            	mMainAdapter.addSection( getString(R.string.home_myplaylists), mMyPlaylistsAdapter);
+            	mMainAdapter.addSection( getString(R.string.profile_myplaylists), mMyPlaylistsAdapter);
             }
         } else {
-            mMainAdapter.addSection( mUsername + getString(R.string.home_userstations), mMyStationsAdapter );        
-            mMainAdapter.addSection( getString(R.string.home_commonartists), mMyRecentAdapter );
+            mMainAdapter.addSection( getString(R.string.profile_userstations,mUsername), mMyStationsAdapter );        
+            mMainAdapter.addSection( getString(R.string.profile_commonartists), mMyRecentAdapter );
             if(session.getSubscriber().equals("1")&&mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-            	mMainAdapter.addSection( mUsername + getString(R.string.home_userplaylists), mMyPlaylistsAdapter);
+            	mMainAdapter.addSection( getString(R.string.profile_userplaylists,mUsername), mMyPlaylistsAdapter);
             }
         }
         if(mMyStationsAdapter != null && mMyStationsAdapter.getCount() > 0)
@@ -552,24 +553,24 @@ public class Profile extends ListActivity
         Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
         mMyStationsAdapter = new LastFMStreamAdapter( this );
         if(isAuthenticatedUser) {
-	        mMyStationsAdapter.putStation( getString(R.string.home_mylibrary), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_mylibrary), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
 	        if(session.getSubscriber().equals("1"))
-	        	mMyStationsAdapter.putStation( getString(R.string.home_myloved), 
+	        	mMyStationsAdapter.putStation( getString(R.string.profile_myloved), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
-	        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_myrecs), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
-	        mMyStationsAdapter.putStation( getString(R.string.home_myneighborhood), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_myneighborhood), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         } else {
-	        mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userlibrary), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_userlibrary,mUsername), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/personal" );
 	        if(session.getSubscriber().equals("1"))
-	        	mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userloved), 
+	        	mMyStationsAdapter.putStation(getString(R.string.profile_userloved,mUsername), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/loved" );
-	        mMyStationsAdapter.putStation( getString(R.string.home_myrecs), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_myrecs), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/recommended" );
-	        mMyStationsAdapter.putStation( mUsername + getString(R.string.home_userneighborhood), 
+	        mMyStationsAdapter.putStation( getString(R.string.profile_userneighborhood,mUsername), 
 	        		"lastfm://user/" + Uri.encode( mUsername ) + "/neighbours" );
         }
         
@@ -835,7 +836,7 @@ public class Profile extends ListActivity
                 adapter.setSourceIconified(iconifiedEntries);
                 mProfileLists[PROFILE_TOPARTISTS].setAdapter(adapter);
             } else {
-                String[] strings = new String[]{"No Top Artists"};
+                String[] strings = new String[]{getString(R.string.profile_notopartists)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -888,7 +889,7 @@ public class Profile extends ListActivity
                 adapter.setSourceIconified(iconifiedEntries);
                 mProfileLists[PROFILE_TOPALBUMS].setAdapter(adapter);
             } else {
-                String[] strings = new String[]{"No Top Albums"};
+                String[] strings = new String[]{getString(R.string.profile_notopalbums)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -932,7 +933,7 @@ public class Profile extends ListActivity
                 adapter.setSourceIconified(iconifiedEntries);
                 mProfileLists[PROFILE_TOPTRACKS].setAdapter(adapter);
             } else {
-                String[] strings = new String[]{"No Top Tracks"};
+                String[] strings = new String[]{getString(R.string.profile_notoptracks)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -975,7 +976,7 @@ public class Profile extends ListActivity
                 adapter.setSourceIconified(iconifiedEntries);
                 mProfileLists[PROFILE_RECENTLYPLAYED].setAdapter(adapter);
             } else {
-                String[] strings = new String[]{"No Recent Tracks"};
+                String[] strings = new String[]{getString(R.string.profile_norecenttracks)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -1012,7 +1013,7 @@ public class Profile extends ListActivity
                 mProfileLists[PROFILE_EVENTS].setAdapter(result);
                 //mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
             } else {
-                String[] strings = new String[]{"No Upcoming Events"};
+                String[] strings = new String[]{getString(R.string.profile_noevents)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -1054,7 +1055,7 @@ public class Profile extends ListActivity
     			adapter.setSourceIconified(iconifiedEntries);
         		mProfileLists[PROFILE_TAGS].setAdapter(adapter);
         	} else {
-                String[] strings = new String[]{"No Tags"};
+                String[] strings = new String[]{getString(R.string.profile_notags)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -1095,7 +1096,7 @@ public class Profile extends ListActivity
                 adapter.setSourceIconified(iconifiedEntries);
                 mProfileLists[PROFILE_FRIENDS].setAdapter(adapter);
             } else {
-                String[] strings = new String[]{"No Friends Retrieved"};
+                String[] strings = new String[]{getString(R.string.profile_nofriends)};
     	        ListAdapter adapter = new ListAdapter( Profile.this, strings );
     	        adapter.disableDisclosureIcons();
     	        adapter.setDisabled();
@@ -1113,13 +1114,13 @@ public class Profile extends ListActivity
         // group -- Not used here.
         // id -- Used only when you want to handle and identify the click yourself.
         // title
-        MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.logout));
+        MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.action_logout));
         logout.setIcon(R.drawable.logout);
 
-        MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.settings));
+        MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.action_settings));
         settings.setIcon(android.R.drawable.ic_menu_preferences);
 
-        MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.nowplaying));
+        MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.action_nowplaying));
 		nowPlaying.setIcon( R.drawable.view_artwork );
         return true;
     }
@@ -1215,7 +1216,9 @@ public class Profile extends ListActivity
             }
             });
         
-        AlertDialog dialog = new AlertDialog.Builder(Profile.this).setTitle("Select Action").setView(mDialogList).create();
+        AlertDialog dialog = new AlertDialog.Builder(Profile.this)
+        	.setTitle(getString(R.string.profile_selectaction))
+        	.setView(mDialogList).create();
         mDialogList.setTag( dialog );
         
         return dialog; 
@@ -1243,7 +1246,8 @@ public class Profile extends ListActivity
                 intent.putExtra("actionSearchType", searchType);
                 startActivity( intent );
             } catch (Exception e) {
-				LastFMApplication.getInstance().presentError(Profile.this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
+				LastFMApplication.getInstance().presentError(Profile.this, getString(R.string.ERROR_AMAZON_TITLE),
+						getString(R.string.ERROR_AMAZON));
             }
         }
     }
@@ -1322,22 +1326,22 @@ public class Profile extends ListActivity
     {
         ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>(); 
         
-        ListEntry entry = new ListEntry(R.string.dialog_similar, R.drawable.radio, getResources().getString(R.string.dialog_similar));
+        ListEntry entry = new ListEntry(R.string.action_similar, R.drawable.radio, getResources().getString(R.string.action_similar));
         iconifiedEntries.add(entry);
 
         if( type == DIALOG_TRACK) {
-            entry = new ListEntry(R.string.dialog_share, R.drawable.share_dark, getResources().getString(R.string.dialog_share));
+            entry = new ListEntry(R.string.action_share, R.drawable.share_dark, getString(R.string.action_share));
             iconifiedEntries.add(entry);
 
-            entry = new ListEntry(R.string.dialog_tagtrack, R.drawable.tag_dark, getResources().getString(R.string.dialog_tagtrack));
+            entry = new ListEntry(R.string.action_tagtrack, R.drawable.tag_dark, getString(R.string.action_tagtrack));
             iconifiedEntries.add(entry);
 
-            entry = new ListEntry(R.string.dialog_addplaylist, R.drawable.playlist_dark, getResources().getString(R.string.dialog_addplaylist));
+            entry = new ListEntry(R.string.action_addplaylist, R.drawable.playlist_dark, getString(R.string.action_addplaylist));
             iconifiedEntries.add(entry);
         }
 
         if(isAmazonInstalled()) {
-        	entry = new ListEntry(R.string.dialog_amazon, R.drawable.shopping_cart_dark, getResources().getString(R.string.dialog_amazon)); // TODO need amazon icon
+        	entry = new ListEntry(R.string.action_amazon, R.drawable.shopping_cart_dark, getString(R.string.action_amazon)); // TODO need amazon icon
         	iconifiedEntries.add(entry);
         }
         return iconifiedEntries;        

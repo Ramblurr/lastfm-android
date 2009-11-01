@@ -17,7 +17,7 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 		
-	<item android:id="@+id/cancel_menu_item" android:title="Cancel" android:icon="@drawable/cancel"/>
-	<item android:id="@+id/save_menu_item" android:title="Save" android:icon="@drawable/done"/>
+	<item android:id="@+id/cancel_menu_item" android:title="@string/common_cancel" android:icon="@drawable/cancel"/>
+	<item android:id="@+id/save_menu_item" android:title="@string/common_save" android:icon="@drawable/done"/>
 		
 </menu>

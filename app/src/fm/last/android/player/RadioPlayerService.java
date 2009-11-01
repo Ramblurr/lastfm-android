@@ -25,7 +25,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -47,12 +46,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
-import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -66,7 +63,6 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import fm.last.android.R;
 import fm.last.android.activity.Player;
@@ -302,9 +298,9 @@ public class RadioPlayerService extends Service
 		if ( currentTrack == null )
 			return;
 		Notification notification = new Notification(
-				R.drawable.as_statusbar, "Streaming: "
-				+ currentTrack.getTitle() + " by "
-				+ currentTrack.getCreator(), System.currentTimeMillis() );
+				R.drawable.as_statusbar, 
+				getString(R.string.playerservice_streaming_ticker_text, currentTrack.getTitle(),
+						currentTrack.getCreator()), System.currentTimeMillis() );
 		PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 				new Intent( this, Player.class ), 0 );
 		String info = currentTrack.getTitle() + " - " + currentTrack.getCreator();
@@ -507,10 +503,14 @@ public class RadioPlayerService extends Service
 				notifyChange( PLAYBACK_ERROR );
 				mState = STATE_ERROR;
 				Notification notification = new Notification(
-						R.drawable.as_statusbar, "An error occured during playback", System.currentTimeMillis() );
+						R.drawable.as_statusbar, getString(R.string.playerservice_error_ticker_text),
+						System.currentTimeMillis() );
 				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 						new Intent( this, Profile.class ), 0 );
-				notification.setLatestEventInfo( this, "Insufficient Content", "Please try another station.", contentIntent );
+				notification.setLatestEventInfo( this,
+						getString(R.string.ERROR_INSUFFICIENT_CONTENT_TITLE),
+						getString(R.string.ERROR_INSUFFICIENT_CONTENT),
+						contentIntent );
 				nm.notify( NOTIFY_ID, notification );
 				return;
 			} catch (Exception e) {
@@ -569,7 +569,7 @@ public class RadioPlayerService extends Service
 		if ( mState != STATE_PAUSED)
 		{
 			Notification notification = new Notification(
-					R.drawable.stop, "Last.fm Paused", System
+					R.drawable.stop, getString(R.string.playerservice_paused_ticker_text), System
 					.currentTimeMillis() );
 			PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 					new Intent( this, Player.class ), 0 );
@@ -577,13 +577,13 @@ public class RadioPlayerService extends Service
 			String name;
 			if ( currentTrack != null )
 			{
-				info = currentTrack.getTitle() + " by \n"
-				+ currentTrack.getCreator();
+				info = getString(R.string.playerservice_paused_info, currentTrack.getTitle(), 
+						currentTrack.getCreator());
 				name = currentStation.getName();
 			}
 			else
 			{
-				info = "Paused";
+				info = getString(R.string.playerservice_paused);
 				name = currentStation.getName();
 			}
 			notification.setLatestEventInfo( this, name, info, contentIntent );
@@ -635,7 +635,7 @@ public class RadioPlayerService extends Service
 			if(e.getMessage().contains("code 503")) {
 				if(mPlaylistRetryCount++ < 4 ) {
 					logger.warning("Playlist service unavailable, retrying...");
-					Thread.currentThread().sleep(2000);
+					Thread.sleep(2000);
 					refreshPlaylist();
 				} else {
 					throw e;

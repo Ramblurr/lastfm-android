@@ -45,7 +45,6 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 import fm.last.android.AndroidLastFmServerFactory;
@@ -396,17 +395,17 @@ public class ScrobblerService extends Service {
 
 			if(auth == null) {
 				NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-				Notification notification = new Notification(
-						R.drawable.as_statusbar, "Scrobbling: "
-						+ mCurrentTrack.title + " by "
-						+ mCurrentTrack.artist, System.currentTimeMillis() );
+				Notification notification = new Notification(						
+						R.drawable.as_statusbar, 
+						getString(R.string.scrobbler_ticker_text, mCurrentTrack.title, mCurrentTrack.artist),
+						System.currentTimeMillis() );
 				Intent metaIntent = new Intent(this, fm.last.android.activity.Metadata.class);
 				metaIntent.putExtra("artist", mCurrentTrack.artist);
 				metaIntent.putExtra("track", mCurrentTrack.title);
 				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 						metaIntent, 0 );
 				String info = mCurrentTrack.title + " - " + mCurrentTrack.artist;
-				notification.setLatestEventInfo( this, "Now Scrobbling",
+				notification.setLatestEventInfo( this, getString(R.string.scrobbler_info_title),
 						info, contentIntent );
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
 				nm.notify( 1338, notification );
@@ -421,11 +420,11 @@ public class ScrobblerService extends Service {
 		}
 		if(intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
-			Toast.makeText(this, "The track was marked as Loved.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getString(R.string.scrobbler_trackloved), Toast.LENGTH_SHORT).show();
 		}
 		if(intent.getAction().equals(BAN) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "B";
-        	Toast.makeText(this, "The track was marked as Banned.", Toast.LENGTH_SHORT).show();
+        	Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
 		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {

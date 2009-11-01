@@ -3,13 +3,8 @@
  */
 package fm.last.android.activity;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
-import fm.last.api.Station;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -44,12 +39,12 @@ public class PopupActionActivity extends ListActivity {
 	    mArtistName = getIntent().getStringExtra("lastfm.artist");
 	    mTrackName = getIntent().getStringExtra("lastfm.track");
 		String[] actions = new String[isAmazonInstalled()?5:4];
-		actions[0] = getString(R.string.menu_viewinfo);
-		actions[1] = getString(R.string.dialog_share);
-		actions[2] = getString(R.string.tag);
-		actions[3] = getString(R.string.dialog_addplaylist);
+		actions[0] = getString(R.string.action_viewinfo);
+		actions[1] = getString(R.string.action_share);
+		actions[2] = getString(R.string.action_tag);
+		actions[3] = getString(R.string.action_addplaylist);
 	    if(isAmazonInstalled()) {
-	    	actions[4] = getString(R.string.dialog_amazon);
+	    	actions[4] = getString(R.string.action_amazon);
 	    }
 	    this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actions)); 
 	}
@@ -93,7 +88,8 @@ public class PopupActionActivity extends ListActivity {
                 intent.putExtra("actionSearchType", searchType);
                 startActivity( intent );
             } catch (Exception e) {
-				LastFMApplication.getInstance().presentError(this, "Amazon Unavailable", "The Amazon MP3 store is not currently available on this device.");
+				LastFMApplication.getInstance().presentError(this, getString(R.string.ERROR_AMAZON_TITLE),
+						getString(R.string.ERROR_AMAZON));
             }
 			break;
 		default:

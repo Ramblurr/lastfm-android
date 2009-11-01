@@ -17,10 +17,10 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 		
-	<item android:id="@+id/info_menu_item" android:title="@string/menu_viewinfo" android:icon="@drawable/info"/>
-	<item android:id="@+id/share_menu_item" android:title="@string/dialog_share" android:icon="@drawable/share"/>
-	<item android:id="@+id/tag_menu_item" android:title="@string/newstation_tag" android:icon="@drawable/tag_menu"/>
-	<item android:id="@+id/playlist_menu_item" android:title="@string/dialog_addplaylist" android:icon="@drawable/playlist"/>
-	<item android:id="@+id/buy_menu_item" android:title="@string/dialog_amazon" android:icon="@drawable/shopping_cart"/>
+	<item android:id="@+id/info_menu_item" android:title="@string/action_viewinfo" android:icon="@drawable/info"/>
+	<item android:id="@+id/share_menu_item" android:title="@string/action_share" android:icon="@drawable/share"/>
+	<item android:id="@+id/tag_menu_item" android:title="@string/action_tag" android:icon="@drawable/tag_menu"/>
+	<item android:id="@+id/playlist_menu_item" android:title="@string/action_addplaylist" android:icon="@drawable/playlist"/>
+	<item android:id="@+id/buy_menu_item" android:title="@string/action_amazon" android:icon="@drawable/shopping_cart"/>
 	
 </menu>
