@@ -23,6 +23,7 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -274,8 +275,12 @@ public class Metadata extends Activity {
 			Artist artist;
 			boolean success = false;
 
-			try {
-				artist = mServer.getArtistInfo(mArtistName, null, null);
+			try {				
+				artist = mServer.getArtistInfo(mArtistName, null, Locale.getDefault().getLanguage());
+				if (artist.getBio().getContent()==null || artist.getBio().getContent().trim().length()==0) {
+					// no bio in current locale -> get the English bio
+					artist = mServer.getArtistInfo(mArtistName, null, null);
+				}
 				String imageURL = "";
 				for(ImageUrl image : artist.getImages()) {
 					if(image.getSize().contentEquals("large")) {
