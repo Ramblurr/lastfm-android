@@ -1,0 +1,9 @@
+app/bin
+app/gen
+app/src/fm/last/android/PrivateAPIKey.java
+app/src/fm/last/android/utils/utils
+app/src/fm/last/api
+app/src/fm/last/util
+app/src/fm/last/xml
+*.apk
+*.keystore

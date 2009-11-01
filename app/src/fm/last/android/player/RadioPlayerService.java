@@ -21,6 +21,8 @@
 package fm.last.android.player;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -135,8 +137,6 @@ public class RadioPlayerService extends Service
 		
 		nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
 		bufferPercent = 0;
-		setForeground( true ); // we dont want the service to be killed while
-		// playing
 		mp.setScreenOnWhilePlaying( true ); // we dont want to sleep while we're
 		// playing
 		currentQueue = new ArrayBlockingQueue<RadioTrack>(20);
@@ -225,7 +225,7 @@ public class RadioPlayerService extends Service
 						} catch ( Exception e ) {
 							e.printStackTrace();
 						}
-						nm.cancel( NOTIFY_ID );
+						clearNotification();
 						mState = STATE_NODATA;
 						currentQueue.clear();
 					}
@@ -282,7 +282,7 @@ public class RadioPlayerService extends Service
 		if(mp.isPlaying())
 			mp.stop();
 		mp.release();
-		nm.cancel( NOTIFY_ID );
+		clearNotification();
 		unregisterReceiver(connectivityListener);
 	}
 
@@ -292,6 +292,19 @@ public class RadioPlayerService extends Service
 		return mBinder;
 	}
 
+	private void clearNotification() {
+		try {
+			Class types[] = {boolean.class};
+			Object args[] = {true};
+			Method method = Service.class.getMethod("stopForeground", types);
+			method.invoke(this, args);
+		} catch (NoSuchMethodException e) {
+			nm.cancel( NOTIFY_ID );
+			setForeground(false);
+		} catch (Exception e) {
+		}
+	}
+	
 	private void playingNotify()
 	{
 
@@ -308,7 +321,16 @@ public class RadioPlayerService extends Service
 				info, contentIntent );
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 		RadioWidgetProvider.updateAppWidget(this);
-		nm.notify( NOTIFY_ID, notification );
+		try {
+			Class types[] = {int.class, Notification.class};
+			Object args[] = {NOTIFY_ID, notification};
+			Method method = Service.class.getMethod("startForeground", types);
+			method.invoke(this, args);
+		} catch (NoSuchMethodException e) {
+			nm.notify( NOTIFY_ID, notification );
+			setForeground(true);
+		} catch (Exception e) {
+		}
 	}
 
 	private OnCompletionListener mOnCompletionListener = new OnCompletionListener()
@@ -379,7 +401,7 @@ public class RadioPlayerService extends Service
 					//the user.  This will bring us into a stopped state.
 					mState = STATE_ERROR;
 					notifyChange(PLAYBACK_ERROR);
-					nm.cancel( NOTIFY_ID );
+					clearNotification();
 					if( wakeLock.isHeld())
 						wakeLock.release();
 					
@@ -465,7 +487,7 @@ public class RadioPlayerService extends Service
 		next_mp = null;
 		mNextPrepared = false;
 		mNextFullyBuffered = false;
-		nm.cancel( NOTIFY_ID );
+		clearNotification();
 		mState = STATE_STOPPED;
 		notifyChange(PLAYBACK_FINISHED);
 		if( wakeLock.isHeld())
@@ -499,7 +521,7 @@ public class RadioPlayerService extends Service
 				refreshPlaylist();
 			} catch (WSError e) {
 				mError = e;
-				nm.cancel( NOTIFY_ID );
+				clearNotification();
 				notifyChange( PLAYBACK_ERROR );
 				mState = STATE_ERROR;
 				Notification notification = new Notification(
@@ -550,7 +572,7 @@ public class RadioPlayerService extends Service
 		{
 			// radio finished
 			notifyChange( PLAYBACK_FINISHED );
-			nm.cancel( NOTIFY_ID );
+			clearNotification();
 			wakeLock.release();
 			wifiLock.release();
 			mState = STATE_STOPPED;
@@ -588,7 +610,7 @@ public class RadioPlayerService extends Service
 			}
 			notification.setLatestEventInfo( this, name, info, contentIntent );
 			// notification.flags |= Notification.FLAG_ONGOING_EVENT;
-			nm.cancel( NOTIFY_ID );
+			clearNotification();
 			nm.notify( NOTIFY_ID, notification );
 			notifyChange( PLAYBACK_STATE_CHANGED );
 			mp.pause();
@@ -676,7 +698,7 @@ public class RadioPlayerService extends Service
 		
 		logger.info("Tuning to station: " + url);
 		if(mState == STATE_PLAYING) {
-			nm.cancel( NOTIFY_ID );
+			clearNotification();
 			mp.stop();
 		}
 		mState = STATE_TUNING;

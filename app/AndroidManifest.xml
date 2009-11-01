@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="fm.last.android" android:versionCode="8" android:versionName="1.2.1">
+	package="fm.last.android" android:versionCode="9" android:versionName="1.2.2">
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<uses-permission android:name="android.permission.WAKE_LOCK"/>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:anyDensity="true"/>
 	<uses-sdk android:minSdkVersion="3"/>
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
@@ -107,7 +108,7 @@
 		                android:resource="@xml/radiowidget_info"
 		                />
 		</receiver>
-		<service android:name=".player.RadioPlayerService" android:process=":player" />
+		<service android:name=".player.RadioPlayerService" android:process=":player" android:label="Last.fm Radio Player"/>
        	<receiver android:name=".scrobbler.MusicIntentReceiver">
     		<intent-filter>
 				<action android:name="com.android.music.playstatechanged"/>
@@ -120,12 +121,13 @@
 				<action android:name="fm.last.android.metachanged"/>
 				<action android:name="fm.last.android.playstatechanged"/>
 				<action android:name="fm.last.android.playbackcomplete"/>
+				<action android:name="fm.last.android.playbackpaused"/>
 				<action android:name="fm.last.android.LOVE"/>
 				<action android:name="fm.last.android.BAN"/>
 				<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
 				<action android:name="fm.last.android.scrobbler.FLUSH"/>
     		</intent-filter>
     	</receiver>
-		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler"/>
+		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler" android:label="Last.fm Scrobbler"/>
     </application>
 </manifest>
