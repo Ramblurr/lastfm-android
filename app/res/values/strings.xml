@@ -114,6 +114,7 @@
 	<string name="profile_tags">Tags</string>
 	<string name="profile_notags">No Tags</string>
 	<string name="profile_selectaction">Select Action</string>
+	<string name="profile_userplays">%d plays since %s</string>
 	
 	<!-- Share activity -->
 	<string name="share_label">Last.fm: Share With A Friend</string>
@@ -168,6 +169,7 @@
 	<string name="player_buffering">Buffering</string>
 	
 	<!-- RadioPlayer service -->
+	<string name="playerservice_label">Last.fm: Radio Player</string>
     <string name="playerservice_error_ticker_text">An error occured during playback</string>
     <string name="playerservice_paused_ticker_text">Last.fm Paused</string>
     <string name="playerservice_paused_info">%s by \n %s</string>
@@ -175,6 +177,7 @@
     <string name="playerservice_streaming_ticker_text">Streaming: %s by %s</string>
     
     <!-- Scrobbler service -->
+    <string name="scrobbler_label">Last.fm: Scrobbler</string>
     <string name="scrobbler_ticker_text">Scrobbling: %s by %s</string>
     <string name="scrobbler_info_title">Now Scrobbling</string>
     <string name="scrobbler_trackloved">The track was marked as Loved.</string>
@@ -193,8 +196,6 @@
     <!-- error message dialogs -->
 	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
 	<string name="ERROR_AUTH_TITLE">Incorrect Login</string>
-	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
-	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT">There is not enough content available to play this station.  Please try another station.</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Insufficient Content</string>
 	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>

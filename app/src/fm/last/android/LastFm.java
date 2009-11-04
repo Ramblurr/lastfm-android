@@ -189,7 +189,7 @@ public class LastFm extends Activity
             String user = mUserField.getText().toString();
             String password = mPassField.getText().toString();
             outState.putString( "username", user );
-            outState.putString( "passowrd", password );
+            outState.putString( "password", password );
         }
         super.onSaveInstanceState( outState );
     }

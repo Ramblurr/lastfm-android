@@ -108,7 +108,7 @@
 		                android:resource="@xml/radiowidget_info"
 		                />
 		</receiver>
-		<service android:name=".player.RadioPlayerService" android:process=":player" android:label="Last.fm Radio Player"/>
+		<service android:name=".player.RadioPlayerService" android:process=":player" android:label="@string/playerservice_label"/>
        	<receiver android:name=".scrobbler.MusicIntentReceiver">
     		<intent-filter>
 				<action android:name="com.android.music.playstatechanged"/>
@@ -128,6 +128,6 @@
 				<action android:name="fm.last.android.scrobbler.FLUSH"/>
     		</intent-filter>
     	</receiver>
-		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler" android:label="Last.fm Scrobbler"/>
+		<service android:name=".scrobbler.ScrobblerService" android:process=":scrobbler" android:label="@string/scrobbler_label"/>
     </application>
 </manifest>

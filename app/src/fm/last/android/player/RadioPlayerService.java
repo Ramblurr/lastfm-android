@@ -21,7 +21,6 @@
 package fm.last.android.player;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;

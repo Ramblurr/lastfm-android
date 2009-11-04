@@ -85,9 +85,7 @@ public class ProfileBubble extends LinearLayout {
         int playcount = Integer.parseInt(mUser.getPlaycount());
         NumberFormat format = NumberFormat.getNumberInstance();
         String count = format.format( playcount );
-        String plays = count + " plays";
-        if(mUser.getJoinDate() != null)
-            plays += " since " + mUser.getJoinDate();
+        String plays = getContext().getString(R.string.profile_userplays, count, mUser.getJoinDate());
         mSecond.setText(second + plays);
 
         if( mUser.getImages().length > 0 ) {

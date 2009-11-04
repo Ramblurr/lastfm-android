@@ -7,16 +7,16 @@
 	<string name="action_settings">Einstellungen</string>
 	<string name="action_nowplaying">Spielt gerade</string>
 	<string name="action_amazon">Bei Amazon kaufen</string>
-	<string name="action_share">Weiterleiten</string>
-	<string name="action_addplaylist">Zur Playlist hinzufügen</string>
+	<string name="action_share">Empfehlen</string>
+	<string name="action_addplaylist">Zu Playlist hinzufügen</string>
 	<string name="action_tagtrack">Titel taggen</string>
 	<string name="action_similar">Ähnliche Künstler anhören</string>
     <string name="action_addlibrary">Zur Musiksammlung hinzufügen</string>
-    <string name="action_tag">Tagge</string>
+    <string name="action_tag">Taggen</string>
 
 	<!-- LastFm main activity -->
 	<string name="main_username">Benutzername</string>
-	<string name="main_password">Paswort</string>
+	<string name="main_password">Passwort</string>
 	<string name="main_login">Anmelden</string>
 	<string name="main_signup">Registrieren</string>
 	<string name="main_newaccount">&quot;Hast du noch keinen Account?&quot;</string>
@@ -37,10 +37,10 @@
 	
     <!-- AddToPlaylist activity -->
     <string name="addtoplaylist_label">Last.fm: Zu Playlist hinzufügen</string>
-    <string name="addtoplaylist_newplaylist">Neue Playliste</string>
+    <string name="addtoplaylist_newplaylist">Neue Playlist</string>
     <string name="addtoplaylist_createplaylist">Anlegen</string>
-    <string name="addtoplaylist_creating">Lege Playliste an</string>
-    <string name="addtoplaylist_creating_error">Beim Anlegen der Playliste trat ein Fehler auf. Bitte versuch es nochmal.</string>
+    <string name="addtoplaylist_creating">Lege Playlist an</string>
+    <string name="addtoplaylist_creating_error">Beim Anlegen der Playlist trat ein Fehler auf. Bitte versuch es nochmal.</string>
     <string name="addtoplaylist_adding_error">Beim Hinzufügen des Titels trat ein Fehler auf. Bitte versuch es nochmal.</string>
     <string name="addtoplaylist_noplaylists">Keine Playlisten</string>
 
@@ -48,7 +48,7 @@
     <string name="tag_label">Last.fm: Tag hinzufügen</string>
     <string name="tagarea_hint">Gib oben einen Tag ein\noder wähle unten einen aus</string>
     <string name="tag_hint">Hier Tags eingeben oder unten auswählen</string>
-    <string name="tag_suggestedtags">Vorgesachlagene Tags</string>
+    <string name="tag_suggestedtags">Vorgeschlagene Tags</string>
     <string name="tag_mytags">Deine Tags</string>
     <string name="tag_loading">Lade Tags</string>
     <string name="tag_saving">Speichere Tags</string>
@@ -63,8 +63,8 @@
 	<string name="prefs_scrobble_music_player_summary">Scrobbel den Android Musik-Player</string>
 	<string name="prefs_scrobble_realtime_title">Scrobbel in Echtzeit</string>
 	<string name="prefs_scrobble_realtime_summary">Sendet \'Hört gerade\' Informationen und scrobbelt sofort.</string>
-	<string name="prefs_scrobble_wifi_only_title">Scrobbel nur bei W-LAN</string>
-	<string name="prefs_scrobble_wifi_only_summary">Sammlelt gespielte Titel, wenn keine WLAN-Verbindung besteht</string>
+	<string name="prefs_scrobble_wifi_only_title">Scrobbel nur bei WLAN</string>
+	<string name="prefs_scrobble_wifi_only_summary">Sammelt gespielte Titel, wenn keine WLAN-Verbindung besteht</string>
 	<string name="prefs_cat_player_title">Player</string>
 	<string name="prefs_highquality_title">High-Quality-Audio</string>
 	<string name="prefs_highquality_summary">Verwende High-Quality-Audio über Handy</string>
@@ -113,19 +113,20 @@
 	<string name="profile_tags">Tags</string>
 	<string name="profile_notags">Keine Tags</string>
 	<string name="profile_selectaction">Aktion wählen</string>
+	<string name="profile_userplays">%d gespielte Titel seit %s</string>
 	
     <!-- Share activity -->
-    <string name="share_label">Last.fm: An einen Freund weiterleiten</string>
-    <string name="share_trackshared">Der Titel wurde weitergeleitet.</string>
-    <string name="share_error">Beim Weiterleiten traten Fehler auf. Bitte versuch es nochmal.</string>
+    <string name="share_label">Last.fm: An einen Freund empfehlen</string>
+    <string name="share_trackshared">Der Titel wurde empfohlen.</string>
+    <string name="share_error">Beim Empfehlen traten Fehler auf. Bitte versuch es nochmal.</string>
     <string name="share_nofriends">Keine Freunde :(</string>
-    <string name="share_selectapplication">Leite Titel weiter mit:</string>
+    <string name="share_selectapplication">Empfehle Titel mit:</string>
     <string name="share_friendslist">Freunde</string>
 	
     <!-- Metadata activity -->
     <string name="metadata_label">Last.fm: Info</string>
     <string name="metadata_bio">Bio</string>
-    <string name="metadata_similar">Ähnlich</string>
+    <string name="metadata_similar">Ähnliche</string>
     <string name="metadata_tags">Tags</string>
     <string name="metadata_events">Events</string>
     <string name="metadata_Fans">Fans</string>
@@ -158,7 +159,7 @@
     <string name="event_label">Last.fm: Event</string>
 	<string name="event_showmap">Karte anzeigen</string>
 	<string name="event_attending">Ich gehe hin</string>
-	<string name="event_notattending">Ich gehe nich hin</string>
+	<string name="event_notattending">Ich gehe nicht hin</string>
 	<string name="event_maybe">Ich gehe vielleicht hin</string>
 	
 	<!-- Player activity -->
@@ -167,6 +168,7 @@
     <string name="player_buffering">Puffere</string>
     
     <!-- RadioPlayer service -->
+    <string name="playerservice_label">Last.fm Radio Player</string>
     <string name="playerservice_error_ticker_text">Beim Abspielen trat ein Fehler auf</string>
     <string name="playerservice_paused_ticker_text">Last.fm angehalten</string>
     <string name="playerservice_paused_info">%s von \n %s</string>
@@ -174,6 +176,7 @@
     <string name="playerservice_streaming_ticker_text">Streame: %s von %s</string>
     
     <!-- Scrobbler service -->
+    <string name="scrobbler_label">Last.fm: Scrobbler</string>
     <string name="scrobbler_ticker_text">Scrobble: %s von %s</string>
     <string name="scrobbler_info_title">Scrobble gerade</string>
     <string name="scrobbler_trackloved">Der Titel wurde geliebt.</string>
@@ -190,10 +193,8 @@
 	<string name="common_save">Speichern</string>
 
     <!-- error message dialogs -->	
-	<string name="ERROR_AUTH">Unable to log in to Last.fm.  Please check your username and password and try again.</string>
+	<string name="ERROR_AUTH">Anmeldung bei Last.fm ist fehlgeschlagen.  Bitte überprüfe Benutzername und Passwort und versuche es nochmal.</string>
 	<string name="ERROR_AUTH_TITLE">Anmeldung fehlgeschlagen</string>
-	<string name="ERROR_CHART_EMPTY">&quot;This chart hasn't been generated yet.  Keep listening to music, and try again in a few days.&quot;</string>
-	<string name="ERROR_CHART_EMPTY_TITLE">Chart Not Available</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT">Es steht nicht genügend Inhalt zu Verfügung, um die Station abzuspielen.  Bitte versuche es mit einer anderen Station.</string>
 	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Unzureichender Inhalt</string>
 	<string name="ERROR_INSUFFICIENT_FANS">Dieser Künstler hat nicht genug Fans, um die Station abzuspielen.  Bitte versuche einen anderen Künstler.</string>
