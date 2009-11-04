@@ -111,6 +111,12 @@ public class Player extends Activity {
 		mProgress = (ProgressBar) findViewById(android.R.id.progress);
 		mProgress.setMax(1000);
 		mAlbum = (AlbumArt) findViewById(R.id.album);
+		LayoutParams params = mAlbum.getLayoutParams();
+		if(AdArea.adsEnabled(this)) {
+			params.width -= 54;
+			params.height -= 54;
+		}
+		mAlbum.setLayoutParams(params);
 		mArtistName = (TextView) findViewById(R.id.track_artist);
 		mTrackName = (TextView) findViewById(R.id.track_title);
 
@@ -271,13 +277,6 @@ public class Player extends Activity {
 	public void onStart() {
 		super.onStart();
 		paused = false;
-
-		LayoutParams params = mAlbum.getLayoutParams();
-		if(AdArea.adsEnabled(this)) {
-			params.width -= 54;
-			params.height -= 54;
-		}
-		mAlbum.setLayoutParams(params);
 	}
 
 	@Override
