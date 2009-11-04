@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="LastFMButton">
+		<item name="android:background">@+drawable/player_controls</item>
+		<item name="android:layout_width">110dip</item>
+		<item name="android:layout_height">62dip</item>
+	</style>
+	<style name="playback_progress">
+		<item name="android:layout_width">160dip</item>
+	</style>
+</resources>
