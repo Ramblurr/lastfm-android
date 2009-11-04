@@ -29,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import fm.last.api.Artist;
 import fm.last.api.Tag;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -175,4 +176,39 @@ public class TagFunctions {
 	    }
 	}
 
+
+	public static Artist[] topArtistsForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+	    if(!status.contains("ok")) {
+	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+	    	if(errorNode != null) {
+		    	WSErrorBuilder eb = new WSErrorBuilder();
+		    	throw eb.build(params.get("method"), errorNode);
+	    	}
+	    	return null;
+	    } else {
+			Node artistMatches = XMLUtil.findNamedElementNode(lfmNode, "topartists");
+	
+			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
+			ArtistBuilder artistBuilder = new ArtistBuilder();
+			List<Artist> artists = new ArrayList<Artist>();
+			for (Node node : elnodes) {
+				Artist artistObject = artistBuilder.build(node);
+				artists.add(artistObject);
+				if(artists.size() > 3)
+					break;
+			}
+			return artists.toArray(new Artist[artists.size()]);
+	    }
+	}
 }

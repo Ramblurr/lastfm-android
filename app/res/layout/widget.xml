@@ -12,7 +12,7 @@
 		android:paddingLeft="72dip">
 			<ProgressBar android:id="@android:id/progress"
 				android:background="#0000" android:layout_height="16dip"
-				android:indeterminateOnly="false" android:progressDrawable="@+drawable/widget_progress"
+				android:indeterminateOnly="false" android:progressDrawable="@drawable/widget_progress"
 				android:layout_width="234dip"/>
 			
 			<LinearLayout android:layout_width="fill_parent"
@@ -41,8 +41,8 @@
 					android:layout_height="12dip"
 					android:indeterminate="false"
 					android:indeterminateOnly="false"
-					android:progressDrawable="@+drawable/widget_progress"
-					android:indeterminateDrawable="@+drawable/widget_spinner"
+					android:progressDrawable="@drawable/widget_progress"
+					android:indeterminateDrawable="@drawable/widget_spinner"
 					android:layout_gravity="center_vertical|right"/>
 			</LinearLayout>
 	</RelativeLayout>

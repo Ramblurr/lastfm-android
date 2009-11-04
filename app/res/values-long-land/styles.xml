@@ -2,10 +2,10 @@
 <resources>
 	<style name="LastFMButton">
 		<item name="android:background">@drawable/player_controls</item>
-		<item name="android:layout_width">120dip</item>
+		<item name="android:layout_width">140dip</item>
 		<item name="android:layout_height">62dip</item>
 	</style>
 	<style name="playback_progress">
-		<item name="android:layout_width">160dip</item>
+		<item name="android:layout_width">280dip</item>
 	</style>
 </resources>

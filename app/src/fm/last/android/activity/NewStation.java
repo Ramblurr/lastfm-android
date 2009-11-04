@@ -280,11 +280,15 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     	        LastFmServer server = AndroidLastFmServerFactory.getServer();
    				mTags = server.searchForTag( params[0] );
    				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((mTags.length < 10) ? mTags.length : 10); i++){
+    			for(int i=0; i< ((mTags.length < 6) ? mTags.length : 6); i++) {
+	            	Artist[] similar = server.topArtistsForTag(mTags[i].getName());
+	            	String artistSample = similar[0].getName() + ", " + similar[1].getName() + ", and " + similar[2].getName();
     				ListEntry entry = new ListEntry(mTags[i], 
-    						R.drawable.tag_dark, 
-    						mTags[i].getName(), 
-    						R.drawable.list_icon_station);
+    						-1, 
+    						mTags[i].getName() + " Tag Radio", 
+    						"",
+    						R.drawable.list_icon_station,
+    						artistSample);
     				iconifiedEntries.add(entry);
     			}
     			return iconifiedEntries;
@@ -321,13 +325,16 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     	        LastFmServer server = AndroidLastFmServerFactory.getServer();
    				mArtists = server.searchForArtist( params[0] );
    				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++){
+    			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++) {
     	            if ( mArtists[i].getStreamable().equals("1") ) {
+    	            	Artist[] similar = server.getSimilarArtists(mArtists[i].getName(), "3");
+    	            	String artistSample = similar[0].getName() + ", " + similar[1].getName() + ", and " + similar[2].getName();
 	    				ListEntry entry = new ListEntry(mArtists[i], 
 	    						R.drawable.artist_icon, 
-	    						mArtists[i].getName(), 
+	    						mArtists[i].getName() + " Radio", 
 	    						mArtists[i].getImages()[0].getUrl(),
-	    						R.drawable.list_icon_station);
+	    						R.drawable.list_icon_station,
+	    						artistSample);
 	    				iconifiedEntries.add(entry);
     	            }
     			}
