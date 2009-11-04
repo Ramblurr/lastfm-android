@@ -282,10 +282,11 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
    				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((mTags.length < 6) ? mTags.length : 6); i++) {
 	            	Artist[] similar = server.topArtistsForTag(mTags[i].getName());
-	            	String artistSample = similar[0].getName() + ", " + similar[1].getName() + ", and " + similar[2].getName();
+	            	String artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
+	            			similar[1].getName(), similar[2].getName());
     				ListEntry entry = new ListEntry(mTags[i], 
     						-1, 
-    						mTags[i].getName() + " Tag Radio", 
+    						getString(R.string.newstation_tagradio, mTags[i].getName()),
     						"",
     						R.drawable.list_icon_station,
     						artistSample);
@@ -328,10 +329,11 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++) {
     	            if ( mArtists[i].getStreamable().equals("1") ) {
     	            	Artist[] similar = server.getSimilarArtists(mArtists[i].getName(), "3");
-    	            	String artistSample = similar[0].getName() + ", " + similar[1].getName() + ", and " + similar[2].getName();
+    	            	String artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
+    	            			similar[1].getName(), similar[2].getName());
 	    				ListEntry entry = new ListEntry(mArtists[i], 
-	    						R.drawable.artist_icon, 
-	    						mArtists[i].getName() + " Radio", 
+	    						R.drawable.artist_icon,
+	    						getString(R.string.newstation_artistradio, mArtists[i].getName()),
 	    						mArtists[i].getImages()[0].getUrl(),
 	    						R.drawable.list_icon_station,
 	    						artistSample);
