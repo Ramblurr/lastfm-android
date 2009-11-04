@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -40,6 +41,8 @@ public class PopupActionActivity extends ListActivity {
 	
 	public void onCreate(Bundle icicle) { 
 	    super.onCreate(icicle); 
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 	    mArtistName = getIntent().getStringExtra("lastfm.artist");
 	    mTrackName = getIntent().getStringExtra("lastfm.track");
 		String[] actions = new String[isAmazonInstalled()?5:4];
