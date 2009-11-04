@@ -25,6 +25,9 @@
 		<item name="android:textColor">#fff</item>
 		<item name="android:textStyle">bold</item>
 	</style>
+	<style name="playback_progress">
+		<item name="android:layout_width">200dip</item>
+	</style>
 	<style name="LastFMButton">
 		<item name="android:background">@+drawable/player_controls</item>
 		<item name="android:layout_width">80dip</item>

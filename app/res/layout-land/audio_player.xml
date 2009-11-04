@@ -15,45 +15,32 @@
      limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" android:background="#000">
+<RelativeLayout
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="#000"
+	xmlns:android="http://schemas.android.com/apk/res/android">
 
-	<LinearLayout
-	    android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-        xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
 			<fm.last.android.widget.AdArea
 				android:id="@+id/AdArea"
 				android:background="@drawable/adarea"
 				android:layout_width="fill_parent"
 				android:layout_height="54px"
+		       android:layout_alignParentTop="true"
 				android:padding="6dip"/>
-
-           <LinearLayout
-               android:orientation="horizontal"
-               android:layout_width="fill_parent"
-               android:layout_height="fill_parent">
 
 			<fm.last.android.widget.AlbumArt
 				android:id="@+id/album" android:gravity="center" 
-				android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
+				android:layout_alignParentLeft="true"
+				android:layout_below="@id/AdArea"
                	android:layout_height="212dip" android:layout_width="212dip" android:layout_margin="10dip"/>
-            
-           <RelativeLayout
-               android:layout_width="fill_parent"
-                  android:layout_height="fill_parent"
-                  android:layout_marginLeft="5dip"
-                  xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
            
                <ImageButton 
                    android:id="@+id/ontour" 
                    android:src="@drawable/on_tour" 
                    android:layout_height="wrap_content"
 			       android:layout_width="wrap_content"
-			       android:layout_alignParentTop="true"
+			       android:layout_below="@id/AdArea"
 			       android:layout_alignParentRight="true"
 			       android:background="@null"
 			       android:visibility="gone"/>
@@ -61,7 +48,9 @@
 				<TableLayout android:id="@+id/track_metadata"
 					android:layout_height="wrap_content"
 					android:layout_width="fill_parent"
-					android:layout_centerVertical="true">
+					android:layout_below="@id/AdArea"
+					android:layout_toRightOf="@id/album"
+					android:paddingTop="80dip">
 	
 	                <TableRow 
 	                    android:layout_height="wrap_content"
@@ -73,7 +62,8 @@
 	                        android:layout_width="fill_parent"
 	                        android:layout_gravity="left"
 	                        android:textStyle="bold"
-	                        android:textSize="18sp"/>
+	                        android:textSize="18sp"
+	                        android:text="Artist"/>
 	                </TableRow>
 					
 					<TableRow
@@ -85,14 +75,16 @@
 							style="@style/playback_info"
 							android:layout_height="wrap_content"
 							android:textStyle="bold" 
-							android:textSize="18sp"/>
+							android:textSize="18sp"
+							android:text="Title"/>
 					</TableRow>
 				</TableLayout>
             
                 <LinearLayout
 	                android:layout_width="fill_parent"
 	                android:layout_height="wrap_content"
-	                android:layout_alignParentBottom="true"
+	                android:layout_toRightOf="@id/album"
+	                android:layout_below="@id/track_metadata"
 	                android:layout_marginBottom="18dip">
 	            
 		            <TextView android:id="@+id/currenttime"
@@ -114,7 +106,7 @@
 		                android:progressDrawable="@+drawable/progress_horizontal"
 		                android:layout_marginLeft="5dip"
 		                android:layout_marginRight="5dip"
-		                android:layout_gravity="center_vertical" android:layout_width="160dip"/>
+		                android:layout_gravity="center_vertical" style="@style/playback_progress"/>
 		
 		            <TextView android:id="@+id/totaltime"
 		                style="@style/playback_time"
@@ -127,8 +119,7 @@
 		                android:text="--:--"/>
 		
 	            </LinearLayout>			
-	         </RelativeLayout>
-	     </LinearLayout>
+
 	     <LinearLayout 
 	        android:id="@+id/playback_controls"
 	        android:orientation="horizontal"
@@ -143,5 +134,4 @@
                <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop"/>
                <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip"/>
            </LinearLayout>
-	</LinearLayout>
-</LinearLayout>
+</RelativeLayout>
