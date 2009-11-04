@@ -6,7 +6,7 @@
 		<item name="android:layout_alignParentLeft">true</item>
 		<item name="android:layout_height">58dip</item>
 		<item name="android:gravity">center_vertical</item>
-		<item name="android:background">@+drawable/title_bar</item>
+		<item name="android:background">@drawable/title_bar</item>
 		<item name="android:paddingLeft">7dip</item>
 		<item name="android:paddingRight">5dip</item>
 	</style>
@@ -29,43 +29,43 @@
 		<item name="android:layout_width">200dip</item>
 	</style>
 	<style name="LastFMButton">
-		<item name="android:background">@+drawable/player_controls</item>
+		<item name="android:background">@drawable/player_controls</item>
 		<item name="android:layout_width">80dip</item>
 		<item name="android:layout_height">76dip</item>
 	</style>
 	<style name="LastFMButton.Love">
-		<item name="android:src">@+drawable/love</item>
+		<item name="android:src">@drawable/love</item>
 	</style>
 	<style name="LastFMButton.Ban">
-		<item name="android:src">@+drawable/ban</item>
+		<item name="android:src">@drawable/ban</item>
 	</style>
 	<style name="LastFMButton.Menu">
-		<item name="android:src">@+drawable/cog</item>
+		<item name="android:src">@drawable/cog</item>
 	</style>
 	<style name="LastFMButton.Stop">
-		<item name="android:src">@+drawable/stop</item>
+		<item name="android:src">@drawable/stop</item>
 	</style>
 	<style name="LastFMButton.Skip">
-		<item name="android:src">@+drawable/skip</item>
+		<item name="android:src">@drawable/skip</item>
 	</style>
 	<style name="WidgetButton">
-		<item name="android:background">@+drawable/widget_button_middle</item>
+		<item name="android:background">@drawable/widget_button_middle</item>
 	</style>
 	<style name="WidgetButton.Love">
-		<item name="android:src">@+drawable/love</item>
+		<item name="android:src">@drawable/love</item>
 	</style>
 	<style name="WidgetButton.Ban">
-		<item name="android:src">@+drawable/ban</item>
+		<item name="android:src">@drawable/ban</item>
 	</style>
 	<style name="WidgetButton.Menu">
-		<item name="android:background">@+drawable/widget_button_left</item>
-		<item name="android:src">@+drawable/cog</item>
+		<item name="android:background">@drawable/widget_button_left</item>
+		<item name="android:src">@drawable/cog</item>
 	</style>
 	<style name="WidgetButton.Play">
-		<item name="android:src">@+drawable/play</item>
+		<item name="android:src">@drawable/play</item>
 	</style>
 	<style name="WidgetButton.Skip">
-		<item name="android:background">@+drawable/widget_button_right</item>
-		<item name="android:src">@+drawable/skip</item>
+		<item name="android:background">@drawable/widget_button_right</item>
+		<item name="android:src">@drawable/skip</item>
 	</style>
 </resources>
