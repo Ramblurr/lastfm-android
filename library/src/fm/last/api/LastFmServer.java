@@ -34,6 +34,8 @@ public interface LastFmServer {
 
 	public Artist[] searchForArtist(String artist) throws IOException;
 
+	public Artist[] topArtistsForTag(String tag) throws IOException;
+	
 	public Tag[] searchForTag(String Tag) throws IOException;
 
 	/**
