@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="372dip"
+	android:layout_height="74dip"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android"
+	android:orientation="vertical">
+
+	<RelativeLayout android:layout_width="fill_parent"
+		android:layout_height="24dip"
+		android:background="@drawable/widget_top_panel"
+		android:paddingTop="6dip"
+		android:paddingLeft="84dip">
+			<ProgressBar android:id="@android:id/progress"
+				android:background="#0000" android:layout_height="14dip" android:layout_marginTop="1dip"
+				android:indeterminateOnly="false" android:progressDrawable="@+drawable/widget_progress"
+				android:layout_width="280dip"/>
+			
+			<LinearLayout android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+
+				<TextView android:id="@+id/widgettext"
+					android:textSize="12sp"
+					android:textColor="#fff"
+					android:textStyle="bold"
+					android:layout_gravity="bottom"
+					android:layout_height="wrap_content" android:singleLine="true"
+			        android:ellipsize="end"
+        			android:gravity="left" android:text="" android:layout_width="240dip"/>
+
+				<TextView android:id="@+id/totaltime"
+					android:textSize="12sp"
+					android:textColor="#ddd"
+					android:layout_gravity="bottom"
+					android:layout_height="wrap_content" android:layout_width="48dip"
+					android:layout_marginLeft="10dip" android:visibility="gone"
+					android:gravity="left" android:text="--:--"/>
+					
+				<ProgressBar android:id="@+id/spinner"
+					android:layout_marginLeft="28dip"
+					android:layout_width="14dip"
+					android:layout_height="14dip"
+					android:indeterminate="false"
+					android:indeterminateOnly="false"
+					android:progressDrawable="@+drawable/widget_progress"
+					android:indeterminateDrawable="@+drawable/widget_spinner"
+					android:layout_gravity="center_vertical|right"/>
+			</LinearLayout>
+	</RelativeLayout>
+
+	<LinearLayout android:id="@+id/playback_controls"
+		android:orientation="horizontal" android:layout_gravity="bottom"
+		android:layout_marginTop="0dip" android:layout_height="50dip"
+		android:layout_width="fill_parent" android:gravity="center">
+
+		<ImageButton android:id="@+id/menu" style="@+style/WidgetButton.Menu"
+			android:layout_width="80dip" android:layout_height="50dip" android:paddingBottom="5dip"
+			android:paddingLeft="9dip"/>
+		<ImageButton android:id="@+id/love" style="@+style/WidgetButton.Love"
+			android:layout_width="70dip" android:layout_height="50dip" android:paddingBottom="5dip"/>
+		<ImageButton android:id="@+id/ban" style="@+style/WidgetButton.Ban"
+			android:layout_width="70dip" android:layout_height="50dip" android:paddingBottom="5dip"/>
+		<ImageButton android:id="@+id/stop" style="@+style/WidgetButton.Play"
+			android:layout_width="70dip" android:layout_height="50dip" android:paddingBottom="5dip"/>
+		<ImageButton android:id="@+id/skip" style="@+style/WidgetButton.Skip"
+			android:layout_width="80dip" android:layout_height="50dip" android:paddingBottom="5dip"
+			android:paddingRight="9dip"/>
+
+	</LinearLayout>
+</LinearLayout>
