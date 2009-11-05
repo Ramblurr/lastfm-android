@@ -16,6 +16,11 @@
 				<category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 		</activity>
+        <receiver android:name=".LastFMMediaButtonHandler">
+            <intent-filter android:priority="32000">
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 		<activity android:name=".activity.Profile" android:label="Last.fm: Profile" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
