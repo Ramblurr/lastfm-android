@@ -60,7 +60,7 @@ public class ProfileBubble extends LinearLayout {
         mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
         mAvatar.setDefaultImageResource( R.drawable.profile_unknown );
 
-        mSecond.setText("Loading profile...");
+        mSecond.setText(getContext().getText(R.string.profile_loading));
     }
 
     public void setUser(User user) {
@@ -83,9 +83,7 @@ public class ProfileBubble extends LinearLayout {
         	second = s + ", ";
 
         int playcount = Integer.parseInt(mUser.getPlaycount());
-        NumberFormat format = NumberFormat.getNumberInstance();
-        String count = format.format( playcount );
-        String plays = getContext().getString(R.string.profile_userplays, count, mUser.getJoinDate());
+        String plays = getContext().getString(R.string.profile_userplays, playcount	, mUser.getJoinDate());
         mSecond.setText(second + plays);
 
         if( mUser.getImages().length > 0 ) {

@@ -115,6 +115,7 @@
 	<string name="profile_notags">No Tags</string>
 	<string name="profile_selectaction">Select Action</string>
 	<string name="profile_userplays">%d plays since %s</string>
+	<string name="profile_loading">Loading Profile...</string>
 	
 	<!-- Share activity -->
 	<string name="share_label">Last.fm: Share With A Friend</string>

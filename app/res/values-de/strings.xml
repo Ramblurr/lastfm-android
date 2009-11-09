@@ -114,6 +114,7 @@
 	<string name="profile_notags">Keine Tags</string>
 	<string name="profile_selectaction">Aktion wählen</string>
 	<string name="profile_userplays">%d gespielte Titel seit %s</string>
+	<string name="profile_loading">Lade Profil...</string>
 	
     <!-- Share activity -->
     <string name="share_label">Last.fm: An einen Freund empfehlen</string>
