@@ -5,7 +5,7 @@
 	<string name="action_viewinfo">Info anzeigen</string>
 	<string name="action_logout">Abmelden</string>
 	<string name="action_settings">Einstellungen</string>
-	<string name="action_nowplaying">Spielt gerade</string>
+	<string name="action_nowplaying">Jetzt läuft</string>
 	<string name="action_amazon">Bei Amazon kaufen</string>
 	<string name="action_share">Empfehlen</string>
 	<string name="action_addplaylist">Zu Playlist hinzufügen</string>

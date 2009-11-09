@@ -22,6 +22,7 @@ package fm.last.android.player;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -704,7 +705,13 @@ public class RadioPlayerService extends Service
 		currentQueue.clear();
 		currentSession = session;
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-			currentStation = server.tuneToStation(url, session.getKey());
+			String lang = Locale.getDefault().getLanguage();
+			if (lang.equalsIgnoreCase("de")) {
+				currentStation = server.tuneToStation(url, session.getKey(), lang);	
+			}
+			else {
+				currentStation = server.tuneToStation(url, session.getKey(), null);
+			}
 			RadioWidgetProvider.updateAppWidget_idle(RadioPlayerService.this, currentStation.getName(), true);
 			if(currentStation != null) {
 				logger.info("Station name: " + currentStation.getName());
