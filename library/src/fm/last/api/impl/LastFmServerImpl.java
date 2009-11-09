@@ -151,13 +151,16 @@ final class LastFmServerImpl implements LastFmServer {
 		return AuthFunctions.getMobileSession(baseUrl, params);
 	}
 
-	public Station tuneToStation(String station, String sk) throws IOException, WSError {
+	public Station tuneToStation(String station, String sk, String lang) throws IOException, WSError {
 		Map<String, String> params = createParams("radio.tune");
 		if (station != null) {
 			params.put("station", station);
 		}
 		if (sk != null) {
 			params.put("sk", sk);
+		}
+		if (lang != null) {
+			params.put("lang", lang);
 		}
 		signParams(params);
 		return RadioFunctions.tuneToStation(baseUrl, params);
