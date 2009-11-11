@@ -63,7 +63,7 @@ public class Tag extends Activity implements TabBarListener {
 	String mTrack;
 	
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
-	Session mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
+	Session mSession = LastFMApplication.getInstance().session;
 
 	ArrayList<String> mTrackOldTags;
 	ArrayList<String> mTrackNewTags;

@@ -332,12 +332,39 @@ public class RadioPlayerService extends Service
 		} catch (Exception e) {
 		}
 	}
+	
+	private void tuningNotify()
+	{
+		String info = "Tuning to station";
+		if ( currentStation != null) {
+			info = "Tuning: " + currentStation.getName();
+		}
+		Notification notification = new Notification(
+				R.drawable.as_statusbar, "Tuning to station", System.currentTimeMillis() );
+		PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
+				new Intent( this, Player.class ), 0 );
+		notification.setLatestEventInfo( this, info,
+				"", contentIntent );
+		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		RadioWidgetProvider.updateAppWidget(this);
+		try {
+			Class types[] = {int.class, Notification.class};
+			Object args[] = {NOTIFY_ID, notification};
+			Method method = Service.class.getMethod("startForeground", types);
+			method.invoke(this, args);
+		} catch (NoSuchMethodException e) {
+			nm.notify( NOTIFY_ID, notification );
+			setForeground(true);
+		} catch (Exception e) {
+		}
+	}
 
 	private OnCompletionListener mOnCompletionListener = new OnCompletionListener()
 	{
 
 		public void onCompletion( MediaPlayer mp )
 		{
+			logger.info("Track completed normally (bye, laurie!)");
 			new NextTrackTask().execute((Void)null);
 		}
 	};
@@ -384,6 +411,7 @@ public class RadioPlayerService extends Service
 					playingNotify();
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
+					logger.info("Ready to produce packets (Hi, Laurie!)");
 				} else {
 					p.stop();
 				}
@@ -696,6 +724,8 @@ public class RadioPlayerService extends Service
 		
 		currentStationURL = url;
 		
+		tuningNotify();
+		
 		logger.info("Tuning to station: " + url);
 		if(mState == STATE_PLAYING) {
 			clearNotification();
@@ -716,11 +746,13 @@ public class RadioPlayerService extends Service
 			if(currentStation != null) {
 				logger.info("Station name: " + currentStation.getName());
 				mPlaylistRetryCount = 0;
+				tuningNotify();
 				refreshPlaylist();
 				currentStationURL = url;
 				notifyChange( STATION_CHANGED );
 				LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
 			} else {
+				clearNotification();
 				currentStationURL = null;
 				wakeLock.release();
 				wifiLock.release();
@@ -806,6 +838,7 @@ public class RadioPlayerService extends Service
 
 		public void skip() throws RemoteException
 		{
+			logger.info("Skip button pressed");
 			if(Looper.myLooper() == null)
 				Looper.prepare();
 			

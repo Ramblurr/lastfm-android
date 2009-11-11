@@ -137,8 +137,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public Boolean doInBackground(Void...params) {
-            Session session = LastFMApplication.getInstance().map
-            .get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().session;
 
             try {
     			mServer.addTrackToPlaylist(mArtist, mTrack, mPlaylistId, session.getKey());
@@ -178,7 +177,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public ArrayList<ListEntry> doInBackground(Void...params) {
-            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().session;
 
             try {
                 RadioPlayList[] playlists = mServer.getUserPlaylists(session.getName());
@@ -228,7 +227,7 @@ public class AddToPlaylist extends Activity {
     	
         @Override
         public ArrayList<ListEntry>  doInBackground(Void...params) {
-            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().session;
 
             try {
                 RadioPlayList[] playlists = mServer.createPlaylist(mTitle, "", session.getKey());

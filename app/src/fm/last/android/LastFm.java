@@ -262,7 +262,7 @@ public class LastFm extends Activity
 	            editor.putString( "lastfm_subscriber", session.getSubscriber());
 	            editor.commit();
 
-	            LastFMApplication.getInstance().map.put( "lastfm_session", session );
+	            LastFMApplication.getInstance().session = session;
 
 	        	if(getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 	        		Intent intent = getIntent();

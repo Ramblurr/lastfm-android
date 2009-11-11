@@ -151,7 +151,7 @@ public class Event extends Activity {
 					server.attendEvent(
 							getIntent().getStringExtra("lastfm.event.id"), 
 							String.valueOf(status), 
-							(LastFMApplication.getInstance().map.get("lastfm_session")).getKey() );
+							(LastFMApplication.getInstance().session).getKey() );
 					setResult(RESULT_OK, new Intent().putExtra("status", status));
 					finish();
 				} catch (WSError e) {

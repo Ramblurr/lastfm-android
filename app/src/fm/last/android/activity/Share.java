@@ -92,7 +92,7 @@ public class Share extends Activity {
         @Override
         public Boolean doInBackground(Void...params) {
             try {
-                Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+                Session session = LastFMApplication.getInstance().session;
     			mServer.shareTrack(mArtist, mTrack, mRecipient, session.getKey());
                 return true;
             } catch (WSError e) {
@@ -133,7 +133,7 @@ public class Share extends Activity {
         @Override
         public ArrayList<ListEntry> doInBackground(Void...params) {
             try {
-                Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+                Session session = LastFMApplication.getInstance().session;
                 User[] friends = mServer.getFriends(session.getName(), null, null).getFriends();
                 if(friends.length == 0 )
                     return null;

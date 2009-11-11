@@ -584,7 +584,7 @@ public class Metadata extends Activity {
 
             Intent intent = fm.last.android.activity.Event.intentFromEvent(Metadata.this, event);
 			try {
-				Event[] events = mServer.getUserEvents((LastFMApplication.getInstance().map.get("lastfm_session")).getName());
+				Event[] events = mServer.getUserEvents((LastFMApplication.getInstance().session).getName());
 				for(Event e : events) {
 //					System.out.printf("Comparing id %d (%s) to %d (%s)\n",e.getId(),e.getTitle(),event.getId(),event.getTitle());
 					if(e.getId() == event.getId()) {

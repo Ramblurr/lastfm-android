@@ -58,7 +58,7 @@ import android.util.Log;
 public class LastFMApplication extends Application
 {
 
-    public WeakHashMap<String, Session> map;
+    public Session session;
 	public fm.last.android.player.IRadioPlayer player = null;
 	private Context mCtx;
 	
@@ -88,16 +88,12 @@ public class LastFMApplication extends Application
         				  + Locale.getDefault().getCountry().toLowerCase() + "; " 
         				  + "Android " + android.os.Build.VERSION.RELEASE + ")";        
 
-        // construct an 'application global' object
-        this.map = new WeakHashMap<String, Session>();
-
         //Populate our Session object
         SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
         String username = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
         String subscriber = settings.getString( "lastfm_subscriber", "0" );
-    	Session session = new Session(username, session_key, subscriber);
-        this.map.put( "lastfm_session", session );
+    	session = new Session(username, session_key, subscriber);
     }
     
 	private ServiceConnection mConnection = new ServiceConnection()
@@ -136,12 +132,11 @@ public class LastFMApplication extends Application
 	public void playRadioStation(Context ctx, String url, boolean showPlayer)
 	{
 		mCtx = ctx;
-		Session s = map.get( "lastfm_session" );
-        if ( s != null && s.getKey().length() > 0 ) {
+        if ( session != null && session.getKey().length() > 0 ) {
 	        final Intent out = new Intent(this, RadioPlayerService.class);
 	        out.setAction("fm.last.android.PLAY");
 	        out.putExtra("station", url);
-	        out.putExtra("session", (Parcelable)s);
+	        out.putExtra("session", (Parcelable)session);
 	        startService(out);
 	        if(showPlayer) {
 	        	IntentFilter intentFilter = new IntentFilter();
@@ -260,7 +255,6 @@ public class LastFMApplication extends Application
 
 	public void fetchRecentStations()
 	{
-		Session session = map.get("lastfm_session");
         LastFmServer server = AndroidLastFmServerFactory.getServer();
 
         //Is it worth it?
@@ -287,11 +281,7 @@ public class LastFMApplication extends Application
 	
     public void onTerminate()
     {
-
-        // clean up application global
-        this.map.clear();
-        this.map = null;
-
+    	session = null;
         instance = null;
         super.onTerminate();
     }

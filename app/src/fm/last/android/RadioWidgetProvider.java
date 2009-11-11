@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -47,7 +46,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
     	final Context ctx = context;
         final String action = intent.getAction();
-		final Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+		final Session session = LastFMApplication.getInstance().session;
 		if(session != null) {
 	        if (action.equals("fm.last.android.widget.ACTION")) {
 	            LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
@@ -213,7 +212,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		if(stationName != null) {
 			views.setTextViewText(R.id.widgettext, stationName);
 		} else {
-			Session session = LastFMApplication.getInstance().map.get("lastfm_session");
+			Session session = LastFMApplication.getInstance().session;
 			if(session != null)
 				views.setTextViewText(R.id.widgettext, session.getName() + "'s Library");
 		}
