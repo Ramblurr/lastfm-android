@@ -14,6 +14,8 @@
     <string name="action_similar">Listen to Similar Artists</string>
     <string name="action_addlibrary">Add to Library</string>
     <string name="action_tag">Tag</string>
+    <string name="action_love">Love Track</string>
+    <string name="action_ban">Ban Track</string>
     
 	<!-- LastFm main activity -->
 	<string name="main_username">Username</string>

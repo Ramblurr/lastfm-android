@@ -53,6 +53,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.AndroidLastFmServerFactory;
@@ -1195,7 +1196,23 @@ public class Profile extends ListActivity
                         case 3: // Add to Playlist
                       	   addItemToPlaylist();
                       	   break;
-                        case 4: // Buy on Amazon
+                        case 4: // Love
+							try {
+	            				LastFmServer server = AndroidLastFmServerFactory.getServer();
+								server.loveTrack(mTrackInfo.getArtist().getName(), mTrackInfo.getName(), LastFMApplication.getInstance().session.getKey());
+								Toast.makeText(Profile.this, getString(R.string.scrobbler_trackloved), Toast.LENGTH_SHORT).show();
+							} catch (Exception e) {
+							}
+                        	break;
+                        case 5: // Ban
+							try {
+	            				LastFmServer server = AndroidLastFmServerFactory.getServer();
+								server.banTrack(mTrackInfo.getArtist().getName(), mTrackInfo.getName(), LastFMApplication.getInstance().session.getKey());
+								Toast.makeText(Profile.this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
+							} catch (Exception e) {
+							}
+                        	break;
+                        case 6: // Buy on Amazon
                      	   buyAmazon(dialogId);
                      	   break;
                     }
@@ -1338,6 +1355,12 @@ public class Profile extends ListActivity
             iconifiedEntries.add(entry);
 
             entry = new ListEntry(R.string.action_addplaylist, R.drawable.playlist_dark, getString(R.string.action_addplaylist));
+            iconifiedEntries.add(entry);
+
+            entry = new ListEntry(R.string.action_love, R.drawable.love, getString(R.string.action_love));
+            iconifiedEntries.add(entry);
+
+            entry = new ListEntry(R.string.action_ban, R.drawable.ban, getString(R.string.action_ban));
             iconifiedEntries.add(entry);
         }
 
