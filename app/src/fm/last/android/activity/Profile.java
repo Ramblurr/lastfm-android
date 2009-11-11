@@ -148,7 +148,7 @@ public class Profile extends ListActivity
         super.onCreate( icicle );
         requestWindowFeature( Window.FEATURE_NO_TITLE );
         setContentView( R.layout.home );
-        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().session;
         if( session == null )
             logout();
         mUsername = getIntent().getStringExtra("lastfm.profile.username");
@@ -336,7 +336,7 @@ public class Profile extends ListActivity
         public Boolean doInBackground(Void...params) {
         	RadioPlayList[] playlists;
             boolean success = false;
-            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().session;
             LastFMApplication.getInstance().fetchRecentStations();
             SetupRecentStations();
             //Check our subscriber status
@@ -350,7 +350,7 @@ public class Profile extends ListActivity
 		            editor.putString( "lastfm_subscriber", subscriber);
 		            editor.commit();
 			    	session = new Session(session.getName(), session.getKey(), subscriber);
-			        LastFMApplication.getInstance().map.put( "lastfm_session", session );
+			        LastFMApplication.getInstance().session = session;
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -381,7 +381,7 @@ public class Profile extends ListActivity
 
         @Override
         public void onPostExecute(Boolean result) {
-            Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+            Session session = LastFMApplication.getInstance().session;
             if(session != null) {
 	            if( !isAuthenticatedUser ) {
 	                mProfileBubble.setUser(Profile.this.mUser);
@@ -410,7 +410,7 @@ public class Profile extends ListActivity
 
     private void RebuildMainMenu() 
     {
-        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().session;
         mMainAdapter = new SeparatedListAdapter(this);
         if(isAuthenticatedUser) {
             mMainAdapter.addSection( getString(R.string.profile_mystations), mMyStationsAdapter );
@@ -448,7 +448,7 @@ public class Profile extends ListActivity
     
     @Override
     public void onResume() {
-    	if(LastFMApplication.getInstance().map.get("lastfm_session") == null) {
+    	if(LastFMApplication.getInstance().session == null) {
     		finish(); //We shouldn't really get here, but sometimes the window stack keeps us around
     	} else {
 			registerReceiver( mStatusListener, mIntentFilter );
@@ -550,7 +550,7 @@ public class Profile extends ListActivity
 
     private void SetupMyStations()
     {
-        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+        Session session = LastFMApplication.getInstance().session;
         mMyStationsAdapter = new LastFMStreamAdapter( this );
         if(isAuthenticatedUser) {
 	        mMyStationsAdapter.putStation( getString(R.string.profile_mylibrary), 
@@ -737,7 +737,7 @@ public class Profile extends ListActivity
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) 
 		{
 			try {
-		        Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+		        Session session = LastFMApplication.getInstance().session;
 				Tag tag = (Tag)l.getAdapter().getItem(position);
 				
 	        	ListAdapter la = (ListAdapter) l.getAdapter();
@@ -1356,7 +1356,7 @@ public class Profile extends ListActivity
         editor.remove( "lastfm_session_key" );
         editor.remove( "lastfm_subscriber" );
         editor.commit();
-        LastFMApplication.getInstance().map.remove("lastfm_session");
+        LastFMApplication.getInstance().session = null;
         try
         {
 			LastFMApplication.getInstance().bindService(new Intent(this,fm.last.android.player.RadioPlayerService.class ),

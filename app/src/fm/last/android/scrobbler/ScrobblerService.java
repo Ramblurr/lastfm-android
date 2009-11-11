@@ -113,7 +113,7 @@ public class ScrobblerService extends Service {
 		}
 		
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-    	mSession = LastFMApplication.getInstance().map.get( "lastfm_session" );
+    	mSession = LastFMApplication.getInstance().session;
 
     	if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
 			String version = "0.1";

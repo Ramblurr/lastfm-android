@@ -37,7 +37,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Session s = LastFMApplication.getInstance().map.get( "lastfm_session" );
+		Session s = LastFMApplication.getInstance().session;
         if ( s != null && s.getKey().length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble", true)) {
         	if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_music_player", true) &&
         			intent.getAction().startsWith("com.")) {

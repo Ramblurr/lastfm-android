@@ -43,7 +43,7 @@ public class AdArea extends ImageButton {
 	private int _cachedWidth = 0;
 	
 	public static boolean adsEnabled(Context context) {
-		Session session = LastFMApplication.getInstance().map.get( "lastfm_session" );
+		Session session = LastFMApplication.getInstance().session;
 		
 		if(session == null || session.getSubscriber().equals("1")) {
 			return false;
