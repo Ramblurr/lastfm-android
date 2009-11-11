@@ -364,6 +364,7 @@ public class RadioPlayerService extends Service
 
 		public void onCompletion( MediaPlayer mp )
 		{
+			logger.info("Track completed normally (bye, laurie!)");
 			new NextTrackTask().execute((Void)null);
 		}
 	};
