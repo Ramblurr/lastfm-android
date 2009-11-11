@@ -20,6 +20,10 @@
  ***************************************************************************/
 package fm.last.android.scrobbler;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.util.concurrent.ArrayBlockingQueue;
+
 import fm.last.android.LastFMApplication;
 import fm.last.api.Session;
 import android.content.BroadcastReceiver;
@@ -43,7 +47,31 @@ public class MusicIntentReceiver extends BroadcastReceiver {
         			intent.getAction().startsWith("com.")) {
         		return;
         	}
-        	Log.i("Last.fm", "Action: " + intent.getAction());
+        	if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+        		ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+                
+                try {
+        			if(context.getFileStreamPath("queue.dat").exists()) {
+        	            FileInputStream fileStream = context.openFileInput("queue.dat");
+        	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+        	            Object obj = objectStream.readObject();
+        	            if(obj instanceof Integer) {
+        	            	Integer count = (Integer)obj;
+        	            	for(int i = 0; i < count.intValue(); i++) {
+        	                    obj = objectStream.readObject();
+        	                    if(obj instanceof ScrobblerQueueEntry)
+        	                    	queue.add((ScrobblerQueueEntry)obj);
+        	            	}
+        	            }
+        	            objectStream.close();
+        	            fileStream.close();
+        			}
+                } catch (Exception e) {
+                	e.printStackTrace();
+                }
+                if(queue.size() < 1)
+                	return;
+        	}
 	        final Intent out = new Intent(context, ScrobblerService.class);
 	        out.setAction(intent.getAction());
 	        out.putExtras(intent);
