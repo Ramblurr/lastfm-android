@@ -118,9 +118,10 @@ public class ImageDownloader {
 				
 				// loop through all images and download url and download them
 				for(int i=0; i<urls.size(); i++){
-
+					if (urls.get(i)==null || urls.get(i).trim().length()==0)
+						continue;
 					// check if we have already downloaded an url
-					if(urls.get(i)!=null && !mImageCache.containsKey(urls.get(i))){
+					if(!mImageCache.containsKey(urls.get(i))){
 
 						InputStream stream = null;
 						URL imageUrl;
