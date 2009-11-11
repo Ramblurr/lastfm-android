@@ -456,7 +456,8 @@ public class Profile extends ListActivity
 	    	SetupRecentStations();
 	    	RebuildMainMenu();
 	    	mMainAdapter.disableLoadBar();
-	
+	    	mProfileList.setEnabled(true);
+	    	
 	    	for( ListView list : mProfileLists )
 	    	{
 	    		try { 
