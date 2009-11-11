@@ -343,7 +343,7 @@ public class Profile extends ListActivity
             //Check our subscriber status
             LastFmServer server = AndroidLastFmServerFactory.getServer();
             try {
-				User user = server.getUserInfo(session.getKey());
+				User user = server.getUserInfo(null,session.getKey());
 				if(user != null) {
 					String subscriber = user.getSubscriber();
 			        SharedPreferences settings = getSharedPreferences( LastFm.PREFS, 0 );
@@ -359,10 +359,10 @@ public class Profile extends ListActivity
 			}
     		try {
     		    if( mUsername == null) {
-    				mUser = mServer.getUserInfo( session.getKey() );
+    				mUser = mServer.getUserInfo(null, session.getKey() );
     				playlists = mServer.getUserPlaylists( session.getName() );
     		    } else {
-    		        mUser = mServer.getAnyUserInfo( mUsername );
+    		        mUser = mServer.getUserInfo( mUsername, null );
     		        tasteometer = mServer.tasteometerCompare(mUsername, session.getName(), 8);
     		        playlists = mServer.getUserPlaylists( mUsername );
     		    }

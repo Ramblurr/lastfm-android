@@ -374,7 +374,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
         public ArrayList<ListEntry> doInBackground(String...params) {
     		try {
     	        LastFmServer server = AndroidLastFmServerFactory.getServer();
-   				User user = server.getAnyUserInfo( params[0] );
+   				User user = server.getUserInfo(params[0],null);
    				if(user != null) {
 	    			ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 					ListEntry entry = new ListEntry(user, 

@@ -21,28 +21,33 @@
 package fm.last.api;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author jennings
  *         Date: Oct 20, 2008
  */
 public class User implements Serializable {
+	
+	public enum Gender {
+		MALE,
+		FEMALE,
+		UNKNOWN
+	}
 
   private static final long serialVersionUID = 2047407259337226913L;
-  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String subscriber) {
+  public User(String name, String realname, String url, ImageUrl[] images, Locale country, String age, Gender gender, String playcount, String subscriber, Date joindate) {
     this.name = name;
+    this.realname = realname;
     this.url = url;
     this.images = images;
     this.country = country;
     this.age = age;
     this.playcount = playcount;
     this.subscriber = subscriber;
-  }
-  public User(String name, String url, ImageUrl[] images, String country, String age, String gender, String playcount, String realname, String joindate)
-  {
-      this(name, url, images, country, age, gender, playcount, "");
-      this.realname = realname;
-      this.joindate = joindate;
+    this.joindate = joindate;
+    this.gender = gender;
   }
   
   public String getName() {
@@ -57,7 +62,7 @@ public class User implements Serializable {
     return url;
   }
 
-  public String getCountry() {
+  public Locale getCountry() {
     return country;
   }
 
@@ -65,16 +70,10 @@ public class User implements Serializable {
     return age;
   }
 
-  public String getGender() {
+  public Gender getGender() {
     return gender;
   }
 
-  public String getPrettyGender() {
-	  if (gender == "m") return "male";
-	  if (gender == "f") return "female";
-	  return null;
-  }
-  
   public String getPlaycount() {
     return playcount;
   }
@@ -83,7 +82,7 @@ public class User implements Serializable {
     return images;
   }
   
-  public String getJoinDate()
+  public Date getJoinDate()
   {
       return joindate;
   }
@@ -93,14 +92,14 @@ public class User implements Serializable {
 	  return subscriber;
   }
   
-  private String name;
-  private String url;
-  private ImageUrl[] images;
-  private String country;
-  private String age;
-  private String gender;
-  private String playcount;
-  private String realname;
-  private String joindate;
-  private String subscriber;
+  private final String name;
+  private final String url;
+  private final ImageUrl[] images;
+  private final Locale country;
+  private final String age;
+  private final Gender gender;
+  private final String playcount;
+  private final String realname;
+  private final Date joindate;
+  private final String subscriber;
 }
