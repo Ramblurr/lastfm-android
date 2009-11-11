@@ -838,6 +838,7 @@ public class RadioPlayerService extends Service
 
 		public void skip() throws RemoteException
 		{
+			logger.info("Skip button pressed");
 			if(Looper.myLooper() == null)
 				Looper.prepare();
 			
