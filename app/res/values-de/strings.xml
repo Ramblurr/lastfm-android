@@ -113,8 +113,10 @@
 	<string name="profile_tags">Tags</string>
 	<string name="profile_notags">Keine Tags</string>
 	<string name="profile_selectaction">Aktion wählen</string>
-	<string name="profile_userplays">%d gespielte Titel seit %s</string>
+	<string name="profile_userplays">%d gespielte Titel seit %2$te. %2$tb %2$tY</string>
 	<string name="profile_loading">Lade Profil...</string>
+	<string name="profile_gender_male">männl.</string>
+    <string name="profile_gender_female">weibl.</string>
 	
     <!-- Share activity -->
     <string name="share_label">Last.fm: An einen Freund empfehlen</string>

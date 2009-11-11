@@ -17,7 +17,7 @@
     
 	<!-- LastFm main activity -->
 	<string name="main_username">Username</string>
-	<string name="main_password">Pasword</string>
+	<string name="main_password">Password</string>
 	<string name="main_login">Log in</string>
 	<string name="main_signup">Sign up</string>
 	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
@@ -114,8 +114,10 @@
 	<string name="profile_tags">Tags</string>
 	<string name="profile_notags">No Tags</string>
 	<string name="profile_selectaction">Select Action</string>
-	<string name="profile_userplays">%d plays since %s</string>
+	<string name="profile_userplays">%d plays since %2$tb %2$te, %2$tY</string>
 	<string name="profile_loading">Loading Profile...</string>
+	<string name="profile_gender_male">male</string>
+	<string name="profile_gender_female">female</string>
 	
 	<!-- Share activity -->
 	<string name="share_label">Last.fm: Share With A Friend</string>

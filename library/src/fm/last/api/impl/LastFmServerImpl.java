@@ -179,20 +179,18 @@ final class LastFmServerImpl implements LastFmServer {
 		return RadioFunctions.getRadioPlaylist(baseUrl, params);
 	}
 
-	public User getUserInfo(String sk) throws IOException, WSError {
+	public User getUserInfo(String user, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getInfo");
+		if (user!=null) {
+			params.put("user", user);
+		}
 		if (sk != null) {
 			params.put("sk", sk);
-		}
-		signParams(params);
+			signParams(params);
+		}		
 		return UserFunctions.getUserInfo(baseUrl, params);
 	}
 	
-    public User getAnyUserInfo(String username) throws IOException {
-        String url = "http://ws.audioscrobbler.com/1.0/user/"+username+"/profile.xml";
-        return UserFunctions.getAnyUserInfo(url);
-    }
-
 	public Tag[] getTrackTopTags(String artist, String track, String mbid)
 	throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTopTags");

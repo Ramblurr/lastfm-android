@@ -22,10 +22,14 @@ package fm.last.api.impl;
 
 import fm.last.api.User;
 import fm.last.api.ImageUrl;
+import fm.last.api.User.Gender;
+import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
 import org.w3c.dom.Node;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author jennings
@@ -37,10 +41,9 @@ public class UserBuilder extends XMLBuilder<User> {
   public User build(Node userNode) {
     node = userNode;
     String name = getText("name");
-    String url = getText("url");
-    String country = getText("country");
-    String age = getText("age");
-    String gender = getText("gender");
+    String realname = getText("realname");
+    String url = getText("url");    
+    String age = getText("age");    
     String playcount = getText("playcount");
     String subscriber = getText("subscriber");
     
@@ -52,32 +55,32 @@ public class UserBuilder extends XMLBuilder<User> {
     for (Node imageNode : imageNodes)
   		images[i++] = imageBuilder.build(imageNode);
     
-    return new User(name, url, images, country, age, gender, playcount, subscriber);
-  }
-  
-  /**
-   * Build a user from the old 1.0 style service
-   * http://ws.audioscrobbler.com/1.0/user/c99koder/profile.xml
-   */
-  public User buildOld(Node userNode) {
-      node = userNode;
-      String name = getAttribute("username");
-      String url = getText("url");
-      String country = getText("country");
-      String age = getText("age");
-      String gender = getText("gender");
-      String playcount = getText("playcount");
-      String realname = getText("realname");
-      String date = getText("registered");
-
-      List<Node> imageNodes = getChildNodes("avatar");
-      if (imageNodes.size() > 1)
-      	imageNodes.remove( 0 ); //remove smallest size if there is one
-      ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
-      int i = 0;
-      for (Node imageNode : imageNodes)
-    		images[i++] = imageBuilder.build(imageNode);
-
-      return new User(name, url, images, country, age, gender, playcount, realname, date);
+    // create locale for country
+    Locale countryLocale = null;
+    String country = getText("country");
+    if (country!=null && country.trim().length()>0) {
+    	countryLocale = new Locale("", country);
     }
+    
+    // create date from UNIX time
+    Date registeredDate = null;
+    Node registered = getChildNode("registered");
+    if (registered!=null) {
+    	String date = XMLUtil.getNodeAttribute(registered, "unixtime");
+    	registeredDate = new Date(Long.parseLong(date)*1000);
+    }
+    
+    Gender genderEnum = Gender.UNKNOWN;
+    String gender = getText("gender");
+    if (gender!=null) {
+    	if (gender.equalsIgnoreCase("m")) {
+    		genderEnum = Gender.MALE;
+    	}
+    	else if (gender.equalsIgnoreCase("f")) {
+    		genderEnum = Gender.FEMALE;
+    	}
+    }
+    
+    return new User(name, realname, url, images, countryLocale, age, genderEnum, playcount, subscriber, registeredDate);
+  }  
 }
