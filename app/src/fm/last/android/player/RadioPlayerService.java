@@ -384,6 +384,7 @@ public class RadioPlayerService extends Service
 					playingNotify();
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
+					logger.info("Ready to produce packets (Hi, Laurie!)");
 				} else {
 					p.stop();
 				}
