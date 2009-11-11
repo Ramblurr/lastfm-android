@@ -13,6 +13,8 @@
 	<string name="action_similar">Ähnliche Künstler anhören</string>
     <string name="action_addlibrary">Zur Musiksammlung hinzufügen</string>
     <string name="action_tag">Taggen</string>
+    <string name="action_love">Titel lieben</string>
+    <string name="action_ban">Titel bannen</string>
 
 	<!-- LastFm main activity -->
 	<string name="main_username">Benutzername</string>
