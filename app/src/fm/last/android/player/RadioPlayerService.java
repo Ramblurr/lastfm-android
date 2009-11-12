@@ -427,6 +427,7 @@ public class RadioPlayerService extends Service
 				if(mAutoSkipCount++ > 4) {
 					//If we weren't able to start playing after 3 attempts, bail out and notify
 					//the user.  This will bring us into a stopped state.
+					logger.severe("Too many playback errors, entering ERROR state");
 					mState = STATE_ERROR;
 					notifyChange(PLAYBACK_ERROR);
 					clearNotification();
@@ -447,6 +448,7 @@ public class RadioPlayerService extends Service
 					}
 				}
 			} else {
+				logger.info("Encountered an error during pre-buffer");
 				next_mp = null;
 				mNextPrepared = false;
 				mNextFullyBuffered = false;
@@ -802,6 +804,7 @@ public class RadioPlayerService extends Service
 
 		public void stop() throws DeadObjectException
 		{
+			logger.info("Stop button pressed");
 			RadioPlayerService.this.stop();
 		}
 
