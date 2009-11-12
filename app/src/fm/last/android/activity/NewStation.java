@@ -281,15 +281,17 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
    				mTags = server.searchForTag( params[0] );
    				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
     			for(int i=0; i< ((mTags.length < 6) ? mTags.length : 6); i++) {
+    				String artistSample = "";
 	            	Artist[] similar = server.topArtistsForTag(mTags[i].getName());
-	            	String artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
+	            	if(similar.length >= 3)
+	            		artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
 	            			similar[1].getName(), similar[2].getName());
     				ListEntry entry = new ListEntry(mTags[i], 
     						-1, 
     						getString(R.string.newstation_tagradio, mTags[i].getName()),
     						"",
     						R.drawable.list_icon_station,
-    						artistSample);
+    						artistSample.length() > 0 ? artistSample : null);
     				iconifiedEntries.add(entry);
     			}
     			return iconifiedEntries;
@@ -326,17 +328,19 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     	        LastFmServer server = AndroidLastFmServerFactory.getServer();
    				mArtists = server.searchForArtist( params[0] );
    				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-    			for(int i=0; i< ((mArtists.length < 10) ? mArtists.length : 10); i++) {
+    			for(int i=0; i< ((mArtists.length < 6) ? mArtists.length : 6); i++) {
     	            if ( mArtists[i].getStreamable().equals("1") ) {
+    	            	String artistSample = "";
     	            	Artist[] similar = server.getSimilarArtists(mArtists[i].getName(), "3");
-    	            	String artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
+    	            	if(similar.length >= 3)
+    	            		artistSample = getString(R.string.newstation_artistsample, similar[0].getName(),
     	            			similar[1].getName(), similar[2].getName());
 	    				ListEntry entry = new ListEntry(mArtists[i], 
 	    						R.drawable.artist_icon,
 	    						getString(R.string.newstation_artistradio, mArtists[i].getName()),
 	    						mArtists[i].getImages()[0].getUrl(),
 	    						R.drawable.list_icon_station,
-	    						artistSample);
+	    						artistSample.length() > 0 ? artistSample : null);
 	    				iconifiedEntries.add(entry);
     	            }
     			}
