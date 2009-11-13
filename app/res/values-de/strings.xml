@@ -182,6 +182,8 @@
     <string name="playerservice_paused_info">%s von \n %s</string>
     <string name="playerservice_paused">Angehalten</string>
     <string name="playerservice_streaming_ticker_text">Streame: %s von %s</string>
+    <string name="playerservice_tuning">Station wird eingestellt</string>
+    <string name="playerservice_tuningwithstation">Stelle ein: %s</string>
     
     <!-- Scrobbler service -->
     <string name="scrobbler_label">Last.fm: Scrobbler</string>

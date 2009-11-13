@@ -334,13 +334,13 @@ public class RadioPlayerService extends Service
 	}
 	
 	private void tuningNotify()
-	{
-		String info = "Tuning to station";
+	{		
+		String info = getString(R.string.playerservice_tuning);
 		if ( currentStation != null) {
-			info = "Tuning: " + currentStation.getName();
+			info = getString(R.string.playerservice_tuningwithstation,currentStation.getName());
 		}
 		Notification notification = new Notification(
-				R.drawable.as_statusbar, "Tuning to station", System.currentTimeMillis() );
+				R.drawable.as_statusbar, getString(R.string.playerservice_tuning), System.currentTimeMillis() );
 		PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
 				new Intent( this, Player.class ), 0 );
 		notification.setLatestEventInfo( this, info,
