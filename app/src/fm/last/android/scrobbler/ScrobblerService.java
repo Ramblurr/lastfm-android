@@ -372,10 +372,12 @@ public class ScrobblerService extends Service {
 			if(scrobbleRealtime || auth != null) {
 				ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 				NetworkInfo ni = cm.getActiveNetworkInfo();
-				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-				if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
-					mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-					mNowPlayingTask.execute(mScrobbler);
+				if (ni != null) {
+					boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+					if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
+						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
+						mNowPlayingTask.execute(mScrobbler);
+					}
 				}
 			}
 
