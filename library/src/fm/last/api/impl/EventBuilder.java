@@ -40,8 +40,7 @@ import fm.last.xml.XMLBuilder;
  */
 public class EventBuilder extends XMLBuilder<Event> {
 
-	private final DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy", Locale.ENGLISH);
-	private final DateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+	private final DateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
 	private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
 
 	@Override
@@ -74,17 +73,6 @@ public class EventBuilder extends XMLBuilder<Event> {
 			String text = getText("startDate");
 			if(text != null){
 				startDate = dateFormat.parse(text);
-			}
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-
-		// startTime 
-		Date startTime = null;
-		try {
-			String text = getText("startTime");
-			if(text != null){
-				startTime = timeFormat.parse(text);
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -133,7 +121,7 @@ public class EventBuilder extends XMLBuilder<Event> {
 
 		return new Event(id, title, artists, headliner,
 				venue, 
-				startDate, startTime, description,
+				startDate, description,
 				images, attendance, reviews, tag, url, status);
 	}
 

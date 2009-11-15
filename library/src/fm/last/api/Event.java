@@ -39,7 +39,6 @@ public class Event implements Serializable{
 	private Venue venue;
 	
 	private Date startDate;
-	private Date startTime;
 	private String description;
 	private ImageUrl[] images;
 	private int attendance;
@@ -49,7 +48,7 @@ public class Event implements Serializable{
 	private String status;
 
 	public Event(int id, String title, String[] artists, String headliner,
-			Venue venue, Date startDate, Date startTime, String description,
+			Venue venue, Date startDate, String description,
 			ImageUrl[] images, int attendance, int reviews, String tag,
 			String url, String status) {
 		super();
@@ -59,7 +58,6 @@ public class Event implements Serializable{
 		this.headliner = headliner;
 		this.venue = venue;
 		this.startDate = startDate;
-		this.startTime = startTime;
 		this.description = description;
 		this.images = images;
 		this.attendance = attendance;
@@ -115,14 +113,6 @@ public class Event implements Serializable{
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
-	}
-
-	public Date getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Date startTime) {
-		this.startTime = startTime;
 	}
 
 	public String getDescription() {
