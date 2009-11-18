@@ -458,6 +458,7 @@ public class Profile extends ListActivity
 	    	RebuildMainMenu();
 	    	mMainAdapter.disableLoadBar();
 	    	mProfileList.setEnabled(true);
+	    	getListView().setEnabled(true);
 	    	
 	    	for( ListView list : mProfileLists )
 	    	{
