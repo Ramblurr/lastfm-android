@@ -382,6 +382,8 @@ public class ScrobblerService extends Service {
 
 			if(auth == null) {
 				NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+				nm.cancel(1338);
+
 				Notification notification = new Notification(						
 						R.drawable.as_statusbar, 
 						getString(R.string.scrobbler_ticker_text, mCurrentTrack.title, mCurrentTrack.artist),
@@ -390,7 +392,7 @@ public class ScrobblerService extends Service {
 				metaIntent.putExtra("artist", mCurrentTrack.artist);
 				metaIntent.putExtra("track", mCurrentTrack.title);
 				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
-						metaIntent, 0 );
+						metaIntent, PendingIntent.FLAG_UPDATE_CURRENT );
 				String info = mCurrentTrack.title + " - " + mCurrentTrack.artist;
 				notification.setLatestEventInfo( this, getString(R.string.scrobbler_info_title),
 						info, contentIntent );
