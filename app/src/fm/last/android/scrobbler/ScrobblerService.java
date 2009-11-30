@@ -250,8 +250,7 @@ public class ScrobblerService extends Service {
          * so we'll have to catch PLAYBACK_STATE_CHANGED and check to see whether the player
          * is currently playing.  We'll then send our own META_CHANGED intent to the scrobbler.
          */
-		if((intent.getAction().equals("com.android.music.playstatechanged") &&
-				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.android.music.metachanged")
+		if(intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
