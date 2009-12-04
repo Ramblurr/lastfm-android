@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import fm.last.android.Amazon;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -162,21 +163,9 @@ public class Metadata extends Activity {
 		return super.onCreateOptionsMenu(menu);
 	}
 	
-	private boolean isAmazonInstalled() {
-		PackageManager pm = getPackageManager();
-		boolean result = false;
-		try {
-			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
-			result = true;
-		} catch (Exception e) {
-			result = false;
-		}
-		return result;
-	}
-
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
-		menu.findItem(R.id.buy_menu_item).setEnabled( isAmazonInstalled() );
+		menu.findItem(R.id.buy_menu_item).setEnabled( Amazon.getAmazonVersion(this) > 0 );
 		menu.findItem(R.id.info_menu_item).setEnabled( mIsPlaying );
 		
 		return super.onPrepareOptionsMenu(menu);
@@ -193,22 +182,7 @@ public class Metadata extends Activity {
 			finish();
 			break;
 		case R.id.buy_menu_item:
-			try {
-				intent = new Intent(Intent.ACTION_SEARCH);
-				intent.setComponent(new ComponentName("com.amazon.mp3",
-						"com.amazon.mp3.android.client.SearchActivity"));
-				intent
-						.putExtra("actionSearchString", mArtistName
-								+ " "
-								+ mTrackName);
-				intent.putExtra("actionSearchType", 0);
-				startActivity(intent);
-			} catch (Exception e) {
-				LastFMApplication
-						.getInstance()
-						.presentError(this, getString(R.string.ERROR_AMAZON_TITLE),
-								getString(R.string.ERROR_AMAZON));
-			}
+			Amazon.searchForTrack(this, mArtistName, mTrackName);
 			break;
 		case R.id.share_menu_item:
 	        intent = new Intent( this, ShareResolverActivity.class );

@@ -23,6 +23,7 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.util.Formatter;
 
+import fm.last.android.Amazon;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -149,21 +150,9 @@ public class Player extends Activity {
         }
 	}
 
-	private boolean isAmazonInstalled() {
-		PackageManager pm = getPackageManager();
-		boolean result = false;
-		try {
-			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
-			result = true;
-		} catch (Exception e) {
-			result = false;
-		}
-		return result;
-	}
-
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu)  {
-		menu.findItem(R.id.buy_menu_item).setEnabled( isAmazonInstalled() );
+		menu.findItem(R.id.buy_menu_item).setEnabled( Amazon.getAmazonVersion(this) > 0 );
 		
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -188,29 +177,10 @@ public class Player extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	public static boolean handleOptionItemSelected( Context c, MenuItem item ) {
+	public boolean handleOptionItemSelected( Context c, MenuItem item ) {
 		switch (item.getItemId()) {
 		case R.id.buy_menu_item:
-			try {
-				if (LastFMApplication.getInstance().player == null)
-					return false;
-				Intent intent = new Intent(Intent.ACTION_SEARCH);
-				intent.setComponent(new ComponentName("com.amazon.mp3",
-						"com.amazon.mp3.android.client.SearchActivity"));
-				intent
-						.putExtra("actionSearchString", LastFMApplication
-								.getInstance().player.getArtistName()
-								+ " "
-								+ LastFMApplication.getInstance().player
-										.getTrackName());
-				intent.putExtra("actionSearchType", 0);
-				c.startActivity(intent);
-			} catch (Exception e) {
-				LastFMApplication
-						.getInstance()
-						.presentError(c, c.getString(R.string.ERROR_AMAZON_TITLE),
-								c.getString(R.string.ERROR_AMAZON));
-			}
+			Amazon.searchForTrack(this, mArtistName.getText().toString(), mTrackName.getText().toString());
 			break;
 		case R.id.share_menu_item:
 			try {

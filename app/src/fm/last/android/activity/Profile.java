@@ -56,6 +56,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
+import fm.last.android.Amazon;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
@@ -1245,29 +1246,13 @@ public class Profile extends ListActivity
     
     void buyAmazon(int type)
     {
-        String query = null;
-        int searchType = 0;
         if (type == DIALOG_ALBUM)
         {
-            query = mAlbumInfo.getArtist() + " " + mAlbumInfo.getTitle();
-            searchType = 1;
+            Amazon.searchForAlbum(this, mAlbumInfo.getArtist(), mAlbumInfo.getTitle());
         } 
         else if( type == DIALOG_TRACK) 
         {
-            query = mTrackInfo.getArtist().getName() + " " + mTrackInfo.getName();
-            searchType = 0;
-        }
-        if( query != null ) {
-            try {
-                Intent intent = new Intent( Intent.ACTION_SEARCH );
-                intent.setComponent(new ComponentName("com.amazon.mp3","com.amazon.mp3.android.client.SearchActivity"));
-                intent.putExtra("actionSearchString", query);
-                intent.putExtra("actionSearchType", searchType);
-                startActivity( intent );
-            } catch (Exception e) {
-				LastFMApplication.getInstance().presentError(Profile.this, getString(R.string.ERROR_AMAZON_TITLE),
-						getString(R.string.ERROR_AMAZON));
-            }
+        	Amazon.searchForTrack(this, mTrackInfo.getName(), mTrackInfo.getArtist().getName());
         }
     }
     
@@ -1329,18 +1314,6 @@ public class Profile extends ListActivity
         
     }
     
-	private boolean isAmazonInstalled() {
-		PackageManager pm = getPackageManager();
-		boolean result = false;
-		try {
-			pm.getPackageInfo("com.amazon.mp3", PackageManager.GET_ACTIVITIES);
-			result = true;
-		} catch (Exception e) {
-			result = false;
-		}
-		return result;
-	}
-
     ArrayList<ListEntry> prepareProfileActions(int type)
     {
         ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>(); 
@@ -1365,7 +1338,7 @@ public class Profile extends ListActivity
             iconifiedEntries.add(entry);
         }
 
-        if(isAmazonInstalled()) {
+        if(Amazon.getAmazonVersion(this) > 0) {
         	entry = new ListEntry(R.string.action_amazon, R.drawable.shopping_cart_dark, getString(R.string.action_amazon)); // TODO need amazon icon
         	iconifiedEntries.add(entry);
         }
