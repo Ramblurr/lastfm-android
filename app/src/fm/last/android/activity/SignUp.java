@@ -85,4 +85,10 @@ public class SignUp extends Activity
         mSignUpButton = (Button)findViewById( R.id.create_account_button );
         mSignUpButton.setOnClickListener( mOnSignUpClickListener );
     }
+
+    @Override
+	public void onResume() {
+		super.onResume();
+		LastFMApplication.getInstance().tracker.trackPageView("/SignUp");
+	}
 }

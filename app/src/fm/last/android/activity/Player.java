@@ -96,7 +96,6 @@ public class Player extends Activity {
 	
 	@Override
 	public void onCreate(Bundle icicle) {
-
 		super.onCreate(icicle);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -282,6 +281,9 @@ public class Player extends Activity {
 		long next = refreshNow();
 		queueNextRefresh(next);
 		super.onResume();
+		
+		LastFMApplication.getInstance().tracker.trackPageView("/Player");
+		
 	}
 
 	@Override

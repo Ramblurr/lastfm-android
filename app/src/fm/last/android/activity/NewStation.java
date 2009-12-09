@@ -156,6 +156,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
     	}
     	
     	super.onResume();
+		
+		LastFMApplication.getInstance().tracker.trackPageView("/NewStation");
+		
     }
     
     @Override

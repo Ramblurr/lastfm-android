@@ -164,6 +164,12 @@ public class Event extends Activity {
     }
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		LastFMApplication.getInstance().tracker.trackPageView("/Event");
+	}
+	
+	@Override
 	protected void onStop() {
 		mPosterImage.cancel();
 		super.onStop();

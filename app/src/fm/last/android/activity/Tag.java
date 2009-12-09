@@ -189,6 +189,12 @@ public class Tag extends Activity implements TabBarListener {
 		});
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		LastFMApplication.getInstance().tracker.trackPageView("/Tag");
+	}
+	
 	/**
 	 * Restores already added tags when orientation is changed
 	 */

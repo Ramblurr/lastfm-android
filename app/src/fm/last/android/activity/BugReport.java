@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 
 import android.content.Context;
@@ -28,8 +29,8 @@ public class BugReport extends DialogPreference {
 	@Override
 	protected void showDialog(Bundle state) {
 		super.showDialog(state);
-		
         mBug = (EditText)getDialog().findViewById(R.id.bug);
+   		LastFMApplication.getInstance().tracker.trackPageView("/BugReport");
 	}
 	
 	@Override

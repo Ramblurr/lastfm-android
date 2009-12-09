@@ -104,7 +104,6 @@ public class Metadata extends Activity {
 	@Override
 	public void onCreate( Bundle icicle ) {
 		super.onCreate( icicle );
-
 		requestWindowFeature( Window.FEATURE_NO_TITLE );
 		setContentView( R.layout.metadata );
 		
@@ -150,6 +149,12 @@ public class Metadata extends Activity {
                 }
         }, Context.BIND_AUTO_CREATE);
 
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		LastFMApplication.getInstance().tracker.trackPageView("/Metadata");
 	}
 	
 	@Override

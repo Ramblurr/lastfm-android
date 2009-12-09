@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import android.util.Log;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -139,6 +142,10 @@ public class UrlUtil {
 			if (reader != null) {
 				reader.close();
 			}
+
+			//Dispatch any queued Analytics data while we've got the network open
+			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+			tracker.dispatch();
 		}
 	}
 

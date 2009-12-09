@@ -117,6 +117,12 @@ public class AddToPlaylist extends Activity {
 		new LoadPlaylistsTask().execute((Void)null);
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+		LastFMApplication.getInstance().tracker.trackPageView("/AddToPlaylist");
+	}
+	
 	private ImageCache getImageCache(){
         if(mImageCache == null){
             mImageCache = new ImageCache();

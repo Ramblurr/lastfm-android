@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+
 import fm.last.android.activity.Player;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
@@ -61,6 +63,7 @@ public class LastFMApplication extends Application
     public Session session;
 	public fm.last.android.player.IRadioPlayer player = null;
 	private Context mCtx;
+	public GoogleAnalyticsTracker tracker;
 	
     private static LastFMApplication instance;
     
@@ -94,6 +97,8 @@ public class LastFMApplication extends Application
         String session_key = settings.getString( "lastfm_session_key", "" );
         String subscriber = settings.getString( "lastfm_subscriber", "0" );
     	session = new Session(username, session_key, subscriber);
+    	tracker = GoogleAnalyticsTracker.getInstance();
+        tracker.start(PrivateAPIKey.ANALYTICS_ID, this);
     }
     
 	private ServiceConnection mConnection = new ServiceConnection()

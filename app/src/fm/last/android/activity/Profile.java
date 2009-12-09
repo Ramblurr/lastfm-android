@@ -493,6 +493,8 @@ public class Profile extends ListActivity
             }, Context.BIND_AUTO_CREATE);
 
     	}
+
+    	LastFMApplication.getInstance().tracker.trackPageView("/Profile");
 		super.onResume();
     }
     
