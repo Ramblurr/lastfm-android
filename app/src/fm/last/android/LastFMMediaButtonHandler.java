@@ -19,33 +19,44 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver{
 			Log.i(TAG, "LastFM-Player not active, don't handling media keys.");
 			return;
 		}
-		
-        KeyEvent event = (KeyEvent) intent
-				.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-        
-		if (event == null) {
-			return;
-		}
-
-		int keycode = event.getKeyCode();
 		try {
 			IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface( service );
+	
+			if(player.isPlaying()) {
+				if(intent.getAction().startsWith("com.smartmadsoft.openwatch.command")) {
+					if(intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_FF")) {
+						player.skip();
+					}
+					if(intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_PLAYPAUSE")) {
+						player.stop();
+					}
+				}
+		
+				if(intent.getAction().equals("android.intent.action.MEDIA_BUTTON")) {
+			        KeyEvent event = (KeyEvent) intent
+							.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+			        
+					if (event == null) {
+						return;
+					}
 			
-			// handling only down events if the player is playing
-			if (event.getAction() == KeyEvent.ACTION_DOWN &&
-					player.isPlaying()){
-				
-				switch (keycode){
-				case KeyEvent.KEYCODE_MEDIA_NEXT:
-					Log.i(TAG,"Next-Button => Skipping '"+player.getTrackName()+"'");
-					player.skip();
-					abortBroadcast();
-					return;
-				case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-					Log.i(TAG,"Pause-Button => Stopping '"+player.getTrackName()+"'");
-					player.stop();
-					abortBroadcast();
-					return;				
+					int keycode = event.getKeyCode();
+	
+					if (event.getAction() == KeyEvent.ACTION_DOWN){
+						
+						switch (keycode){
+						case KeyEvent.KEYCODE_MEDIA_NEXT:
+							Log.i(TAG,"Next-Button => Skipping '"+player.getTrackName()+"'");
+							player.skip();
+							abortBroadcast();
+							return;
+						case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+							Log.i(TAG,"Pause-Button => Stopping '"+player.getTrackName()+"'");
+							player.stop();
+							abortBroadcast();
+							return;				
+						}
+					}
 				}
 			}
 		} catch (RemoteException e) {
