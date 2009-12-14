@@ -331,6 +331,13 @@ public class RadioPlayerService extends Service
 			setForeground(true);
 		} catch (Exception e) {
 		}
+		
+		//Send the now playing info to an OpenWatch-enabled watch
+		Intent i = new Intent("com.smartmadsoft.openwatch.action.TEXT");
+		i.putExtra("line1", currentTrack.getTitle());
+		i.putExtra("line2", currentTrack.getCreator());
+		sendBroadcast(i);
+
 	}
 	
 	private void tuningNotify()
