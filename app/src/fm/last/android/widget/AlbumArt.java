@@ -72,6 +72,7 @@ public class AlbumArt extends ImageView {
     		super();
     		
     		mURL = url;
+    		Log.i("Last.fm", "Fetching art: " + url);
     	}
     	
         @Override

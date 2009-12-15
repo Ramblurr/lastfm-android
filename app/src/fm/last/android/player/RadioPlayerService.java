@@ -99,7 +99,8 @@ public class RadioPlayerService extends Service
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
-
+	private boolean mDoHasWiFi = false;
+	
 	private static final int NOTIFY_ID = 1337;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -218,6 +219,15 @@ public class RadioPlayerService extends Service
 
 			if(ni.getState() == NetworkInfo.State.DISCONNECTED) {
 				if(mState != STATE_STOPPED) {
+					//Ignore disconnections that don't change our WiFi / cell state
+					if((ni.getType() == ConnectivityManager.TYPE_WIFI) != mDoHasWiFi) {
+						return;
+					}
+
+					//We just lost the WiFi connection so update our state
+					if(ni.getType() == ConnectivityManager.TYPE_WIFI)
+						mDoHasWiFi = false;
+					
 					logger.info("Data connection lost! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo() + " Reason: " + ni.getReason());
 					if(mp != null && bufferPercent < 100) {
 						try {
@@ -243,6 +253,12 @@ public class RadioPlayerService extends Service
 				}
 			} else if(ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
 				if(mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
+					if(ni.getType() == ConnectivityManager.TYPE_WIFI) {
+						if(!mDoHasWiFi)
+							mDoHasWiFi = true;
+						else
+							return;
+					}
 					logger.info("New data connection attached! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo() + " Reason: " + ni.getReason());
 					mState = STATE_TUNING;
 					nextSong();
@@ -676,6 +692,8 @@ public class RadioPlayerService extends Service
 				bitrate = "64";
 			else
 				bitrate = "128";
+			
+			mDoHasWiFi = (ni.getType() == ConnectivityManager.TYPE_WIFI);
 			
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", false))
 				bitrate = "128";
