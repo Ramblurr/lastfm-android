@@ -22,6 +22,7 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
 				<action android:name="com.smartmadsoft.openwatch.command.BUTTON_FF"/>
 				<action android:name="com.smartmadsoft.openwatch.command.BUTTON_PLAYPAUSE"/>
+				<action android:name="android.media.AUDIO_BECOMING_NOISY"/>
             </intent-filter>
         </receiver>
 		<activity android:name=".activity.Profile" android:label="@string/profile_label" android:configChanges="keyboardHidden">
