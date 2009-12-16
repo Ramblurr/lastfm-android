@@ -107,7 +107,7 @@ public class BugReport extends DialogPreference {
 		        	"Android version: " + Build.VERSION.RELEASE + "\n" +
 		        	"Firmware fingerprint: " + Build.FINGERPRINT + "\n";
 		        
-		        String address[] = {"Last.fm Client Team <sam@last.fm>"};
+		        String address[] = {"Last.fm Client Team <client@last.fm>"};
 		        Intent email = new Intent(Intent.ACTION_SEND);
 		        email.putExtra(Intent.EXTRA_EMAIL, address);
 		        email.putExtra(Intent.EXTRA_TEXT, bugReport);
