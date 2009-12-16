@@ -20,6 +20,7 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +43,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -252,6 +254,12 @@ public class Profile extends ListActivity
 		
 		if( getIntent().getBooleanExtra("lastfm.profile.new_user", false ) )
 			startActivity( new Intent( Profile.this, NewStation.class ) );
+		
+        File f = new File("/sdcard/lastfm-logs.zip");
+		if(f.exists()) {
+			Log.i("Last.fm", "Removing stale bug report archive");
+			f.delete();
+		}
     }
     
     

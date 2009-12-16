@@ -52,6 +52,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -502,11 +503,11 @@ public class Player extends Activity {
 				    					mAlbum.setImageBitmap(mCachedBitmap);
 				    					mCachedBitmap = null;
 				    				} else {
-				    					new LoadAlbumArtTask().execute((Void) null);
+				    					new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
 				    				}
     							} else {
     			    				new LoadEventsTask().execute((Void)null);
-			    					new LoadAlbumArtTask().execute((Void) null);
+			    					new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
     							}
 		    				}
     					} catch (java.util.concurrent.RejectedExecutionException e) {
@@ -612,7 +613,7 @@ public class Player extends Activity {
 				.toString();
 	}
 
-	private class LoadAlbumArtTask extends UserTask<Void, Void, Boolean> {
+	private class LoadAlbumArtTask extends UserTask<String, Void, Boolean> {
 		String artUrl;
 
 		@Override
@@ -621,30 +622,28 @@ public class Player extends Activity {
 		}
 
 		@Override
-		public Boolean doInBackground(Void... params) {
+		public Boolean doInBackground(String... params) {
 			Album album;
 			boolean success = false;
 
+			artUrl = params[0];
+			Log.i("LastFm", "Art URL from playlist: " + artUrl);
+			
 			try {
-				if (LastFMApplication.getInstance().player != null) {
-					artUrl = LastFMApplication.getInstance().player.getArtUrl();
-					String artistName = LastFMApplication.getInstance().player
-							.getArtistName();
-					String albumName = LastFMApplication.getInstance().player
-							.getAlbumName();
-					if (albumName != null && albumName.length() > 0) {
-						album = mServer.getAlbumInfo(artistName, albumName);
-						if (album != null) {
-							for (ImageUrl image : album.getImages()) {
-								if (image.getSize().contentEquals("extralarge")) {
-									artUrl = image.getUrl();
-									break;
-								}
+				String artistName = params[1];
+				String albumName = params[2];
+				if (albumName != null && albumName.length() > 0) {
+					album = mServer.getAlbumInfo(artistName, albumName);
+					if (album != null) {
+						for (ImageUrl image : album.getImages()) {
+							if (image.getSize().contentEquals("extralarge")) {
+								artUrl = image.getUrl();
+								break;
 							}
 						}
 					}
-					success = true;
 				}
+					success = true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

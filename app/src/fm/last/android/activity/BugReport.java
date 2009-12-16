@@ -3,6 +3,8 @@ package fm.last.android.activity;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -69,7 +71,28 @@ public class BugReport extends DialogPreference {
 		        		Log.i("Last.fm", "Skipping non-existing log file: " + filenames[i]);
 		        	}
 		        }
-		    
+
+		        //Run 'logcat' and store the output as a file inside our zip
+		        ArrayList<String> commandLine = new ArrayList<String>();
+                commandLine.add("logcat");
+                commandLine.add("-d");
+                commandLine.add("-v");
+                commandLine.add("time");
+                
+                Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]));
+                InputStream in = process.getInputStream();
+                
+	            // Add ZIP entry to output stream.
+	            out.putNextEntry(new ZipEntry("logcat.log"));
+
+	            int len;
+                while ((len = in.read(buf)) > 0) {
+                	out.write(buf,0,len);
+                }
+		        
+                out.closeEntry();
+                in.close();
+                
 		        // Complete the ZIP file
 		        out.close();
 		        
@@ -84,7 +107,7 @@ public class BugReport extends DialogPreference {
 		        	"Android version: " + Build.VERSION.RELEASE + "\n" +
 		        	"Firmware fingerprint: " + Build.FINGERPRINT + "\n";
 		        
-		        String address[] = {"Last.fm Client Team <client@last.fm>"};
+		        String address[] = {"Last.fm Client Team <sam@last.fm>"};
 		        Intent email = new Intent(Intent.ACTION_SEND);
 		        email.putExtra(Intent.EXTRA_EMAIL, address);
 		        email.putExtra(Intent.EXTRA_TEXT, bugReport);
