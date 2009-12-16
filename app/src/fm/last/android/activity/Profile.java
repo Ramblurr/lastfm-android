@@ -666,24 +666,31 @@ public class Profile extends ListActivity
             switch ( position )
             {
             case PROFILE_TOPARTISTS: //"Top Artists"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
                 new LoadTopArtistsTask().execute((Void)null);
                 break;
             case PROFILE_TOPALBUMS: //"Top Albums"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
                 new LoadTopAlbumsTask().execute((Void)null);
                 break;
             case PROFILE_TOPTRACKS: //"Top Tracks"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
                 new LoadTopTracksTask().execute((Void)null);
                 break;
             case PROFILE_RECENTLYPLAYED: //"Recently Played"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
                 new LoadRecentTracksTask().execute((Void)null);
                 break;
             case PROFILE_EVENTS: //"Events"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events");
                 new LoadEventsTask().execute((Void)null);
                 break;
             case PROFILE_FRIENDS: //"Friends"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
                 new LoadFriendsTask().execute((Void)null);
                 break;
             case PROFILE_TAGS: //"Tags"
+            	LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
                 new LoadTagsTask().execute((Void)null);
                 break;
             default: 
@@ -1248,6 +1255,11 @@ public class Profile extends ListActivity
     
     void buyAmazon(int type)
     {
+		LastFMApplication.getInstance().tracker.trackEvent(
+	            "Clicks",  // Category
+	            "charts-buy",  // Action
+	            "", // Label
+	            0);       // Value
         if (type == DIALOG_ALBUM)
         {
             Amazon.searchForAlbum(this, mAlbumInfo.getArtist(), mAlbumInfo.getTitle());

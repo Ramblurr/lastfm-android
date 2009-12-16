@@ -16,6 +16,7 @@
 
 package fm.last.android.activity;
 
+import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 
 import android.app.ListActivity;
@@ -86,6 +87,12 @@ public class ShareResolverActivity extends ListActivity {
         Intent intent = mAdapter.intentForPosition(position);
 
         if (intent != null) {
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "share",  // Action
+		            intent.getPackage(), // Label
+		            0);       // Value
+        	
             startActivity(intent);
         }
         finish();

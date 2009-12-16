@@ -46,7 +46,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -179,6 +178,11 @@ public class Player extends Activity {
 	public boolean handleOptionItemSelected( Context c, MenuItem item ) {
 		switch (item.getItemId()) {
 		case R.id.buy_menu_item:
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "player-buy",  // Action
+		            "", // Label
+		            0);       // Value
 			Amazon.searchForTrack(this, mArtistName.getText().toString(), mTrackName.getText().toString());
 			break;
 		case R.id.share_menu_item:
@@ -295,48 +299,69 @@ public class Player extends Activity {
 	private View.OnClickListener mLoveListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-
-			if (LastFMApplication.getInstance().player == null)
-				return;
 			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "player-love",  // Action
+		            "", // Label
+		            0);       // Value
 		}
 	};
 
 	private View.OnClickListener mBanListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-
-			if (LastFMApplication.getInstance().player == null)
-				return;
 			Intent i = new Intent("fm.last.android.BAN");
 			sendBroadcast(i);
-			try {
-				LastFMApplication.getInstance().player.skip();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "player-ban",  // Action
+		            "", // Label
+		            0);       // Value
+			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
+                    new ServiceConnection() {
+                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+        					try {
+        						if (player.isPlaying())
+        							player.skip();
+        					} catch (RemoteException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					unbindService(this);
+                    }
+
+                    public void onServiceDisconnected(ComponentName comp) {}
+            }, 0);
 		}
 	};
 
 	private View.OnClickListener mNextListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "player-skip",  // Action
+		            "", // Label
+		            0);       // Value
+			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
+                    new ServiceConnection() {
+                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+        					try {
+        						if (player.isPlaying())
+        							player.skip();
+        					} catch (RemoteException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					unbindService(this);
+                    }
 
-			if (LastFMApplication.getInstance().player == null)
-				return;
-			try {
-				// If the player is in a stopped state, call startRadio instead
-				// of skip
-				if (LastFMApplication.getInstance().player.isPlaying())
-					LastFMApplication.getInstance().player.skip();
-				else
-					LastFMApplication.getInstance().player.startRadio();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                    public void onServiceDisconnected(ComponentName comp) {}
+            }, 0);
 		}
 	};
 
@@ -361,6 +386,11 @@ public class Player extends Activity {
 	private View.OnClickListener mOntourListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "on-tour-badge",  // Action
+		            "", // Label
+		            0);       // Value
 			showEventsMetadataIntent();
 		}
 
@@ -369,16 +399,29 @@ public class Player extends Activity {
 	private View.OnClickListener mStopListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
+			LastFMApplication.getInstance().tracker.trackEvent(
+	            "Clicks",  // Category
+	            "player-stop",  // Action
+	            "", // Label
+	            0);       // Value
 
-			if (LastFMApplication.getInstance().player != null) {
-				try {
-					if(LastFMApplication.getInstance().player.isPlaying())
-						LastFMApplication.getInstance().player.stop();
-					LastFMApplication.getInstance().unbindPlayerService();
-				} catch (RemoteException ex) {
-					System.out.println(ex.getMessage());
-				}
-			}
+			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
+                    new ServiceConnection() {
+                    public void onServiceConnected(ComponentName comp, IBinder binder) {
+                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+        					try {
+        						if (player.isPlaying())
+        							player.stop();
+        					} catch (RemoteException e) {
+        						// TODO Auto-generated catch block
+        						e.printStackTrace();
+        					}
+        					unbindService(this);
+                    }
+
+                    public void onServiceDisconnected(ComponentName comp) {}
+            }, 0);
+			LastFMApplication.getInstance().unbindPlayerService();
 			finish();
 		}
 	};

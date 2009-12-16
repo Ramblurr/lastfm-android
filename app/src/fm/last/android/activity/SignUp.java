@@ -56,6 +56,12 @@ public class SignUp extends Activity
 				String email = mEmail.getText().toString();
 				
 				server.signUp(username, password, email);
+
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Clicks",  // Category
+			            "signup",  // Action
+			            "", // Label
+			            0);       // Value
 				
 				setResult( RESULT_OK, new Intent().putExtra("username", username)
 												  .putExtra("password", password));

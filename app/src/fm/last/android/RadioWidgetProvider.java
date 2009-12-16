@@ -73,6 +73,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	                    public void onServiceDisconnected(ComponentName comp) {}
 	            }, Context.BIND_AUTO_CREATE);
 	        } else if (action.equals("fm.last.android.widget.SKIP")) {
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Clicks",  // Category
+			            "widget-skip",  // Action
+			            "", // Label
+			            0);       // Value
 	            LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
 	                    new ServiceConnection() {
 	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -101,6 +106,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	                    public void onServiceDisconnected(ComponentName comp) {}
 	            }, Context.BIND_AUTO_CREATE);
 	        } else if (action.equals("fm.last.android.widget.STOP")) {
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Clicks",  // Category
+			            "widget-stop",  // Action
+			            "", // Label
+			            0);       // Value
 	            LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
 	                    new ServiceConnection() {
 	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -132,9 +142,19 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        } else if (action.equals("fm.last.android.widget.LOVE")) {
 				Intent i = new Intent("fm.last.android.LOVE");
 				context.sendBroadcast(i);
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Clicks",  // Category
+			            "widget-love",  // Action
+			            "", // Label
+			            0);       // Value
 	        } else if (action.equals("fm.last.android.widget.BAN")) {
 				Intent i = new Intent("fm.last.android.BAN");
 				context.sendBroadcast(i);
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Clicks",  // Category
+			            "widget-ban",  // Action
+			            "", // Label
+			            0);       // Value
 				LastFMApplication.getInstance().bindService(new Intent(context,fm.last.android.player.RadioPlayerService.class ),
 	                    new ServiceConnection() {
 	                    public void onServiceConnected(ComponentName comp, IBinder binder) {

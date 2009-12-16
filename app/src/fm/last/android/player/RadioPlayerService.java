@@ -100,6 +100,8 @@ public class RadioPlayerService extends Service
 	private int mPlaylistRetryCount = 0;
 	private int mAutoSkipCount = 0;
 	private boolean mDoHasWiFi = false;
+	private long mStationStartTime = 0;
+	private long mTrackStartTime = 0;
 	
 	private static final int NOTIFY_ID = 1337;
 
@@ -319,6 +321,14 @@ public class RadioPlayerService extends Service
 			setForeground(false);
 		} catch (Exception e) {
 		}
+		if(currentStation != null && mStationStartTime > 0) {
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Radio",  // Category
+		            "Stream",  // Action
+		            currentStation.getType(), // Label
+		            (int)((System.currentTimeMillis() - mStationStartTime)/1000));       // Value
+			mStationStartTime = 0;
+		}
 	}
 	
 	private void playingNotify()
@@ -380,6 +390,7 @@ public class RadioPlayerService extends Service
 			setForeground(true);
 		} catch (Exception e) {
 		}
+		mStationStartTime = System.currentTimeMillis();
 	}
 
 	private OnCompletionListener mOnCompletionListener = new OnCompletionListener()
@@ -441,6 +452,11 @@ public class RadioPlayerService extends Service
 			} else {
 				mNextPrepared = true;
 			}
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Radio",  // Category
+		            "Buffering",  // Action
+		            currentStation.getType(), // Label
+		            (int)((System.currentTimeMillis() - mTrackStartTime)/1000));       // Value
 		}
 	};
 	
@@ -508,6 +524,7 @@ public class RadioPlayerService extends Service
 			
 			if(p == mp)
 				mState = STATE_PREPARING;
+			mTrackStartTime = System.currentTimeMillis();
 			p.prepareAsync();
 		}
 		catch ( IllegalStateException e )
@@ -699,8 +716,14 @@ public class RadioPlayerService extends Service
 				bitrate = "128";
 			logger.info("Requesting bitrate: " + bitrate);
 			playlist = server.getRadioPlayList( bitrate, currentSession.getKey() );
-			if(playlist == null || playlist.getTracks().length == 0)
+			if(playlist == null || playlist.getTracks().length == 0) {
+				LastFMApplication.getInstance().tracker.trackEvent(
+			            "Radio",  // Category
+			            "Error",  // Action
+			            "NotEnoughContent", // Label
+			            0);       // Value
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
+			}
 
 			RadioTrack[] tracks = playlist.getTracks();
 			logger.info("Got " + tracks.length + " track(s)");
@@ -719,6 +742,16 @@ public class RadioPlayerService extends Service
 				}
 			}
 		} catch (WSError e) {
+			String message;
+			if(e.getCode() == WSError.ERROR_NotEnoughContent)
+				message = "NotEnoughContent";
+			else
+				message = e.getMessage();
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Radio",  // Category
+		            "Error",  // Action
+		            message, // Label
+		            0);       // Value
 			logger.severe("Web service error: " + e.getMessage());
 			mError = e;
 			throw e;

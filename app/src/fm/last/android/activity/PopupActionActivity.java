@@ -7,10 +7,7 @@ import fm.last.android.Amazon;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import android.app.ListActivity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -72,6 +69,11 @@ public class PopupActionActivity extends ListActivity {
 	        startActivity( intent );
 			break;
 		case 4:
+			LastFMApplication.getInstance().tracker.trackEvent(
+		            "Clicks",  // Category
+		            "widget-buy",  // Action
+		            "", // Label
+		            0);       // Value
 			Amazon.searchForTrack(this, mArtistName, mTrackName);
 			break;
 		default:

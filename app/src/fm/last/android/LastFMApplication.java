@@ -288,6 +288,7 @@ public class LastFMApplication extends Application
     {
     	session = null;
         instance = null;
+        tracker.stop();
         super.onTerminate();
     }
     
