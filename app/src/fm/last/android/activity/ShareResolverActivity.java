@@ -90,7 +90,7 @@ public class ShareResolverActivity extends ListActivity {
 			LastFMApplication.getInstance().tracker.trackEvent(
 		            "Clicks",  // Category
 		            "share",  // Action
-		            intent.getPackage(), // Label
+		            intent.getComponent().getPackageName(), // Label
 		            0);       // Value
         	
             startActivity(intent);
