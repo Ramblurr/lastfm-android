@@ -6,6 +6,6 @@
 		<item name="android:layout_height">62dip</item>
 	</style>
 	<style name="playback_progress">
-		<item name="android:layout_width">280dip</item>
+		<item name="android:layout_width">230dip</item>
 	</style>
 </resources>
