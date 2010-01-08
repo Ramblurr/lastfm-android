@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
@@ -27,7 +28,8 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver{
 					player.skip();
 				}
 				if(intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_PLAYPAUSE") ||
-						intent.getAction().equals("android.media.AUDIO_BECOMING_NOISY")) {
+						(intent.getAction().equals("android.media.AUDIO_BECOMING_NOISY") && 
+								PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("handle_noisy", true))) {
 					player.stop();
 				}
 		

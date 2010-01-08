@@ -34,6 +34,10 @@
             android:key="highquality"
             android:defaultValue="false"
             android:summary="@string/prefs_highquality_summary" android:title="@string/prefs_highquality_title"/>
+    <CheckBoxPreference
+            android:key="handle_noisy"
+            android:defaultValue="true"
+            android:summary="@string/prefs_noisy_summary" android:title="@string/prefs_noisy_title"/>
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/prefs_cat_feedback_title">

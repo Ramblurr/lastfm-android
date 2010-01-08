@@ -75,6 +75,8 @@
 	<string name="prefs_bugreport_title">Report a bug</string>
 	<string name="prefs_bugreport_summary">Email a bug report to Last.fm</string>
 	<string name="prefs_bugreport_send">Send</string>
+	<string name="prefs_noisy_title">Headset interruption</string>
+	<string name="prefs_noisy_summary">Stops music playback when headset is disconnected</string>
 	
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
