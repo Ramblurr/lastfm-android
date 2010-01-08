@@ -21,6 +21,8 @@
 package fm.last.api;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * @author jennings
@@ -32,6 +34,11 @@ public class Friends implements Serializable {
 
   public Friends(User[] friends) {
     this.friends = friends;
+	Arrays.sort(this.friends, new Comparator<User>() {
+	    public int compare(User u1, User u2) {
+	        return u1.getName().toLowerCase().compareTo(u2.getName().toLowerCase());
+	      }
+	    });
   }
   
   public User[] getFriends() {
