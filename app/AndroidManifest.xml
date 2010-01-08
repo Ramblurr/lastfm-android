@@ -82,7 +82,7 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Preferences" android:label="@string/prefs_label">
+		<activity android:name=".activity.Preferences" android:configChanges="orientation|keyboardHidden" android:label="@string/prefs_label">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
 				<category android:name="android.intent.category.DEFAULT"/>
