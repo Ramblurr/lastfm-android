@@ -40,6 +40,7 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.RadioWidgetProvider;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -102,6 +103,7 @@ public class RadioPlayerService extends Service
 	private boolean mDoHasWiFi = false;
 	private long mStationStartTime = 0;
 	private long mTrackStartTime = 0;
+	private PendingIntent mPreBufferIntent = null;
 	
 	private static final int NOTIFY_ID = 1337;
 
@@ -211,8 +213,38 @@ public class RadioPlayerService extends Service
     	IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityListener, intentFilter);
+
+    	intentFilter = new IntentFilter();
+		intentFilter.addAction("fm.last.android.player.PREBUFFER");
+		registerReceiver(prebufferListener, intentFilter);
 	}
 
+	BroadcastReceiver prebufferListener = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			mPreBufferIntent = null;
+
+			// Check if we're running low on tracks
+			if ( currentQueue.size() < 2 )
+			{
+				mPlaylistRetryCount = 0;
+				try {
+					//Please to be working?
+					refreshPlaylist();
+				} catch (WSError e) {
+					logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
+				} catch (Exception e) {
+				}
+			}
+			if(currentQueue.size() > 1) {
+				mNextPrepared = false;
+				mNextFullyBuffered = false;
+				next_mp = new MediaPlayer();
+				playTrack((RadioTrack)(currentQueue.peek()), next_mp);
+			}
+		}
+	};
+	
 	BroadcastReceiver connectivityListener = new BroadcastReceiver() {
 
 		@Override
@@ -302,6 +334,7 @@ public class RadioPlayerService extends Service
 		mp.release();
 		clearNotification();
 		unregisterReceiver(connectivityListener);
+		unregisterReceiver(prebufferListener);
 	}
 
 	public IBinder getBinder()
@@ -410,25 +443,15 @@ public class RadioPlayerService extends Service
 		{
 			if(p == mp) {
 				bufferPercent = percent;
-				if(next_mp == null && percent == 100) {
-					// Check if we're running low on tracks
-					if ( currentQueue.size() < 2 )
-					{
-						mPlaylistRetryCount = 0;
-						try {
-							//Please to be working?
-							refreshPlaylist();
-						} catch (WSError e) {
-							logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
-						} catch (Exception e) {
-						}
-					}
-					if(currentQueue.size() > 1) {
-						mNextPrepared = false;
-						mNextFullyBuffered = false;
-						next_mp = new MediaPlayer();
-						playTrack((RadioTrack)(currentQueue.peek()), next_mp);
-					}
+				if(mPreBufferIntent == null && percent == 100) {
+			        Intent intent = new Intent("fm.last.android.player.PREBUFFER");
+			        mPreBufferIntent = PendingIntent.getBroadcast(RadioPlayerService.this, 0, intent, 0);
+			        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+			        long delay = (mp.getDuration() - mp.getCurrentPosition() - 30000);
+			        if(delay < 1000) 
+			        	delay = 1000;
+			        am.set(AlarmManager.RTC, System.currentTimeMillis() + delay, mPreBufferIntent);
+			        logger.info("Prebuffering in " + delay/1000 + " seconds");
 				}
 			}
 			if(p == next_mp && percent == 100) {
@@ -488,6 +511,7 @@ public class RadioPlayerService extends Service
 				}
 			} else {
 				logger.info("Encountered an error during pre-buffer");
+				next_mp.release();
 				next_mp = null;
 				mNextPrepared = false;
 				mNextFullyBuffered = false;
@@ -557,6 +581,11 @@ public class RadioPlayerService extends Service
 		next_mp = null;
 		mNextPrepared = false;
 		mNextFullyBuffered = false;
+		if(mPreBufferIntent != null) {
+	        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+	        am.cancel(mPreBufferIntent);
+	        mPreBufferIntent = null;
+		}
 		clearNotification();
 		mState = STATE_STOPPED;
 		notifyChange(PLAYBACK_FINISHED);
@@ -580,6 +609,12 @@ public class RadioPlayerService extends Service
 		if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
 			mp.stop();
+		}
+		
+		if(mPreBufferIntent != null) {
+	        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+	        am.cancel(mPreBufferIntent);
+	        mPreBufferIntent = null;
 		}
 		
 		mState = STATE_SKIPPING;
@@ -612,7 +647,6 @@ public class RadioPlayerService extends Service
 		
 		if(next_mp != null) {
 			logger.info("Skipping to pre-buffered track");
-			mp.stop();
 			mp.release();
 			mp = next_mp;
 			next_mp = null;
@@ -685,6 +719,11 @@ public class RadioPlayerService extends Service
 			notifyChange( PLAYBACK_STATE_CHANGED );
 			mp.pause();
 			mState = STATE_PAUSED;
+			if(mPreBufferIntent != null) {
+		        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+		        am.cancel(mPreBufferIntent);
+		        mPreBufferIntent = null;
+			}
 		}
 		else
 		{
