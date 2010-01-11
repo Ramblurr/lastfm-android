@@ -135,6 +135,10 @@ public class ScrobblerService extends Service {
 	            Object obj = objectStream.readObject();
 	            if(obj instanceof ScrobblerQueueEntry) {
 	            	mCurrentTrack = (ScrobblerQueueEntry)obj;
+	            	if(mCurrentTrack.startTime > System.currentTimeMillis()) {
+	            		mCurrentTrack = null;
+	            		logger.info("Serialized start time is in the future! ignoring");
+	            	}
 	            }
 	            objectStream.close();
 	            fileStream.close();
@@ -263,7 +267,7 @@ public class ScrobblerService extends Service {
 									if(s.isPlaying()) {
 										i.setAction(META_CHANGED);
 										i.putExtra("position", s.position());
-										i.putExtra("duration", (int)s.duration());
+										i.putExtra("duration", s.duration());
 										handleIntent(i);
 									} else { //Media player was paused
 										mCurrentTrack = null;
@@ -299,7 +303,7 @@ public class ScrobblerService extends Service {
 									if(s.isPlaying()) {
 										i.setAction(META_CHANGED);
 										i.putExtra("position", s.position());
-										i.putExtra("duration", (int)s.duration());
+										i.putExtra("duration", s.duration());
 										i.putExtra("track", s.getTrackName());
 										i.putExtra("artist", s.getArtistName());
 										i.putExtra("album", s.getAlbumName());
@@ -342,7 +346,10 @@ public class ScrobblerService extends Service {
         	String artist = intent.getStringExtra("artist");
         	
         	if(mCurrentTrack != null) {
-        		if(startTime < (mCurrentTrack.startTime + mCurrentTrack.duration) 
+        		long scrobblePoint = mCurrentTrack.duration / 2;
+        		if(scrobblePoint > 240000)
+        			scrobblePoint = 240000;
+        		if(startTime < (mCurrentTrack.startTime + scrobblePoint) 
         				&& mCurrentTrack.title.equals(title)
         				&& mCurrentTrack.artist.equals(artist)) {
         			logger.warning("Ignoring duplicate scrobble");
@@ -357,7 +364,7 @@ public class ScrobblerService extends Service {
         	mCurrentTrack.title = title;
         	mCurrentTrack.artist = artist;
         	mCurrentTrack.album = intent.getStringExtra("album");
-        	mCurrentTrack.duration = intent.getIntExtra("duration", 0);
+        	mCurrentTrack.duration = intent.getLongExtra("duration", 0);
         	if(mCurrentTrack.title == null || mCurrentTrack.artist == null) {
         		mCurrentTrack = null;
         		stopIfReady();

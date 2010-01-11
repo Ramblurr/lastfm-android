@@ -30,12 +30,12 @@ import fm.last.api.RadioTrack;
  * @author Sam Steele <sam@last.fm>
  */
 public class ScrobblerQueueEntry implements Serializable {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	public String artist;
 	public String title;
 	public String album;
 	public Long startTime;
-	public Integer duration;
+	public Long duration;
 	public String trackAuth = "";
 	public String rating = "";
 	public Boolean postedNowPlaying = false;
