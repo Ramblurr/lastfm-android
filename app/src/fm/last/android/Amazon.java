@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 /**
  * @author sam
@@ -48,7 +49,7 @@ public class Amazon {
         int searchType = 0;
     	Intent intent;
         try {
-			if(getAmazonVersion(ctx) > 600000) {
+			if(getAmazonVersion(ctx) > 60000) {
                 intent = new Intent( ACTION_EXTERNAL_EVENT );
                 intent.putExtra(EXTRA_EXTERNAL_EVENT_TYPE, TYPE_SEARCH);
                 intent.putExtra(EXTRA_SEARCH_STRING, query);
@@ -71,7 +72,7 @@ public class Amazon {
         int searchType = 1;
     	Intent intent;
         try {
-			if(getAmazonVersion(ctx) > 600000) {
+			if(getAmazonVersion(ctx) > 60000) {
                 intent = new Intent( ACTION_EXTERNAL_EVENT );
                 intent.putExtra(EXTRA_EXTERNAL_EVENT_TYPE, TYPE_SEARCH);
                 intent.putExtra(EXTRA_SEARCH_STRING, query);
