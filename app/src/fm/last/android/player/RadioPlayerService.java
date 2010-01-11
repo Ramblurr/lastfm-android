@@ -741,6 +741,8 @@ public class RadioPlayerService extends Service
 		RadioPlayList playlist;
 		try {
 			String bitrate;
+			String rtp = "1";
+			String discovery = "0";
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			logger.info("Current network type: " + ni.getTypeName());
@@ -753,8 +755,15 @@ public class RadioPlayerService extends Service
 			
 			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", false))
 				bitrate = "128";
+
+			if(!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true))
+				rtp = "0";
+
+			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("discovery", false))
+				discovery = "1";
+
 			logger.info("Requesting bitrate: " + bitrate);
-			playlist = server.getRadioPlayList( bitrate, currentSession.getKey() );
+			playlist = server.getRadioPlayList( bitrate, rtp, discovery, currentSession.getKey() );
 			if(playlist == null || playlist.getTracks().length == 0) {
 				LastFMApplication.getInstance().tracker.trackEvent(
 			            "Radio",  // Category

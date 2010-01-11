@@ -38,6 +38,10 @@
             android:key="handle_noisy"
             android:defaultValue="true"
             android:summary="@string/prefs_noisy_summary" android:title="@string/prefs_noisy_title"/>
+    <CheckBoxPreference
+            android:key="discovery"
+            android:defaultValue="false"
+            android:summary="@string/prefs_discovery_summary" android:title="@string/prefs_discovery_title"/>
     </PreferenceCategory>
     
     <PreferenceCategory android:title="@string/prefs_cat_feedback_title">

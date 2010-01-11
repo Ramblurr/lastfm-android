@@ -77,6 +77,8 @@
 	<string name="prefs_bugreport_send">Send</string>
 	<string name="prefs_noisy_title">Headset interruption</string>
 	<string name="prefs_noisy_summary">Stops music playback when headset is disconnected</string>
+	<string name="prefs_discovery_title">Discovery mode</string>
+	<string name="prefs_discovery_summary">Only play songs you've never heard before</string>
 	
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>

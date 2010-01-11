@@ -166,7 +166,7 @@ final class LastFmServerImpl implements LastFmServer {
 		return RadioFunctions.tuneToStation(baseUrl, params);
 	}
 
-	public RadioPlayList getRadioPlayList(String bitrate, String sk) throws IOException, WSError {
+	public RadioPlayList getRadioPlayList(String bitrate, String rtp, String discovery, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("radio.getPlaylist");
 		if (sk != null) {
 			params.put("sk", sk);
@@ -175,6 +175,8 @@ final class LastFmServerImpl implements LastFmServer {
 			bitrate = "128";
 		params.put("bitrate", bitrate);
 		params.put("speed_multiplier", "2");
+		params.put("rtp", rtp);
+		params.put("discovery", discovery);
 		signParams(params);
 		return RadioFunctions.getRadioPlaylist(baseUrl, params);
 	}
