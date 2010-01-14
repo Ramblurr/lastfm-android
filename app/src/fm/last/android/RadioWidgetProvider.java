@@ -6,6 +6,7 @@ package fm.last.android;
 import java.util.Formatter;
 
 import fm.last.android.activity.PopupActionActivity;
+import fm.last.android.activity.Profile;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
@@ -60,6 +61,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	        							Intent i = new Intent( LastFMApplication.getInstance(), PopupActionActivity.class );
 	        					        i.putExtra("lastfm.artist", artist);
 	        					        i.putExtra("lastfm.track", track);
+	        					        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	        					        LastFMApplication.getInstance().startActivity( i );
+	        						} else {
+	        							Intent i = new Intent( LastFMApplication.getInstance(), Profile.class );
 	        					        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	        					        LastFMApplication.getInstance().startActivity( i );
 	        						}
