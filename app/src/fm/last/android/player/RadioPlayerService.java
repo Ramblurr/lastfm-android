@@ -815,7 +815,7 @@ public class RadioPlayerService extends Service
 			i.putExtra( "artist", currentTrack.getCreator() );
 			i.putExtra( "album", currentTrack.getAlbum() );
 			i.putExtra( "track", currentTrack.getTitle() );
-			i.putExtra( "duration", currentTrack.getDuration());
+			i.putExtra( "duration", (long)currentTrack.getDuration());
 			i.putExtra( "trackAuth", currentTrack.getTrackAuth());
 		}
 		if (what.equals(PLAYBACK_ERROR) && mError != null) {
