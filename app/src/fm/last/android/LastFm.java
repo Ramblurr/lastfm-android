@@ -63,7 +63,7 @@ public class LastFm extends Activity
     private EditText mUserField;
     private Button mLoginButton;
     private Button mSignupButton;
-    
+
     /** Specifies if the user has just signed up */
     private boolean mNewUser = false;
 
@@ -80,16 +80,16 @@ public class LastFm extends Activity
         String user = settings.getString( "lastfm_user", "" );
         String session_key = settings.getString( "lastfm_session_key", "" );
         String pass;
-        
+
         new CheckUpdatesTask().execute((Void)null);
-        
+
         if ( !user.equals( "" ) && !session_key.equals( "" ) )
         {
         	if(getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
         		Intent intent = getIntent();
         		Bundle extras = intent.getExtras();
         		if (extras != null) {
-        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 
+        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
         		            AppWidgetManager.INVALID_APPWIDGET_ID);
             		Intent resultValue = new Intent();
             		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -112,7 +112,7 @@ public class LastFm extends Activity
         mLoginButton = ( Button ) findViewById( R.id.sign_in_button );
         mSignupButton = ( Button ) findViewById( R.id.sign_up_button );
         mUserField.setNextFocusDownId( R.id.password );
-        
+
         mPassField.setOnKeyListener( new View.OnKeyListener()
         {
 
@@ -133,17 +133,17 @@ public class LastFm extends Activity
 			pass = icicle.getString( "pass" );
 			if(user != null)
 			    mUserField.setText( user );
-			
+
 			if(pass != null)
 			    mPassField.setText( pass );
         }
-        
+
         mLoginButton.setOnClickListener( new View.OnClickListener()
         {
             public void onClick( View v )
             {
-            	if (mLoginTask != null) return; 
-            	
+            	if (mLoginTask != null) return;
+
             	String user = mUserField.getText().toString();
                 String password = mPassField.getText().toString();
 
@@ -152,13 +152,13 @@ public class LastFm extends Activity
 							getResources().getString(R.string.ERROR_MISSINGINFO));
 					return;
                 }
-            
+
                 mLoginTask = new LoginTask( v.getContext() );
                 mLoginTask.execute( user, password );
             }
         });
-        
-        mSignupButton.setOnClickListener( new OnClickListener() 
+
+        mSignupButton.setOnClickListener( new OnClickListener()
         {
 			public void onClick(View v) {
 				Intent intent = new Intent( LastFm.this, SignUp.class );
@@ -166,13 +166,13 @@ public class LastFm extends Activity
 			}
         });
     }
-    
+
     @Override
     public void onActivityResult( int requestCode, int resultCode, Intent data)
     {
     	if( requestCode != 0 || resultCode != RESULT_OK )
     		return;
-    	
+
     	mUserField.setText( data.getExtras().getString("username") );
     	mPassField.setText( data.getExtras().getString("password") );
     	mNewUser = true;
@@ -195,32 +195,32 @@ public class LastFm extends Activity
     }
 
 
-    /** In a task because it can take a while, and Android has a tendency to 
-      * panic and show the force quit/wait dialog quickly. And this blocks. 
+    /** In a task because it can take a while, and Android has a tendency to
+      * panic and show the force quit/wait dialog quickly. And this blocks.
       */
     private class LoginTask extends UserTask<String, Void, Session>
     {
     	Context context;
     	ProgressDialog mDialog;
-    	
+
     	Exception e;
     	WSError wse;
-    	
+
     	LoginTask( Context c )
     	{
     		this.context = c;
     		mLoginButton.setEnabled( false );
-    		
+
 			mDialog = ProgressDialog.show( c , "", getString(R.string.main_authenticating),
 					true, false );
 			mDialog.setCancelable( true );
     	}
-    	    	
-        public Session doInBackground(String...params) 
+
+        public Session doInBackground(String...params)
         {
         	String user = params[0];
         	String pass = params[1];
-        	
+
             try
             {
             	return login( user, pass );
@@ -232,13 +232,14 @@ public class LastFm extends Activity
             catch ( Exception e )
             {
             	this.e = e;
-            }        	
+            }
 
             return null;
-        }         
-        
+        }
+
         Session login( String user, String pass ) throws Exception, WSError
         {
+            user = user.trim().toLowerCase();
             LastFmServer server = AndroidLastFmServerFactory.getServer();
             String md5Password = MD5.getInstance().hash(pass);
             String authToken = MD5.getInstance().hash(user + md5Password);
@@ -247,13 +248,13 @@ public class LastFm extends Activity
             	throw(new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
             return session;
         }
-        
+
         @Override
-        public void onPostExecute( Session session ) 
+        public void onPostExecute( Session session )
         {
         	mLoginButton.setEnabled( true );
         	mLoginTask = null;
-        	
+
         	if (session != null)
         	{
 	            SharedPreferences.Editor editor = getSharedPreferences( PREFS, 0 ).edit();
@@ -268,7 +269,7 @@ public class LastFm extends Activity
 	        		Intent intent = getIntent();
 	        		Bundle extras = intent.getExtras();
 	        		if (extras != null) {
-	        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 
+	        			int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
 	        		            AppWidgetManager.INVALID_APPWIDGET_ID);
 	            		Intent resultValue = new Intent();
 	            		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -287,7 +288,7 @@ public class LastFm extends Activity
                 LastFMApplication.getInstance().presentError( context, wse );
             }
         	else if (e != null)
-            {           	
+            {
         		AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
         		d.setIcon(android.R.drawable.ic_dialog_alert);
         		d.setNeutralButton(getString(R.string.common_ok),
@@ -304,7 +305,7 @@ public class LastFm extends Activity
             				new DialogInterface.OnClickListener() {
             					public void onClick(DialogInterface dialog, int whichButton)
             					{
-            		            	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword")); 
+            		            	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword"));
             		                startActivity(myIntent);
             					}
             				});
@@ -314,17 +315,17 @@ public class LastFm extends Activity
             	}
         		d.show();
             }
-            
+
             mDialog.dismiss();
         }
     }
-    
+
     private LoginTask mLoginTask;
-    
+
 
     private class CheckUpdatesTask extends UserTask<Void, Void, Boolean> {
     	private String mUpdateURL = "";
-    	
+
         @Override
         public Boolean doInBackground(Void...params) {
             boolean success = false;
@@ -346,7 +347,7 @@ public class LastFm extends Activity
         public void onPostExecute(Boolean result) {
         	if(result) {
         		NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-        		Notification notification = new Notification( R.drawable.as_statusbar, 
+        		Notification notification = new Notification( R.drawable.as_statusbar,
         				getString(R.string.newversion_ticker_text), System.currentTimeMillis() );
         		PendingIntent contentIntent = PendingIntent.getActivity( LastFm.this, 0,
         				new Intent( Intent.ACTION_VIEW, Uri.parse(mUpdateURL)), 0 );
