@@ -608,7 +608,8 @@ public class RadioPlayerService extends Service
 		
 		if(mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
-			mp.stop();
+			if(mp.isPlaying())
+				mp.stop();
 		}
 		
 		if(mPreBufferIntent != null) {
