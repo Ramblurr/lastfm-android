@@ -152,7 +152,6 @@ public class LastFm extends Activity {
 		});
 
 		mSignupButton.setOnClickListener(new OnClickListener() {
->>>>>>> f2ef9889dd5679f9f6a84dc57d45007c5ef06f73:app/src/fm/last/android/LastFm.java
 			public void onClick(View v) {
 				Intent intent = new Intent(LastFm.this, SignUp.class);
 				startActivityForResult(intent, 0);
@@ -220,7 +219,7 @@ public class LastFm extends Activity {
 		}
 
 		Session login(String user, String pass) throws Exception, WSError {
-			user = user.trim().toLowerCase();
+			user = user.toLowerCase().trim();
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			String md5Password = MD5.getInstance().hash(pass);
 			String authToken = MD5.getInstance().hash(user + md5Password);
@@ -325,5 +324,4 @@ public class LastFm extends Activity {
 			}
 		}
 	}
->>>>>>> f2ef9889dd5679f9f6a84dc57d45007c5ef06f73:app/src/fm/last/android/LastFm.java
 }
