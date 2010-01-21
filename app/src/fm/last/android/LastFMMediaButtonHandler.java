@@ -41,7 +41,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver{
 						return;
 					}
 			
-					int keycode = event.getKeyCode();
+					int keycode = event.getKeyCode(); 
 	
 					if (event.getAction() == KeyEvent.ACTION_DOWN){
 						
