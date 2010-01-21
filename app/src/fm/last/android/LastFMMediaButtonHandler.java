@@ -38,14 +38,11 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver{
 							.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
 			        
 					if (event == null) {
-						Log.i("Last.fm", "Balls");
 						return;
 					}
 			
 					int keycode = event.getKeyCode();
 	
-					Log.i("Last.fm","Keycode: " + keycode);
-					
 					if (event.getAction() == KeyEvent.ACTION_DOWN){
 						
 						switch (keycode){
