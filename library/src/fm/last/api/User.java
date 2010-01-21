@@ -25,81 +25,78 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class User implements Serializable {
-	
+
 	public enum Gender {
-		MALE,
-		FEMALE,
-		UNKNOWN
+		MALE, FEMALE, UNKNOWN
 	}
 
-  private static final long serialVersionUID = 2047407259337226913L;
-  public User(String name, String realname, String url, ImageUrl[] images, Locale country, String age, Gender gender, String playcount, String subscriber, Date joindate) {
-    this.name = name;
-    this.realname = realname;
-    this.url = url;
-    this.images = images;
-    this.country = country;
-    this.age = age;
-    this.playcount = playcount;
-    this.subscriber = subscriber;
-    this.joindate = joindate;
-    this.gender = gender;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public String getRealName() {
-      return realname;
-    }
+	private static final long serialVersionUID = 2047407259337226913L;
 
-  public String getUrl() {
-    return url;
-  }
+	public User(String name, String realname, String url, ImageUrl[] images, Locale country, String age, Gender gender, String playcount, String subscriber,
+			Date joindate) {
+		this.name = name;
+		this.realname = realname;
+		this.url = url;
+		this.images = images;
+		this.country = country;
+		this.age = age;
+		this.playcount = playcount;
+		this.subscriber = subscriber;
+		this.joindate = joindate;
+		this.gender = gender;
+	}
 
-  public Locale getCountry() {
-    return country;
-  }
+	public String getName() {
+		return name;
+	}
 
-  public String getAge() {
-    return age;
-  }
+	public String getRealName() {
+		return realname;
+	}
 
-  public Gender getGender() {
-    return gender;
-  }
+	public String getUrl() {
+		return url;
+	}
 
-  public String getPlaycount() {
-    return playcount;
-  }
+	public Locale getCountry() {
+		return country;
+	}
 
-  public ImageUrl[] getImages() {
-    return images;
-  }
-  
-  public Date getJoinDate()
-  {
-      return joindate;
-  }
-  
-  public String getSubscriber()
-  {
-	  return subscriber;
-  }
-  
-  private final String name;
-  private final String url;
-  private final ImageUrl[] images;
-  private final Locale country;
-  private final String age;
-  private final Gender gender;
-  private final String playcount;
-  private final String realname;
-  private final Date joindate;
-  private final String subscriber;
+	public String getAge() {
+		return age;
+	}
+
+	public Gender getGender() {
+		return gender;
+	}
+
+	public String getPlaycount() {
+		return playcount;
+	}
+
+	public ImageUrl[] getImages() {
+		return images;
+	}
+
+	public Date getJoinDate() {
+		return joindate;
+	}
+
+	public String getSubscriber() {
+		return subscriber;
+	}
+
+	private final String name;
+	private final String url;
+	private final ImageUrl[] images;
+	private final Locale country;
+	private final String age;
+	private final Gender gender;
+	private final String playcount;
+	private final String realname;
+	private final Date joindate;
+	private final String subscriber;
 }

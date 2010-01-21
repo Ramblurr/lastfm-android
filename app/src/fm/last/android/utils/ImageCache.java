@@ -25,10 +25,9 @@ import java.util.Map;
 
 import android.graphics.Bitmap;
 
-
 /**
- * Class responsible for caching downloaded images
- * and holding references to them.
+ * Class responsible for caching downloaded images and holding references to
+ * them.
  * 
  * @author Lukasz Wisniewski
  */

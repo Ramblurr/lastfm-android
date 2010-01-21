@@ -24,92 +24,90 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import fm.last.android.R;
-import fm.last.api.User;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import fm.last.android.R;
+import fm.last.api.User;
 
 public class ProfileBubble extends LinearLayout {
 
-    User mUser;
-    TextView mFirst;
-    TextView mSecond;
-    AlbumArt mAvatar;
+	User mUser;
+	TextView mFirst;
+	TextView mSecond;
+	AlbumArt mAvatar;
 
-    public ProfileBubble(Context context) {
-        super(context);
-        init();
-    }
+	public ProfileBubble(Context context) {
+		super(context);
+		init();
+	}
 
-    public ProfileBubble(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-    
-    private void init()
-    {
-        LayoutInflater.from(getContext()).inflate(R.layout.profile_bubble, this);
-        // we did do this but it looks wrong due to lack of 
-        //this.setBackgroundResource(R.drawable.profile_bubble_bg);
+	public ProfileBubble(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+	}
 
-        mFirst  = (TextView) findViewById(R.id.profile_username);
-        mSecond = (TextView) findViewById(R.id.profile_meta);
-        mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
-        mAvatar.setDefaultImageResource( R.drawable.profile_unknown );
+	private void init() {
+		LayoutInflater.from(getContext()).inflate(R.layout.profile_bubble, this);
+		// we did do this but it looks wrong due to lack of
+		// this.setBackgroundResource(R.drawable.profile_bubble_bg);
 
-        mSecond.setText(getContext().getText(R.string.profile_loading));
-    }
+		mFirst = (TextView) findViewById(R.id.profile_username);
+		mSecond = (TextView) findViewById(R.id.profile_meta);
+		mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
+		mAvatar.setDefaultImageResource(R.drawable.profile_unknown);
 
-    public void setUser(User user) {
-        mUser = user;        
-        if(user.getRealName() == null || user.getRealName().trim().length()==0)
-            mFirst.setText(user.getName());
-        else 
-            mFirst.setText(user.getRealName());
-        
-        
-        List<String> seconds = new ArrayList<String>();
+		mSecond.setText(getContext().getText(R.string.profile_loading));
+	}
 
-        if (user.getAge() != null && user.getAge().trim().length()>0) seconds.add(user.getAge());
-        if (user.getGender() != null) {
-        	switch (user.getGender()) {
-        	case MALE:
-        		seconds.add(getContext().getString(R.string.profile_gender_male));
-        		break;
-        	case FEMALE:
-        		seconds.add(getContext().getString(R.string.profile_gender_female));
-        		break;
-        	}        	
-        }
-        if (user.getCountry() != null) {
-        	Locale current = Locale.getDefault();
-        	String displayCountry;
-        	if (current.getLanguage().equalsIgnoreCase("de")) {
-        		// translate supported languages
-        		displayCountry = user.getCountry().getDisplayCountry();
-        	}
-        	else {
-        		// default to English for non-supported languages
-        		displayCountry = user.getCountry().getDisplayCountry(Locale.ENGLISH);
-        	}
-        	if (displayCountry!=null && displayCountry.trim().length()>0) {
-        		seconds.add(displayCountry);
-        	}
-        }
-        
-        String second = "";
-        for(String s: seconds)
-        	second += s + ", ";
+	public void setUser(User user) {
+		mUser = user;
+		if (user.getRealName() == null || user.getRealName().trim().length() == 0)
+			mFirst.setText(user.getName());
+		else
+			mFirst.setText(user.getRealName());
 
-        int playcount = Integer.parseInt(mUser.getPlaycount());
-        String plays = getContext().getString(R.string.profile_userplays, playcount	, mUser.getJoinDate());
-        mSecond.setText(second + plays);
+		List<String> seconds = new ArrayList<String>();
 
-        if( mUser.getImages().length > 0 ) {
-        	mAvatar.fetch(mUser.getImages()[0].getUrl());
-        }
-    }
+		if (user.getAge() != null && user.getAge().trim().length() > 0)
+			seconds.add(user.getAge());
+		if (user.getGender() != null) {
+			switch (user.getGender()) {
+			case MALE:
+				seconds.add(getContext().getString(R.string.profile_gender_male));
+				break;
+			case FEMALE:
+				seconds.add(getContext().getString(R.string.profile_gender_female));
+				break;
+			}
+		}
+		if (user.getCountry() != null) {
+			Locale current = Locale.getDefault();
+			String displayCountry;
+			if (current.getLanguage().equalsIgnoreCase("de")) {
+				// translate supported languages
+				displayCountry = user.getCountry().getDisplayCountry();
+			} else {
+				// default to English for non-supported languages
+				displayCountry = user.getCountry().getDisplayCountry(Locale.ENGLISH);
+			}
+			if (displayCountry != null && displayCountry.trim().length() > 0) {
+				seconds.add(displayCountry);
+			}
+		}
+
+		String second = "";
+		for (String s : seconds)
+			second += s + ", ";
+
+		int playcount = Integer.parseInt(mUser.getPlaycount());
+		String plays = getContext().getString(R.string.profile_userplays, playcount, mUser.getJoinDate());
+		mSecond.setText(second + plays);
+
+		if (mUser.getImages().length > 0) {
+			mAvatar.fetch(mUser.getImages()[0].getUrl());
+		}
+	}
 }

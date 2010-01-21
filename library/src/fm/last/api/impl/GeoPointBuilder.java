@@ -35,14 +35,14 @@ public class GeoPointBuilder extends XMLBuilder<GeoPoint> {
 		node = geoPointNode;
 		try {
 			double latitude = 0, longitude = 0;
-			if(getText("geo:lat") != null)
+			if (getText("geo:lat") != null)
 				latitude = Double.parseDouble(getText("geo:lat"));
-	
-			if(getText("geo:long") != null)
+
+			if (getText("geo:long") != null)
 				longitude = Double.parseDouble(getText("geo:long"));
 			return new GeoPoint(latitude, longitude);
-		} catch(NumberFormatException e) {
-			return new GeoPoint(0,0);
+		} catch (NumberFormatException e) {
+			return new GeoPoint(0, 0);
 		}
 	}
 

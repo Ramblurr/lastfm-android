@@ -30,12 +30,13 @@ import fm.last.xml.XMLBuilder;
  */
 public class StationBuilder extends XMLBuilder<Station> {
 
-  public Station build(Node stationNode) {
-    node = stationNode;
-    String name = getText("name");
-    String type = getText("type");
-    String url = getText("url");
-    String supportsdiscovery = getText("supportsdiscovery");
-    return new Station(name, type, url, supportsdiscovery);
-  }
+	@Override
+	public Station build(Node stationNode) {
+		node = stationNode;
+		String name = getText("name");
+		String type = getText("type");
+		String url = getText("url");
+		String supportsdiscovery = getText("supportsdiscovery");
+		return new Station(name, type, url, supportsdiscovery);
+	}
 }

@@ -33,35 +33,36 @@ import fm.last.xml.XMLBuilder;
  * @author Mike Jennings
  */
 public class TrackBuilder extends XMLBuilder<Track> {
-  private ArtistBuilder artistBuilder = new ArtistBuilder();
-  private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
+	private ArtistBuilder artistBuilder = new ArtistBuilder();
+	private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
 
-  public Track build(Node trackNode) {
-    node = trackNode;
-    String id = getText("id");
-    String name = getText("name");
-    String mbid = getText("mbid");
-    String url = getText("url");
-    String duration = getText("duration");
-    String streamable = getText("streamable");
-    String listeners = getText("listeners");
-    String playcount = getText("playcount");
-    Artist artist;
-    Node artistNode = getChildNode("artist");
-    if(artistNode.getChildNodes().getLength() > 1) {
-	    artist = artistBuilder.build(artistNode);
-    } else {
-        String artistName = getText("artist");
-    	artist = new Artist(artistName, "", "", "", null, "", "", "");
-    }
-    
-    List<Node> imageNodes = getChildNodes("image");
-    ImageUrl[] images = new ImageUrl[imageNodes.size()];
-    int i = 0;
-    for (Node imageNode : imageNodes) {
-      images[i++] =imageBuilder.build(imageNode);
-    }
-    
-    return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images);
-  }
+	@Override
+	public Track build(Node trackNode) {
+		node = trackNode;
+		String id = getText("id");
+		String name = getText("name");
+		String mbid = getText("mbid");
+		String url = getText("url");
+		String duration = getText("duration");
+		String streamable = getText("streamable");
+		String listeners = getText("listeners");
+		String playcount = getText("playcount");
+		Artist artist;
+		Node artistNode = getChildNode("artist");
+		if (artistNode.getChildNodes().getLength() > 1) {
+			artist = artistBuilder.build(artistNode);
+		} else {
+			String artistName = getText("artist");
+			artist = new Artist(artistName, "", "", "", null, "", "", "");
+		}
+
+		List<Node> imageNodes = getChildNodes("image");
+		ImageUrl[] images = new ImageUrl[imageNodes.size()];
+		int i = 0;
+		for (Node imageNode : imageNodes) {
+			images[i++] = imageBuilder.build(imageNode);
+		}
+
+		return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images);
+	}
 }

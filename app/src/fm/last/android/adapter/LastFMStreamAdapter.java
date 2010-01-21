@@ -22,10 +22,6 @@ package fm.last.android.adapter;
 
 import java.util.ArrayList;
 
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.player.IRadioPlayer;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -36,165 +32,150 @@ import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.BaseAdapter;
 import android.widget.ViewSwitcher;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.player.IRadioPlayer;
 
 /** The adapter for radio streams, uses non-full-width list entry graphics */
-public class LastFMStreamAdapter extends BaseAdapter
-{
-	public class Stream
-	{
-		public Stream(String label, String url)
-		{
+public class LastFMStreamAdapter extends BaseAdapter {
+	public class Stream {
+		public Stream(String label, String url) {
 			mLabel = label;
 			mStationUrl = url;
 		}
 
-	    public int icon()
-	    {
-	        try {
-	        	if(player != null && player.isPlaying()) {
-		        	String current = player.getStationUrl();
+		public int icon() {
+			try {
+				if (player != null && player.isPlaying()) {
+					String current = player.getStationUrl();
 					if (current != null && mStationUrl.compareTo(current) == 0) {
-						// now playing is always the same (focus or not) 
+						// now playing is always the same (focus or not)
 						return R.drawable.now_playing;
 					}
-	        	}
+				}
+			} catch (RemoteException e) {
 			}
-	        catch (RemoteException e) 
-			{}
 			return R.drawable.list_icon_station;
-	    }
-		
+		}
+
 		public String mLabel;
 		public String mStationUrl;
 	};
-	
+
 	ArrayList<Stream> mItems;
-    Activity context;
-    private int mLoadingBar = -1;
+	Activity context;
+	private int mLoadingBar = -1;
 	IRadioPlayer player = null;
 
-    /**
-	 * Enables load bar at given position,
-	 * at the same time only one can
-	 * be launched per adapter
+	/**
+	 * Enables load bar at given position, at the same time only one can be
+	 * launched per adapter
 	 * 
 	 * @param position
 	 */
-	public void enableLoadBar(int position){
+	public void enableLoadBar(int position) {
 		this.mLoadingBar = position;
 		notifyDataSetChanged();
 	}
-	
+
 	/**
 	 * Disables load bar
 	 */
-	public void disableLoadBar(){
+	public void disableLoadBar() {
 		this.mLoadingBar = -1;
 		notifyDataSetChanged();
 	}
 
 	/**
-	 * Binds to the player service, refreshes our list, then unbinds the player service
+	 * Binds to the player service, refreshes our list, then unbinds the player
+	 * service
 	 */
-	public void updateNowPlaying(){
-        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
-                new ServiceConnection() {
-                public void onServiceConnected(ComponentName comp, IBinder binder) {
-					player = IRadioPlayer.Stub.asInterface(binder);
-					notifyDataSetChanged();
-					LastFMApplication.getInstance().unbindService(this);
-                }
+	public void updateNowPlaying() {
+		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
+				new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						player = IRadioPlayer.Stub.asInterface(binder);
+						notifyDataSetChanged();
+						LastFMApplication.getInstance().unbindService(this);
+					}
 
-                public void onServiceDisconnected(ComponentName comp) {
-                	player = null;
-                }
-        }, Context.BIND_AUTO_CREATE);
+					public void onServiceDisconnected(ComponentName comp) {
+						player = null;
+					}
+				}, Context.BIND_AUTO_CREATE);
 	}
 
-    public LastFMStreamAdapter( Activity context )
-    {
-    	mItems = new ArrayList<Stream>();
-        this.context = context;
-    }
-    
-    public int getCount()
-    {
-        return mItems.size();
-    }
+	public LastFMStreamAdapter(Activity context) {
+		mItems = new ArrayList<Stream>();
+		this.context = context;
+	}
 
-    public Object getItem( int position )
-    {
-        return mItems.get( position );
-    }
+	public int getCount() {
+		return mItems.size();
+	}
 
-    public long getItemId( int position )
-    {
-        return position;
-    }
+	public Object getItem(int position) {
+		return mItems.get(position);
+	}
 
-    public View getView( int position, View convertView, ViewGroup parent )
-    {
-        View row = convertView;
+	public long getItemId(int position) {
+		return position;
+	}
 
-        if(row == null) {
-            LayoutInflater inflater = context.getLayoutInflater();
-            row = inflater.inflate( R.layout.list_row, null );
-        }
-        else
-        	row.setTag( "" ); // when reused, don't pretend to be something else
+	public View getView(int position, View convertView, ViewGroup parent) {
+		View row = convertView;
 
-        
-        TextView name = (TextView)row.findViewById(R.id.row_label);
-        name.setText( mItems.get(position).mLabel );
-        
-        ViewSwitcher switcher = (ViewSwitcher)row.findViewById(R.id.row_view_switcher);
-        row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
-        
-        ((ImageView)row.findViewById( R.id.row_disclosure_icon )).setImageResource( mItems.get(position).icon() );
-        
-		switcher.setDisplayedChild( mLoadingBar == position ? 1 : 0 );
-        
-        if(position == mItems.size() - 1) {
-        	row.setBackgroundResource(R.drawable.list_entry_rounded_bottom);
-        	row.setTag("bottom");
-        } else
-        	row.setBackgroundResource(R.drawable.list_entry);
+		if (row == null) {
+			LayoutInflater inflater = context.getLayoutInflater();
+			row = inflater.inflate(R.layout.list_row, null);
+		} else
+			row.setTag(""); // when reused, don't pretend to be something else
 
-        return row;
-    }
-    
-    public void putStation( String label, String station )
-    {
-    	mItems.add( new Stream( label, station ) );
-    }
-    
-    public void putStationAtFront( String label, String station )
-    {
-    	mItems.add(0, new Stream( label, station ) );
-    }
+		TextView name = (TextView) row.findViewById(R.id.row_label);
+		name.setText(mItems.get(position).mLabel);
 
-    public void resetList()
-    {
-    	mItems.clear();
-    }
+		ViewSwitcher switcher = (ViewSwitcher) row.findViewById(R.id.row_view_switcher);
+		row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
 
-    public void updateModel()
-    {
-        notifyDataSetChanged();
-    }
+		((ImageView) row.findViewById(R.id.row_disclosure_icon)).setImageResource(mItems.get(position).icon());
 
-    public String getLabel( int position )
-    {
-        return mItems.get(position).mLabel;
-    }
+		switcher.setDisplayedChild(mLoadingBar == position ? 1 : 0);
 
-    public String getStation( int position )
-    {
-        return mItems.get(position).mStationUrl;
-    }
+		if (position == mItems.size() - 1) {
+			row.setBackgroundResource(R.drawable.list_entry_rounded_bottom);
+			row.setTag("bottom");
+		} else
+			row.setBackgroundResource(R.drawable.list_entry);
+
+		return row;
+	}
+
+	public void putStation(String label, String station) {
+		mItems.add(new Stream(label, station));
+	}
+
+	public void putStationAtFront(String label, String station) {
+		mItems.add(0, new Stream(label, station));
+	}
+
+	public void resetList() {
+		mItems.clear();
+	}
+
+	public void updateModel() {
+		notifyDataSetChanged();
+	}
+
+	public String getLabel(int position) {
+		return mItems.get(position).mLabel;
+	}
+
+	public String getStation(int position) {
+		return mItems.get(position).mStationUrl;
+	}
 
 }

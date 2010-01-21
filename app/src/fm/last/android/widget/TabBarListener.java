@@ -26,11 +26,12 @@ package fm.last.android.widget;
  * @author Lukasz Wisniewski
  */
 public interface TabBarListener {
-	
+
 	/**
 	 * Notifies of tab clicked
 	 * 
-	 * @param index ViewFlipper child's index
+	 * @param index
+	 *            ViewFlipper child's index
 	 */
 	public void tabChanged(int id, int previousId);
 }

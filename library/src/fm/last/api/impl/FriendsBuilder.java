@@ -20,29 +20,30 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
+import java.util.List;
+
+import org.w3c.dom.Node;
+
 import fm.last.api.Friends;
 import fm.last.api.User;
 import fm.last.xml.XMLBuilder;
-import org.w3c.dom.Node;
-
-import java.util.List;
 
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class FriendsBuilder extends XMLBuilder<Friends> {
-  private UserBuilder userBuilder = new UserBuilder();
+	private UserBuilder userBuilder = new UserBuilder();
 
-  public Friends build(Node friendsNode) {
-    node = friendsNode;
+	@Override
+	public Friends build(Node friendsNode) {
+		node = friendsNode;
 
-    List<Node> userNodes = getChildNodes("user");
-    User[] users = new User[userNodes.size()];
-    int i = 0;
-    for (Node imageNode : userNodes) {
-  		users[i++] =userBuilder.build(imageNode);
-    }
-    return new Friends(users);
-  }
+		List<Node> userNodes = getChildNodes("user");
+		User[] users = new User[userNodes.size()];
+		int i = 0;
+		for (Node imageNode : userNodes) {
+			users[i++] = userBuilder.build(imageNode);
+		}
+		return new Friends(users);
+	}
 }

@@ -27,15 +27,16 @@ import fm.last.xml.XMLBuilder;
 
 /**
  * a class for building ImageURL objects
- *
+ * 
  * @author Mike Jennings
  */
 public class ImageUrlBuilder extends XMLBuilder<ImageUrl> {
 
-  public ImageUrl build(Node imageUrlnode) {
-    node = imageUrlnode;
-    String url = getText();
-    String size = getAttribute("size");
-    return new ImageUrl(url, size);
-  }
+	@Override
+	public ImageUrl build(Node imageUrlnode) {
+		node = imageUrlnode;
+		String url = getText();
+		String size = getAttribute("size");
+		return new ImageUrl(url, size);
+	}
 }

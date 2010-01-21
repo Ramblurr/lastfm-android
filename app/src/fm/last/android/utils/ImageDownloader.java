@@ -32,82 +32,80 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 
 /**
- * Class responsible for downloading images asynchronously
- * in a separate threads
+ * Class responsible for downloading images asynchronously in a separate threads
  * 
  * @author Lukasz Wisniewski
  */
 public class ImageDownloader {
-	
+
 	private static final String TASK_TAG_DEFAULT = "default";
-	
+
 	protected static final String TAG = "ImageDownloader";
 	ImageDownloaderListener mListener;
 	ImageCache mImageCache;
-	
+
 	/**
 	 * Handle to ongoing tasks
 	 */
-	private Hashtable<String, UserTask<ArrayList<String>, Integer, Object> > mTasks;
+	private Hashtable<String, UserTask<ArrayList<String>, Integer, Object>> mTasks;
 
 	/**
 	 * Default constructor
 	 * 
 	 * @param imageCache
 	 */
-	public ImageDownloader(ImageCache imageCache){
-		if(imageCache == null){
+	public ImageDownloader(ImageCache imageCache) {
+		if (imageCache == null) {
 			imageCache = new ImageCache();
-		} 
+		}
 		this.mImageCache = imageCache;
-		
-		mTasks = new Hashtable<String, UserTask<ArrayList<String>, Integer, Object> >();
+
+		mTasks = new Hashtable<String, UserTask<ArrayList<String>, Integer, Object>>();
 	}
 
-	public void setListener(ImageDownloaderListener l){
+	public void setListener(ImageDownloaderListener l) {
 		this.mListener = l;
 	}
-	
+
 	/**
 	 * Requests images download, for multiple running on one instance use
 	 * getImages(ArrayList&lt;String&gt; urls, String tag)
 	 * 
 	 * @param urls
 	 */
-	public void getImages(ArrayList<String> urls){
+	public void getImages(ArrayList<String> urls) {
 		getImages(urls, TASK_TAG_DEFAULT);
 	}
 
 	/**
-	 * Requests images download additionally tagging running task with a
-	 * given string vale 
+	 * Requests images download additionally tagging running task with a given
+	 * string vale
 	 * 
 	 * @param urls
 	 * @param tag
 	 */
 	@SuppressWarnings("unchecked")
-	public void getImages(ArrayList<String> urls, String tag){
-		
-		UserTask< ArrayList<String>, Integer, Object> userTask = 
-			new UserTask< ArrayList<String>, Integer, Object>(){
+	public void getImages(ArrayList<String> urls, String tag) {
+
+		UserTask<ArrayList<String>, Integer, Object> userTask = new UserTask<ArrayList<String>, Integer, Object>() {
 
 			@Override
 			public void onPostExecute(Object result) {
-				if(mListener != null){
+				if (mListener != null) {
 					mListener.asynOperationEnded();
 				}
 			}
 
 			@Override
 			public void onPreExecute() {
-				if(mListener != null){
+				if (mListener != null) {
 					mListener.asynOperationStarted();
 				}
 			}
 
 			@Override
 			public void onProgressUpdate(Integer... values) {
-				if(mListener != null){
+				if (mListener != null) {
 					mListener.imageDownloadProgress(values[0].intValue(), values[1].intValue());
 				}
 			}
@@ -115,13 +113,13 @@ public class ImageDownloader {
 			@Override
 			public Object doInBackground(ArrayList<String>... params) {
 				ArrayList<String> urls = params[0];
-				
+
 				// loop through all images and download url and download them
-				for(int i=0; i<urls.size(); i++){
-					if (urls.get(i)==null || urls.get(i).trim().length()==0)
+				for (int i = 0; i < urls.size(); i++) {
+					if (urls.get(i) == null || urls.get(i).trim().length() == 0)
 						continue;
 					// check if we have already downloaded an url
-					if(!mImageCache.containsKey(urls.get(i))){
+					if (!mImageCache.containsKey(urls.get(i))) {
 
 						InputStream stream = null;
 						URL imageUrl;
@@ -134,16 +132,17 @@ public class ImageDownloader {
 								try {
 									mImageCache.put(urls.get(i), bmp);
 								} catch (NullPointerException e) {
-									Log.e(TAG, "Failed to cache "+urls.get(i));
+									Log.e(TAG, "Failed to cache " + urls.get(i));
 								}
 							} catch (IOException e) {
 								Log.w(TAG, "Couldn't load bitmap from url: " + urls.get(i), e);
 							} finally {
 								try {
-									if(stream != null){
+									if (stream != null) {
 										stream.close();
 									}
-								} catch (IOException e) {}
+								} catch (IOException e) {
+								}
 							}
 						} catch (MalformedURLException e) {
 							Log.w(TAG, "Wrong url: " + urls.get(i), e);
@@ -151,7 +150,7 @@ public class ImageDownloader {
 					} // END: check if we have already downloaded an url
 
 					// passing already downloaded images and total count
-					publishProgress((Integer)(i+1), (Integer)urls.size());
+					publishProgress((i + 1), urls.size());
 
 				} // for loop end
 				return null;
@@ -164,30 +163,30 @@ public class ImageDownloader {
 	}
 
 	/**
-	 * Returns UserTask instance initialized with getImages(ArrayList&lt;String&gt; urls)
-	 * request
+	 * Returns UserTask instance initialized with
+	 * getImages(ArrayList&lt;String&gt; urls) request
 	 * 
 	 * @return
 	 */
 	public final UserTask<ArrayList<String>, Integer, Object> getUserTask() {
-		if(mTasks.containsKey(TASK_TAG_DEFAULT)){
+		if (mTasks.containsKey(TASK_TAG_DEFAULT)) {
 			return mTasks.get(TASK_TAG_DEFAULT);
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
-	 * Returns UserTask instance initialized with getImages(ArrayList&lt;String&gt; urls, String tag)
-	 * request
+	 * Returns UserTask instance initialized with
+	 * getImages(ArrayList&lt;String&gt; urls, String tag) request
 	 * 
 	 * @return
 	 */
 	public final UserTask<ArrayList<String>, Integer, Object> getUserTask(String tag) {
-		if(mTasks.containsKey(tag)){
+		if (mTasks.containsKey(tag)) {
 			return mTasks.get(tag);
 		}
-		
+
 		return null;
 	}
 }

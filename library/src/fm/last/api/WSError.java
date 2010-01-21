@@ -46,21 +46,22 @@ public class WSError extends Error implements Parcelable {
 	public static final int ERROR_NotEnoughMembers = 21;
 	public static final int ERROR_NotEnoughFans = 22;
 	public static final int ERROR_NotEnoughNeighbours = 23;
-	
+
 	public WSError(String method, String message, Integer code) {
 		this.method = method;
 		this.message = message;
 		this.code = code;
 	}
-	
+
 	public String getMethod() {
 		return method;
 	}
-	
+
+	@Override
 	public String getMessage() {
 		return message;
 	}
-	
+
 	public Integer getCode() {
 		return code;
 	}
@@ -70,7 +71,7 @@ public class WSError extends Error implements Parcelable {
 		dest.writeString(message);
 		dest.writeInt(code);
 	}
-	
+
 	public static final Parcelable.Creator<WSError> CREATOR = new Parcelable.Creator<WSError>() {
 		public WSError createFromParcel(Parcel in) {
 			return new WSError(in);
@@ -78,9 +79,9 @@ public class WSError extends Error implements Parcelable {
 
 		public WSError[] newArray(int size) {
 			return new WSError[size];
-		}	
+		}
 	};
-	
+
 	private WSError(Parcel in) {
 		method = in.readString();
 		message = in.readString();

@@ -36,8 +36,7 @@ public class Location implements Serializable {
 	private GeoPoint geoPoint;
 	private String timezone;
 
-	public Location(String city, String country, String street,
-			String postalcode, GeoPoint geoPoint, String timezone) {
+	public Location(String city, String country, String street, String postalcode, GeoPoint geoPoint, String timezone) {
 		super();
 		this.city = city;
 		this.country = country;
@@ -94,6 +93,5 @@ public class Location implements Serializable {
 	public String getTimezone() {
 		return timezone;
 	}
-	
-	
+
 }

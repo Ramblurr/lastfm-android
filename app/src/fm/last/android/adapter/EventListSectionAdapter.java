@@ -22,27 +22,26 @@ package fm.last.android.adapter;
 
 import java.util.ArrayList;
 
-import fm.last.android.R;
-import fm.last.api.Event;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import fm.last.android.R;
+import fm.last.api.Event;
 
 /**
  * ListView adapter for Events (section)
  * 
  * @author Lukasz Wisniewski
  */
-public class EventListSectionAdapter extends ListAdapter{
+public class EventListSectionAdapter extends ListAdapter {
 	private static final long serialVersionUID = 2070559787839689784L;
 	private ArrayList<Event> mEvents;
 
-//	private EventListAdapterListener mAdapterListener;
-//	private int mProvidedPages;
-//	private int mTotalPages;
+	// private EventListAdapterListener mAdapterListener;
+	// private int mProvidedPages;
+	// private int mTotalPages;
 
 	/**
 	 * Default constructor
@@ -57,25 +56,23 @@ public class EventListSectionAdapter extends ListAdapter{
 	/**
 	 * Standard class fields initialization shared between all constructors
 	 */
-	private void init(){
+	private void init() {
 	}
-	
-
 
 	/**
 	 * Sets data source for the adapter.
 	 * 
 	 * @param events
 	 */
-	public void setEventsSource(ArrayList<Event> events){
+	public void setEventsSource(ArrayList<Event> events) {
 
-		mEvents = events;		
-		//notifyDataSetChanged();
+		mEvents = events;
+		// notifyDataSetChanged();
 	}
 
 	@Override
 	public int getCount() {
-		if(mEvents != null){
+		if (mEvents != null) {
 			return mEvents.size();
 		}
 		return 0;
@@ -93,46 +90,45 @@ public class EventListSectionAdapter extends ListAdapter{
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View row=convertView;
+		View row = convertView;
 
 		ViewHolder holder;
 
-		if (row==null) {
+		if (row == null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
-			row=inflater.inflate(R.layout.event_row, null);
+			row = inflater.inflate(R.layout.event_row, null);
 
 			holder = new ViewHolder();
-			holder.eventName = (TextView)row.findViewById(R.id.ExtendedRowBiggerText);
-			holder.venueName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText0);
-			holder.countryName = (TextView)row.findViewById(R.id.ExtendedRowSmallerText1);
+			holder.eventName = (TextView) row.findViewById(R.id.ExtendedRowBiggerText);
+			holder.venueName = (TextView) row.findViewById(R.id.ExtendedRowSmallerText0);
+			holder.countryName = (TextView) row.findViewById(R.id.ExtendedRowSmallerText1);
 
 			row.setTag(holder);
-		}
-		else{
+		} else {
 			holder = (ViewHolder) row.getTag();
 		}
 
 		holder.eventName.setText(mEvents.get(position).getTitle());
-		holder.venueName.setText(mEvents.get(position).getVenue().getName()+", "
-				+mEvents.get(position).getVenue().getLocation().getCity());
+		holder.venueName.setText(mEvents.get(position).getVenue().getName() + ", " + mEvents.get(position).getVenue().getLocation().getCity());
 		holder.countryName.setText(mEvents.get(position).getVenue().getLocation().getCountry());
 
-//		String date = "";
-//		if(mEntries.get(position).event.getStartDate() != null){
-//			date = mDateFormat.format(mEntries.get(position).event.getStartDate());
-//		}
-//
-//		String hour = "";
-//		if(mEntries.get(position).event.getStartTime() != null){
-//			hour = mHourFormat.format(mEntries.get(position).event.getStartTime());
-//		}
+		// String date = "";
+		// if(mEntries.get(position).event.getStartDate() != null){
+		// date =
+		// mDateFormat.format(mEntries.get(position).event.getStartDate());
+		// }
+		//
+		// String hour = "";
+		// if(mEntries.get(position).event.getStartTime() != null){
+		// hour =
+		// mHourFormat.format(mEntries.get(position).event.getStartTime());
+		// }
 
 		return row;
 	}
 
 	/**
-	 * Class implementing holder pattern,
-	 * performance boost
+	 * Class implementing holder pattern, performance boost
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
@@ -142,47 +138,50 @@ public class EventListSectionAdapter extends ListAdapter{
 		TextView countryName;
 	}
 
-//	private boolean fetchingMore = false;
-//
-//	private void fetchMore(){
-//		mAdapterListener.getPaginatedPage(mProvidedPages+1);
-//	}
-//
-//	@Override
-//	public void onScroll(AbsListView view, int firstVisibleItem,
-//			int visibleItemCount, int totalItemCount) {
-//		super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
-//
-//		if(mProvidedPages < mTotalPages){
-//			if(firstVisibleItem + visibleItemCount == totalItemCount){
-//				// TODO load paginated results
-//				if (!fetchingMore){
-//					fetchingMore = true;
-//					Log.i(TAG, String.format("total = %d, provided = %d", mTotalPages, mProvidedPages ) );
-//					Log.i(TAG, "fetching more results..." );
-//					fetchMore();
-//				}
-//			}
-//		}
-//	}
+	// private boolean fetchingMore = false;
+	//
+	// private void fetchMore(){
+	// mAdapterListener.getPaginatedPage(mProvidedPages+1);
+	// }
+	//
+	// @Override
+	// public void onScroll(AbsListView view, int firstVisibleItem,
+	// int visibleItemCount, int totalItemCount) {
+	// super.onScroll(view, firstVisibleItem, visibleItemCount, totalItemCount);
+	//
+	// if(mProvidedPages < mTotalPages){
+	// if(firstVisibleItem + visibleItemCount == totalItemCount){
+	// // TODO load paginated results
+	// if (!fetchingMore){
+	// fetchingMore = true;
+	// Log.i(TAG, String.format("total = %d, provided = %d", mTotalPages,
+	// mProvidedPages ) );
+	// Log.i(TAG, "fetching more results..." );
+	// fetchMore();
+	// }
+	// }
+	// }
+	// }
 
-//	/**
-//	 * Method for providing event data to adapter on-the-fly
-//	 * 
-//	 * @param events
-//	 */
-//	public void providePage(PaginatedResult<Event> events){
-//		Log.i(TAG, "providePage "+events.getPage());
-//		if(events.getPage() == 1){
-//			setEventsSource(events.getPageResults(), events.getPageResults().toString());
-//			mTotalPages = events.getTotalPages();
-//			mProvidedPages = 1;
-//		}
-//		else {
-//			mProvidedPages++;
-//			addEventsSource(events.getPageResults(), events.getPageResults().toString());
-//		}
-//		fetchingMore = false;
-//	}
+	// /**
+	// * Method for providing event data to adapter on-the-fly
+	// *
+	// * @param events
+	// */
+	// public void providePage(PaginatedResult<Event> events){
+	// Log.i(TAG, "providePage "+events.getPage());
+	// if(events.getPage() == 1){
+	// setEventsSource(events.getPageResults(),
+	// events.getPageResults().toString());
+	// mTotalPages = events.getTotalPages();
+	// mProvidedPages = 1;
+	// }
+	// else {
+	// mProvidedPages++;
+	// addEventsSource(events.getPageResults(),
+	// events.getPageResults().toString());
+	// }
+	// fetchingMore = false;
+	// }
 
 }

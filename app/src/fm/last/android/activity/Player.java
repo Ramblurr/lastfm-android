@@ -23,21 +23,6 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.util.Formatter;
 
-import fm.last.android.Amazon;
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.player.IRadioPlayer;
-import fm.last.android.player.RadioPlayerService;
-import fm.last.android.utils.UserTask;
-import fm.last.android.widget.AdArea;
-import fm.last.android.widget.AlbumArt;
-import fm.last.api.Album;
-import fm.last.api.Event;
-import fm.last.api.ImageUrl;
-import fm.last.api.LastFmServer;
-import fm.last.api.WSError;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -65,6 +50,20 @@ import android.view.animation.Animation.AnimationListener;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import fm.last.android.Amazon;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.player.IRadioPlayer;
+import fm.last.android.player.RadioPlayerService;
+import fm.last.android.utils.UserTask;
+import fm.last.android.widget.AdArea;
+import fm.last.android.widget.AlbumArt;
+import fm.last.api.Album;
+import fm.last.api.Event;
+import fm.last.api.ImageUrl;
+import fm.last.api.LastFmServer;
+import fm.last.api.WSError;
 
 public class Player extends Activity {
 
@@ -87,13 +86,13 @@ public class Player extends Activity {
 	private String mCachedArtist = null;
 	private String mCachedTrack = null;
 	private Bitmap mCachedBitmap = null;
-	
+
 	private static final int REFRESH = 1;
 
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
 	private IntentFilter mIntentFilter;
-	
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -108,7 +107,7 @@ public class Player extends Activity {
 		mProgress.setMax(1000);
 		mAlbum = (AlbumArt) findViewById(R.id.album);
 		LayoutParams params = mAlbum.getLayoutParams();
-		if(AdArea.adsEnabled(this)) {
+		if (AdArea.adsEnabled(this)) {
 			params.width -= 54;
 			params.height -= 54;
 		}
@@ -136,26 +135,26 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
 
 		Intent intent = getIntent();
-        if(intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
-        	LastFMApplication.getInstance().playRadioStation(Player.this,intent.getData().toString(), false);
-        }
-        
-        if(icicle != null) {
-	       	mCachedArtist = icicle.getString("artist");
-	       	mCachedTrack = icicle.getString("track");
-	       	mCachedBitmap = icicle.getParcelable("artwork");
-	       	if(icicle.getBoolean("isOnTour", false))
+		if (intent != null && intent.getData() != null && intent.getData().getScheme().equals("lastfm")) {
+			LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
+		}
+
+		if (icicle != null) {
+			mCachedArtist = icicle.getString("artist");
+			mCachedTrack = icicle.getString("track");
+			mCachedBitmap = icicle.getParcelable("artwork");
+			if (icicle.getBoolean("isOnTour", false))
 				mOntourButton.setVisibility(View.VISIBLE);
-        }
+		}
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu)  {
-		menu.findItem(R.id.buy_menu_item).setEnabled( Amazon.getAmazonVersion(this) > 0 );
-		
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.findItem(R.id.buy_menu_item).setEnabled(Amazon.getAmazonVersion(this) > 0);
+
 		return super.onPrepareOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -165,36 +164,33 @@ public class Player extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if( item.getItemId() == R.id.info_menu_item ) {
+		if (item.getItemId() == R.id.info_menu_item) {
 			showMetadataIntent();
 			return true;
 		}
-		
-		if( handleOptionItemSelected( this, item ) )
+
+		if (handleOptionItemSelected(this, item))
 			return true;
-		
+
 		return super.onOptionsItemSelected(item);
 	}
-	
-	public boolean handleOptionItemSelected( Context c, MenuItem item ) {
+
+	public boolean handleOptionItemSelected(Context c, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.buy_menu_item:
-			LastFMApplication.getInstance().tracker.trackEvent(
-		            "Clicks",  // Category
-		            "player-buy",  // Action
-		            "", // Label
-		            0);       // Value
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"player-buy", // Action
+					"", // Label
+					0); // Value
 			Amazon.searchForTrack(this, mArtistName.getText().toString(), mTrackName.getText().toString());
 			break;
 		case R.id.share_menu_item:
 			try {
 				if (LastFMApplication.getInstance().player == null)
 					return false;
-		        Intent intent = new Intent( c, ShareResolverActivity.class );
-				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication
-						.getInstance().player.getArtistName());
-				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication
-						.getInstance().player.getTrackName());
+				Intent intent = new Intent(c, ShareResolverActivity.class);
+				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
+				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
 				c.startActivity(intent);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -205,17 +201,15 @@ public class Player extends Activity {
 				if (LastFMApplication.getInstance().player == null)
 					return false;
 				Intent intent = new Intent(c, AddToPlaylist.class);
-				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication
-						.getInstance().player.getArtistName());
-				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication
-						.getInstance().player.getTrackName());
+				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication.getInstance().player.getArtistName());
+				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication.getInstance().player.getTrackName());
 				c.startActivity(intent);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			break;
 		case R.id.tag_menu_item:
-			fireTagActivity( c );
+			fireTagActivity(c);
 			break;
 
 		default:
@@ -224,7 +218,7 @@ public class Player extends Activity {
 		return false;
 	}
 
-	private static void fireTagActivity( Context c ) {
+	private static void fireTagActivity(Context c) {
 		String artist = null;
 		String track = null;
 
@@ -233,8 +227,7 @@ public class Player extends Activity {
 				return;
 			artist = LastFMApplication.getInstance().player.getArtistName();
 			track = LastFMApplication.getInstance().player.getTrackName();
-			Intent myIntent = new Intent(c,
-					fm.last.android.activity.Tag.class);
+			Intent myIntent = new Intent(c, fm.last.android.activity.Tag.class);
 			myIntent.putExtra("lastfm.artist", artist);
 			myIntent.putExtra("lastfm.track", track);
 			c.startActivity(myIntent);
@@ -286,9 +279,9 @@ public class Player extends Activity {
 		long next = refreshNow();
 		queueNextRefresh(next);
 		super.onResume();
-		
+
 		LastFMApplication.getInstance().tracker.trackPageView("/Player");
-		
+
 	}
 
 	@Override
@@ -302,11 +295,10 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
-			LastFMApplication.getInstance().tracker.trackEvent(
-		            "Clicks",  // Category
-		            "player-love",  // Action
-		            "", // Label
-		            0);       // Value
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"player-love", // Action
+					"", // Label
+					0); // Value
 		}
 	};
 
@@ -315,83 +307,80 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			Intent i = new Intent("fm.last.android.BAN");
 			sendBroadcast(i);
-			LastFMApplication.getInstance().tracker.trackEvent(
-		            "Clicks",  // Category
-		            "player-ban",  // Action
-		            "", // Label
-		            0);       // Value
-			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
-                    new ServiceConnection() {
-                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-        					try {
-        						if (player.isPlaying())
-        							player.skip();
-        					} catch (RemoteException e) {
-        						// TODO Auto-generated catch block
-        						e.printStackTrace();
-        					}
-        					unbindService(this);
-                    }
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"player-ban", // Action
+					"", // Label
+					0); // Value
+			bindService(new Intent(Player.this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+					try {
+						if (player.isPlaying())
+							player.skip();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					unbindService(this);
+				}
 
-                    public void onServiceDisconnected(ComponentName comp) {}
-            }, 0);
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
 		}
 	};
 
 	private View.OnClickListener mNextListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent(
-		            "Clicks",  // Category
-		            "player-skip",  // Action
-		            "", // Label
-		            0);       // Value
-			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
-                    new ServiceConnection() {
-                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-        					try {
-        						if (player.isPlaying())
-        							player.skip();
-        					} catch (RemoteException e) {
-        						// TODO Auto-generated catch block
-        						e.printStackTrace();
-        					}
-        					unbindService(this);
-                    }
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"player-skip", // Action
+					"", // Label
+					0); // Value
+			bindService(new Intent(Player.this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+					try {
+						if (player.isPlaying())
+							player.skip();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					unbindService(this);
+				}
 
-                    public void onServiceDisconnected(ComponentName comp) {}
-            }, 0);
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
 		}
 	};
 
 	private void showMetadataIntent() {
-		showMetadataIntent( false );
+		showMetadataIntent(false);
 	}
-	
+
 	private void showEventsMetadataIntent() {
-		showMetadataIntent( true );
+		showMetadataIntent(true);
 	}
-	
-	private void showMetadataIntent( boolean gotoEventsTab ) {
+
+	private void showMetadataIntent(boolean gotoEventsTab) {
 		Intent metaIntent = new Intent(this, fm.last.android.activity.Metadata.class);
 		metaIntent.putExtra("artist", mArtistName.getText());
 		metaIntent.putExtra("track", mTrackName.getText());
-		if( gotoEventsTab )
-			metaIntent.putExtra("show_events", true );
-		
+		if (gotoEventsTab)
+			metaIntent.putExtra("show_events", true);
+
 		startActivity(metaIntent);
 	}
-	
+
 	private View.OnClickListener mOntourListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent(
-		            "Clicks",  // Category
-		            "on-tour-badge",  // Action
-		            "", // Label
-		            0);       // Value
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"on-tour-badge", // Action
+					"", // Label
+					0); // Value
 			showEventsMetadataIntent();
 		}
 
@@ -400,28 +389,27 @@ public class Player extends Activity {
 	private View.OnClickListener mStopListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent(
-	            "Clicks",  // Category
-	            "player-stop",  // Action
-	            "", // Label
-	            0);       // Value
+			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+					"player-stop", // Action
+					"", // Label
+					0); // Value
 
-			bindService(new Intent(Player.this,fm.last.android.player.RadioPlayerService.class ),
-                    new ServiceConnection() {
-                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-                            IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-        					try {
-        						if (player.isPlaying())
-        							player.stop();
-        					} catch (RemoteException e) {
-        						// TODO Auto-generated catch block
-        						e.printStackTrace();
-        					}
-        					unbindService(this);
-                    }
+			bindService(new Intent(Player.this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+					try {
+						if (player.isPlaying())
+							player.stop();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					unbindService(this);
+				}
 
-                    public void onServiceDisconnected(ComponentName comp) {}
-            }, 0);
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
 			LastFMApplication.getInstance().unbindPlayerService();
 			finish();
 		}
@@ -458,70 +446,63 @@ public class Player extends Activity {
 				if (error != null) {
 					LastFMApplication.getInstance().presentError(Player.this, error);
 				} else {
-					LastFMApplication.getInstance().presentError(
-							Player.this,
-							getResources().getString(
-									R.string.ERROR_PLAYBACK_FAILED_TITLE),
-							getResources().getString(
-									R.string.ERROR_PLAYBACK_FAILED));
+					LastFMApplication.getInstance().presentError(Player.this, getResources().getString(R.string.ERROR_PLAYBACK_FAILED_TITLE),
+							getResources().getString(R.string.ERROR_PLAYBACK_FAILED));
 				}
 			}
 		}
 	};
 
 	private void updateTrackInfo() {
-        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
-                new ServiceConnection() {
-                public void onServiceConnected(ComponentName comp, IBinder binder) {
-                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-    					try {
-    						String artistName = player.getArtistName();
-		    				String trackName = player.getTrackName();
-		    				if(!mArtistName.getText().equals(artistName) || !mTrackName.getText().equals(trackName)) {
-			    				if(artistName.equals(RadioPlayerService.UNKNOWN)) {
-			    					mArtistName.setText("");
-			    				} else {
-			    					mArtistName.setText(artistName);
-			    				}
-			    				if(trackName.equals(RadioPlayerService.UNKNOWN)) {
-			    					mTrackName.setText("");
-			    				} else {
-			    					mTrackName.setText(trackName);
-			    				}
-			    				
+		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
+				new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+						try {
+							String artistName = player.getArtistName();
+							String trackName = player.getTrackName();
+							if (!mArtistName.getText().equals(artistName) || !mTrackName.getText().equals(trackName)) {
+								if (artistName.equals(RadioPlayerService.UNKNOWN)) {
+									mArtistName.setText("");
+								} else {
+									mArtistName.setText(artistName);
+								}
+								if (trackName.equals(RadioPlayerService.UNKNOWN)) {
+									mTrackName.setText("");
+								} else {
+									mTrackName.setText(trackName);
+								}
+
 								if (mTuningDialog != null && player.getState() == RadioPlayerService.STATE_TUNING) {
-									mTuningDialog = ProgressDialog.show(Player.this, "",
-											getString(R.string.player_tuning), true, false);
-									mTuningDialog
-											.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
+									mTuningDialog = ProgressDialog.show(Player.this, "", getString(R.string.player_tuning), true, false);
+									mTuningDialog.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
 									mTuningDialog.setCancelable(true);
 								}
-	
-			    				if(mCachedArtist != null && mCachedArtist.equals(artistName) && 
-			    						mCachedTrack != null && mCachedTrack.equals(trackName)) {
-		    						if(mCachedBitmap != null) {
-				    					mAlbum.setImageBitmap(mCachedBitmap);
-				    					mCachedBitmap = null;
-				    				} else {
-				    					new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
-				    				}
-    							} else {
-    			    				new LoadEventsTask().execute((Void)null);
-			    					new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
-    							}
-		    				}
-    					} catch (java.util.concurrent.RejectedExecutionException e) {
-    						e.printStackTrace();
-    					} catch (RemoteException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
-    					LastFMApplication.getInstance().unbindService(this);
-                }
 
-                public void onServiceDisconnected(ComponentName comp) {
-                }
-        }, Context.BIND_AUTO_CREATE);
+								if (mCachedArtist != null && mCachedArtist.equals(artistName) && mCachedTrack != null && mCachedTrack.equals(trackName)) {
+									if (mCachedBitmap != null) {
+										mAlbum.setImageBitmap(mCachedBitmap);
+										mCachedBitmap = null;
+									} else {
+										new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
+									}
+								} else {
+									new LoadEventsTask().execute((Void) null);
+									new LoadAlbumArtTask().execute(player.getArtUrl(), player.getArtistName(), player.getAlbumName());
+								}
+							}
+						} catch (java.util.concurrent.RejectedExecutionException e) {
+							e.printStackTrace();
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LastFMApplication.getInstance().unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, Context.BIND_AUTO_CREATE);
 	}
 
 	private void queueNextRefresh(long delay) {
@@ -533,59 +514,59 @@ public class Player extends Activity {
 	}
 
 	private long refreshNow() {
-        LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(),fm.last.android.player.RadioPlayerService.class ),
-                new ServiceConnection() {
-                public void onServiceConnected(ComponentName comp, IBinder binder) {
-                        IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-    					try {
-    						mDuration = player.getDuration();
-    						long pos = player.getPosition();
-    						if ((pos >= 0) && (mDuration > 0) && (pos <= mDuration)) {
-    							mCurrentTime.setText(makeTimeString(Player.this, pos / 1000));
-    							mTotalTime.setText(makeTimeString(Player.this, mDuration / 1000));
-    							mProgress.setProgress((int) (1000 * pos / mDuration));
-    							if (mBufferingDialog != null) {
-    								mBufferingDialog.dismiss();
-    								mBufferingDialog = null;
-    							}
-    							if (mTuningDialog != null) {
-    								mTuningDialog.dismiss();
-    								mTuningDialog = null;
-    							}
-    						} else {
-    							mCurrentTime.setText("--:--");
-    							mTotalTime.setText("--:--");
-    							mProgress.setProgress(0);
-    							if (mBufferingDialog == null && player.isPlaying()) {
-        							if (mTuningDialog != null) {
-        								mTuningDialog.dismiss();
-        								mTuningDialog = null;
-        							}
-    								mBufferingDialog = ProgressDialog.show(Player.this, "",
-    										getString(R.string.player_buffering), true, false);
-    								mBufferingDialog
-    										.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
-    								mBufferingDialog.setCancelable(true);
-    							}
-    						}
-    						// return the number of milliseconds until the next full second, so
-    						// the counter can be updated at just the right time
-    					} catch (RemoteException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
-    					LastFMApplication.getInstance().unbindService(this);
-                }
+		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
+				new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+						try {
+							mDuration = player.getDuration();
+							long pos = player.getPosition();
+							if ((pos >= 0) && (mDuration > 0) && (pos <= mDuration)) {
+								mCurrentTime.setText(makeTimeString(Player.this, pos / 1000));
+								mTotalTime.setText(makeTimeString(Player.this, mDuration / 1000));
+								mProgress.setProgress((int) (1000 * pos / mDuration));
+								if (mBufferingDialog != null) {
+									mBufferingDialog.dismiss();
+									mBufferingDialog = null;
+								}
+								if (mTuningDialog != null) {
+									mTuningDialog.dismiss();
+									mTuningDialog = null;
+								}
+							} else {
+								mCurrentTime.setText("--:--");
+								mTotalTime.setText("--:--");
+								mProgress.setProgress(0);
+								if (mBufferingDialog == null && player.isPlaying()) {
+									if (mTuningDialog != null) {
+										mTuningDialog.dismiss();
+										mTuningDialog = null;
+									}
+									mBufferingDialog = ProgressDialog.show(Player.this, "", getString(R.string.player_buffering), true, false);
+									mBufferingDialog.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
+									mBufferingDialog.setCancelable(true);
+								}
+							}
+							// return the number of milliseconds until the next
+							// full second, so
+							// the counter can be updated at just the right time
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LastFMApplication.getInstance().unbindService(this);
+					}
 
-                public void onServiceDisconnected(ComponentName comp) {
-                }
-        }, Context.BIND_AUTO_CREATE);
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, Context.BIND_AUTO_CREATE);
 
 		return 500;
 	}
 
 	private final Handler mHandler = new Handler() {
 
+		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case REFRESH:
@@ -609,8 +590,7 @@ public class Player extends Activity {
 	 */
 
 	public static String makeTimeString(Context context, long secs) {
-		return new Formatter().format("%02d:%02d", secs / 60, secs % 60)
-				.toString();
+		return new Formatter().format("%02d:%02d", secs / 60, secs % 60).toString();
 	}
 
 	private class LoadAlbumArtTask extends UserTask<String, Void, Boolean> {
@@ -628,7 +608,7 @@ public class Player extends Activity {
 
 			artUrl = params[0];
 			Log.i("LastFm", "Art URL from playlist: " + artUrl);
-			
+
 			try {
 				String artistName = params[1];
 				String albumName = params[2];
@@ -643,13 +623,12 @@ public class Player extends Activity {
 						}
 					}
 				}
-					success = true;
+				success = true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return success;
 		}
-		
 
 		@Override
 		public void onPostExecute(Boolean result) {
@@ -660,32 +639,29 @@ public class Player extends Activity {
 			}
 		}
 	}
-	
+
 	private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
 		String mArtist = null;
-		
+
 		@Override
-		public void onPreExecute()
-		{
+		public void onPreExecute() {
 			mArtist = mArtistName.getText().toString();
 			mOntourButton.clearAnimation();
 			mOntourButton.setVisibility(View.GONE);
 			mOntourButton.invalidate();
 		}
-		
+
 		@Override
-		public Boolean doInBackground(Void...params) {
+		public Boolean doInBackground(Void... params) {
 			boolean result = false;
-			if( mArtist != null && 
-				Player.this.mArtistName.getText().toString()
-						.compareToIgnoreCase( mArtist ) != 0 )
+			if (mArtist != null && Player.this.mArtistName.getText().toString().compareToIgnoreCase(mArtist) != 0)
 				return false;
 
 			try {
 				Event[] events = mServer.getArtistEvents(mArtist);
-				if(events.length > 0)
+				if (events.length > 0)
 					result = true;
-				
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -694,16 +670,15 @@ public class Player extends Activity {
 
 		@Override
 		public void onPostExecute(Boolean result) {
-			
-			//Check if this is a stale event request
-			if( Player.this.mArtistName.getText().toString()
-						.compareToIgnoreCase( mArtist ) != 0 )
+
+			// Check if this is a stale event request
+			if (Player.this.mArtistName.getText().toString().compareToIgnoreCase(mArtist) != 0)
 				return;
-			
-			if(result) {
-				
+
+			if (result) {
+
 				Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
-				a.setAnimationListener(new AnimationListener(){
+				a.setAnimationListener(new AnimationListener() {
 
 					public void onAnimationEnd(Animation animation) {
 					}

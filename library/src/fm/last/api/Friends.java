@@ -25,24 +25,23 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class Friends implements Serializable {
-  private static final long serialVersionUID = 50693901684109497L;
-  private User[] friends;
+	private static final long serialVersionUID = 50693901684109497L;
+	private User[] friends;
 
-  public Friends(User[] friends) {
-    this.friends = friends;
-	Arrays.sort(this.friends, new Comparator<User>() {
-	    public int compare(User u1, User u2) {
-	        return u1.getName().toLowerCase().compareTo(u2.getName().toLowerCase());
-	      }
-	    });
-  }
-  
-  public User[] getFriends() {
-    return friends;
-  }
+	public Friends(User[] friends) {
+		this.friends = friends;
+		Arrays.sort(this.friends, new Comparator<User>() {
+			public int compare(User u1, User u2) {
+				return u1.getName().toLowerCase().compareTo(u2.getName().toLowerCase());
+			}
+		});
+	}
+
+	public User[] getFriends() {
+		return friends;
+	}
 
 }

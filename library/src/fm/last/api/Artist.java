@@ -24,7 +24,7 @@ import java.io.Serializable;
 
 /**
  * Represents an Artist
- *
+ * 
  * @author Mike Jennings
  */
 public class Artist implements Serializable {
@@ -90,11 +90,11 @@ public class Artist implements Serializable {
 	public Artist[] getSimilar() {
 		return similar;
 	}
-	
+
 	public String getPlaycount() {
 		return playcount;
 	}
-	
+
 	public String getListeners() {
 		return listeners;
 	}

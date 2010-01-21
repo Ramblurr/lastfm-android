@@ -23,18 +23,6 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.adapter.TagListAdapter;
-import fm.last.android.utils.UserTask;
-import fm.last.android.widget.TabBar;
-import fm.last.android.widget.TabBarListener;
-import fm.last.android.widget.TagLayout;
-import fm.last.android.widget.TagLayoutListener;
-import fm.last.api.LastFmServer;
-import fm.last.api.Session;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -52,6 +40,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.adapter.TagListAdapter;
+import fm.last.android.utils.UserTask;
+import fm.last.android.widget.TabBar;
+import fm.last.android.widget.TabBarListener;
+import fm.last.android.widget.TagLayout;
+import fm.last.android.widget.TagLayoutListener;
+import fm.last.api.LastFmServer;
+import fm.last.api.Session;
 
 /**
  * Activity for tagging albums, artists and songs
@@ -61,7 +60,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class Tag extends Activity implements TabBarListener {
 	String mArtist;
 	String mTrack;
-	
+
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 	Session mSession = LastFMApplication.getInstance().session;
 
@@ -75,7 +74,7 @@ public class Tag extends Activity implements TabBarListener {
 
 	Animation mFadeOutAnimation;
 	boolean animate = false;
-	
+
 	// --------------------------------
 	// XML LAYOUT start
 	// --------------------------------
@@ -86,8 +85,9 @@ public class Tag extends Activity implements TabBarListener {
 	TagLayout mTagLayout;
 	TabBar mTabBar;
 	ListView mTagList;
-	
+
 	ProgressDialog mSaveDialog;
+
 	// --------------------------------
 	// XML LAYOUT start
 	// --------------------------------
@@ -96,10 +96,10 @@ public class Tag extends Activity implements TabBarListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//mLogin = new DbImpl(this).getLogin();
+		// mLogin = new DbImpl(this).getLogin();
 
 		mArtist = getIntent().getStringExtra("lastfm.artist");
-		mTrack = getIntent().getStringExtra("lastfm.track");	
+		mTrack = getIntent().getStringExtra("lastfm.track");
 
 		// loading activity layout
 		setContentView(R.layout.tag);
@@ -107,68 +107,65 @@ public class Tag extends Activity implements TabBarListener {
 		// binding views to XML-layout
 		mTagEditText = (EditText) findViewById(R.id.tag_text_edit);
 		mTagButton = (Button) findViewById(R.id.tag_add_button);
-		mTagLayout = (TagLayout)findViewById(R.id.TagLayout);
-		mTagList = (ListView)findViewById(R.id.TagList);
-		mTabBar = (TabBar)findViewById(R.id.TabBar);
+		mTagLayout = (TagLayout) findViewById(R.id.TagLayout);
+		mTagList = (ListView) findViewById(R.id.TagList);
+		mTabBar = (TabBar) findViewById(R.id.TabBar);
 
 		// loading & setting animations
 		mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.tag_row_fadeout);
 		mTagLayout.setAnimationsEnabled(true);
-		
+
 		// configure the tabs
 		mTabBar.addTab(getString(R.string.tag_suggestedtags), R.drawable.list_add_to_playlist);
 		mTabBar.addTab(getString(R.string.tag_mytags), R.drawable.profile);
-		mTabBar.setListener( this );
-		
+		mTabBar.setListener(this);
+
 		// restoring or creatingData
 		restoreMe();
-		
-		
+
 		// add callback listeners
-		mTagEditText.setOnKeyListener( new View.OnKeyListener() {
+		mTagEditText.setOnKeyListener(new View.OnKeyListener() {
 
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				switch( event.getKeyCode() )
-				{
-					case KeyEvent.KEYCODE_ENTER:
-						mTagButton.performClick();
-						mTagEditText.setText( "" );
-						return true;
-					default:
-						return false;
+				switch (event.getKeyCode()) {
+				case KeyEvent.KEYCODE_ENTER:
+					mTagButton.performClick();
+					mTagEditText.setText("");
+					return true;
+				default:
+					return false;
 				}
 			}
-			
+
 		});
-		
-		mTagButton.setOnClickListener(new OnClickListener(){
+
+		mTagButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
 				addTag(mTagEditText.getText().toString());
 			}
-			
+
 		});
-		
-		mTagLayout.setTagLayoutListener(new TagLayoutListener(){
+
+		mTagLayout.setTagLayoutListener(new TagLayoutListener() {
 
 			public void tagRemoved(String tag) {
 				removeTag(tag);
 			}
-			
+
 		});
 		mTagLayout.setAreaHint(R.string.tagarea_hint);
 
-		mTagList.setOnItemClickListener(new OnItemClickListener(){
+		mTagList.setOnItemClickListener(new OnItemClickListener() {
 
-			public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-					long time) {
-				if(!animate){
-					String tag = (String)parent.getItemAtPosition(position);
-					if(addTag(tag)){
-						mFadeOutAnimation.setAnimationListener(new AnimationListener(){
+			public void onItemClick(final AdapterView<?> parent, final View view, final int position, long time) {
+				if (!animate) {
+					String tag = (String) parent.getItemAtPosition(position);
+					if (addTag(tag)) {
+						mFadeOutAnimation.setAnimationListener(new AnimationListener() {
 
 							public void onAnimationEnd(Animation animation) {
-								((TagListAdapter)parent.getAdapter()).tagAdded(position);
+								((TagListAdapter) parent.getAdapter()).tagAdded(position);
 								animate = false;
 							}
 
@@ -188,44 +185,48 @@ public class Tag extends Activity implements TabBarListener {
 
 		});
 	}
-	
+
 	@Override
 	public void onResume() {
 		super.onResume();
 		LastFMApplication.getInstance().tracker.trackPageView("/Tag");
 	}
-	
+
 	/**
 	 * Restores already added tags when orientation is changed
 	 */
 	@SuppressWarnings("unchecked")
-	private void restoreMe(){
+	private void restoreMe() {
 		mTopTagListAdapter = new TagListAdapter(this);
 		mUserTagListAdapter = new TagListAdapter(this);
-		
-		if (getLastNonConfigurationInstance()!=null){
-			Object savedState[] = (Object[])getLastNonConfigurationInstance();
+
+		if (getLastNonConfigurationInstance() != null) {
+			Object savedState[] = (Object[]) getLastNonConfigurationInstance();
 			mTopTags = (ArrayList<String>) savedState[0];
 			mUserTags = (ArrayList<String>) savedState[1];
 			mTrackOldTags = (ArrayList<String>) savedState[2];
 			mTrackNewTags = (ArrayList<String>) savedState[3];
-			
-			// this looks insane, and well, it is. Basically when changing orientation we are 
-			// serialised and unserialised - unserialisation happens here. But if we are still
-			// loading tags the above 4 members will be null, so we need to do a new usertask
-			// because otherwise we'll never get the tags, and we can't serialise the usertask
+
+			// this looks insane, and well, it is. Basically when changing
+			// orientation we are
+			// serialised and unserialised - unserialisation happens here. But
+			// if we are still
+			// loading tags the above 4 members will be null, so we need to do a
+			// new usertask
+			// because otherwise we'll never get the tags, and we can't
+			// serialise the usertask
 			try {
 				fillData();
 				return;
 			} catch (NullPointerException e) {
 				e.printStackTrace();
 			}
-		}  
-		
-		new LoadTagTask().execute((Object)null);
+		}
+
+		new LoadTagTask().execute((Object) null);
 	}
-	
-	private void fetchDataFromServer(){
+
+	private void fetchDataFromServer() {
 		fm.last.api.Tag topTags[] = null;
 		fm.last.api.Tag userTags[] = null;
 		fm.last.api.Tag oldTags[] = null;
@@ -236,40 +237,39 @@ public class Tag extends Activity implements TabBarListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		mTopTags = new ArrayList<String>();
-		if(topTags != null){
-			for(int i=0; i < topTags.length; i++){
+		if (topTags != null) {
+			for (int i = 0; i < topTags.length; i++) {
 				mTopTags.add(topTags[i].getName());
 			}
 		}
-		
+
 		mUserTags = new ArrayList<String>();
-		if(userTags != null){
-			for(int i=0; i < userTags.length; i++){
+		if (userTags != null) {
+			for (int i = 0; i < userTags.length; i++) {
 				mUserTags.add(userTags[i].getName());
 			}
 		}
-		
+
 		mTrackOldTags = new ArrayList<String>();
-		if(oldTags != null){
-			for(int i=0; i < oldTags.length; i++){
+		if (oldTags != null) {
+			for (int i = 0; i < oldTags.length; i++) {
 				mTrackOldTags.add(oldTags[i].getName());
 			}
 		}
-		
+
 		mTrackNewTags = new ArrayList<String>(mTrackOldTags);
 	}
-	
+
 	/**
 	 * Fills mTopTagListAdapter, mUserTagListListAdapter and mTagLayout with
 	 * data (mTopTags, mUserTags & mTrackNewTags)
 	 */
-	private void fillData()
-	{
+	private void fillData() {
 		mTopTagListAdapter.setSource(mTopTags, mTrackNewTags);
 		mUserTagListAdapter.setSource(mUserTags, mTrackNewTags);
-		for(int i=0; i<mTrackNewTags.size(); i++){
+		for (int i = 0; i < mTrackNewTags.size(); i++) {
 			mTagLayout.addTag(mTrackNewTags.get(i));
 		}
 		mTagList.setAdapter(mTopTagListAdapter);
@@ -282,44 +282,44 @@ public class Tag extends Activity implements TabBarListener {
 		savedState[1] = mUserTags;
 		savedState[2] = mTrackOldTags;
 		savedState[3] = mTrackNewTags;
-		
+
 		return savedState;
 	}
 
 	/**
-	 * Commit tag changes to last.fm server 
+	 * Commit tag changes to last.fm server
 	 */
-	private void commit(){
+	private void commit() {
 
 		ArrayList<String> addTags = new ArrayList<String>();
 		ArrayList<String> removeTags = new ArrayList<String>();
 
 		// TODO maybe nicer diff algorithm here
 
-		for(int i=0; i<mTrackOldTags.size(); i++){
+		for (int i = 0; i < mTrackOldTags.size(); i++) {
 			String oldTag = mTrackOldTags.get(i);
 			boolean presentInNew = false;
-			for(int j=0; j<mTrackNewTags.size(); j++){
-				if(oldTag.equals(mTrackNewTags.get(j))){
+			for (int j = 0; j < mTrackNewTags.size(); j++) {
+				if (oldTag.equals(mTrackNewTags.get(j))) {
 					presentInNew = true;
 					break;
 				}
 			}
-			if(!presentInNew){
+			if (!presentInNew) {
 				removeTags.add(oldTag);
 			}
 		}
 
-		for(int i=0; i<mTrackNewTags.size(); i++){
+		for (int i = 0; i < mTrackNewTags.size(); i++) {
 			String newTag = mTrackNewTags.get(i);
 			boolean presentInOld = false;
-			for(int j=0; j<mTrackOldTags.size(); j++){
-				if(newTag.equals(mTrackOldTags.get(j))){
+			for (int j = 0; j < mTrackOldTags.size(); j++) {
+				if (newTag.equals(mTrackOldTags.get(j))) {
 					presentInOld = true;
 					break;
 				}
 			}
-			if(!presentInOld){
+			if (!presentInOld) {
 				addTags.add(newTag);
 			}
 		}
@@ -333,7 +333,7 @@ public class Tag extends Activity implements TabBarListener {
 			e.printStackTrace();
 		}
 
-		for(int i=0; i<removeTags.size(); i++){
+		for (int i = 0; i < removeTags.size(); i++) {
 			try {
 				mServer.removeTrackTag(mArtist, mTrack, removeTags.get(i), mSession.getKey());
 			} catch (IOException e) {
@@ -343,11 +343,12 @@ public class Tag extends Activity implements TabBarListener {
 
 	}
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-    	MenuInflater inflater = getMenuInflater();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.tag, menu);
 		return super.onCreateOptionsMenu(menu);
-    }
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -356,7 +357,7 @@ public class Tag extends Activity implements TabBarListener {
 			finish();
 			break;
 		case R.id.save_menu_item:
-			new SaveTagTask().execute((Object)null);
+			new SaveTagTask().execute((Object) null);
 			break;
 		default:
 			break;
@@ -364,17 +365,16 @@ public class Tag extends Activity implements TabBarListener {
 		return super.onOptionsItemSelected(item);
 	}
 
-	
-	/// @see TabBarListener
+	// / @see TabBarListener
 	public void tabChanged(int id, int previousId) {
-    	switch(id) {
-	    	case R.drawable.profile:
-				mTagList.setAdapter(mUserTagListAdapter);
-	    		break;
-	    	case R.drawable.list_add_to_playlist:
-				mTagList.setAdapter(mTopTagListAdapter);
-	    		break;
-    	}
+		switch (id) {
+		case R.drawable.profile:
+			mTagList.setAdapter(mUserTagListAdapter);
+			break;
+		case R.drawable.list_add_to_playlist:
+			mTagList.setAdapter(mTopTagListAdapter);
+			break;
+		}
 	}
 
 	/**
@@ -383,12 +383,12 @@ public class Tag extends Activity implements TabBarListener {
 	 * @param tag
 	 * @return true if successful
 	 */
-	private boolean addTag(String tag){
-		if( !isValidTag( tag ))
+	private boolean addTag(String tag) {
+		if (!isValidTag(tag))
 			return false;
-		
-		for(int i=0; i<mTrackNewTags.size(); i++){
-			if(mTrackNewTags.get(i).equals(tag)){
+
+		for (int i = 0; i < mTrackNewTags.size(); i++) {
+			if (mTrackNewTags.get(i).equals(tag)) {
 				// tag already exists, abort
 				return false;
 			}
@@ -397,7 +397,6 @@ public class Tag extends Activity implements TabBarListener {
 		mTagLayout.addTag(tag);
 		return true;
 	}
-	
 
 	/**
 	 * Validates a tag
@@ -405,11 +404,10 @@ public class Tag extends Activity implements TabBarListener {
 	 * @param tag
 	 * @return true if tag is valid
 	 */
-	private boolean isValidTag( String tag )
-	{
-		if( tag.trim().length() == 0 )
+	private boolean isValidTag(String tag) {
+		if (tag.trim().length() == 0)
 			return false;
-		
+
 		return true;
 	}
 
@@ -418,28 +416,28 @@ public class Tag extends Activity implements TabBarListener {
 	 * 
 	 * @param tag
 	 */
-	private void removeTag(String tag){
-		for(int i=mTrackNewTags.size()-1; mTrackNewTags.size()>0 && i >= 0; i--){
-			if(mTrackNewTags.get(i).equals(tag)){
+	private void removeTag(String tag) {
+		for (int i = mTrackNewTags.size() - 1; mTrackNewTags.size() > 0 && i >= 0; i--) {
+			if (mTrackNewTags.get(i).equals(tag)) {
 				mTrackNewTags.remove(i);
 			}
 		}
 		mTopTagListAdapter.tagUnadded(tag);
 		mUserTagListAdapter.tagUnadded(tag);
 	}
-	
+
 	/**
 	 * Fetches tags from the server
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class LoadTagTask extends UserTask<Object, Integer, Object>{
+	private class LoadTagTask extends UserTask<Object, Integer, Object> {
 		ProgressDialog mLoadDialog;
+
 		@Override
 		public void onPreExecute() {
-			if(mLoadDialog == null){
-				mLoadDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_loading),
-						true, false);
+			if (mLoadDialog == null) {
+				mLoadDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_loading), true, false);
 				mLoadDialog.setCancelable(true);
 			}
 		}
@@ -454,32 +452,31 @@ public class Tag extends Activity implements TabBarListener {
 		public void onPostExecute(Object result) {
 			fillData();
 			try {
-				if(mLoadDialog != null){
+				if (mLoadDialog != null) {
 					mLoadDialog.dismiss();
 					mLoadDialog = null;
 				}
-			}
-			catch( IllegalArgumentException e )
-			{
-				// for some reason this happens if you change orientation during the tag loading phase
-				// we reason it is because a new activity is created, but it's a bit mysterious
+			} catch (IllegalArgumentException e) {
+				// for some reason this happens if you change orientation during
+				// the tag loading phase
+				// we reason it is because a new activity is created, but it's a
+				// bit mysterious
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
-	
+
 	/**
 	 * Saves tags to the server
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class SaveTagTask extends UserTask<Object, Integer, Object>{
+	private class SaveTagTask extends UserTask<Object, Integer, Object> {
 
 		@Override
 		public void onPreExecute() {
-			if(mSaveDialog == null){
-				mSaveDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_saving),
-						true, false);
+			if (mSaveDialog == null) {
+				mSaveDialog = ProgressDialog.show(Tag.this, "", getString(R.string.tag_saving), true, false);
 				mSaveDialog.setCancelable(true);
 			}
 		}
@@ -492,12 +489,12 @@ public class Tag extends Activity implements TabBarListener {
 
 		@Override
 		public void onPostExecute(Object result) {
-			if(mSaveDialog != null){
+			if (mSaveDialog != null) {
 				mSaveDialog.dismiss();
 				mSaveDialog = null;
 			}
 			finish();
 		}
-		
+
 	}
 }

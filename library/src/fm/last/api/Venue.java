@@ -27,12 +27,12 @@ import java.io.Serializable;
  * 
  * @author Lukasz Wisniewski
  */
-public class Venue implements Serializable{
+public class Venue implements Serializable {
 	private static final long serialVersionUID = -9136513976031500466L;
 	private String name;
 	private String url;
 	private Location location;
-	
+
 	public Venue(String name, String url, Location location) {
 		super();
 		this.name = name;
@@ -63,6 +63,5 @@ public class Venue implements Serializable{
 	public void setLocation(Location location) {
 		this.location = location;
 	}
-	
-	
+
 }

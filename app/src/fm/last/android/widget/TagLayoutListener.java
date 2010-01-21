@@ -27,8 +27,8 @@ package fm.last.android.widget;
  */
 public interface TagLayoutListener {
 	/**
-	 * Notifies of click on TagButton inside
-	 * TagLayout which equals removing the tag
+	 * Notifies of click on TagButton inside TagLayout which equals removing the
+	 * tag
 	 * 
 	 * @param tag
 	 */
