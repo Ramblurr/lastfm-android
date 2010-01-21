@@ -427,24 +427,6 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.rating = "B";
         	Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
-				stopSelf();
-			} else {
-				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-				NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-				if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
-					if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
-						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-						mNowPlayingTask.execute(mScrobbler);
-					}
-			   		if(mQueue.size() > 0 && mSubmissionTask == null) {
-				   		mSubmissionTask = new SubmitTracksTask();
-				   		mSubmissionTask.execute(mScrobbler);
-			   		}
-				}
-			}
-		}
 		if(intent.getAction().equals("fm.last.android.scrobbler.FLUSH")) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();

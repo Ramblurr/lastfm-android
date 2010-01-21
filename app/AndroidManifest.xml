@@ -133,7 +133,6 @@
 				<action android:name="fm.last.android.playbackpaused"/>
 				<action android:name="fm.last.android.LOVE"/>
 				<action android:name="fm.last.android.BAN"/>
-				<action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
 				<action android:name="fm.last.android.scrobbler.FLUSH"/>
     		</intent-filter>
     	</receiver>

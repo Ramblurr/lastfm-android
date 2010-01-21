@@ -100,6 +100,8 @@ public class LastFm extends Activity
 	            Intent intent = getIntent();
 	            intent = new Intent( LastFm.this, Profile.class );
 	            startActivity( intent );
+	    		Intent i = new Intent("fm.last.android.scrobbler.FLUSH");
+	    		sendBroadcast(i);
         	}
             finish();
             return;
