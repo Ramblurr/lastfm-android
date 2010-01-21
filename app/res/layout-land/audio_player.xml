@@ -76,6 +76,11 @@
 							android:layout_height="wrap_content"
 							android:textStyle="bold" 
 							android:textSize="18sp"
+							android:gravity="left"
+							android:singleLine="true"
+							android:layout_width="225dip"
+							android:ellipsize="marquee"
+							android:focusable="true"
 							android:text="Title"/>
 					</TableRow>
 				</TableLayout>
