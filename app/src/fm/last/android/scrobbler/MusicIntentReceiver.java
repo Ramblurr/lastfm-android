@@ -24,23 +24,20 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
-import fm.last.android.R;
-import fm.last.android.activity.Profile;
-import fm.last.android.player.IRadioPlayer;
-import fm.last.android.player.RadioPlayerService;
-import fm.last.api.LastFmServer;
-import fm.last.api.Session;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
+import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
+import fm.last.android.R;
+import fm.last.android.player.IRadioPlayer;
+import fm.last.android.player.RadioPlayerService;
+import fm.last.api.LastFmServer;
+import fm.last.api.Session;
 
 /**
  * @author sam
@@ -51,52 +48,52 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Session s = LastFMApplication.getInstance().session;
-        if ( s != null && s.getKey().length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble", true)) {
-        	if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_music_player", true) &&
-        			intent.getAction().startsWith("com.")) {
-        		return;
-        	}
-        	if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-        		ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
-                
-                try {
-        			if(context.getFileStreamPath("queue.dat").exists()) {
-        	            FileInputStream fileStream = context.openFileInput("queue.dat");
-        	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-        	            Object obj = objectStream.readObject();
-        	            if(obj instanceof Integer) {
-        	            	Integer count = (Integer)obj;
-        	            	for(int i = 0; i < count.intValue(); i++) {
-        	                    obj = objectStream.readObject();
-        	                    if(obj instanceof ScrobblerQueueEntry)
-        	                    	queue.add((ScrobblerQueueEntry)obj);
-        	            	}
-        	            }
-        	            objectStream.close();
-        	            fileStream.close();
-        			}
-                } catch (Exception e) {
-                	e.printStackTrace();
-                }
-                if(queue.size() < 1)
-                	return;
-        	}
-	        final Intent out = new Intent(context, ScrobblerService.class);
-	        out.setAction(intent.getAction());
-	        out.putExtras(intent);
-	        context.startService(out);
-        } else if ( s != null && s.getKey().length() > 0 && intent.getAction().equals("fm.last.android.LOVE")) {
-        	IBinder service = peekService(context, new Intent(context,RadioPlayerService.class));
-    		if (service == null){
-    			return;
-    		}
-   			try {
-   	   			IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface( service );
-				if(player != null && player.isPlaying()) {
+		if (s != null && s.getKey().length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble", true)) {
+			if (!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_music_player", true)
+					&& intent.getAction().startsWith("com.")) {
+				return;
+			}
+			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+				ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+
+				try {
+					if (context.getFileStreamPath("queue.dat").exists()) {
+						FileInputStream fileStream = context.openFileInput("queue.dat");
+						ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+						Object obj = objectStream.readObject();
+						if (obj instanceof Integer) {
+							Integer count = (Integer) obj;
+							for (int i = 0; i < count.intValue(); i++) {
+								obj = objectStream.readObject();
+								if (obj instanceof ScrobblerQueueEntry)
+									queue.add((ScrobblerQueueEntry) obj);
+							}
+						}
+						objectStream.close();
+						fileStream.close();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if (queue.size() < 1)
+					return;
+			}
+			final Intent out = new Intent(context, ScrobblerService.class);
+			out.setAction(intent.getAction());
+			out.putExtras(intent);
+			context.startService(out);
+		} else if (s != null && s.getKey().length() > 0 && intent.getAction().equals("fm.last.android.LOVE")) {
+			IBinder service = peekService(context, new Intent(context, RadioPlayerService.class));
+			if (service == null) {
+				return;
+			}
+			try {
+				IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
+				if (player != null && player.isPlaying()) {
 					String track = player.getTrackName();
 					String artist = player.getArtistName();
-					if(!track.equals(RadioPlayerService.UNKNOWN) && !artist.equals(RadioPlayerService.UNKNOWN)) {
-	    				LastFmServer server = AndroidLastFmServerFactory.getServer();
+					if (!track.equals(RadioPlayerService.UNKNOWN) && !artist.equals(RadioPlayerService.UNKNOWN)) {
+						LastFmServer server = AndroidLastFmServerFactory.getServer();
 						server.loveTrack(artist, track, LastFMApplication.getInstance().session.getKey());
 						Toast.makeText(context, context.getString(R.string.scrobbler_trackloved), Toast.LENGTH_SHORT).show();
 					}
@@ -105,18 +102,18 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        } else if ( s != null && s.getKey().length() > 0 && intent.getAction().equals("fm.last.android.BAN")) {
-        	IBinder service = peekService(context, new Intent(context,RadioPlayerService.class));
-    		if (service == null){
-    			return;
-    		}
-   			try {
-   	   			IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface( service );
-				if(player != null && player.isPlaying()) {
+		} else if (s != null && s.getKey().length() > 0 && intent.getAction().equals("fm.last.android.BAN")) {
+			IBinder service = peekService(context, new Intent(context, RadioPlayerService.class));
+			if (service == null) {
+				return;
+			}
+			try {
+				IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
+				if (player != null && player.isPlaying()) {
 					String track = player.getTrackName();
 					String artist = player.getArtistName();
-					if(!track.equals(RadioPlayerService.UNKNOWN) && !artist.equals(RadioPlayerService.UNKNOWN)) {
-	    				LastFmServer server = AndroidLastFmServerFactory.getServer();
+					if (!track.equals(RadioPlayerService.UNKNOWN) && !artist.equals(RadioPlayerService.UNKNOWN)) {
+						LastFmServer server = AndroidLastFmServerFactory.getServer();
 						server.banTrack(artist, track, LastFMApplication.getInstance().session.getKey());
 						Toast.makeText(context, context.getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 					}
@@ -125,6 +122,6 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        }
+		}
 	}
 }

@@ -44,12 +44,23 @@
             android:summary="@string/prefs_discovery_summary" android:title="@string/prefs_discovery_title"/> -->
     </PreferenceCategory>
     
-    <PreferenceCategory android:title="@string/prefs_cat_feedback_title">
+    <PreferenceCategory android:title="@string/prefs_cat_about_title">
     <fm.last.android.activity.BugReport 
 		android:title="@string/prefs_bugreport_title"
 		android:summary="@string/prefs_bugreport_summary"
 		android:dialogLayout="@layout/bugreport"
 		android:negativeButtonText="@string/common_cancel" android:positiveButtonText="@string/prefs_bugreport_send"/>
-    		
+	<Preference
+		android:title="Terms Of Service"
+		android:key="tos"
+		/>    		
+	<Preference
+		android:title="Privacy Policy"
+		android:key="privacy"
+		/>    		
+	<Preference
+		android:title="Version"
+		android:key="version"
+		/>    		
     </PreferenceCategory>
 </PreferenceScreen>

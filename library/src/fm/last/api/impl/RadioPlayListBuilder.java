@@ -20,42 +20,43 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
-import fm.last.api.RadioPlayList;
-import fm.last.api.RadioTrack;
-import fm.last.xml.XMLBuilder;
-import fm.last.util.XMLUtil;
-import org.w3c.dom.Node;
-
 import java.util.List;
 
+import org.w3c.dom.Node;
+
+import fm.last.api.RadioPlayList;
+import fm.last.api.RadioTrack;
+import fm.last.util.XMLUtil;
+import fm.last.xml.XMLBuilder;
+
 /**
- * @author jennings
- *         Date: Oct 25, 2008
+ * @author jennings Date: Oct 25, 2008
  */
 public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
-  private RadioTrackBuilder trackBuilder = new RadioTrackBuilder();
+	private RadioTrackBuilder trackBuilder = new RadioTrackBuilder();
 
-  public RadioPlayList build(Node radioTracklistNode) {
-    node = radioTracklistNode;
+	@Override
+	public RadioPlayList build(Node radioTracklistNode) {
+		node = radioTracklistNode;
 
-    String title = getText("title");
-    String creator = getText("creator");
-    String date = getText("date");
-    String link = getText("link");
-    String id = getText("id");
-    boolean streamable = true;
-    if(getText("streamable") != null && getText("streamable").contentEquals("0"))
-    	streamable = false;
-    Node trackListNode = getChildNode("trackList");
-    RadioTrack[] tracks = null;
-    if(trackListNode != null) {
-        List<Node> trackNodes = XMLUtil.findNamedElementNodes(trackListNode, "track");
-        tracks = new RadioTrack[trackNodes.size()];
-        int i = 0;
-        for (Node trackNode : trackNodes) {
-          tracks[i++] = trackBuilder.build(trackNode);
-        }
-    }
-    return new RadioPlayList(title, creator, date, link, tracks, id, streamable);
-  }
+		String title = getText("title");
+		String creator = getText("creator");
+		String date = getText("date");
+		String link = getText("link");
+		String id = getText("id");
+		boolean streamable = true;
+		if (getText("streamable") != null && getText("streamable").contentEquals("0"))
+			streamable = false;
+		Node trackListNode = getChildNode("trackList");
+		RadioTrack[] tracks = null;
+		if (trackListNode != null) {
+			List<Node> trackNodes = XMLUtil.findNamedElementNodes(trackListNode, "track");
+			tracks = new RadioTrack[trackNodes.size()];
+			int i = 0;
+			for (Node trackNode : trackNodes) {
+				tracks[i++] = trackBuilder.build(trackNode);
+			}
+		}
+		return new RadioPlayList(title, creator, date, link, tracks, id, streamable);
+	}
 }

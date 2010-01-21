@@ -53,8 +53,8 @@ public class EventBuilder extends XMLBuilder<Event> {
 		Node artistsNode = getChildNode("artists");
 		List<Node> artistNodes = XMLUtil.findNamedElementNodes(artistsNode, "artist");
 		String[] artists = new String[artistNodes.size()];
-		int i=0;
-		for(Node artist : artistNodes){
+		int i = 0;
+		for (Node artist : artistNodes) {
 			artists[i++] = artist.getFirstChild().getNodeValue();
 		}
 
@@ -71,7 +71,7 @@ public class EventBuilder extends XMLBuilder<Event> {
 		Date startDate = null;
 		try {
 			String text = getText("startDate");
-			if(text != null){
+			if (text != null) {
 				startDate = dateFormat.parse(text);
 			}
 		} catch (ParseException e) {
@@ -82,7 +82,7 @@ public class EventBuilder extends XMLBuilder<Event> {
 		// FIXME String description = getText("description");
 		String description = null;
 		Node descriptionNode = getChildNode("description").getFirstChild();
-		if(descriptionNode != null){
+		if (descriptionNode != null) {
 			description = descriptionNode.getNodeValue();
 		}
 
@@ -109,20 +109,17 @@ public class EventBuilder extends XMLBuilder<Event> {
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
-		
+
 		// tag
 		String tag = getText("tag");
-		
+
 		// url
 		String url = getText("url");
-		
+
 		// status
 		String status = this.getAttribute("status");
 
-		return new Event(id, title, artists, headliner,
-				venue, 
-				startDate, description,
-				images, attendance, reviews, tag, url, status);
+		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status);
 	}
 
 }

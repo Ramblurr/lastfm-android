@@ -33,7 +33,8 @@ public class WSErrorBuilder extends XMLBuilder<WSError> {
 		Integer code = Integer.parseInt(this.getAttribute("code"));
 		return new WSError(method, message, code);
 	}
-	
+
+	@Override
 	public WSError build(Node errorNode) {
 		return this.build("", errorNode);
 	}

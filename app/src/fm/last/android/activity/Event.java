@@ -51,107 +51,108 @@ public class Event extends Activity {
 	private RadioGroup mAttendance;
 	private AlbumArt mPosterImage;
 
-	public interface EventActivityResult
-	{
+	public interface EventActivityResult {
 		public void onEventStatus(int status);
 	}
-	
-    private static int resourceToStatus(int resId) {
-    	switch(resId) {
-	    	case R.id.attending: return 0;
-	    	case R.id.maybe: return 1;
-	    	case R.id.notattending: return 2;
+
+	private static int resourceToStatus(int resId) {
+		switch (resId) {
+		case R.id.attending:
+			return 0;
+		case R.id.maybe:
+			return 1;
+		case R.id.notattending:
+			return 2;
 		}
-    	return 2;
-    }
+		return 2;
+	}
 
-    private static int statusToResource(int status) {
-    	switch(status) {
-	    	case 0: return R.id.attending;
-	    	case 1: return R.id.maybe;
-	    	case 2: return R.id.notattending;
+	private static int statusToResource(int status) {
+		switch (status) {
+		case 0:
+			return R.id.attending;
+		case 1:
+			return R.id.maybe;
+		case 2:
+			return R.id.notattending;
 		}
-    	return R.id.notattending;
-    }
-	
-    @Override
-    public void onCreate( Bundle icicle )
-    {
-        super.onCreate( icicle );
-        requestWindowFeature( Window.FEATURE_NO_TITLE );
-        setContentView( R.layout.event );
-        
-        mTitle = (TextView)findViewById(R.id.title);
-        mTitle.setText(getIntent().getStringExtra("lastfm.event.title"));
+		return R.id.notattending;
+	}
 
-        mArtists = (TextView)findViewById(R.id.artists);
-        mArtists.setText(getIntent().getStringExtra("lastfm.event.artists"));
+	@Override
+	public void onCreate(Bundle icicle) {
+		super.onCreate(icicle);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.event);
 
-        mVenue = (TextView)findViewById(R.id.venue);
-        mVenue.setText(getIntent().getStringExtra("lastfm.event.venue"));
+		mTitle = (TextView) findViewById(R.id.title);
+		mTitle.setText(getIntent().getStringExtra("lastfm.event.title"));
 
-        mStreet = (TextView)findViewById(R.id.street);
-        mStreet.setText(getIntent().getStringExtra("lastfm.event.street"));
+		mArtists = (TextView) findViewById(R.id.artists);
+		mArtists.setText(getIntent().getStringExtra("lastfm.event.artists"));
 
-        mMonth = (TextView)findViewById(R.id.month);
-        mMonth.setText(getIntent().getStringExtra("lastfm.event.month"));
+		mVenue = (TextView) findViewById(R.id.venue);
+		mVenue.setText(getIntent().getStringExtra("lastfm.event.venue"));
 
-        mDay = (TextView)findViewById(R.id.day);
-        mDay.setText(getIntent().getStringExtra("lastfm.event.day"));
-        
-        mPosterImage = (AlbumArt)findViewById(R.id.poster);
-        mPosterImage.fetch(getIntent().getStringExtra("lastfm.event.poster"));
-        
-        int statusResource;
-        try {
-        	statusResource = statusToResource(
-        			Integer.parseInt( 
-        					getIntent().getStringExtra("lastfm.event.status") ) );
-        } catch (Exception e) {
-        	statusResource = R.id.notattending;
-        }
-        mAttendance = (RadioGroup)findViewById(R.id.attend);
-        mAttendance.check(statusResource);
-        
-        findViewById(R.id.cancel).setOnClickListener(new OnClickListener() {
+		mStreet = (TextView) findViewById(R.id.street);
+		mStreet.setText(getIntent().getStringExtra("lastfm.event.street"));
+
+		mMonth = (TextView) findViewById(R.id.month);
+		mMonth.setText(getIntent().getStringExtra("lastfm.event.month"));
+
+		mDay = (TextView) findViewById(R.id.day);
+		mDay.setText(getIntent().getStringExtra("lastfm.event.day"));
+
+		mPosterImage = (AlbumArt) findViewById(R.id.poster);
+		mPosterImage.fetch(getIntent().getStringExtra("lastfm.event.poster"));
+
+		int statusResource;
+		try {
+			statusResource = statusToResource(Integer.parseInt(getIntent().getStringExtra("lastfm.event.status")));
+		} catch (Exception e) {
+			statusResource = R.id.notattending;
+		}
+		mAttendance = (RadioGroup) findViewById(R.id.attend);
+		mAttendance.check(statusResource);
+
+		findViewById(R.id.cancel).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);
 				finish();
 			}
-        });
-        
-        findViewById(R.id.showmap).setOnClickListener(new OnClickListener() {
-        	public void onClick(View v) {
-        		String query = "";
-        		String street = getIntent().getStringExtra("lastfm.event.street");
-        		String city = getIntent().getStringExtra("lastfm.event.city");
-        		String postalcode = getIntent().getStringExtra("lastfm.event.postalcode");
-        		String country = getIntent().getStringExtra("lastfm.event.country");
-        		
-        		if(street != null && street.length() > 0)
-        			query += street + ",";
-        		if(city != null && city.length() > 0)
-        			query += " " + city + ",";
-        		if(postalcode != null && postalcode.length() > 0)
-        			query += " " + postalcode;
-        		if(country != null && country.length() > 0)
-        			query += " " + country;
-            	final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/?f=q&q=" + query + "&ie=UTF8&om=1&iwloc=addr")); 
-                startActivity(myIntent);
-                finish();
-        	}
-        });
-        
-        findViewById(R.id.ok).setOnClickListener(new OnClickListener() {
+		});
+
+		findViewById(R.id.showmap).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				String query = "";
+				String street = getIntent().getStringExtra("lastfm.event.street");
+				String city = getIntent().getStringExtra("lastfm.event.city");
+				String postalcode = getIntent().getStringExtra("lastfm.event.postalcode");
+				String country = getIntent().getStringExtra("lastfm.event.country");
+
+				if (street != null && street.length() > 0)
+					query += street + ",";
+				if (city != null && city.length() > 0)
+					query += " " + city + ",";
+				if (postalcode != null && postalcode.length() > 0)
+					query += " " + postalcode;
+				if (country != null && country.length() > 0)
+					query += " " + country;
+				final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://maps.google.com/?f=q&q=" + query
+						+ "&ie=UTF8&om=1&iwloc=addr"));
+				startActivity(myIntent);
+				finish();
+			}
+		});
+
+		findViewById(R.id.ok).setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
 
 				try {
 					int status = resourceToStatus(mAttendance.getCheckedRadioButtonId());
-					server.attendEvent(
-							getIntent().getStringExtra("lastfm.event.id"), 
-							String.valueOf(status), 
-							(LastFMApplication.getInstance().session).getKey() );
+					server.attendEvent(getIntent().getStringExtra("lastfm.event.id"), String.valueOf(status), (LastFMApplication.getInstance().session)
+							.getKey());
 					setResult(RESULT_OK, new Intent().putExtra("status", status));
 					finish();
 				} catch (WSError e) {
@@ -160,45 +161,44 @@ public class Event extends Activity {
 					e.printStackTrace();
 				}
 			}
-        });
-    }
+		});
+	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		LastFMApplication.getInstance().tracker.trackPageView("/Event");
 	}
-	
+
 	@Override
 	protected void onStop() {
 		mPosterImage.cancel();
 		super.onStop();
 	}
-    
-    public static Intent intentFromEvent(Context packageContext, fm.last.api.Event event)
-    {
-	    Intent intent = new Intent( packageContext, fm.last.android.activity.Event.class );
-	    intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
-	    intent.putExtra("lastfm.event.title", event.getTitle());
-	    String artists = "";
-	    for(String artist : event.getArtists()) {
-	        if(artists.length() > 0)
-	            artists += ", ";
-	        artists += artist;
-	    }
-	    for(ImageUrl image : event.getImages()) {
-	        if(image.getSize().contentEquals("large"))
-	            intent.putExtra("lastfm.event.poster", image.getUrl());
-	    }
-	    intent.putExtra("lastfm.event.artists", artists);
-	    intent.putExtra("lastfm.event.venue", event.getVenue().getName());
-	    intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
-	    intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
-	    intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
-	    intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
-	    intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
-	    intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
-	    intent.putExtra("lastfm.event.status", event.getStatus());
-	    return intent;
-    }
+
+	public static Intent intentFromEvent(Context packageContext, fm.last.api.Event event) {
+		Intent intent = new Intent(packageContext, fm.last.android.activity.Event.class);
+		intent.putExtra("lastfm.event.id", Integer.toString(event.getId()));
+		intent.putExtra("lastfm.event.title", event.getTitle());
+		String artists = "";
+		for (String artist : event.getArtists()) {
+			if (artists.length() > 0)
+				artists += ", ";
+			artists += artist;
+		}
+		for (ImageUrl image : event.getImages()) {
+			if (image.getSize().contentEquals("large"))
+				intent.putExtra("lastfm.event.poster", image.getUrl());
+		}
+		intent.putExtra("lastfm.event.artists", artists);
+		intent.putExtra("lastfm.event.venue", event.getVenue().getName());
+		intent.putExtra("lastfm.event.street", event.getVenue().getLocation().getStreet());
+		intent.putExtra("lastfm.event.city", event.getVenue().getLocation().getCity());
+		intent.putExtra("lastfm.event.postalcode", event.getVenue().getLocation().getPostalcode());
+		intent.putExtra("lastfm.event.country", event.getVenue().getLocation().getCountry());
+		intent.putExtra("lastfm.event.month", new SimpleDateFormat("MMM").format(event.getStartDate()));
+		intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
+		intent.putExtra("lastfm.event.status", event.getStatus());
+		return intent;
+	}
 }

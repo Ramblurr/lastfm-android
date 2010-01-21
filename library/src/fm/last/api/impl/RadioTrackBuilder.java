@@ -31,21 +31,22 @@ import fm.last.xml.XMLBuilder;
  */
 public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
 
-  public RadioTrack build(Node trackNode) {
-    node = trackNode;
-    String location = getText("location");
-    String title = getText("title");
-    String identifier = getText("identifier");
-    String album = getText("album");
-    String creator = getText("creator");
-    String duration = getText("duration");
-    String image = getText("image");
-    String auth = "";
-    Node extensionNode = XMLUtil.findNamedElementNode(node, "extension");
-    if(extensionNode != null) {
-    	Node authNode = XMLUtil.findNamedElementNode(extensionNode, "trackauth");
-    	auth = authNode.getFirstChild().getNodeValue();
-    }
-    return new RadioTrack(location, title, identifier, album, creator, duration, image, auth);
-  }
+	@Override
+	public RadioTrack build(Node trackNode) {
+		node = trackNode;
+		String location = getText("location");
+		String title = getText("title");
+		String identifier = getText("identifier");
+		String album = getText("album");
+		String creator = getText("creator");
+		String duration = getText("duration");
+		String image = getText("image");
+		String auth = "";
+		Node extensionNode = XMLUtil.findNamedElementNode(node, "extension");
+		if (extensionNode != null) {
+			Node authNode = XMLUtil.findNamedElementNode(extensionNode, "trackauth");
+			auth = authNode.getFirstChild().getNodeValue();
+		}
+		return new RadioTrack(location, title, identifier, album, creator, duration, image, auth);
+	}
 }

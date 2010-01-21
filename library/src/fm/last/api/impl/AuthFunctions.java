@@ -20,11 +20,6 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
-import fm.last.api.Session;
-import fm.last.api.WSError;
-import fm.last.util.UrlUtil;
-import fm.last.util.XMLUtil;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -32,38 +27,42 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import fm.last.api.Session;
+import fm.last.api.WSError;
+import fm.last.util.UrlUtil;
+import fm.last.util.XMLUtil;
+
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class AuthFunctions {
-  private AuthFunctions() {
-  }
+	private AuthFunctions() {
+	}
 
-  public static Session getMobileSession(String baseUrl, Map<String, String> params) throws IOException, WSError {
-    String response = UrlUtil.doGet(baseUrl, params);
+	public static Session getMobileSession(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
 
-    Document responseXML = null;
-    try {
-      responseXML = XMLUtil.stringToDocument(response);
-    } catch (SAXException e) {
-      throw new IOException(e.getMessage());
-    }
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
 
-    Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-    if(!status.contains("ok")) {
-    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-    	if(errorNode != null) {
-	    	WSErrorBuilder eb = new WSErrorBuilder();
-	    	throw eb.build(params.get("method"), errorNode);
-    	}
-    	return null;
-    } else {
-	    Node sessionNode = XMLUtil.findNamedElementNode(lfmNode, "session");
-	    SessionBuilder builder = new SessionBuilder();
-	    return builder.build(sessionNode);
-    }
-  }
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
+			Node sessionNode = XMLUtil.findNamedElementNode(lfmNode, "session");
+			SessionBuilder builder = new SessionBuilder();
+			return builder.build(sessionNode);
+		}
+	}
 
 }

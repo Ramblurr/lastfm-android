@@ -30,16 +30,18 @@ import fm.last.xml.XMLBuilder;
  */
 public class TagBuilder extends XMLBuilder<Tag> {
 
+	@Override
 	public Tag build(Node tagNode) {
 		node = tagNode;
-	    String name = getText("name");
-	    String tagcountStr = getText("tagcount");
-	    int tagcount = -1;
-	    try {
-	    	tagcount = Integer.parseInt(tagcountStr);
-	    } catch (NumberFormatException e){} // ignore failed tagcount parsing 
-	    String url = getText("url");
-	    return new Tag(name, tagcount, url);
+		String name = getText("name");
+		String tagcountStr = getText("tagcount");
+		int tagcount = -1;
+		try {
+			tagcount = Integer.parseInt(tagcountStr);
+		} catch (NumberFormatException e) {
+		} // ignore failed tagcount parsing
+		String url = getText("url");
+		return new Tag(name, tagcount, url);
 	}
 
 }

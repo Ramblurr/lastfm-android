@@ -23,44 +23,43 @@ package fm.last.api;
 import java.io.Serializable;
 
 /**
- * @author jennings
- *         Date: Oct 21, 2008
+ * @author jennings Date: Oct 21, 2008
  */
 public class Album implements Serializable {
 
-  private static final long serialVersionUID = -8821153568949520331L;
-  private String artist;
-  private String title;
-  private String mbid;
-  private String url;
-  private ImageUrl[] images;
+	private static final long serialVersionUID = -8821153568949520331L;
+	private String artist;
+	private String title;
+	private String mbid;
+	private String url;
+	private ImageUrl[] images;
 
-  public Album(String artist, String title, String mbid, String url, ImageUrl[] images) {
-    this.artist = artist;
-    this.title = title;
-    this.mbid = mbid;
-    this.url = url;
-    this.images = images;
-  }
+	public Album(String artist, String title, String mbid, String url, ImageUrl[] images) {
+		this.artist = artist;
+		this.title = title;
+		this.mbid = mbid;
+		this.url = url;
+		this.images = images;
+	}
 
-  public String getArtist() {
-    return artist;
-  }
+	public String getArtist() {
+		return artist;
+	}
 
-  public String getTitle() {
-    return title;
-  }
+	public String getTitle() {
+		return title;
+	}
 
-  public String getMbid() {
-    return mbid;
-  }
+	public String getMbid() {
+		return mbid;
+	}
 
-  public String getUrl() {
-    return url;
-  }
+	public String getUrl() {
+		return url;
+	}
 
-  public ImageUrl[] getImages() {
-    return images;
-  }
+	public ImageUrl[] getImages() {
+		return images;
+	}
 
 }

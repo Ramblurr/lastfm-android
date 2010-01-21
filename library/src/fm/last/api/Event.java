@@ -23,21 +23,20 @@ package fm.last.api;
 import java.io.Serializable;
 import java.util.Date;
 
-
 /**
  * Represents an event
  * 
  * @author Lukasz Wisniewski
  */
-public class Event implements Serializable{
+public class Event implements Serializable {
 	private static final long serialVersionUID = 4832815335124538661L;
 	private int id;
 	private String title;
 	private String[] artists;
 	private String headliner;
-	
+
 	private Venue venue;
-	
+
 	private Date startDate;
 	private String description;
 	private ImageUrl[] images;
@@ -47,10 +46,8 @@ public class Event implements Serializable{
 	private String url;
 	private String status;
 
-	public Event(int id, String title, String[] artists, String headliner,
-			Venue venue, Date startDate, String description,
-			ImageUrl[] images, int attendance, int reviews, String tag,
-			String url, String status) {
+	public Event(int id, String title, String[] artists, String headliner, Venue venue, Date startDate, String description, ImageUrl[] images, int attendance,
+			int reviews, String tag, String url, String status) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -162,7 +159,7 @@ public class Event implements Serializable{
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
+
 	public String getStatus() {
 		return status;
 	}
@@ -170,5 +167,5 @@ public class Event implements Serializable{
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
+
 }

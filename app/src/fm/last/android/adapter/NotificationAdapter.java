@@ -20,7 +20,6 @@
  ***************************************************************************/
 package fm.last.android.adapter;
 
-import fm.last.android.R;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,11 +27,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
+import fm.last.android.R;
 
 /**
- * This adapter is not representing any particular data
- * however may be used to place some notifications within
- * a ListView widget
+ * This adapter is not representing any particular data however may be used to
+ * place some notifications within a ListView widget
  * 
  * @author Lukasz Wisniewski
  */
@@ -49,7 +48,7 @@ public class NotificationAdapter extends BaseAdapter {
 	public static final int LOAD_MODE = 1;
 
 	protected Activity mContext;
-	
+
 	private int mMode = 0;
 	private String mText;
 
@@ -61,13 +60,16 @@ public class NotificationAdapter extends BaseAdapter {
 	public NotificationAdapter(Activity context) {
 		this.mContext = context;
 	}
-	
+
 	/**
 	 * Constructor allowing to set adapter's mode and informative text
 	 * 
 	 * @param context
-	 * @param mode Mode in which this adapter should operate, <code>LOAD_MODE</code> or <code>INFO_MODE</code>
-	 * @param text Informative text e.g.: "Loading", "No events found" etc.
+	 * @param mode
+	 *            Mode in which this adapter should operate,
+	 *            <code>LOAD_MODE</code> or <code>INFO_MODE</code>
+	 * @param text
+	 *            Informative text e.g.: "Loading", "No events found" etc.
 	 */
 	public NotificationAdapter(Activity context, int mode, String text) {
 		this.mContext = context;
@@ -86,63 +88,67 @@ public class NotificationAdapter extends BaseAdapter {
 	public long getItemId(int position) {
 		return 0;
 	}
-	
+
+	@Override
 	public boolean isEnabled(int position) {
-        return false;
-    }
+		return false;
+	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View row = convertView;
-		
+
 		ViewHolder holder;
-		
-		if (row==null) {
+
+		if (row == null) {
 			LayoutInflater inflater = mContext.getLayoutInflater();
-			row=inflater.inflate(R.layout.list_row, null);
-			
+			row = inflater.inflate(R.layout.list_row, null);
+
 			holder = new ViewHolder();
-			holder.label = (TextView)row.findViewById(R.id.row_label);
-			holder.vs = (ViewSwitcher)row.findViewById(R.id.row_view_switcher);
-			
+			holder.label = (TextView) row.findViewById(R.id.row_label);
+			holder.vs = (ViewSwitcher) row.findViewById(R.id.row_view_switcher);
+
 			row.setTag(holder);
 		} else {
-			holder = (ViewHolder)row.getTag();
+			holder = (ViewHolder) row.getTag();
 		}
-		
+
 		holder.label.setText(mText);
-		
+
 		// INFO_MODE
-		if(mMode == INFO_MODE){
+		if (mMode == INFO_MODE) {
 			holder.vs.setVisibility(View.GONE);
-		}else{ //LOAD_MODE
+		} else { // LOAD_MODE
 			holder.vs.setDisplayedChild(1);
 			holder.vs.setVisibility(View.VISIBLE);
 		}
 		return row;
 	}
-	
+
 	/**
 	 * "Holder pattern implementation, performance boost"... well not really
-	 * here but I put it for my convenience 
+	 * here but I put it for my convenience
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
 	static class ViewHolder {
-        TextView label;
-        ViewSwitcher vs;
-    }
+		TextView label;
+		ViewSwitcher vs;
+	}
 
 	/**
 	 * Sets mode of the <code>NotificationAdapter</code>
 	 * 
-	 * @param mode Mode in which this adapter should operate, <code>LOAD_MODE</code> or <code>INFO_MODE</code>
-	 * @param text Informative text e.g.: "Loading", "No events found" etc.
+	 * @param mode
+	 *            Mode in which this adapter should operate,
+	 *            <code>LOAD_MODE</code> or <code>INFO_MODE</code>
+	 * @param text
+	 *            Informative text e.g.: "Loading", "No events found" etc.
 	 */
-	public void setMode(int mode, String text){
+	public void setMode(int mode, String text) {
 		this.mMode = mode;
 		this.mText = text;
-		
+
 		notifyDataSetChanged();
 	}
-	
+
 }

@@ -40,8 +40,9 @@ import fm.last.util.XMLUtil;
  */
 public class TagFunctions {
 	private static int TAGS_PER_POST = 10;
-	
-	private TagFunctions() {}
+
+	private TagFunctions() {
+	}
 
 	public static Tag[] searchForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
@@ -54,18 +55,18 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-	    if(!status.contains("ok")) {
-	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-	    	if(errorNode != null) {
-		    	WSErrorBuilder eb = new WSErrorBuilder();
-		    	throw eb.build(params.get("method"), errorNode);
-	    	}
-	    	return null;
-	    } else {
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
 			Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
 			Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "tagmatches");
-	
+
 			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
 			TagBuilder tagBuilder = new TagBuilder();
 			List<Tag> tags = new ArrayList<Tag>();
@@ -74,7 +75,7 @@ public class TagFunctions {
 				tags.add(artistObject);
 			}
 			return tags.toArray(new Tag[tags.size()]);
-	    }
+		}
 	}
 
 	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException, WSError {
@@ -88,17 +89,17 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-	    if(!status.contains("ok")) {
-	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-	    	if(errorNode != null) {
-		    	WSErrorBuilder eb = new WSErrorBuilder();
-		    	throw eb.build(params.get("method"), errorNode);
-	    	}
-	    	return null;
-	    } else {
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
 			Node childNode = XMLUtil.findNamedElementNode(lfmNode, child);
-	
+
 			Node[] elnodes = XMLUtil.getChildNodes(childNode, Node.ELEMENT_NODE);
 			TagBuilder tagBuilder = new TagBuilder();
 			List<Tag> tags = new ArrayList<Tag>();
@@ -107,7 +108,7 @@ public class TagFunctions {
 				tags.add(artistObject);
 			}
 			return tags.toArray(new Tag[tags.size()]);
-	    }
+		}
 	}
 
 	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
@@ -120,12 +121,12 @@ public class TagFunctions {
 
 	public static void addTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doPost(baseUrl, params);
-//		int n = (tag.length-1) / TAGS_PER_POST;
-//		int i = 0;
-//		do{
-//			params.put("tags", buildTags(tag, i*TAGS_PER_POST));
-//			
-//		}while (i++ < n);
+		// int n = (tag.length-1) / TAGS_PER_POST;
+		// int i = 0;
+		// do{
+		// params.put("tags", buildTags(tag, i*TAGS_PER_POST));
+		//			
+		// }while (i++ < n);
 
 		Document responseXML = null;
 		try {
@@ -135,22 +136,22 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-	    if(!status.contains("ok")) {
-	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-	    	if(errorNode != null) {
-		    	WSErrorBuilder eb = new WSErrorBuilder();
-		    	throw eb.build(params.get("method"), errorNode);
-	    	}
-	    }
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+		}
 	}
 
-	public static String buildTags(String[] tag){
+	public static String buildTags(String[] tag) {
 		String tags = "";
-		if(tag!=null && tag.length > 0){
+		if (tag != null && tag.length > 0) {
 			tags = tag[0];
-			for(int i=1; i<TAGS_PER_POST && i<tag.length; i++){
-				tags += ","+tag[i];
+			for (int i = 1; i < TAGS_PER_POST && i < tag.length; i++) {
+				tags += "," + tag[i];
 			}
 		}
 		return tags;
@@ -166,16 +167,15 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-	    if(!status.contains("ok")) {
-	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-	    	if(errorNode != null) {
-		    	WSErrorBuilder eb = new WSErrorBuilder();
-		    	throw eb.build(params.get("method"), errorNode);
-	    	}
-	    }
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+		}
 	}
-
 
 	public static Artist[] topArtistsForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String response = UrlUtil.doGet(baseUrl, params);
@@ -188,27 +188,27 @@ public class TagFunctions {
 		}
 
 		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-	    String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-	    if(!status.contains("ok")) {
-	    	Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-	    	if(errorNode != null) {
-		    	WSErrorBuilder eb = new WSErrorBuilder();
-		    	throw eb.build(params.get("method"), errorNode);
-	    	}
-	    	return null;
-	    } else {
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
 			Node artistMatches = XMLUtil.findNamedElementNode(lfmNode, "topartists");
-	
+
 			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
 			ArtistBuilder artistBuilder = new ArtistBuilder();
 			List<Artist> artists = new ArrayList<Artist>();
 			for (Node node : elnodes) {
 				Artist artistObject = artistBuilder.build(node);
 				artists.add(artistObject);
-				if(artists.size() > 3)
+				if (artists.size() > 3)
 					break;
 			}
 			return artists.toArray(new Artist[artists.size()]);
-	    }
+		}
 	}
 }

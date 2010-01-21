@@ -46,7 +46,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
-
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -61,20 +60,25 @@ import fm.last.api.Session;
  * 
  * @author Sam Steele <sam@last.fm>
  * 
- * This is a scrobbler that can scrobble both our radio player as well as the built-in media player
- * and other 3rd party apps that broadcast fm.last.android.metachanged notifications.  We can't
- * rely on com.android.music.metachanged due to a bug in the built-in media player that does not
- * broadcast this notification when playing the first track, only when starting the next track.
+ *         This is a scrobbler that can scrobble both our radio player as well
+ *         as the built-in media player and other 3rd party apps that broadcast
+ *         fm.last.android.metachanged notifications. We can't rely on
+ *         com.android.music.metachanged due to a bug in the built-in media
+ *         player that does not broadcast this notification when playing the
+ *         first track, only when starting the next track.
  * 
- * Scrobbles and Now Playing data are serialized between launches, and will be sent when the track or
- * network state changes.  This service has a very short lifetime and is only started for a few seconds at
- * a time when there's work to be done.  This server is started when music state or network state change.
+ *         Scrobbles and Now Playing data are serialized between launches, and
+ *         will be sent when the track or network state changes. This service
+ *         has a very short lifetime and is only started for a few seconds at a
+ *         time when there's work to be done. This server is started when music
+ *         state or network state change.
  * 
- * Scrobbles are submitted to the server after Now Playing info is sent, or when a network connection becomes
- * available.
+ *         Scrobbles are submitted to the server after Now Playing info is sent,
+ *         or when a network connection becomes available.
  * 
- * Sample code for a 3rd party to integrate with us is located at http://wiki.github.com/c99koder/lastfm-android/scrobbler-interface
- *
+ *         Sample code for a 3rd party to integrate with us is located at
+ *         http://wiki.github.com/c99koder/lastfm-android/scrobbler-interface
+ * 
  */
 public class ScrobblerService extends Service {
 	private Session mSession;
@@ -85,7 +89,7 @@ public class ScrobblerService extends Service {
 	NowPlayingTask mNowPlayingTask = null;
 	ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
 	ScrobblerQueueEntry mCurrentTrack = null;
-	
+
 	public static final String META_CHANGED = "fm.last.android.metachanged";
 	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
 	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playstatechanged";
@@ -93,99 +97,100 @@ public class ScrobblerService extends Service {
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
 	public static final String PLAYBACK_PAUSED = "fm.last.android.playbackpaused";
 	public static final String UNKNOWN = "fm.last.android.unknown";
-	
+
 	private Logger logger;
-	
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
 
-    	logger = Logger.getLogger("fm.last.android.scrobbler");
+		logger = Logger.getLogger("fm.last.android.scrobbler");
 		try {
-			if(logger.getHandlers().length < 1) {
+			if (logger.getHandlers().length < 1) {
 				FileHandler handler = new FileHandler(getFilesDir().getAbsolutePath() + "/scrobbler.log", 4096, 1, true);
-		        handler.setFormatter(new SimpleFormatter());
-		        logger.addHandler(handler);
+				handler.setFormatter(new SimpleFormatter());
+				logger.addHandler(handler);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		LastFmServer server = AndroidLastFmServerFactory.getServer();
-    	mSession = LastFMApplication.getInstance().session;
 
-    	if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
+		LastFmServer server = AndroidLastFmServerFactory.getServer();
+		mSession = LastFMApplication.getInstance().session;
+
+		if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
 			String version = "0.1";
 			try {
 				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
 			} catch (NameNotFoundException e) {
 			}
-			mScrobbler = server.createAudioscrobbler( mSession, version );
-        } else {
-        	//User not authenticated, shutting down...
-        	stopSelf();
-        	return;
-        }
-        
-        try {
-			if(getFileStreamPath("currentTrack.dat").exists()) {
-	            FileInputStream fileStream = openFileInput("currentTrack.dat");
-	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-	            Object obj = objectStream.readObject();
-	            if(obj instanceof ScrobblerQueueEntry) {
-	            	mCurrentTrack = (ScrobblerQueueEntry)obj;
-	            	if(mCurrentTrack.startTime > System.currentTimeMillis()) {
-	            		mCurrentTrack = null;
-	            		logger.info("Serialized start time is in the future! ignoring");
-	            	}
-	            }
-	            objectStream.close();
-	            fileStream.close();
-			}
-        } catch (Exception e) {
-        	mCurrentTrack = null;
-        }
+			mScrobbler = server.createAudioscrobbler(mSession, version);
+		} else {
+			// User not authenticated, shutting down...
+			stopSelf();
+			return;
+		}
 
-        mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
-        
-        try {
-			if(getFileStreamPath("queue.dat").exists()) {
-	            FileInputStream fileStream = openFileInput("queue.dat");
-	            ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-	            Object obj = objectStream.readObject();
-	            if(obj instanceof Integer) {
-	            	Integer count = (Integer)obj;
-	            	for(int i = 0; i < count.intValue(); i++) {
-	                    obj = objectStream.readObject();
-	                    if(obj instanceof ScrobblerQueueEntry)
-	                    	mQueue.add((ScrobblerQueueEntry)obj);
-	            	}
-	            }
-	            objectStream.close();
-	            fileStream.close();
-	            logger.info("Loaded " + mQueue.size() + " queued tracks");
+		try {
+			if (getFileStreamPath("currentTrack.dat").exists()) {
+				FileInputStream fileStream = openFileInput("currentTrack.dat");
+				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+				Object obj = objectStream.readObject();
+				if (obj instanceof ScrobblerQueueEntry) {
+					mCurrentTrack = (ScrobblerQueueEntry) obj;
+					if (mCurrentTrack.startTime > System.currentTimeMillis()) {
+						mCurrentTrack = null;
+						logger.info("Serialized start time is in the future! ignoring");
+					}
+				}
+				objectStream.close();
+				fileStream.close();
 			}
-        } catch (Exception e) {
-        	e.printStackTrace();
-        }
+		} catch (Exception e) {
+			mCurrentTrack = null;
+		}
+
+		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+
+		try {
+			if (getFileStreamPath("queue.dat").exists()) {
+				FileInputStream fileStream = openFileInput("queue.dat");
+				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+				Object obj = objectStream.readObject();
+				if (obj instanceof Integer) {
+					Integer count = (Integer) obj;
+					for (int i = 0; i < count.intValue(); i++) {
+						obj = objectStream.readObject();
+						if (obj instanceof ScrobblerQueueEntry)
+							mQueue.add((ScrobblerQueueEntry) obj);
+					}
+				}
+				objectStream.close();
+				fileStream.close();
+				logger.info("Loaded " + mQueue.size() + " queued tracks");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+
 		try {
-	        Intent intent = new Intent("fm.last.android.scrobbler.FLUSH");
-	        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-	        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-	        am.cancel(alarmIntent); //cancel any pending alarm intents
-			if(mQueue.size() > 0) {
-		        //schedule an alarm to wake the device and try again in an hour
-		        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
+			Intent intent = new Intent("fm.last.android.scrobbler.FLUSH");
+			PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			am.cancel(alarmIntent); // cancel any pending alarm intents
+			if (mQueue.size() > 0) {
+				// schedule an alarm to wake the device and try again in an hour
+				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
 			}
-			if(getFileStreamPath("currentTrack.dat").exists())
+			if (getFileStreamPath("currentTrack.dat").exists())
 				deleteFile("currentTrack.dat");
-			if(mCurrentTrack != null) {
+			if (mCurrentTrack != null) {
 				FileOutputStream filestream = openFileOutput("currentTrack.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
 				objectstream.writeObject(mCurrentTrack);
@@ -193,21 +198,21 @@ public class ScrobblerService extends Service {
 				filestream.close();
 			}
 		} catch (Exception e) {
-			if(getFileStreamPath("currentTrack.dat").exists())
+			if (getFileStreamPath("currentTrack.dat").exists())
 				deleteFile("currentTrack.dat");
 			logger.severe("Unable to save current track state");
 			e.printStackTrace();
 		}
 
 		try {
-			if(getFileStreamPath("queue.dat").exists())
+			if (getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
-			if(mQueue.size() > 0) {
+			if (mQueue.size() > 0) {
 				logger.info("Writing " + mQueue.size() + " queued tracks");
 				FileOutputStream filestream = openFileOutput("queue.dat", 0);
 				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
 				objectstream.writeObject(new Integer(mQueue.size()));
-				while(mQueue.size() > 0) {
+				while (mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.take();
 					objectstream.writeObject(e);
 				}
@@ -215,266 +220,244 @@ public class ScrobblerService extends Service {
 				filestream.close();
 			}
 		} catch (Exception e) {
-			if(getFileStreamPath("queue.dat").exists())
+			if (getFileStreamPath("queue.dat").exists())
 				deleteFile("queue.dat");
 			logger.severe("Unable to save queue state");
 			e.printStackTrace();
 		}
 	}
-	
+
 	/*
-	 * This will check the distance between the start time and the current time to determine
-	 * whether this is a skip or a played track, and will add it to our scrobble queue.
+	 * This will check the distance between the start time and the current time
+	 * to determine whether this is a skip or a played track, and will add it to
+	 * our scrobble queue.
 	 */
 	public void enqueueCurrentTrack() {
-		if(mCurrentTrack != null) {
+		if (mCurrentTrack != null) {
 			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
 			boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
-			if(!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
+			if (!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
 				mCurrentTrack.rating = "S";
 			}
-			if(played || mCurrentTrack.rating.length() > 0) {
+			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-		   		mQueue.add(mCurrentTrack);
+				mQueue.add(mCurrentTrack);
 			}
-	   		mCurrentTrack = null;
+			mCurrentTrack = null;
 		}
 	}
-	
-    @Override
-    public void onStart(Intent intent, int startId) {
-    	final Intent i = intent;
-    	if(mScrobbler == null) {
-    		stopIfReady();
-    		return;
-    	}
-    	
-    	/*
-         * The Android media player doesn't send a META_CHANGED notification for the first track,
-         * so we'll have to catch PLAYBACK_STATE_CHANGED and check to see whether the player
-         * is currently playing.  We'll then send our own META_CHANGED intent to the scrobbler.
-         */
-		if(intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
+
+	@Override
+	public void onStart(Intent intent, int startId) {
+		final Intent i = intent;
+		if (mScrobbler == null) {
+			stopIfReady();
+			return;
+		}
+
+		/*
+		 * The Android media player doesn't send a META_CHANGED notification for
+		 * the first track, so we'll have to catch PLAYBACK_STATE_CHANGED and
+		 * check to see whether the player is currently playing. We'll then send
+		 * our own META_CHANGED intent to the scrobbler.
+		 */
+		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
-			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
-	            bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"),
-	                    new ServiceConnection() {
-	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-	                            com.android.music.IMediaPlaybackService s =
-	                                    com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-	                            
-	                            try {
-									if(s.isPlaying()) {
-										i.setAction(META_CHANGED);
-										i.putExtra("position", s.position());
-										i.putExtra("duration", s.duration());
-										handleIntent(i);
-									} else { //Media player was paused
-										mCurrentTrack = null;
-										NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-										nm.cancel( 1338 );
-										stopSelf();
-									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								unbindService(this);
-	                    }
-	
-	                    public void onServiceDisconnected(ComponentName comp) {}
-	            }, 0);
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+				bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+
+						try {
+							if (s.isPlaying()) {
+								i.setAction(META_CHANGED);
+								i.putExtra("position", s.position());
+								i.putExtra("duration", s.duration());
+								handleIntent(i);
+							} else { // Media player was paused
+								mCurrentTrack = null;
+								NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+								nm.cancel(1338);
+								stopSelf();
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
 			} else {
-				//Clear the current track in case the user has disabled scrobbling of the media player
-				//during the middle of this track.
+				// Clear the current track in case the user has disabled
+				// scrobbling of the media player
+				// during the middle of this track.
 				mCurrentTrack = null;
 				stopIfReady();
 			}
-		} else if((intent.getAction().equals("com.htc.music.playstatechanged") &&
-				intent.getIntExtra("id", -1) != -1) || intent.getAction().equals("com.htc.music.metachanged")) {
-			if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
-	            bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"),
-	                    new ServiceConnection() {
-	                    public void onServiceConnected(ComponentName comp, IBinder binder) {
-	                            com.htc.music.IMediaPlaybackService s =
-	                                    com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
-	                            
-	                            try {
-									if(s.isPlaying()) {
-										i.setAction(META_CHANGED);
-										i.putExtra("position", s.position());
-										i.putExtra("duration", s.duration());
-										i.putExtra("track", s.getTrackName());
-										i.putExtra("artist", s.getArtistName());
-										i.putExtra("album", s.getAlbumName());
-										handleIntent(i);
-									} else { //Media player was paused
-										mCurrentTrack = null;
-										NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-										nm.cancel( 1338 );
-										stopSelf();
-									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								unbindService(this);
-	                    }
-	
-	                    public void onServiceDisconnected(ComponentName comp) {}
-	            }, 0);
+		} else if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
+				|| intent.getAction().equals("com.htc.music.metachanged")) {
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+
+						try {
+							if (s.isPlaying()) {
+								i.setAction(META_CHANGED);
+								i.putExtra("position", s.position());
+								i.putExtra("duration", s.duration());
+								i.putExtra("track", s.getTrackName());
+								i.putExtra("artist", s.getArtistName());
+								i.putExtra("album", s.getAlbumName());
+								handleIntent(i);
+							} else { // Media player was paused
+								mCurrentTrack = null;
+								NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+								nm.cancel(1338);
+								stopSelf();
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
 			} else {
-				//Clear the current track in case the user has disabled scrobbling of the media player
-				//during the middle of this track.
+				// Clear the current track in case the user has disabled
+				// scrobbling of the media player
+				// during the middle of this track.
 				mCurrentTrack = null;
 				stopIfReady();
 			}
 		} else {
 			handleIntent(i);
 		}
-    }
-    
-    public void handleIntent(Intent intent) {
-        if(intent.getAction().equals(META_CHANGED)) {
-        	long startTime = System.currentTimeMillis() / 1000;
-        	long position = intent.getLongExtra("position", 0) / 1000;
-        	if(position > 0) {
-        		startTime -= position;
-        	}
-        	
-        	String title = intent.getStringExtra("track");
-        	String artist = intent.getStringExtra("artist");
-        	
-        	if(mCurrentTrack != null) {
-        		long scrobblePoint = mCurrentTrack.duration / 2;
-        		if(scrobblePoint > 240000)
-        			scrobblePoint = 240000;
-        		if(startTime < (mCurrentTrack.startTime + scrobblePoint) 
-        				&& mCurrentTrack.title.equals(title)
-        				&& mCurrentTrack.artist.equals(artist)) {
-        			logger.warning("Ignoring duplicate scrobble");
-        			stopIfReady();
-        			return;
-        		}
-        		enqueueCurrentTrack();
-        	}
-        	mCurrentTrack = new ScrobblerQueueEntry();
-        	
-        	mCurrentTrack.startTime = startTime;
-        	mCurrentTrack.title = title;
-        	mCurrentTrack.artist = artist;
-        	mCurrentTrack.album = intent.getStringExtra("album");
-        	mCurrentTrack.duration = intent.getLongExtra("duration", 0);
-        	if(mCurrentTrack.title == null || mCurrentTrack.artist == null) {
-        		mCurrentTrack = null;
-        		stopIfReady();
-        		return;
-        	}
-        	String auth = intent.getStringExtra("trackAuth");
-			if(auth != null && auth.length() > 0) {
+	}
+
+	public void handleIntent(Intent intent) {
+		if (intent.getAction().equals(META_CHANGED)) {
+			long startTime = System.currentTimeMillis() / 1000;
+			long position = intent.getLongExtra("position", 0) / 1000;
+			if (position > 0) {
+				startTime -= position;
+			}
+
+			String title = intent.getStringExtra("track");
+			String artist = intent.getStringExtra("artist");
+
+			if (mCurrentTrack != null) {
+				long scrobblePoint = mCurrentTrack.duration / 2;
+				if (scrobblePoint > 240000)
+					scrobblePoint = 240000;
+				if (startTime < (mCurrentTrack.startTime + scrobblePoint) && mCurrentTrack.title.equals(title) && mCurrentTrack.artist.equals(artist)) {
+					logger.warning("Ignoring duplicate scrobble");
+					stopIfReady();
+					return;
+				}
+				enqueueCurrentTrack();
+			}
+			mCurrentTrack = new ScrobblerQueueEntry();
+
+			mCurrentTrack.startTime = startTime;
+			mCurrentTrack.title = title;
+			mCurrentTrack.artist = artist;
+			mCurrentTrack.album = intent.getStringExtra("album");
+			mCurrentTrack.duration = intent.getLongExtra("duration", 0);
+			if (mCurrentTrack.title == null || mCurrentTrack.artist == null) {
+				mCurrentTrack = null;
+				stopIfReady();
+				return;
+			}
+			String auth = intent.getStringExtra("trackAuth");
+			if (auth != null && auth.length() > 0) {
 				mCurrentTrack.trackAuth = auth;
 			}
 			boolean scrobbleRealtime = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_realtime", true);
-			if(scrobbleRealtime || auth != null) {
+			if (scrobbleRealtime || auth != null) {
 				ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 				NetworkInfo ni = cm.getActiveNetworkInfo();
 				if (ni != null) {
 					boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-					if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
+					if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
 						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
 						mNowPlayingTask.execute(mScrobbler);
 					}
 				}
 			}
 
-			if(auth == null) {
-				NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
+			if (auth == null) {
+				NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 				nm.cancel(1338);
 
-				Notification notification = new Notification(						
-						R.drawable.as_statusbar, 
-						getString(R.string.scrobbler_ticker_text, mCurrentTrack.title, mCurrentTrack.artist),
-						System.currentTimeMillis() );
+				Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.scrobbler_ticker_text, mCurrentTrack.title,
+						mCurrentTrack.artist), System.currentTimeMillis());
 				Intent metaIntent = new Intent(this, fm.last.android.activity.Metadata.class);
 				metaIntent.putExtra("artist", mCurrentTrack.artist);
 				metaIntent.putExtra("track", mCurrentTrack.title);
-				PendingIntent contentIntent = PendingIntent.getActivity( this, 0,
-						metaIntent, PendingIntent.FLAG_UPDATE_CURRENT );
+				PendingIntent contentIntent = PendingIntent.getActivity(this, 0, metaIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				String info = mCurrentTrack.title + " - " + mCurrentTrack.artist;
-				notification.setLatestEventInfo( this, getString(R.string.scrobbler_info_title),
-						info, contentIntent );
+				notification.setLatestEventInfo(this, getString(R.string.scrobbler_info_title), info, contentIntent);
 				notification.flags |= Notification.FLAG_ONGOING_EVENT;
-				nm.notify( 1338, notification );
+				nm.notify(1338, notification);
 			}
 		}
-		if(intent.getAction().equals(PLAYBACK_FINISHED) 
-				|| intent.getAction().equals("com.android.music.playbackcomplete") 
+		if (intent.getAction().equals(PLAYBACK_FINISHED) || intent.getAction().equals("com.android.music.playbackcomplete")
 				|| intent.getAction().equals("com.htc.music.playbackcomplete")) {
 			enqueueCurrentTrack();
-			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-			nm.cancel( 1338 );
+			NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			nm.cancel(1338);
 		}
-		if(intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
+		if (intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
 			mCurrentTrack = null;
-			NotificationManager nm = ( NotificationManager ) getSystemService( NOTIFICATION_SERVICE );
-			nm.cancel( 1338 );
+			NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+			nm.cancel(1338);
 		}
-		if(intent.getAction().equals(LOVE) && mCurrentTrack != null) {
+		if (intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
 			Toast.makeText(this, getString(R.string.scrobbler_trackloved), Toast.LENGTH_SHORT).show();
 		}
-		if(intent.getAction().equals(BAN) && mCurrentTrack != null) {
+		if (intent.getAction().equals(BAN) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "B";
-        	Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if(intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-			if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
-				stopSelf();
-			} else {
-				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-				NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-				if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
-					if(mCurrentTrack != null && !mCurrentTrack.postedNowPlaying && mNowPlayingTask == null) {
-						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-						mNowPlayingTask.execute(mScrobbler);
-					}
-			   		if(mQueue.size() > 0 && mSubmissionTask == null) {
-				   		mSubmissionTask = new SubmitTracksTask();
-				   		mSubmissionTask.execute(mScrobbler);
-			   		}
-				}
-			}
-		}
-		if(intent.getAction().equals("fm.last.android.scrobbler.FLUSH")) {
+		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH")) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-			if(!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
-		   		if(mQueue.size() > 0 && mSubmissionTask == null) {
-			   		mSubmissionTask = new SubmitTracksTask();
-			   		mSubmissionTask.execute(mScrobbler);
-		   		}
+			if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
+				if (mQueue.size() > 0 && mSubmissionTask == null) {
+					mSubmissionTask = new SubmitTracksTask();
+					mSubmissionTask.execute(mScrobbler);
+				}
 			}
 		}
 		stopIfReady();
-    }
-    
-    public void stopIfReady() {
-		if(mSubmissionTask == null && mNowPlayingTask == null)
+	}
+
+	public void stopIfReady() {
+		if (mSubmissionTask == null && mNowPlayingTask == null)
 			stopSelf();
-    }
-    
-    /* We don't currently offer any bindable functions.  Perhaps in the future we can add
-     * a function to get the queue size / last scrobbler result / etc.
-     */
+	}
+
+	/*
+	 * We don't currently offer any bindable functions. Perhaps in the future we
+	 * can add a function to get the queue size / last scrobbler result / etc.
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
+
 	private class NowPlayingTask extends UserTask<AudioscrobblerService, Void, Boolean> {
 		RadioTrack mTrack;
-		
+
 		public NowPlayingTask(RadioTrack track) {
 			mTrack = track;
 		}
@@ -482,21 +465,19 @@ public class ScrobblerService extends Service {
 		@Override
 		public void onPreExecute() {
 			/* If we have any scrobbles in the queue, try to send them now */
-	   		if(mSubmissionTask == null && mQueue.size() > 0) {
-		   		mSubmissionTask = new SubmitTracksTask();
-		   		mSubmissionTask.execute(mScrobbler);
-	   		}
+			if (mSubmissionTask == null && mQueue.size() > 0) {
+				mSubmissionTask = new SubmitTracksTask();
+				mSubmissionTask.execute(mScrobbler);
+			}
 		}
-		
+
+		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
-			try
-			{
+			try {
 				scrobbler[0].nowPlaying(mTrack);
 				success = true;
-			}
-			catch ( Exception e )
-			{
+			} catch (Exception e) {
 				success = false;
 			}
 			return success;
@@ -504,28 +485,28 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPostExecute(Boolean result) {
-			if(mCurrentTrack != null)
+			if (mCurrentTrack != null)
 				mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
-	   		stopIfReady();
+			stopIfReady();
 		}
 	}
 
 	private class SubmitTracksTask extends UserTask<AudioscrobblerService, Void, Boolean> {
 
+		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
-			try
-			{
+			try {
 				logger.info("Going to submit " + mQueue.size() + " tracks");
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				while(mQueue.size() > 0) {
+				while (mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
-					if(e != null && e.title != null && e.artist != null) {
-						if(e.rating.equals("L")) {
+					if (e != null && e.title != null && e.artist != null) {
+						if (e.rating.equals("L")) {
 							server.loveTrack(e.artist, e.title, mSession.getKey());
 						}
-						if(e.rating.equals("B")) {
+						if (e.rating.equals("B")) {
 							server.banTrack(e.artist, e.title, mSession.getKey());
 						}
 						scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
@@ -533,9 +514,7 @@ public class ScrobblerService extends Service {
 					mQueue.take();
 				}
 				success = true;
-			}
-			catch ( Exception e )
-			{
+			} catch (Exception e) {
 				logger.severe("Unable to submit track: " + e.toString());
 				e.printStackTrace();
 				success = false;

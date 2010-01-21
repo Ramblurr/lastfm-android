@@ -25,8 +25,8 @@ package fm.last.android.utils;
  * 
  * @author Lukasz Wisniewski
  */
-public interface ImageDownloaderListener extends DownloaderListener{
-	
+public interface ImageDownloaderListener extends DownloaderListener {
+
 	/**
 	 * Notifies on images total download progress
 	 * 

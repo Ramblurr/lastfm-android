@@ -20,21 +20,22 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
-import fm.last.api.Session;
-import fm.last.xml.XMLBuilder;
 import org.w3c.dom.Node;
 
+import fm.last.api.Session;
+import fm.last.xml.XMLBuilder;
+
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class SessionBuilder extends XMLBuilder<Session> {
 
-  public Session build(Node sessionNode) {
-    node = sessionNode;
-    String name = getText("name");
-    String key = getText("key");
-    String subscriber = getText("subscriber");
-    return new Session(name, key, subscriber);
-  }
+	@Override
+	public Session build(Node sessionNode) {
+		node = sessionNode;
+		String name = getText("name");
+		String key = getText("key");
+		String subscriber = getText("subscriber");
+		return new Session(name, key, subscriber);
+	}
 }

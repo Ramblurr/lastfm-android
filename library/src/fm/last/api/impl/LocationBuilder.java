@@ -39,7 +39,7 @@ public class LocationBuilder extends XMLBuilder<Location> {
 		String street = getText("street");
 		String postalcode = getText("postalcode");
 		String timezone = getText("timezone");
-		
+
 		GeoPointBuilder geoPointBuilder = new GeoPointBuilder();
 		Node geoPointNode = getChildNode("geo:point");
 		GeoPoint geoPoint = geoPointBuilder.build(geoPointNode);

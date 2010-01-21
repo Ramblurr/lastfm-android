@@ -20,67 +20,67 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
-import fm.last.api.User;
-import fm.last.api.ImageUrl;
-import fm.last.api.User.Gender;
-import fm.last.util.XMLUtil;
-import fm.last.xml.XMLBuilder;
-import org.w3c.dom.Node;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.w3c.dom.Node;
+
+import fm.last.api.ImageUrl;
+import fm.last.api.User;
+import fm.last.api.User.Gender;
+import fm.last.util.XMLUtil;
+import fm.last.xml.XMLBuilder;
+
 /**
- * @author jennings
- *         Date: Oct 20, 2008
+ * @author jennings Date: Oct 20, 2008
  */
 public class UserBuilder extends XMLBuilder<User> {
-  private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
-  
-  public User build(Node userNode) {
-    node = userNode;
-    String name = getText("name");
-    String realname = getText("realname");
-    String url = getText("url");    
-    String age = getText("age");    
-    String playcount = getText("playcount");
-    String subscriber = getText("subscriber");
-    
-    List<Node> imageNodes = getChildNodes("image");
-    if (imageNodes.size() > 1)
-    	imageNodes.remove( 0 ); //remove smallest size if there is one
-    ImageUrl[] images = new ImageUrl[imageNodes.size()];	    	    
-    int i = 0;
-    for (Node imageNode : imageNodes)
-  		images[i++] = imageBuilder.build(imageNode);
-    
-    // create locale for country
-    Locale countryLocale = null;
-    String country = getText("country");
-    if (country!=null && country.trim().length()>0) {
-    	countryLocale = new Locale("", country);
-    }
-    
-    // create date from UNIX time
-    Date registeredDate = null;
-    Node registered = getChildNode("registered");
-    if (registered!=null) {
-    	String date = XMLUtil.getNodeAttribute(registered, "unixtime");
-    	registeredDate = new Date(Long.parseLong(date)*1000);
-    }
-    
-    Gender genderEnum = Gender.UNKNOWN;
-    String gender = getText("gender");
-    if (gender!=null) {
-    	if (gender.equalsIgnoreCase("m")) {
-    		genderEnum = Gender.MALE;
-    	}
-    	else if (gender.equalsIgnoreCase("f")) {
-    		genderEnum = Gender.FEMALE;
-    	}
-    }
-    
-    return new User(name, realname, url, images, countryLocale, age, genderEnum, playcount, subscriber, registeredDate);
-  }  
+	private ImageUrlBuilder imageBuilder = new ImageUrlBuilder();
+
+	@Override
+	public User build(Node userNode) {
+		node = userNode;
+		String name = getText("name");
+		String realname = getText("realname");
+		String url = getText("url");
+		String age = getText("age");
+		String playcount = getText("playcount");
+		String subscriber = getText("subscriber");
+
+		List<Node> imageNodes = getChildNodes("image");
+		if (imageNodes.size() > 1)
+			imageNodes.remove(0); // remove smallest size if there is one
+		ImageUrl[] images = new ImageUrl[imageNodes.size()];
+		int i = 0;
+		for (Node imageNode : imageNodes)
+			images[i++] = imageBuilder.build(imageNode);
+
+		// create locale for country
+		Locale countryLocale = null;
+		String country = getText("country");
+		if (country != null && country.trim().length() > 0) {
+			countryLocale = new Locale("", country);
+		}
+
+		// create date from UNIX time
+		Date registeredDate = null;
+		Node registered = getChildNode("registered");
+		if (registered != null) {
+			String date = XMLUtil.getNodeAttribute(registered, "unixtime");
+			registeredDate = new Date(Long.parseLong(date) * 1000);
+		}
+
+		Gender genderEnum = Gender.UNKNOWN;
+		String gender = getText("gender");
+		if (gender != null) {
+			if (gender.equalsIgnoreCase("m")) {
+				genderEnum = Gender.MALE;
+			} else if (gender.equalsIgnoreCase("f")) {
+				genderEnum = Gender.FEMALE;
+			}
+		}
+
+		return new User(name, realname, url, images, countryLocale, age, genderEnum, playcount, subscriber, registeredDate);
+	}
 }

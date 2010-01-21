@@ -20,22 +20,30 @@
  ***************************************************************************/
 package fm.last.util;
 
-import java.io.*;
-import java.util.Map;
-import java.util.HashMap;
-import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
-import android.util.Log;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 /**
  * A collection of utility methods to manipulate URLs.
- *
+ * 
  * @author Mike Jennings
  */
 public class UrlUtil {
@@ -43,19 +51,18 @@ public class UrlUtil {
 
 	private UrlUtil() {
 	}
-	
+
 	public static String useragent;
 
 	/** mainly sets the User-Agent we need */
-	private static void setUserAgent( HttpURLConnection conn )
-	{
+	private static void setUserAgent(HttpURLConnection conn) {
 		if (useragent != null)
-			conn.setRequestProperty("User-Agent", useragent );
+			conn.setRequestProperty("User-Agent", useragent);
 	}
-	
+
 	public static URL getRedirectedUrl(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setInstanceFollowRedirects(false);
 		int rc = conn.getResponseCode();
@@ -108,7 +115,7 @@ public class UrlUtil {
 
 	public static String doPost(URL url, InputStream stuffToPost, String contentType) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		if (contentType != null) {
@@ -119,7 +126,7 @@ public class UrlUtil {
 			ostr = conn.getOutputStream();
 			copy(stuffToPost, ostr);
 		} finally {
-			if( ostr != null )
+			if (ostr != null)
 				ostr.close();
 		}
 
@@ -132,8 +139,7 @@ public class UrlUtil {
 				contentStream = conn.getErrorStream();
 			else if (rc != 200) {
 				throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
-			}
-			else
+			} else
 				contentStream = conn.getInputStream();
 			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
 			String response = toString(reader);
@@ -143,16 +149,16 @@ public class UrlUtil {
 				reader.close();
 			}
 
-			//Dispatch any queued Analytics data while we've got the network open
+			// Dispatch any queued Analytics data while we've got the network
+			// open
 			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
 			tracker.dispatch();
 		}
 	}
 
-
 	public static String doGet(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
@@ -169,9 +175,9 @@ public class UrlUtil {
 		}
 	}
 
-
 	/**
 	 * Do a GET request and retrieve up to maxBytes bytes
+	 * 
 	 * @param url
 	 * @param maxBytes
 	 * @return
@@ -179,7 +185,7 @@ public class UrlUtil {
 	 */
 	public static byte[] doGetAndReturnBytes(URL url, int maxBytes) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		InputStream istr = null;
 		try {
@@ -190,14 +196,13 @@ public class UrlUtil {
 			istr = new BufferedInputStream(conn.getInputStream(), 512);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			copy(istr, baos, maxBytes);
-			return baos.toByteArray();      
+			return baos.toByteArray();
 		} finally {
 			if (istr != null) {
 				istr.close();
 			}
 		}
 	}
-
 
 	private static String buildUrl(String baseurl, Map<String, String> params) throws IOException {
 		if (params.isEmpty()) {
@@ -231,20 +236,18 @@ public class UrlUtil {
 	}
 
 	private static String escape(String s) {
-		try
-		{
-			return URLEncoder.encode(s, "UTF-8" );
-		} catch( UnsupportedEncodingException e )
-		{
-			Log.e( "UrlUtil", "Cannot find UTF-8 encoding - this is not very likely!");
+		try {
+			return URLEncoder.encode(s, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			Log.e("UrlUtil", "Cannot find UTF-8 encoding - this is not very likely!");
 			return s;
 		}
-		
+
 	}
 
 	public static String getXML(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
@@ -259,7 +262,7 @@ public class UrlUtil {
 
 	public static Bitmap getImage(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		setUserAgent( conn );
+		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		return BitmapFactory.decodeStream(conn.getInputStream());
 	}
@@ -267,7 +270,7 @@ public class UrlUtil {
 	private static String toString(BufferedReader reader) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		String line;
-		while ( (line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			sb.append(line).append('\n');
 		}
 		return sb.toString();
@@ -277,19 +280,18 @@ public class UrlUtil {
 	private static String readString(BufferedReader reader) throws IOException {
 		String line;
 		StringBuilder sb = new StringBuilder();
-		while ( (line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			sb.append(line);
 		}
 		return sb.toString();
 	}
-
 
 	@SuppressWarnings("unused")
 	private static Map<String, String> getParams(BufferedReader reader) throws IOException {
 		Map<String, String> params = new HashMap<String, String>();
 		String line;
 		int eq;
-		while ( (line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			eq = line.indexOf('=');
 			if (eq > 0) {
 				String key = line.substring(0, eq);
@@ -301,4 +303,3 @@ public class UrlUtil {
 	}
 
 }
-

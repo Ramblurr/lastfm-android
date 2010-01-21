@@ -27,11 +27,11 @@ import fm.last.api.LastFmServer;
  */
 public class XmlRpcLastfmServerFactory {
 
-  private XmlRpcLastfmServerFactory() {
-  }
+	private XmlRpcLastfmServerFactory() {
+	}
 
-  public static LastFmServer getServer(String baseurl, String api_key, String api_secret) {
-    return new LastFmServerImpl(baseurl, api_key, api_secret);
-  }
+	public static LastFmServer getServer(String baseurl, String api_key, String api_secret) {
+		return new LastFmServerImpl(baseurl, api_key, api_secret);
+	}
 
 }
