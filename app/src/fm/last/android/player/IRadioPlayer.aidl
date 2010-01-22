@@ -38,6 +38,7 @@ interface IRadioPlayer {
 	String getTrackName();
 	String getArtUrl();
 	long   getDuration();
+	boolean getLoved();
 	long   getPosition();
 	int	   getBufferPercent();
 	

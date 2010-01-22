@@ -45,6 +45,16 @@
 			       android:background="@null"
 			       android:visibility="gone"/>
 
+			   <ImageButton 
+                   android:id="@+id/loved" 
+                   android:src="@drawable/loved" 
+                   android:layout_height="wrap_content"
+			       android:layout_width="wrap_content"
+			       android:layout_below="@id/AdArea"
+			       android:layout_alignParentLeft="true"
+			       android:background="@null"
+				   android:visibility="gone"/>
+
 				<TableLayout android:id="@+id/track_metadata"
 					android:layout_height="wrap_content"
 					android:layout_width="fill_parent"
