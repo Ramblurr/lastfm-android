@@ -46,6 +46,10 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 					if (event.getAction() == KeyEvent.ACTION_DOWN) {
 
 						switch (keycode) {
+						case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+							// ignore previous button as accepting it would start the built-in player
+							abortBroadcast();
+							return;
 						case KeyEvent.KEYCODE_MEDIA_NEXT:
 							Log.i(TAG, "Next-Button => Skipping '" + player.getTrackName() + "'");
 							player.skip();
