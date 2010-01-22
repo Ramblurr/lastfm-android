@@ -520,8 +520,6 @@ public class Player extends Activity {
 	
 								});
 								mIsLovedButton.startAnimation(a);
-							} else {
-								android.util.Log.e("LOVEDCHECK", "WTF-NO");
 							}
 
 							if (!mArtistName.getText().equals(artistName)
