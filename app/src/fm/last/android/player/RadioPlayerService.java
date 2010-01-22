@@ -772,6 +772,7 @@ public class RadioPlayerService extends Service {
 			i.putExtra("track", currentTrack.getTitle());
 			i.putExtra("duration", (long) currentTrack.getDuration());
 			i.putExtra("trackAuth", currentTrack.getTrackAuth());
+			i.putExtra("loved", currentTrack.getLoved());
 		}
 		if (what.equals(PLAYBACK_ERROR) && mError != null) {
 			i.putExtra("error", (Parcelable) mError);
@@ -906,6 +907,10 @@ public class RadioPlayerService extends Service {
 				return UNKNOWN;
 		}
 
+		public boolean getLoved() throws RemoteException {
+			return currentTrack != null ? currentTrack.getLoved() : false;
+		}
+		
 		public String getArtistName() throws RemoteException {
 
 			if (currentTrack != null)

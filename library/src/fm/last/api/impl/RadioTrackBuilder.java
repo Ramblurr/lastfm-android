@@ -41,12 +41,17 @@ public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
 		String creator = getText("creator");
 		String duration = getText("duration");
 		String image = getText("image");
+
+		String lovedStr = findNamedElementNode(getChildNode("extension"), "loved").getFirstChild().getNodeValue();
+		// probably don't need the IgnoreCase but just in case digits have case in the future...
+		Boolean loved = lovedStr.equalsIgnoreCase("1");
+		
 		String auth = "";
 		Node extensionNode = XMLUtil.findNamedElementNode(node, "extension");
 		if (extensionNode != null) {
 			Node authNode = XMLUtil.findNamedElementNode(extensionNode, "trackauth");
 			auth = authNode.getFirstChild().getNodeValue();
 		}
-		return new RadioTrack(location, title, identifier, album, creator, duration, image, auth);
+		return new RadioTrack(location, title, identifier, album, creator, duration, image, auth, loved);
 	}
 }
