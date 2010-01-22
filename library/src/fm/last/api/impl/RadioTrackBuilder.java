@@ -42,7 +42,7 @@ public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
 		String duration = getText("duration");
 		String image = getText("image");
 
-		String lovedStr = findNamedElementNode(getChildNode("extension"), "loved").getFirstChild().getNodeValue();
+		String lovedStr = XMLUtil.findNamedElementNode(getChildNode("extension"), "loved").getFirstChild().getNodeValue();
 		// probably don't need the IgnoreCase but just in case digits have case in the future...
 		Boolean loved = lovedStr.equalsIgnoreCase("1");
 		
