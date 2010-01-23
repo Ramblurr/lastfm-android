@@ -6,26 +6,12 @@
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<uses-permission android:name="android.permission.READ_LOGS" />
-	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
-
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.READ_OWNER_DATA" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.VIBRATE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
 	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
 	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
-
-	<!--
-		For EAS purposes; could be removed when EAS has a permanent home
-	-->
-	<uses-permission android:name="android.permission.WRITE_CONTACTS" />
-
 
 	<supports-screens android:smallScreens="true"
 		android:normalScreens="true" android:largeScreens="true"
