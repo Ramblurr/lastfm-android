@@ -59,10 +59,9 @@ public class LastFMApplication extends Application {
 	private Context mCtx;
 	public GoogleAnalyticsTracker tracker;
 
-	private static LastFMApplication instance;
+	private static LastFMApplication instance = null;
 
 	public static LastFMApplication getInstance() {
-
 		return instance;
 	}
 

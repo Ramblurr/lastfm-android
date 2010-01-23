@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">Last.fm</string>
+	<string name="ACCOUNT_TYPE">fm.last.android.account</string>
 	
 	<!-- all actions not specific to an activity -->
 	<string name="action_viewinfo">View Info</string>
@@ -78,7 +79,7 @@
 	<string name="prefs_noisy_title">Headset interruption</string>
 	<string name="prefs_noisy_summary">Stops music playback when headset is disconnected</string>
 	<string name="prefs_discovery_title">Discovery mode</string>
-	<string name="prefs_discovery_summary">Only play songs you've never heard before</string>
+	<string name="prefs_discovery_summary">Only play songs you\'ve never heard before</string>
 	
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>

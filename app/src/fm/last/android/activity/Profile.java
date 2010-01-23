@@ -926,7 +926,7 @@ public class Profile extends ListActivity {
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
-				Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
+				Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), "true", 10);
 				if (recenttracks.length == 0)
 					return null;
 

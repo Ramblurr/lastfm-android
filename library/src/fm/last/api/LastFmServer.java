@@ -141,11 +141,12 @@ public interface LastFmServer {
 	 * See http://www.lastfm.pl/api/show?service=278
 	 * 
 	 * @param user
+	 * @param nowPlaying
 	 * @param limit
 	 * @return An array of tracks
 	 * @throws IOException
 	 */
-	public Track[] getUserRecentTracks(String user, int limit) throws IOException;
+	public Track[] getUserRecentTracks(String user, String nowPlaying, int limit) throws IOException;
 
 	/**
 	 * See http://www.lastfm.pl/api/show?service=320

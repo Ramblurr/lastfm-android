@@ -22,6 +22,9 @@ package fm.last.android;
 
 import java.net.URL;
 
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorResponse;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -89,6 +92,20 @@ public class LastFm extends Activity {
 					resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 					setResult(RESULT_OK, resultValue);
 					RadioWidgetProvider.updateAppWidget(this);
+				}
+			} else if (getIntent().getAction() != null && getIntent().getAction().equals("fm.last.android.sync.LOGIN")) {
+				Intent intent = getIntent();
+				Bundle extras = intent.getExtras();
+				if (extras != null) {
+					Account account = new Account(user, getString(R.string.ACCOUNT_TYPE));
+					AccountAuthenticatorResponse response = extras.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+					AccountManager am = AccountManager.get(this);
+					if (am.addAccountExplicitly(account, session_key, null)) {
+						Bundle result = new Bundle();
+						result.putString(AccountManager.KEY_ACCOUNT_NAME, user);
+						result.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.ACCOUNT_TYPE));
+						response.onResult(result);
+					}
 				}
 			} else {
 				Intent intent = getIntent();
@@ -231,6 +248,7 @@ public class LastFm extends Activity {
 
 		@Override
 		public void onPostExecute(Session session) {
+			boolean accountCreated = false;
 			mLoginButton.setEnabled(true);
 			mLoginTask = null;
 
@@ -243,6 +261,10 @@ public class LastFm extends Activity {
 
 				LastFMApplication.getInstance().session = session;
 
+				Account account = new Account(session.getName(), getString(R.string.ACCOUNT_TYPE));
+				AccountManager am = AccountManager.get(LastFm.this);
+				accountCreated = am.addAccountExplicitly(account, session.getKey(), null);
+				
 				if (getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 					Intent intent = getIntent();
 					Bundle extras = intent.getExtras();
@@ -252,6 +274,19 @@ public class LastFm extends Activity {
 						resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 						setResult(RESULT_OK, resultValue);
 						RadioWidgetProvider.updateAppWidget(LastFm.this);
+					}
+				} else if (getIntent().getAction() != null && getIntent().getAction().equals("fm.last.android.sync.LOGIN")) {
+					Intent intent = getIntent();
+					Bundle extras = intent.getExtras();
+					if (extras != null) {
+						if (accountCreated) {
+							AccountAuthenticatorResponse response = extras.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+							Bundle result = new Bundle();
+							result.putString(AccountManager.KEY_ACCOUNT_NAME, session.getName());
+							result.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.ACCOUNT_TYPE));
+							response.onResult(result);
+						}
+						finish();
 					}
 				} else {
 					Intent intent = new Intent(LastFm.this, Profile.class);
