@@ -172,6 +172,8 @@ public class ContactsSyncAdapterService extends Service {
 				if (!localContacts.containsKey(user.getName())) {
 					if (user.getRealName().length() > 0)
 						addContact(account, user.getRealName(), user.getName());
+					else
+						addContact(account, user.getName(), user.getName());
 				} else {
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
 					if (tracks.length > 0) {
