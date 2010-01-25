@@ -8,6 +8,13 @@
             android:key="scrobble"
             android:defaultValue="true"
             android:summary="@string/prefs_scrobble_summary" android:title="@string/prefs_scrobble_title"/>
+	
+	<fm.last.android.activity.SeekBarPreference
+            android:key="scrobble_percentage"
+			android:max="100"
+			android:defaultValue="50"
+			android:dialogMessage="@strings/prefs_scrobble_perc_title"
+            android:summary="@string/prefs_scrobble_percentage" android:title="@string/prefs_scrobble_perc_title"/>
 
     <CheckBoxPreference
             android:key="scrobble_music_player"
