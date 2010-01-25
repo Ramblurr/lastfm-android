@@ -57,28 +57,28 @@ import fm.last.api.Session;
 
 /**
  * A Last.fm scrobbler for Android
- * 
+ *
  * @author Sam Steele <sam@last.fm>
- * 
+ *
  *         This is a scrobbler that can scrobble both our radio player as well
  *         as the built-in media player and other 3rd party apps that broadcast
  *         fm.last.android.metachanged notifications. We can't rely on
  *         com.android.music.metachanged due to a bug in the built-in media
  *         player that does not broadcast this notification when playing the
  *         first track, only when starting the next track.
- * 
+ *
  *         Scrobbles and Now Playing data are serialized between launches, and
  *         will be sent when the track or network state changes. This service
  *         has a very short lifetime and is only started for a few seconds at a
  *         time when there's work to be done. This server is started when music
  *         state or network state change.
- * 
+ *
  *         Scrobbles are submitted to the server after Now Playing info is sent,
  *         or when a network connection becomes available.
- * 
+ *
  *         Sample code for a 3rd party to integrate with us is located at
  *         http://wiki.github.com/c99koder/lastfm-android/scrobbler-interface
- * 
+ *
  */
 public class ScrobblerService extends Service {
 	private Session mSession;
