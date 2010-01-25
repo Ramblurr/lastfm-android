@@ -3,7 +3,8 @@
  * 
  * http://www.apache.org/licenses/LICENSE-2.0
  */
-package com.hlidskialf.android.preference;
+
+package fm.last.android.activity;
 
 import android.content.Context;
 import android.util.AttributeSet;
