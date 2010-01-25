@@ -235,7 +235,12 @@ public class ScrobblerService extends Service {
 	public void enqueueCurrentTrack() {
 		if (mCurrentTrack != null) {
 			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
-			boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
+
+			int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
+			int track_duration = mCurrentTrack.duration / 1000;
+			scrobble_perc = track_duration * (scrobble_perc * 0.01);
+
+			boolean played = (playTime > (mCurrentTrack.duration / scrobble_perc)) || (playTime > 240);
 			if (!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
 				mCurrentTrack.rating = "S";
 			}
