@@ -13,8 +13,8 @@
 			android:key="scrobble_percentage"
 			android:max="100"
 			android:defaultValue="50"
-			android:dialogMessage="@strings/prefs_scrobble_perc_title"
-			android:summary="@string/prefs_scrobble_percentage" android:title="@string/prefs_scrobble_perc_title"/>
+			android:dialogMessage="@string/prefs_scrobble_perc_title"
+			android:title="@string/prefs_scrobble_perc_title"/>
 
 		<CheckBoxPreference
 			android:key="scrobble_music_player"

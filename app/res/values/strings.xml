@@ -61,7 +61,7 @@
 	<string name="prefs_label">Last.fm: Preferences</string>
 	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
 	<string name="prefs_scrobble_title">Enable Scrobbling</string>
-	<string name="prefs_scrobble_percentage">Set the percentage of a track's playtime required to scrobble.</string>
+	<string name="prefs_scrobble_percentage">Set the percentage of a track\'s playtime required to scrobble.</string>
 	<string name="prefs_scrobble_perc_title">Scrobble Percentage</string>
 	<string name="prefs_scrobble_summary">Update your Last.fm profile as you listen to music</string>
 	<string name="prefs_scrobble_music_player_title">Scrobble Android player</string>

@@ -237,10 +237,10 @@ public class ScrobblerService extends Service {
 			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
 
 			int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
-			int track_duration = mCurrentTrack.duration / 1000;
-			scrobble_perc = track_duration * (scrobble_perc * 0.01);
+			int track_duration = (int) (mCurrentTrack.duration / 1000);
 
-			boolean played = (playTime > (mCurrentTrack.duration / scrobble_perc)) || (playTime > 240);
+			scrobble_perc = (int)(track_duration * (scrobble_perc * 0.01));
+			boolean played = (playTime > scrobble_perc) || (playTime > 240);
 			if (!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
 				mCurrentTrack.rating = "S";
 			}
@@ -358,7 +358,9 @@ public class ScrobblerService extends Service {
 			String artist = intent.getStringExtra("artist");
 
 			if (mCurrentTrack != null) {
-				long scrobblePoint = mCurrentTrack.duration / 2;
+				int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
+				long scrobblePoint = mCurrentTrack.duration * (scrobble_perc / 100);
+
 				if (scrobblePoint > 240000)
 					scrobblePoint = 240000;
 				if (startTime < (mCurrentTrack.startTime + scrobblePoint) && mCurrentTrack.title.equals(title) && mCurrentTrack.artist.equals(artist)) {
