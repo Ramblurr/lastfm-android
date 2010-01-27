@@ -13,6 +13,7 @@
 			android:key="scrobble_percentage"
 			android:max="100"
 			android:defaultValue="50"
+			android:summary="@string/prefs_scrobble_percentage"
 			android:dialogMessage="@string/prefs_scrobble_perc_title"
 			android:title="@string/prefs_scrobble_perc_title"/>
 
