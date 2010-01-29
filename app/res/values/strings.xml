@@ -2,7 +2,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 	<string name="app_name">Last.fm</string>
 	<string name="ACCOUNT_TYPE">fm.last.android.account</string>
-	
+
 	<!-- all actions not specific to an activity -->
 	<string name="action_viewinfo">View Info</string>
 	<string name="action_logout">Logout</string>
@@ -17,28 +17,28 @@
     <string name="action_tag">Tag</string>
     <string name="action_love">Love Track</string>
     <string name="action_ban">Ban Track</string>
-    
+
 	<!-- LastFm main activity -->
 	<string name="main_username">Username</string>
 	<string name="main_password">Password</string>
 	<string name="main_login">Log in</string>
 	<string name="main_signup">Sign up</string>
-	<string name="main_newaccount">&quot;Haven't got an account yet?&quot;</string>
+	<string name="main_newaccount">&quot;Haven\'t got an account yet?&quot;</string>
 	<string name="main_authenticating">Authenticating</string>
 	<string name="main_forgotpassword">Forgot Password</string>
-	
+
 	<!-- notification for new version -->
 	<string name="newversion_ticker_text">A new version of Last.fm is available</string>
 	<string name="newversion_info_title">New version available</string>
 	<string name="newversion_info_text">Click here to download the update</string>
-	
+
 	<!-- SignUp activity -->
 	<string name="signup_label">Last.fm: Sign Up</string>
 	<string name="signup_create_account">Create Account</string>
 	<string name="signup_username">Username</string>
 	<string name="signup_password">Password</string>
 	<string name="signup_email">Your email</string>
-	
+
 	<!-- AddToPlaylist activity -->
 	<string name="addtoplaylist_label">Last.fm: Add To Playlist</string>
 	<string name="addtoplaylist_newplaylist">New Playlist</string>
@@ -47,7 +47,7 @@
 	<string name="addtoplaylist_creating_error">An error occurred while creating the playlist. Please try again.</string>
 	<string name="addtoplaylist_adding_error">An error occured while adding track to playlist. Please try again.</string>
 	<string name="addtoplaylist_noplaylists">No Playlists</string>
-	
+
 	<!-- Tag activity -->
 	<string name="tag_label">Last.fm: Tag</string>
 	<string name="tagarea_hint">Enter a tag above,\nor choose one from below</string>
@@ -57,11 +57,13 @@
 	<string name="tag_loading">Loading tags</string>
 	<string name="tag_saving">Saving tags</string>
 	<string name="tag_add">Add</string>
-	
+
 	<!-- Preferences activity -->
 	<string name="prefs_label">Last.fm: Preferences</string>
 	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
 	<string name="prefs_scrobble_title">Enable Scrobbling</string>
+	<string name="prefs_scrobble_percentage">Set the percentage of a track\'s playtime required to scrobble.</string>
+	<string name="prefs_scrobble_perc_title">Scrobble Percentage</string>
 	<string name="prefs_scrobble_summary">Update your Last.fm profile as you listen to music</string>
 	<string name="prefs_scrobble_music_player_title">Scrobble Android player</string>
 	<string name="prefs_scrobble_music_player_summary">Scrobble the built-in Android music player</string>
@@ -80,14 +82,14 @@
 	<string name="prefs_noisy_summary">Stops music playback when headset is disconnected</string>
 	<string name="prefs_discovery_title">Discovery mode</string>
 	<string name="prefs_discovery_summary">Only play songs you\'ve never heard before</string>
-	
+
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
-	
+
 	<!-- Profile activity -->
 	<string name="profile_label">Last.fm: Profile</string>
 	<string name="profile_myradio">Radio</string>
-    <string name="profile_userradio">%s\'s Radio</string>	
+    <string name="profile_userradio">%s\'s Radio</string>
 	<string name="profile_myprofile">Profile</string>
 	<string name="profile_userprofile">%s\'s Profile</string>
 	<string name="profile_tracksplayed">plays</string>
@@ -105,7 +107,7 @@
     <string name="profile_userlibrary">%s\'s Library</string>
     <string name="profile_userstations">%s\'s Stations</string>
     <string name="profile_userplaylists">%s\'s Playlists</string>
-    <string name="profile_myplaylists">Your Playlists</string>		
+    <string name="profile_myplaylists">Your Playlists</string>
 	<string name="profile_topartists">Top Artists</string>
 	<string name="profile_notopartists">No Top Artists</string>
 	<string name="profile_topalbums">Top Albums</string>
@@ -125,7 +127,7 @@
 	<string name="profile_loading">Loading Profile...</string>
 	<string name="profile_gender_male">male</string>
 	<string name="profile_gender_female">female</string>
-	
+
 	<!-- Share activity -->
 	<string name="share_label">Last.fm: Share With A Friend</string>
 	<string name="share_trackshared">The track was shared.</string>
@@ -133,7 +135,7 @@
 	<string name="share_nofriends">No Friends :(</string>
 	<string name="share_selectapplication">Share track using:</string>
 	<string name="share_friendslist">Friends List</string>
-	
+
 	<!-- Metadata activity -->
 	<string name="metadata_label">Last.fm: Info</string>
 	<string name="metadata_bio">Bio</string>
@@ -148,7 +150,7 @@
 	<string name="metadata_nofans">No Top Listeners</string>
 	<string name="metadata_plays">plays</string>
 	<string name="metadata_listeners">listeners</string>
-	
+
 	<!-- NewStation activity -->
 	<string name="newstation_label">Last.fm: Create a New Station</string>
 	<string name="newstation_search">Search</string>
@@ -160,7 +162,7 @@
 	<string name="newstation_user">User</string>
 	<string name="newstation_edithint_artist">eg. Nirvana</string>
 	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
-	<string name="newstation_edithint_tag">eg. Rock</string>	
+	<string name="newstation_edithint_tag">eg. Rock</string>
 	<string name="newstation_hint_tag">Type in a tag to get started.</string>
 	<string name="newstation_edithint_user">eg. Last.hq</string>
 	<string name="newstation_hint_user">Type in a username\n to get started.</string>
@@ -175,12 +177,12 @@
 	<string name="event_attending">I\'m attending</string>
 	<string name="event_notattending">I\'m not attending</string>
 	<string name="event_maybe">I might attend</string>
-	
+
 	<!-- Player activity -->
 	<string name="player_label">Last.fm: Player</string>
 	<string name="player_tuning">Tuning</string>
 	<string name="player_buffering">Buffering</string>
-	
+
 	<!-- RadioPlayer service -->
 	<string name="playerservice_label">Last.fm: Radio Player</string>
     <string name="playerservice_error_ticker_text">An error occured during playback</string>
@@ -190,20 +192,20 @@
     <string name="playerservice_streaming_ticker_text">Streaming: %s by %s</string>
     <string name="playerservice_tuning">Tuning to station</string>
     <string name="playerservice_tuningwithstation">Tuning: %s</string>
-    
+
     <!-- Scrobbler service -->
     <string name="scrobbler_label">Last.fm: Scrobbler</string>
     <string name="scrobbler_ticker_text">Scrobbling: %s by %s</string>
     <string name="scrobbler_info_title">Now Scrobbling</string>
     <string name="scrobbler_trackloved">The track was marked as Loved.</string>
-    <string name="scrobbler_trackbanned">The track was marked as Banned.</string>  
+    <string name="scrobbler_trackbanned">The track was marked as Banned.</string>
 
 	<string name="durationformat">
 		<xliff:g id="format">%2$d:%5$02d</xliff:g>
 	</string>
-	
+
 	<!-- some strings common to different activities -->
-	<string name="common_loading">Loading...</string>	
+	<string name="common_loading">Loading...</string>
 	<string name="common_cancel">Cancel</string>
 	<string name="common_ok">OK</string>
 	<string name="common_save">Save</string>
@@ -215,8 +217,8 @@
 	<string name="ERROR_INSUFFICIENT_CONTENT_TITLE">Insufficient Content</string>
 	<string name="ERROR_INSUFFICIENT_FANS">There are not enough fans of this artist to play this station.  Please try another artist.</string>
 	<string name="ERROR_INSUFFICIENT_MEMBERS">There are not enough members in this group to play this station.  Please try another group.</string>
-	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Your musical neighborhood hasn't been calculated yet.  Try listening to more music and try again in a few days.&quot;</string>
-	<string name="ERROR_MISSINGINFO">&quot;You must have a valid Last.fm username and password.  If you don't have an account, click the Sign Up button.&quot;</string>
+	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Your musical neighborhood hasn\'t been calculated yet.  Try listening to more music and try again in a few days.&quot;</string>
+	<string name="ERROR_MISSINGINFO">&quot;You must have a valid Last.fm username and password.  If you don\'t have an account, click the Sign Up button.&quot;</string>
 	<string name="ERROR_MISSINGINFO_TITLE">Missing Information</string>
 	<string name="ERROR_NONETWORK">This feature requires a connection to the internet.  Please connect to the internet and try again.</string>
 	<string name="ERROR_NONETWORK_TITLE">No Network Connection</string>
@@ -233,7 +235,7 @@
 	<string name="ERROR_NOSUCHUSER">Unable to find a user with this username.  Please check the spelling and try again</string>
 	<string name="ERROR_NOSUCHUSER_TITLE">User Not Found</string>
 	<string name="ERROR_UPGRADE">An upgrade is required to continue using this software.  Please upgrade your software and try again.</string>
-	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>	
+	<string name="ERROR_UPGRADE_TITLE">Upgrade Required</string>
 	<string name="ERROR_SIGNUP_TITLE">Could not signup</string>
 	<string name="ERROR_AMAZON">The Amazon MP3 store is not currently available on this device.</string>
 	<string name="ERROR_AMAZON_TITLE">Amazon Unavailable</string>

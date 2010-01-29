@@ -57,28 +57,28 @@ import fm.last.api.Session;
 
 /**
  * A Last.fm scrobbler for Android
- * 
+ *
  * @author Sam Steele <sam@last.fm>
- * 
+ *
  *         This is a scrobbler that can scrobble both our radio player as well
  *         as the built-in media player and other 3rd party apps that broadcast
  *         fm.last.android.metachanged notifications. We can't rely on
  *         com.android.music.metachanged due to a bug in the built-in media
  *         player that does not broadcast this notification when playing the
  *         first track, only when starting the next track.
- * 
+ *
  *         Scrobbles and Now Playing data are serialized between launches, and
  *         will be sent when the track or network state changes. This service
  *         has a very short lifetime and is only started for a few seconds at a
  *         time when there's work to be done. This server is started when music
  *         state or network state change.
- * 
+ *
  *         Scrobbles are submitted to the server after Now Playing info is sent,
  *         or when a network connection becomes available.
- * 
+ *
  *         Sample code for a 3rd party to integrate with us is located at
  *         http://wiki.github.com/c99koder/lastfm-android/scrobbler-interface
- * 
+ *
  */
 public class ScrobblerService extends Service {
 	private Session mSession;
@@ -235,7 +235,12 @@ public class ScrobblerService extends Service {
 	public void enqueueCurrentTrack() {
 		if (mCurrentTrack != null) {
 			long playTime = (System.currentTimeMillis() / 1000) - mCurrentTrack.startTime;
-			boolean played = (playTime > (mCurrentTrack.duration / 2000)) || (playTime > 240);
+
+			int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
+			int track_duration = (int) (mCurrentTrack.duration / 1000);
+
+			scrobble_perc = (int)(track_duration * (scrobble_perc * 0.01));
+			boolean played = (playTime > scrobble_perc) || (playTime > 240);
 			if (!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
 				mCurrentTrack.rating = "S";
 			}
@@ -353,7 +358,9 @@ public class ScrobblerService extends Service {
 			String artist = intent.getStringExtra("artist");
 
 			if (mCurrentTrack != null) {
-				long scrobblePoint = mCurrentTrack.duration / 2;
+				int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
+				long scrobblePoint = mCurrentTrack.duration * (scrobble_perc / 100);
+
 				if (scrobblePoint > 240000)
 					scrobblePoint = 240000;
 				if (startTime < (mCurrentTrack.startTime + scrobblePoint) && mCurrentTrack.title.equals(title) && mCurrentTrack.artist.equals(artist)) {
