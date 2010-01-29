@@ -41,6 +41,7 @@
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
+				<data android:mimeType="vnd.android.cursor.item/vnd.fm.last.android.profile" />
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.NewStation" android:label="@string/newstation_label"

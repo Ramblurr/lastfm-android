@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -154,7 +155,16 @@ public class Profile extends ListActivity {
 		Session session = LastFMApplication.getInstance().session;
 		if (session == null)
 			logout();
-		mUsername = getIntent().getStringExtra("lastfm.profile.username");
+		
+		if(getIntent().getData() != null) {
+			Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
+			if(cursor.moveToNext()) {
+				mUsername = cursor.getString(cursor.getColumnIndex("DATA1"));
+			}
+		} else {
+			mUsername = getIntent().getStringExtra("lastfm.profile.username");
+		}
+		
 		if (mUsername == null) {
 			mUsername = session.getName();
 			isAuthenticatedUser = true;
