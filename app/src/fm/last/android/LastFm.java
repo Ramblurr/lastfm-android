@@ -22,9 +22,6 @@ package fm.last.android;
 
 import java.net.URL;
 
-import android.accounts.Account;
-import android.accounts.AccountAuthenticatorResponse;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -47,6 +44,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
+import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
@@ -97,14 +95,10 @@ public class LastFm extends Activity {
 				Intent intent = getIntent();
 				Bundle extras = intent.getExtras();
 				if (extras != null) {
-					Account account = new Account(user, getString(R.string.ACCOUNT_TYPE));
-					AccountAuthenticatorResponse response = extras.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
-					AccountManager am = AccountManager.get(this);
-					if (am.addAccountExplicitly(account, session_key, null)) {
-						Bundle result = new Bundle();
-						result.putString(AccountManager.KEY_ACCOUNT_NAME, user);
-						result.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.ACCOUNT_TYPE));
-						response.onResult(result);
+					try {
+						AccountAuthenticatorService.addAccount(this, user, session_key, extras.getParcelable("accountAuthenticatorResponse"));
+					} catch (Exception e) {
+						Log.i("Last.fm", "Unable to add account");
 					}
 				}
 			} else {
@@ -248,7 +242,6 @@ public class LastFm extends Activity {
 
 		@Override
 		public void onPostExecute(Session session) {
-			boolean accountCreated = false;
 			mLoginButton.setEnabled(true);
 			mLoginTask = null;
 
@@ -261,10 +254,6 @@ public class LastFm extends Activity {
 
 				LastFMApplication.getInstance().session = session;
 
-				Account account = new Account(session.getName(), getString(R.string.ACCOUNT_TYPE));
-				AccountManager am = AccountManager.get(LastFm.this);
-				accountCreated = am.addAccountExplicitly(account, session.getKey(), null);
-				
 				if (getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 					Intent intent = getIntent();
 					Bundle extras = intent.getExtras();
@@ -279,12 +268,10 @@ public class LastFm extends Activity {
 					Intent intent = getIntent();
 					Bundle extras = intent.getExtras();
 					if (extras != null) {
-						if (accountCreated) {
-							AccountAuthenticatorResponse response = extras.getParcelable(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
-							Bundle result = new Bundle();
-							result.putString(AccountManager.KEY_ACCOUNT_NAME, session.getName());
-							result.putString(AccountManager.KEY_ACCOUNT_TYPE, getString(R.string.ACCOUNT_TYPE));
-							response.onResult(result);
+						try {
+							AccountAuthenticatorService.addAccount(LastFm.this, session.getName(), session.getKey(), extras.getParcelable("accountAuthenticatorResponse"));
+						} catch (Exception e) {
+							Log.i("Last.fm", "Unable to add account");
 						}
 						finish();
 					}
