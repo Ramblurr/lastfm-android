@@ -1,4 +1,5 @@
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
     android:contentAuthority="com.android.contacts" 
-    android:accountType="fm.last.android.account" 
+    android:accountType="fm.last.android.account"
+    android:supportsUploading="false"
 /> 
