@@ -121,9 +121,9 @@ public class ContactsSyncAdapterService extends Service {
 					String mimeType = c.getString(2);
 					String status = "";
 					if (track.getNowPlaying() != null && track.getNowPlaying().equals("true"))
-						status = "Listening to " + track.getName() + " by " + track.getArtist();
+						status = "Listening to " + track.getName() + " by " + track.getArtist().getName();
 					else
-						status = "Listened to " + track.getName() + " by " + track.getArtist();
+						status = "Listened to " + track.getName() + " by " + track.getArtist().getName();
 
 					if (mimeType.equals("vnd.android.cursor.item/vnd.fm.last.android.profile")) {
 						ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
