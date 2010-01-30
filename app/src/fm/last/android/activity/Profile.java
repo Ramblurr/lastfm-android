@@ -74,6 +74,7 @@ import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
+import fm.last.android.widget.QuickContactProfileBubble;
 import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
 import fm.last.api.Artist;
@@ -187,7 +188,11 @@ public class Profile extends ListActivity {
 			getListView().addHeaderView(b, null, true);
 			getListView().setItemsCanFocus(true);
 		} else {
-			mProfileBubble = new ProfileBubble(this);
+			try {
+				mProfileBubble = new QuickContactProfileBubble(this);
+			} catch (java.lang.VerifyError e) {
+				mProfileBubble = new ProfileBubble(this);
+			}
 			mProfileBubble.setTag("header");
 			mProfileBubble.setClickable(false);
 			getListView().addHeaderView(mProfileBubble, null, false);
