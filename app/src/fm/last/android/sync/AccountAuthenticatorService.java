@@ -3,9 +3,15 @@
  */
 package fm.last.android.sync;
 
+import java.io.IOException;
+
+import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.api.LastFmServer;
+import fm.last.api.LastFmServerFactory;
+import fm.last.api.MD5;
 import fm.last.api.Session;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -98,8 +104,27 @@ public class AccountAuthenticatorService extends Service {
 		 */
 		@Override
 		public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
-			// TODO Auto-generated method stub
-			Log.i(TAG, "getAuthToken");
+			String api_key = options.getString("api_key");
+			String api_secret = options.getString("api_secret");
+			
+			LastFmServer server = LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/", api_key, api_secret);
+			AccountManager am = AccountManager.get(mContext);
+			String user = account.name.toLowerCase().trim();
+			String md5Password = MD5.getInstance().hash(am.getPassword(account));
+			String authToken = MD5.getInstance().hash(user + md5Password);
+
+			try {
+				Session session = server.getMobileSession(user, authToken);
+				if(session != null) {
+					Bundle result = new Bundle();
+					result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+					result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+					result.putString(AccountManager.KEY_AUTHTOKEN, session.getKey());
+					return result;
+				}
+			} catch (IOException e) {
+				throw new NetworkErrorException(e);
+			}
 			return null;
 		}
 
@@ -141,10 +166,11 @@ public class AccountAuthenticatorService extends Service {
 		return ret;
 	}
 	
-	public static void addAccount(Context ctx, String username, String session_key, Parcelable response) {
+	public static void addAccount(Context ctx, String username, String password, Parcelable response) {
 		AccountAuthenticatorResponse authResponse = (AccountAuthenticatorResponse)response;
-		Bundle result = AccountAuthenticatorImpl.addAccount(ctx, username, session_key);
-		authResponse.onResult(result);
+		Bundle result = AccountAuthenticatorImpl.addAccount(ctx, username, password);
+		if(authResponse != null)
+			authResponse.onResult(result);
 	}
 	
 	private AccountAuthenticatorImpl getAuthenticator() { 

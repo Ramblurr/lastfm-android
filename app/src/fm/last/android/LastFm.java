@@ -34,7 +34,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -221,8 +223,10 @@ public class LastFm extends Activity {
 			try {
 				return login(user, pass);
 			} catch (WSError e) {
+				e.printStackTrace();
 				wse = e;
 			} catch (Exception e) {
+				e.printStackTrace();
 				this.e = e;
 			}
 
@@ -237,6 +241,12 @@ public class LastFm extends Activity {
 			Session session = server.getMobileSession(user, authToken);
 			if (session == null)
 				throw (new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
+			else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+				Parcelable authResponse = null;
+				if(getIntent() != null && getIntent().getExtras() != null)
+					authResponse = getIntent().getExtras().getParcelable("accountAuthenticatorResponse");
+				AccountAuthenticatorService.addAccount(LastFm.this, user, pass, authResponse);
+			}
 			return session;
 		}
 
@@ -268,11 +278,6 @@ public class LastFm extends Activity {
 					Intent intent = getIntent();
 					Bundle extras = intent.getExtras();
 					if (extras != null) {
-						try {
-							AccountAuthenticatorService.addAccount(LastFm.this, session.getName(), session.getKey(), extras.getParcelable("accountAuthenticatorResponse"));
-						} catch (Exception e) {
-							Log.i("Last.fm", "Unable to add account");
-						}
 						finish();
 					}
 				} else {
@@ -283,7 +288,7 @@ public class LastFm extends Activity {
 				finish();
 			} else if (wse != null) {
 				LastFMApplication.getInstance().presentError(context, wse);
-			} else if (e != null) {
+			} else if (e != null && e.getMessage() != null) {
 				AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
 				d.setIcon(android.R.drawable.ic_dialog_alert);
 				d.setNeutralButton(getString(R.string.common_ok), new DialogInterface.OnClickListener() {
