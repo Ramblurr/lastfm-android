@@ -90,9 +90,20 @@ small {
     font-size: 12px;
 }
 
-.infoMessage em {
+.tip {
     background: #faf6c3;
     font-style: normal;
+	padding: 4px;
+	margin: 4px;
+}
+
+.tip h3, p {
+	display: inline;
+	padding-right: 0.5em;
+}
+
+.tip h3:after {
+	content: ':';
 }
 
 .errorMessage em {
