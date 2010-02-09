@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import android.util.Log;
+
 import fm.last.api.Artist;
 import fm.last.api.ImageUrl;
 import fm.last.api.Track;
@@ -39,6 +41,7 @@ public class TrackBuilder extends XMLBuilder<Track> {
 	@Override
 	public Track build(Node trackNode) {
 		node = trackNode;
+		String nowPlaying = getAttribute("nowplaying");
 		String id = getText("id");
 		String name = getText("name");
 		String mbid = getText("mbid");
@@ -47,6 +50,7 @@ public class TrackBuilder extends XMLBuilder<Track> {
 		String streamable = getText("streamable");
 		String listeners = getText("listeners");
 		String playcount = getText("playcount");
+		
 		Artist artist;
 		Node artistNode = getChildNode("artist");
 		if (artistNode.getChildNodes().getLength() > 1) {
@@ -63,6 +67,10 @@ public class TrackBuilder extends XMLBuilder<Track> {
 			images[i++] = imageBuilder.build(imageNode);
 		}
 
-		return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images);
+		if(getChildNode("date") != null)
+			node = getChildNode("date");
+		String date = getAttribute("uts");
+
+		return new Track(id, name, mbid, url, duration, streamable, listeners, playcount, artist, null, images, date, nowPlaying);
 	}
 }

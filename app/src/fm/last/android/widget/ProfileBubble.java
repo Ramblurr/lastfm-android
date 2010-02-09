@@ -24,10 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.provider.ContactsContract;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import fm.last.android.R;
 import fm.last.api.User;
@@ -50,20 +56,22 @@ public class ProfileBubble extends LinearLayout {
 	}
 
 	private void init() {
+		removeAllViews();
+
 		LayoutInflater.from(getContext()).inflate(R.layout.profile_bubble, this);
 		// we did do this but it looks wrong due to lack of
 		// this.setBackgroundResource(R.drawable.profile_bubble_bg);
 
 		mFirst = (TextView) findViewById(R.id.profile_username);
 		mSecond = (TextView) findViewById(R.id.profile_meta);
+		mSecond.setText(getContext().getText(R.string.profile_loading));
 		mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
 		mAvatar.setDefaultImageResource(R.drawable.profile_unknown);
-
-		mSecond.setText(getContext().getText(R.string.profile_loading));
 	}
 
 	public void setUser(User user) {
 		mUser = user;
+
 		if (user.getRealName() == null || user.getRealName().trim().length() == 0)
 			mFirst.setText(user.getName());
 		else
@@ -106,7 +114,7 @@ public class ProfileBubble extends LinearLayout {
 		String plays = getContext().getString(R.string.profile_userplays, playcount, mUser.getJoinDate());
 		mSecond.setText(second + plays);
 
-		if (mUser.getImages().length > 0) {
+		if (mUser.getImages().length > 0 && mAvatar != null) {
 			mAvatar.fetch(mUser.getImages()[0].getUrl());
 		}
 	}

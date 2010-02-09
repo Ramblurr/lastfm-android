@@ -369,11 +369,13 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserTopTracks(baseUrl, params);
 	}
 
-	public Track[] getUserRecentTracks(String user, int limit) throws IOException {
+	public Track[] getUserRecentTracks(String user, String nowPlaying, int limit) throws IOException {
 		Map<String, String> params = createParams("user.getRecentTracks");
 		if (user != null) {
 			params.put("user", user);
 		}
+		if (nowPlaying != null && nowPlaying.length() > 0)
+			params.put("nowPlaying", nowPlaying);
 		if (limit > 0) {
 			params.put("limit", String.valueOf(limit));
 		}

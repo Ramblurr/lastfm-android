@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android" 
+	android:layout_height="70dip" 
+	android:layout_width="fill_parent"
+	android:orientation="horizontal"
+	android:gravity="top"
+	android:paddingTop="12dip"
+	android:paddingBottom="6dip"
+	android:paddingRight="11dip">
+	<QuickContactBadge android:id="@+id/profile_avatar"
+		android:layout_marginLeft="12dip"
+		android:layout_marginRight="12dip"
+		android:gravity="center"
+		style="@*android:style/Widget.QuickContactBadge.WindowSmall"
+		android:paddingRight="10dip"/>
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:orientation="vertical"
+		android:gravity="center_vertical"
+		xmlns:android="http://schemas.android.com/apk/res/android">
+		<TextView android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:id="@+id/profile_username" android:color="#ffffff"
+			android:textStyle="bold" />
+		<TextView android:layout_width="wrap_content" android:color="#cccccc"
+			android:layout_height="wrap_content" android:id="@+id/profile_meta" />
+	</LinearLayout>
+</LinearLayout>

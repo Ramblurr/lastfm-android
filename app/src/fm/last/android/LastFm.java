@@ -34,7 +34,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -44,6 +46,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
+import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
@@ -89,6 +92,16 @@ public class LastFm extends Activity {
 					resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 					setResult(RESULT_OK, resultValue);
 					RadioWidgetProvider.updateAppWidget(this);
+				}
+			} else if (getIntent().getAction() != null && getIntent().getAction().equals("fm.last.android.sync.LOGIN")) {
+				Intent intent = getIntent();
+				Bundle extras = intent.getExtras();
+				if (extras != null) {
+					try {
+						AccountAuthenticatorService.addAccount(this, user, session_key, extras.getParcelable("accountAuthenticatorResponse"));
+					} catch (Exception e) {
+						Log.i("Last.fm", "Unable to add account");
+					}
 				}
 			} else {
 				Intent intent = getIntent();
@@ -210,8 +223,10 @@ public class LastFm extends Activity {
 			try {
 				return login(user, pass);
 			} catch (WSError e) {
+				e.printStackTrace();
 				wse = e;
 			} catch (Exception e) {
+				e.printStackTrace();
 				this.e = e;
 			}
 
@@ -226,6 +241,12 @@ public class LastFm extends Activity {
 			Session session = server.getMobileSession(user, authToken);
 			if (session == null)
 				throw (new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
+			else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+				Parcelable authResponse = null;
+				if(getIntent() != null && getIntent().getExtras() != null)
+					authResponse = getIntent().getExtras().getParcelable("accountAuthenticatorResponse");
+				AccountAuthenticatorService.addAccount(LastFm.this, user, pass, authResponse);
+			}
 			return session;
 		}
 
@@ -253,6 +274,12 @@ public class LastFm extends Activity {
 						setResult(RESULT_OK, resultValue);
 						RadioWidgetProvider.updateAppWidget(LastFm.this);
 					}
+				} else if (getIntent().getAction() != null && getIntent().getAction().equals("fm.last.android.sync.LOGIN")) {
+					Intent intent = getIntent();
+					Bundle extras = intent.getExtras();
+					if (extras != null) {
+						finish();
+					}
 				} else {
 					Intent intent = new Intent(LastFm.this, Profile.class);
 					intent.putExtra("lastfm.profile.new_user", mNewUser);
@@ -261,7 +288,7 @@ public class LastFm extends Activity {
 				finish();
 			} else if (wse != null) {
 				LastFMApplication.getInstance().presentError(context, wse);
-			} else if (e != null) {
+			} else if (e != null && e.getMessage() != null) {
 				AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
 				d.setIcon(android.R.drawable.ic_dialog_alert);
 				d.setNeutralButton(getString(R.string.common_ok), new DialogInterface.OnClickListener() {

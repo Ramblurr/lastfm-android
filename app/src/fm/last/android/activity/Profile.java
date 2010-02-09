@@ -36,6 +36,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -73,6 +74,7 @@ import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
+import fm.last.android.widget.QuickContactProfileBubble;
 import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
 import fm.last.api.Artist;
@@ -154,7 +156,16 @@ public class Profile extends ListActivity {
 		Session session = LastFMApplication.getInstance().session;
 		if (session == null)
 			logout();
-		mUsername = getIntent().getStringExtra("lastfm.profile.username");
+		
+		if(getIntent().getData() != null) {
+			Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
+			if(cursor.moveToNext()) {
+				mUsername = cursor.getString(cursor.getColumnIndex("DATA1"));
+			}
+		} else {
+			mUsername = getIntent().getStringExtra("lastfm.profile.username");
+		}
+		
 		if (mUsername == null) {
 			mUsername = session.getName();
 			isAuthenticatedUser = true;
@@ -177,7 +188,11 @@ public class Profile extends ListActivity {
 			getListView().addHeaderView(b, null, true);
 			getListView().setItemsCanFocus(true);
 		} else {
-			mProfileBubble = new ProfileBubble(this);
+			try {
+				mProfileBubble = new QuickContactProfileBubble(this);
+			} catch (java.lang.VerifyError e) {
+				mProfileBubble = new ProfileBubble(this);
+			}
 			mProfileBubble.setTag("header");
 			mProfileBubble.setClickable(false);
 			getListView().addHeaderView(mProfileBubble, null, false);
@@ -926,7 +941,7 @@ public class Profile extends ListActivity {
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
-				Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), 10);
+				Track[] recenttracks = mServer.getUserRecentTracks(mUser.getName(), "true", 10);
 				if (recenttracks.length == 0)
 					return null;
 

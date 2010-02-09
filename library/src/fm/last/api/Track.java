@@ -38,9 +38,11 @@ public class Track implements Serializable {
 	private String playcount;
 	private Artist artist;
 	private Album album;
-
+	private String date;
+	private String nowPlaying;
+	
 	public Track(String id, String name, String mbid, String url, String duration, String streamable, String listeners, String playcount, Artist artist,
-			Album album, ImageUrl[] images) {
+			Album album, ImageUrl[] images, String date, String nowPlaying) {
 		this.id = id;
 		this.name = name;
 		this.mbid = mbid;
@@ -52,6 +54,8 @@ public class Track implements Serializable {
 		this.artist = artist;
 		this.album = album;
 		this.images = images;
+		this.date = date;
+		this.nowPlaying = nowPlaying;
 	}
 
 	public String getId() {
@@ -96,5 +100,13 @@ public class Track implements Serializable {
 
 	public Album getAlbum() {
 		return album;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public String getNowPlaying() {
+		return nowPlaying;
 	}
 }
