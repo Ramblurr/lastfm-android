@@ -1,0 +1,547 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY appversion "1.3.5">
+  <!ENTITY app "Last.fm for Android">
+  <!ENTITY amazonNote "<footnote><para>The Amazon.com mp3 store is not available on all Android devices.</para></footnote>">
+]>
+<!-- =============Document Header ============================= -->
+<article id="index" lang="en">
+  <articleinfo>
+	 <title>&app; Manual</title>
+	 <copyright>
+		<year>2010</year>
+		<holder>Last.fm Ltd.</holder> </copyright>	 
+
+	 <publisher role="maintainer">
+		<publishername>Last.fm Ltd.</publishername>
+	 </publisher>
+
+	 <releaseinfo> This manual describes version &appversion; of &app;.
+		</releaseinfo>
+  </articleinfo>
+
+<!-- ============= Document Body ============================= -->
+<!-- ============= Introduction ============================== -->
+  <sect1 id="intro">
+	<title>Introduction</title>
+	<para>Welcome to <application>&app;</application>
+	! Last.fm is a music service that lets
+	you discover new music you like,
+	based on the music you already listen
+	to.</para>
+
+	<para>Last.fm is filled with tons of information on artists, albums and tracks
+	including charts, statistics and more, all built by the Last.fm users
+	who’re keeping track of what they’re listening to with Last.fm. This
+	process is called 'Scrobbling,' and can be enabled or disabled from the
+	Settings screen.</para>
+
+	<para>You can read more about artists you like, view similar artists, see
+	upcoming concerts, and explore interesting genres using this app. If
+	you're not sure how to do something or get lost, press the Menu button
+	on your device and tap 'Help' to access this guide again at a later
+	time.</para>
+  </sect1>
+<!-- ============= Radio Stations ============================ -->
+<sect1 id="radio">
+	 <title>Radio Stations</title>
+
+	<para>
+		Whenever you launch Last.fm for Android, you'll be taken to your radio
+		stations.</para>
+
+	<figure id="radiotab">
+	  <title>Radio Tab</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/radiotab.png" format="PNG"/>
+				 </imageobject>
+			<textobject> <phrase>Displays a list of radio stations</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+
+<para>
+	From the station list page, you can tap the "Start a New
+	Station" button
+	to start a station based on an artist or tag, or listen
+	to another
+	user's personal library.</para>
+	
+<para>
+	Below the button, the radio station
+	list is split up into multiple
+	sections:</para>
+
+<variablelist>
+	<varlistentry>
+   		<term>Your Stations</term>
+   		<listitem>
+			<para>This section contains your personal radio stations, including:</para>
+				<variablelist>
+			   		<varlistentry>
+			    		<term>Your Library</term>
+			    		<listitem>
+			    			<para>Listen to tracks you've added to your library. Tracks are automatically added to your library as you listen to Last.fm radio or, if scrobbling is enabled, tracks you listen to in your Android music player. You can also manage your library online at www.last.fm</para>
+			    		</listitem>
+			    	</varlistentry>
+			    	<varlistentry>
+			    		<term>Recommended by Last.fm</term>
+			    		<listitem>
+			    			<para>Discover new music based on artists you like.</para>
+			    		</listitem>
+			    	</varlistentry>
+			    	<varlistentry>
+			    		<term>Your Neighborhood</term>
+			    		<listitem>
+			    			<para>Listen to what users with similar tastes are listening to.</para>
+			    		</listitem>
+			    	</varlistentry>
+			    </variablelist>
+   		</listitem>
+   	</varlistentry>
+	<varlistentry>
+   		<term>Recent Stations</term>
+   		<listitem>
+			<para>This section contains a list of the previous 5 radio stations you've listened to on Last.fm, whether it was on the web, on Android, or in another player.</para>
+		</listitem>
+	</varlistentry>
+</variablelist>
+<para>Pressing the Menu button on your Android device will display a menu that will allow you to Logout of Last.fm, modify application settings, and jump to the radio player screen.</para>
+</sect1>
+<!-- ============= Profile ====================================== -->
+<sect1 id="profile">
+<title>Profile</title>
+<para>What was the name of that last song I heard? Which artist have you listened to the most? Last.fm knows, and you can know too on the profile tab. </para>
+	<figure id="profiletab">
+	  <title>Profile Tab</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/profiletab.png" format="PNG"/>
+				 </imageobject>
+			<textobject> <phrase>Displays a list of actions related to the current profile</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+
+<para>This tab contains charts for your music history, info about upcoming concerts you may be attending, a list of your Last.fm friends, and your tag radio stations.</para>
+<variablelist>
+	<varlistentry>
+   		<term>Top Artists</term>
+   		<listitem>
+			<para>
+	Artists you've listened to the most are displayed on this chart.
+	Tapping an artist on this chart will take you to their similar artists
+	radio station.</para>
+		</listitem>
+	</varlistentry>
+	<varlistentry>
+   		<term>Top Albums</term>
+   		<listitem>
+			<para>
+	Albums you've listened to the most are displayed on this chart. Tapping
+	an album from this chart will pop up a menu allowing you to listen to
+	similar artist radio and, if supported on your device, a link to
+	purchase the album from the Amazon MP3 store.</para>
+		</listitem>
+	</varlistentry>
+	<varlistentry>
+   		<term>Top Tracks &amp; Recently Played</term>
+   		<listitem>
+			<para>
+	Tracks that you've listened to most frequently or most recently are
+	displayed on these charts. Tapping a track will pop up a menu allowing
+	you to listen to similar artists radio, a link to the track with a
+	friend, add tags to a track, add the track to a playlist, rate the
+	track as loved or banned, and if supported on your device, a link to
+	purchase the track from the Amazon MP3 store. Rating a track as <emphasis>loved</emphasis>
+	will add it to your Loved Tracks radio station, and rating a track as
+	<glossterm>banned</glossterm> will prevent Last.fm Radio from playing this track again.</para>
+		</listitem>
+	</varlistentry>
+	<varlistentry>
+   		<term>Events</term>
+   		<listitem>
+			<para>
+	Contains a list of events you've marked as attending. Selecting an
+	event will display venue information, maps, and will allow you to
+	indicate whether you plan on attending an event.</para>
+		</listitem>
+	</varlistentry>
+	<varlistentry>
+   		<term>Friends</term>
+   		<listitem>
+			<para>
+	Selecting a friend from this list will take you to their profile where
+	you can listen to their personal radio stations and view their personal
+	charts.</para>
+		</listitem>
+	</varlistentry>
+	<varlistentry>
+   		<term>Tags</term>
+   		<listitem>
+			<para>
+	Listen to a personalized radio station based on tags the Last.fm
+	community applied to tracks by tapping on stations from this list.</para>
+		</listitem>
+	</varlistentry>
+</variablelist>
+</sect1>
+<!-- ============= The Player ================================ -->
+<sect1 id="player">
+	 <title>Player</title>
+
+	<para>The last.fm radio player is displayed whenever you're listening to Last.fm radio.</para>
+
+	<figure id="playerscreen">
+	  <title>Player</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/player.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>Displays information about the current song</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+
+<para>
+	You can access the player screen by starting a radio station, selecting
+	a currently-playing radio station, or by pulling down the notification
+	drawer and selecting the Last.fm notification.</para>
+	
+<para>The player screen contains several buttons for interacting with the current song:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>Love</term>
+    		<listitem>
+    			<para>Adds this song to your Loved Tracks radio station and lets the Last.fm recommendation system know you like this song.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Ban</term>
+    		<listitem>
+    			<para>Lets Last.fm know that you never want to hear this song again.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Stop</term>
+    		<listitem>
+    			<para>Stops the current radio station and returns you to the radio station list.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Skip</term>
+    		<listitem>
+    			<para>Skips the current song.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>On Tour</term>
+    		<listitem>
+    			<para>This badge will appear if an artist has upcoming concert events. Tapping it will take you to the Events page of the Artist Info screen.</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+
+<para>The player screen also has several functions accessable by pressing the Menu button on your Android device:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>View Info</term>
+    		<listitem>
+    			<para>Display artist biography, similar artists, tags, upcoming concert events, and top listeners for the current artist.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Share</term>
+    		<listitem>
+    			<para>Send a link to this track to your friends.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Tag</term>
+    		<listitem>
+    			<para>Apply tags to this track. Tagging a track makes it available through your personal tag radio stations, and helps categorize and organize our catalog.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Buy on Amazon</term>
+    		<listitem>
+    			<para>Purchase this track or album from the Amazon MP3 store. &amazonNote;</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+</sect1>
+<!-- ============= Artist Info =============================== -->
+<sect1 id="artist">
+	 <title>Artist Information</title>
+
+	<para>Who's the lead singer of this band? Who does this artist remind me of? Can I see them live? The Artist Info screen knows all this and more!</para>
+
+	<figure id="artistinfo">
+	  <title>Artist Info</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/artistinfo.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>Displays information about the current artist</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+
+<tip><para>If you have scrobbling enabled, you can view information about the currently playing artist in the built-in Android media player by tapping the <emphasis>Now Scrobbling</emphasis> notification.</para></tip>
+
+<para>The artist information screen is organized into several tabs:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>Bio</term>
+    		<listitem>
+    			<para>View biographical information about this artist or band provided by our Last.fm users.</para>
+    			<tip><para>Artist bios on Last.fm can be edited on the website, and may be used under the Creative Commons Attribution/Share-Alike License.</para></tip>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Similar Artists</term>
+    		<listitem>
+    			<para>View artists that sound similar to the current artist. Tapping on an artist from this list will jump to their similar artist radio station.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Tags</term>
+    		<listitem>
+    			<para>See how other users have tagged this track. Tapping a tag from this list will jump to a radio station based on that tag.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Events</term>
+    		<listitem>
+    			<para>If the artist is currently on tour, you'll see a list of upcoming events in this list. Tapping an event will display venue info, a map, and allow you to indicate whether you'd like to attend this event.</para>
+    		</listitem>
+    	</varlistentry>
+    	<varlistentry>
+    		<term>Fans</term>
+    		<listitem>
+    			<para>These are the users that listen to this artist the most. Tapping on a user from this list will take you to their profile where you can listen to their personal radio stations and view their charts.</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+</sect1>
+<!-- ============= Sharing =================================== -->
+<sect1 id="sharing">
+	 <title>Sharing A Track</title>
+
+	<para>You can send a link to a track to your Last.fm friends, as well as various other apps on your device, such as Facebook or SMS, by tapping one of the many Share buttons throughout the Last.fm app.</para>
+
+	<figure id="share">
+	  <title>Choosing an Application</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/share.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>Choosing an application to share a track to</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+	
+	<para>Selecting the Last.fm icon will display a list of your Last.fm friends, and tapping on any other entry in the list will take you to the appropriate application with a link to the current track on Last.fm.</para>
+</sect1>
+<!-- ============= Tagging =================================== -->
+<sect1 id="tagging">
+	 <title>Tagging A Track</title>
+
+	<para>Want to mark a track so you can find it later? Want easy access to your crabcore radio station? Tagging tracks on Last.fm is for you! Tags help you organize tracks so you can find them later, and help create radio stations for the Last.fm community to enjoy.
+	</para>
+
+	<figure id="tagger">
+	  <title>Track Tagger</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/tagger.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>Adds/remove tags on a track</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+	
+	<para>The tag screen is broken up into 3 sections:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>Text field</term>
+    		<listitem>
+    			<para>Enter any tag you like into this text field using your keyboard. Pressing enter, or tapping the Add button, will apply the tag to the current track.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Tag Area</term>
+    		<listitem>
+    			<para>Tags currently applied to the track are displayed in this area. Tapping on a tag will remove it.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Suggested Tags</term>
+    		<listitem>
+    			<para>The tags most frequently applied to this track by the Last.fm community, and your most frequently used tags are displayed here for easy access</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+	<para>When you've finished modifying the tags for a track, press the Menu button your Android device and tap Save. If you've decided you don't want to save your changes, tap the Cancel button, or press the Back button on your Android device. </para>
+</sect1>
+<!-- ============= The Widget ==================================== -->
+<sect1 id="desktopwidget">
+	 <title>Desktop Widget</title>
+
+	<para>
+The Last.fm widget gives you quick access to the current Last.fm radio station. If Last.fm Radio is currently playing, the widget will display the current track, otherwise the name of the last station you listened to will be displayed.
+	</para>
+
+	<figure id="widget">
+	  <title>Desktop Widget</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/widget.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>A desktop widget that displays the current track information</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+	
+	<tip><para>You can add the Last.fm widget to your Android desktop by pressing the Menu button on your Android device, then selecting "Add", "Widgets", "Last.fm Radio".</para></tip>
+	
+	<para>The widget contains several buttons for controling the current Last.fm radio station:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>Menu</term>
+    		<listitem>
+    			<para>This button will display a popup with actions you can perform on the current track, including Share, Tag, and Buy on Amazon. &amazonNote;</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Love</term>
+    		<listitem>
+    			<para>Marks the current track as Loved.</para>
+    			<tip><para>You can also use this button to rate tracks playing in the built-in media player.</para></tip> 
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Ban</term>
+    		<listitem>
+    			<para>Bans the current track.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Stop or Play</term>
+    		<listitem>
+    			<para>If Last.fm is currently playing, this button will stop the current station. If Last.fm is not currently playing, this button will start the last station you listened to.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Skip</term>
+    		<listitem>
+    			<para>Skips the current track.</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+</sect1>
+<!-- ============= Settings ================================== -->
+<sect1 id="settings">
+	 <title>Settings</title>
+
+	<para>The settings screen allows you to control various features in the Last.fm app. You can access the settings screen by pressing the Menu button on your Android device from the radio station list and selecting the Settings option.
+	</para>
+
+	<figure id="settingsscreen">
+	  <title>Settings Screen</title>
+	  <screenshot>
+		 <mediaobject>
+			<imageobject>
+			  <imagedata fileref="figures/settings.png" format="PNG"/>
+				 </imageobject>
+			<textobject><phrase>Controls various settings in the app</phrase>
+			</textobject>
+		</mediaobject>
+	  </screenshot>
+	</figure>
+	
+	<para>The settings screen allows you to control various aspects of the Last.fm app:</para>
+	<variablelist>
+   		<varlistentry>
+    		<term>Enable Scrobbling</term>
+    		<listitem>
+    			<para>This toggle will enable / disable all scrobbling features in the Last.fm app. Scrobbling is the process of sending information about the current song to Last.fm. This information helps build up your charts, and influences your recommendations.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Scrobble Android Player</term>
+    		<listitem>
+    			<para>This toggle will allow you to enable or disable scrobbling of the built-in media player on your Android device.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Scrobble in Real-time</term>
+    		<listitem>
+    			<para>Sends "Now Playing" information instantly to your Last.fm profile.  When turned off, scrobbles will be sent in a batch after an hour.</para>
+    			<tip><para>Turning this option off may help increase battery life.</para></tip>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Scrobble Only On Wi-Fi</term>
+    		<listitem>
+    			<para>This option allows you to queue up your scrobbles while you're on the road, and send them all in a batch the next time you connect to a Wi-Fi network.</para>
+    			<tip><para>Turning this option on may help increase battery life.</para></tip>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>High-Quality Audio</term>
+    		<listitem>
+    			<para>This option streams higher quality audio while listening over your cellular data connection.</para>
+    			<note><para>If your cell data connection is slow, this will increase the amount of buffering between tracks.</para></note>
+    			<note><para>High-quality audio is always used over Wi-Fi connections.</para></note>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Headset Interruption</term>
+    		<listitem>
+    			<para>This option allows you to decide whether you'd like the Last.fm player to stop when you unplug or disconnect your headphones.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Report A Bug</term>
+    		<listitem>
+    			<para>Tell us about a problem you've found in the app. You will be able to enter comments about the issue, and the app will automatically attach info that can help us troubleshoot the issue.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Terms Of Service</term>
+    		<listitem>
+    			<para>Displays the Last.fm terms of service.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Privacy Policy</term>
+    		<listitem>
+    			<para>Displays the Last.fm privacy policy.</para>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>Version</term>
+    		<listitem>
+    			<para>Displays the current version of the Last.fm application installed on your device.</para>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+</sect1>
+</article>

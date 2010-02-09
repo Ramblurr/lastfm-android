@@ -1,0 +1,117 @@
+* {
+    -webkit-text-size-adjust: none;
+}
+
+body {
+    font-family: Helvetica, sans-serif;
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    background: #7c8697; /* same as footer */
+}
+
+a {
+    color: #50638F;
+}
+
+img {
+    border: 0;
+}
+
+#header {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAAATCAMAAAAEertBAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAMBQTFRFx6yssY6Ot1VRyZWT////5NXVlmhoyg0ErjUwxzQubS4u6LOxvAsDzg0EtQoC2MHB8c3L9+jniQYCuQoDawQClggCwnt5vwsDewQBVQIB01NNuhkTumto89za1mtm9vDwu3p4oggC23x5xwwEiTIwxAwDiVRUo3l5xCYfwREJiBsX4ZeT3czMahUT+vX1wwwDlhYSuhYO7eLi24aDkxIOwRkS4p+c/fv7wQsDvQsEz2Fc3nVwxHJv+/n5wg4GxUZBBerCRQAAAmFJREFUOMuVk3t3ojAQxUFHKo8NkQHF+qBIEVpfVatCW9fv/632Bsoe97jbPb1/eGeSyS9mEjTfD398R6k3HA59vhnX3KX2HU6y0ndES/MWFFHn7iuxENfpa4eUzJu6/4Fiy+pe5w9E8v7dvvs2qEXU/qP+b/+mASWVYi8Mw7iOhRf6YVAkaQCQHgQI6/HAJXpBKoI4cTzUJEmJdV6aNCDhzzNNa8+HAklg6ZrbNlblk6ETaYZhbGtQ10CLVNo15mKla5rhOSusy/xUgdI0HVh1E2lncSqMOu48H+hTeVqp36R92j32VKQ/VwvdQIE2m80r7lTOZhKk5033RJPZu43uHOSEqCelzDeVpnKNOqQgupGN8rW2tlFJLQUqiiIjsn/CF9iDxxgviicp34sCPeoXV0KPDjCAdnlRAHE2i2KPVQo0GAyWdMphg6cdrV/eMD4MA0cNKNDgSgCNYP16GFu2YRdYDRInWtaFgI/zM/bT50PvS1Crnv2AdT9BZTnC3ZSVTERiulYNjLKgLBWovJICwRSorGbHsAbkOLgd16mlzuYcpnYElOE4CuRcSYFgCuRUs2NYA2LmiCIPxnGMsxkxou0Ux2VG6YOaYOHjm2dWIBi+lBZXs2NYAwo9RvuNMI5D6xENiiyEsdehHTP6qIeeH/OrS1rwFQgPSM9U/TmzLD3SeK+6Y1lWdiKb2VSZoXXVm1Br/w06qnfJPDt9vmzmRfOceyaK7Cr84Cl+L79B/VvQdjGZLIQQpj2hs9yPVHiUaLXc54jF6Nijnn0RfJR7pEcpt7A3KS+weynfYLmUs196AmHLGogJ7gAAAABJRU5ErkJggg==), url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAoCAIAAACw1AcgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAADlJREFUCFtjucXPyvL/PwPLfwZk/B9M/wOxoXJgNhINEoew/yPkkMxBUY9iPsJsBgx7gWJIeMuffwC8ZC8JS2P4ZAAAAABJRU5ErkJggg==);
+    background-position: 10px 10px, 0 0;
+    background-repeat: no-repeat, repeat-x;
+    height: 40px;
+    position: relative;
+    line-height: 0;
+    text-align: center;
+}
+
+h1.header {
+	padding-top: 18px;
+	color: white;
+	margin: 0px;
+	font-size: 14pt;
+	display: none;
+}
+
+#header .separator {
+    display: none;
+}
+
+.headerLinks a {
+    display: block;
+    float: right;
+    padding: 0 10px;
+    border-width: 0 2px 0 2px;
+    -webkit-border-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAcCAYAAABCgc61AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALxJREFUKM+VUbEKAjEMTXt3pbPDgfgD7geufoT4K35CBz9NcHBzFwdFxFltYnIVlKO508Ar6QsvLyEmOJgDwJoxgxQbxsoEb09NVdSTwrbsMSJsH/FsEbEeM4lMCtqcuZKEIILvkF8qAOQLUSsgZQqYUeCnFSkKUhWaR2cPHDbPjsvvszOVcD0KzQMzCw6Y949Lfyr0CxL8fnNben+5sTlCguTC2WaxDIfKXXcsE0gunCGiESunDPfudGfsX12hgW5h82oHAAAAAElFTkSuQmCC) 0 2 0 2;
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    text-shadow: #630500 0 -1px 1px;
+    height: 28px;
+    line-height: 28px;
+}
+
+.headerLinks {
+    float: right;
+    margin-top: 6px;
+    margin-right: 9px;
+}
+
+div.article, div.toc, div.sect1 {
+    padding: 1em;
+    background: white;
+}
+
+body>h1, h2.title {
+	background: white;
+	padding: 0px;
+	margin: 0px 0px 0.5em 0px;
+}
+
+#footer {
+    padding: 10px;
+    border-top: solid 1px #383e48;
+    background: #7c8697 url(http://cdn.last.fm/mobile/iphone/footer_bg.png) left top repeat-x;
+    color: #fff;
+    text-shadow: #42464C 0 1px 1px;
+    font-weight: bold;
+    height: 60px;
+}
+
+#footer a {
+    color: #fff;
+}
+
+small {
+    font-size: 12px;
+}
+
+.infoMessage em {
+    background: #faf6c3;
+    font-style: normal;
+}
+
+.errorMessage em {
+    color: #da352d;
+    font-style: normal;
+}
+
+p {
+	margin: 0px 0px 1em 0px;
+}
+
+.term {
+	font-weight: bold;
+}
+
+.mediaobject img {
+	height: 100%;
+}
+
+.screenshot {
+	height: 240px;
+}

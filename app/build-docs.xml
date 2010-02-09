@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<project name="docbook-src" default="usage">
+    
+    <description>
+            This Ant build.xml file is used to transform DocBook XML to various
+    </description>
+
+    <!--
+      - target:  usage
+      -->
+    <target name="usage" description="Prints the Ant build.xml usage">
+        <echo message="Use -projecthelp to get a list of the available targets." />
+    </target>
+
+    <!--
+      - target:  clean
+      -->
+    <target name="clean" description="Cleans up generated files.">
+        <delete dir="assets" />
+    </target>
+
+    <!--
+      - target:  depends
+      -->
+    <target name="depends">
+        <mkdir dir="assets" />
+    	<mkdir dir="assets/figures" />
+    </target>
+
+    <!--
+      - target:  build-html
+      - description:  Iterates through a directory and transforms
+      -     .xml files into .html files using the DocBook XSL.
+      -->
+    <target name="build-html" depends="depends" 
+        description="Generates HTML files from DocBook XML">
+        <xslt style="doc/style.xsl" extension=".html" 
+            basedir="doc" destdir="assets">
+        	<include name="guide.xml" />
+            <param name="html.stylesheet" expression="style.css" />
+        </xslt>
+        <!-- Copy the stylesheet to the same directory as the HTML files -->
+        <copy todir="assets">
+            <fileset dir="doc">
+                <include name="style.css" />
+            </fileset>
+        </copy>
+        <!-- Copy the figures to the same directory as the HTML files -->
+        <copy todir="assets/figures">
+            <fileset dir="doc/figures">
+            </fileset>
+        </copy>
+    </target>
+    
+</project>
