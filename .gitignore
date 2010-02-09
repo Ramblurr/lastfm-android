@@ -5,5 +5,7 @@ app/src/fm/last/android/utils/utils
 app/src/fm/last/api
 app/src/fm/last/util
 app/src/fm/last/xml
+app/.externalToolBuilders
+app/assets
 *.apk
 *.keystore
