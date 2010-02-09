@@ -72,7 +72,6 @@ public class Player extends Activity {
 	private ImageButton mStopButton;
 	private ImageButton mNextButton;
 	private ImageButton mOntourButton;
-	private ImageButton mIsLovedButton;
 	private AlbumArt mAlbum;
 	private TextView mCurrentTime;
 	private TextView mTotalTime;
@@ -81,6 +80,7 @@ public class Player extends Activity {
 	private ProgressBar mProgress;
 	private long mDuration;
 	private boolean paused;
+	private boolean loved = false;
 
 	private ProgressDialog mBufferingDialog;
 	private ProgressDialog mTuningDialog;
@@ -129,8 +129,6 @@ public class Player extends Activity {
 		mOntourButton = (ImageButton) findViewById(R.id.ontour);
 		mOntourButton.setOnClickListener(mOntourListener);
 
-		mIsLovedButton = (ImageButton) findViewById(R.id.loved);
-
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(RadioPlayerService.META_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_FINISHED);
@@ -151,8 +149,12 @@ public class Player extends Activity {
 			mCachedBitmap = icicle.getParcelable("artwork");
 			if (icicle.getBoolean("isOnTour", false))
 				mOntourButton.setVisibility(View.VISIBLE);
-			if (icicle.getBoolean("loved", false))
-				mIsLovedButton.setVisibility(View.VISIBLE);
+			loved = icicle.getBoolean("loved", false);
+			if (loved) {
+				mLoveButton.setImageResource(R.drawable.loved);
+			} else {
+				mLoveButton.setImageResource(R.drawable.love);
+			}
 		}
 	}
 
@@ -274,7 +276,7 @@ public class Player extends Activity {
 		outState.putBoolean("isOnTour",
 				mOntourButton.getVisibility() == View.VISIBLE);
 		outState.putBoolean("loved",
-				mIsLovedButton.getVisibility() == View.VISIBLE);
+				loved);
 		super.onSaveInstanceState(outState);
 	}
 
@@ -312,6 +314,8 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
+			mLoveButton.setImageResource(R.drawable.loved);
+
 			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
 					"player-love", // Action
 					"", // Label
@@ -451,9 +455,6 @@ public class Player extends Activity {
 		public void onReceive(Context context, Intent intent) {
 
 			String action = intent.getAction();
-			mIsLovedButton.clearAnimation();
-			mIsLovedButton.setVisibility(View.GONE);
-			mIsLovedButton.invalidate();
 			if (action.equals(RadioPlayerService.META_CHANGED)) {
 				// redraw the artist/title info and
 				// set new max for progress bar
@@ -503,23 +504,13 @@ public class Player extends Activity {
 						try {
 							String artistName = player.getArtistName();
 							String trackName = player.getTrackName();
-
-							if (player.getLoved()) {
-								Animation a = AnimationUtils.loadAnimation(Player.this, R.anim.tag_fadein);
-								a.setAnimationListener(new AnimationListener() {
-	
-									public void onAnimationEnd(Animation animation) {
-									}
-	
-									public void onAnimationRepeat(Animation animation) {
-									}
-	
-									public void onAnimationStart(Animation animation) {
-										mIsLovedButton.setVisibility(View.VISIBLE);
-									}
-	
-								});
-								mIsLovedButton.startAnimation(a);
+							loved = player.getLoved();
+							
+							
+							if (loved) {
+								mLoveButton.setImageResource(R.drawable.loved);
+							} else {
+								mLoveButton.setImageResource(R.drawable.love);
 							}
 
 							if (!mArtistName.getText().equals(artistName)
