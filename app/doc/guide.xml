@@ -544,4 +544,301 @@ The Last.fm widget gives you quick access to the current Last.fm radio station. 
     	</varlistentry>
     </variablelist>
 </sect1>
+<!-- ============= Version History ================================== -->
+<sect1 id="versionhistory">
+	 <title>Version History</title>
+
+	<variablelist>
+   		<varlistentry>
+    		<term>1.3.5</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>
+							Adjust the landscape layout to fit properly on the Nexus One.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Sort the friends list alphabetically.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Make sure loving/banning a radio track still works with scrobbling turned off.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Launch the profile activity when pressing the gear button on the widget while radio isn't playing.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Add a preference to enable/disable stopping the radio player when disconnecting a headset.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Prevent the bug reporter dialog from disappearing when switching orientation or sliding the keyboard out.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Clear the scrobbler notification when disabling scrobbling.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Fix the amazon links so they work in the new version of Amazon's mp3 store app.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Fix a bug where the player could stop playing in the middle of a song.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>
+							Improve detection of duplicate tracks so playing the same song sequentially should still be scrobbled.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.3.4</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Resolves a crash when sharing tracks on Android 1.5.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.3.3</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Resolves an issue where tracks would skip after 10 seconds on Android 2.0.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Stop the radio player when unplugging the headphones.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Display the current track info on OpenWatch-compatible bluetooth watches.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.3.2</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Resolves an issue where the "Now Scrobbling" notification would remain in the notification tray on Android 2.0 after a song ended.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.3.1</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Addresses an issue Droid users are experiencing with scrolling the radio station list.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.3.0</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Display 3 similar artists below each artist / tag search result entry so users have an idea of what to expect from each station.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Love / Ban tracks from the Recently Played and Top Tracks charts.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>German localization provided by André Twupack.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Support for stopping / skipping tracks via the Bluetooth headset buttons provided by Johannes Rudolph.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fix a bug where the radio station list would stop responding to the touch screen after starting a station on Android 2.0.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fix a bug where the player could get stuck buffering on Android 2.0.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.2.2</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Adds support for QVGA devices such as HTC Tattoo and WXVGA devices such as the Motorola Droid.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.2.1</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>You can now share tracks with 3rd party apps, such as Messaging, Facebook, Gmail, etc.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>New bug reporter located in the preferences menu that will email us your log files to help troubleshoot issues.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Cache the album art when flipping between portrait and landscape.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fix a bug where the artists weren't being displayed on the Recently Played chart.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fix a bug where running out of content in the current station would cause the current track to stop half-way through.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.2.0</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Recent Stations now sync with the website.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>New preference options to enable/disable real-time scrobbling and sending scrobbles only over Wi-Fi.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Improved startup time of the app and widget.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fix a bug where the player could start playing randomly.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.1.1</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Scrobbles are properly cached when your network connection is disconnected.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>The scrobble toggle in the preferences now properly disables the scrobbler if you prefer to use Scrobbledroid or another scrobbler.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Support for scrobbling the HTC Hero media player.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Display a popup alert when tagging a track loved/banned from the widget.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Skip to the next track after banning a track through the widget.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Misc. crashes in the widget and scrobbler have been fixed.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.1.0</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Prebuffering of next track to reduce delay.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>64Kbps streaming option.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Desktop widget to allow quick skip / love / ban.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Native media player scrobbling.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+   		<varlistentry>
+    		<term>1.0.1</term>
+    		<listitem>
+    			<itemizedlist>
+    				<listitem>
+    					<para>Crash fixes.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Most activity states are saved when changing orientation and changing tasks.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Better radio error handling.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Better resilience when playing in the background.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Adjust music volume at all times on the radio player activity.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Fade the music back in after receiving a call.
+    					</para>
+    				</listitem>
+    				<listitem>
+    					<para>Some UI tweaks.
+    					</para>
+    				</listitem>
+    			</itemizedlist>
+    		</listitem>
+    	</varlistentry>
+    </variablelist>
+</sect1>
 </article>
