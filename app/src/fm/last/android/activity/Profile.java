@@ -1108,14 +1108,17 @@ public class Profile extends ListActivity {
 		MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.action_settings));
 		settings.setIcon(android.R.drawable.ic_menu_preferences);
 
-		MenuItem nowPlaying = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.action_nowplaying));
+		MenuItem help = menu.add(Menu.NONE, 2, Menu.NONE, "Help");
+		help.setIcon(android.R.drawable.ic_menu_preferences);
+
+		MenuItem nowPlaying = menu.add(Menu.NONE, 3, Menu.NONE, getString(R.string.action_nowplaying));
 		nowPlaying.setIcon(R.drawable.view_artwork);
 		return true;
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(2).setEnabled(mIsPlaying);
+		menu.findItem(3).setEnabled(mIsPlaying);
 
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -1133,6 +1136,10 @@ public class Profile extends ListActivity {
 			startActivity(intent);
 			return true;
 		case 2:
+			intent = new Intent(Profile.this, Help.class);
+			startActivity(intent);
+			return true;
+		case 3:
 			intent = new Intent(Profile.this, Player.class);
 			startActivity(intent);
 			return true;
