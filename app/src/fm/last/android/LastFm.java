@@ -82,6 +82,13 @@ public class LastFm extends Activity {
 
 		new CheckUpdatesTask().execute((Void) null);
 
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+			if(!AccountAuthenticatorService.hasLastfmAccount(this)) {
+				session_key = "";
+				LastFMApplication.getInstance().logout();
+			}
+		}
+		
 		if (!user.equals("") && !session_key.equals("")) {
 			if (getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 				Intent intent = getIntent();

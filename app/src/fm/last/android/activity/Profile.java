@@ -40,6 +40,7 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -71,6 +72,7 @@ import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
@@ -154,8 +156,12 @@ public class Profile extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.home);
 		Session session = LastFMApplication.getInstance().session;
-		if (session == null)
-			logout();
+		if (session == null) {
+			LastFMApplication.getInstance().logout();
+			Intent intent = new Intent(Profile.this, LastFm.class);
+			startActivity(intent);
+			finish();
+		}
 		
 		if(getIntent().getData() != null) {
 			Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
@@ -1143,7 +1149,9 @@ public class Profile extends ListActivity {
 		Intent intent;
 		switch (item.getItemId()) {
 		case 0:
-			logout();
+			LastFMApplication.getInstance().logout();
+			intent = new Intent(Profile.this, LastFm.class);
+			startActivity(intent);
 			finish();
 			break;
 		case 1:
@@ -1336,43 +1344,6 @@ public class Profile extends ListActivity {
 			iconifiedEntries.add(entry);
 		}
 		return iconifiedEntries;
-	}
-
-	private void logout() {
-		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
-		SharedPreferences.Editor editor = settings.edit();
-		editor.remove("lastfm_user");
-		editor.remove("lastfm_pass");
-		editor.remove("lastfm_session_key");
-		editor.remove("lastfm_subscriber");
-		editor.commit();
-		LastFMApplication.getInstance().session = null;
-		try {
-			LastFMApplication.getInstance().bindService(new Intent(this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-					try {
-						if (player.isPlaying())
-							player.stop();
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					LastFMApplication.getInstance().unbindService(this);
-				}
-
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
-			deleteDatabase(LastFm.DB_NAME);
-			deleteFile("currentTrack.dat");
-			deleteFile("queue.dat");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-		Intent intent = new Intent(Profile.this, LastFm.class);
-		startActivity(intent);
-		finish();
 	}
 
 	private ImageCache getImageCache() {

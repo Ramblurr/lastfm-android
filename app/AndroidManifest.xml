@@ -127,6 +127,12 @@
 				<category android:name="android.intent.category.DEFAULT"/>
 			</intent-filter>
 		</activity>
+		<activity android:name=".activity.AccountFailActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT"/>
+			</intent-filter>
+		</activity>
 		<receiver android:name="RadioWidgetProvider"
 		            android:label="Last.fm Radio"
 		            android:icon="@drawable/icon"

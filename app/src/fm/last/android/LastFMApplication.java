@@ -38,14 +38,19 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import fm.last.android.activity.Player;
+import fm.last.android.activity.Profile;
+import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -326,5 +331,42 @@ public class LastFMApplication extends Application {
 			}
 		});
 		d.show();
+	}
+	
+	public void logout() {
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		editor.remove("lastfm_user");
+		editor.remove("lastfm_pass");
+		editor.remove("lastfm_session_key");
+		editor.remove("lastfm_subscriber");
+		editor.commit();
+		session = null;
+		try {
+			LastFMApplication.getInstance().bindService(new Intent(this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+					try {
+						if (player.isPlaying())
+							player.stop();
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					LastFMApplication.getInstance().unbindService(this);
+				}
+
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
+			deleteDatabase(LastFm.DB_NAME);
+			deleteFile("currentTrack.dat");
+			deleteFile("queue.dat");
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+				AccountAuthenticatorService.removeLastfmAccount(this);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 }

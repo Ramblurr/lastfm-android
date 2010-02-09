@@ -9,6 +9,7 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.android.activity.AccountFailActivity;
 import fm.last.api.LastFmServer;
 import fm.last.api.LastFmServerFactory;
 import fm.last.api.MD5;
@@ -23,8 +24,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * @author sam
@@ -58,6 +61,23 @@ public class AccountAuthenticatorService extends Service {
 			return result;
 		}
 
+		public static Boolean hasLastfmAccount(Context ctx) {
+			AccountManager am = AccountManager.get(ctx);
+			Account[] accounts = am.getAccountsByType(ctx.getString(R.string.ACCOUNT_TYPE));
+			if(accounts != null && accounts.length > 0)
+				return true;
+			else
+				return false;
+		}
+		
+		public static void removeLastfmAccount(Context ctx) {
+			AccountManager am = AccountManager.get(ctx);
+			Account[] accounts = am.getAccountsByType(ctx.getString(R.string.ACCOUNT_TYPE));
+			for(Account account : accounts) {
+				am.removeAccount(account, null, null);
+			}
+		}
+		
 		/* (non-Javadoc)
 		 * @see android.accounts.AbstractAccountAuthenticator#addAccount(android.accounts.AccountAuthenticatorResponse, java.lang.String, java.lang.String, java.lang.String[], android.os.Bundle)
 		 */
@@ -66,6 +86,14 @@ public class AccountAuthenticatorService extends Service {
 				throws NetworkErrorException {
 			Bundle result;
 			Session session = LastFMApplication.getInstance().session;
+			
+			if(hasLastfmAccount(mContext)) {
+				result = new Bundle();
+				Intent i = new Intent(mContext, AccountFailActivity.class);
+				i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+				result.putParcelable(AccountManager.KEY_INTENT, i);
+				return result;
+			}
 			
 			if(session != null && session.getKey().length() > 0) {
 				result = addAccount(mContext, session.getName(), session.getKey());
@@ -171,6 +199,14 @@ public class AccountAuthenticatorService extends Service {
 		Bundle result = AccountAuthenticatorImpl.addAccount(ctx, username, password);
 		if(authResponse != null)
 			authResponse.onResult(result);
+	}
+	
+	public static Boolean hasLastfmAccount(Context ctx) {
+		return AccountAuthenticatorImpl.hasLastfmAccount(ctx);
+	}
+	
+	public static void removeLastfmAccount(Context ctx) {
+		AccountAuthenticatorImpl.removeLastfmAccount(ctx);
 	}
 	
 	private AccountAuthenticatorImpl getAuthenticator() { 
