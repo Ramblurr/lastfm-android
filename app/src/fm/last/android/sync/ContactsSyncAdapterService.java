@@ -89,12 +89,19 @@ public class ContactsSyncAdapterService extends Service {
 		builder.withValue(RawContacts.SYNC1, username);
 		operationList.add(builder.build());
 
-		builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-		builder.withValueBackReference(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
-		builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
-		builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
-		operationList.add(builder.build());
-
+		if(name.length() > 0) {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
+			operationList.add(builder.build());
+		} else {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.CommonDataKinds.Nickname.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.NAME, username);
+			operationList.add(builder.build());
+		}
 		builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 		builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
 		builder.withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/vnd.fm.last.android.profile");
@@ -167,13 +174,10 @@ public class ContactsSyncAdapterService extends Service {
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		try {
-			Friends friends = server.getFriends(account.name, "", "50");
+			Friends friends = server.getFriends(account.name, null, null);
 			for (User user : friends.getFriends()) {
 				if (!localContacts.containsKey(user.getName())) {
-					if (user.getRealName().length() > 0)
-						addContact(account, user.getRealName(), user.getName());
-					else
-						addContact(account, user.getName(), user.getName());
+					addContact(account, user.getRealName(), user.getName());
 				} else {
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
 					if (tracks.length > 0) {
