@@ -75,11 +75,11 @@ body>h1, h2.title {
 #footer {
     padding: 10px;
     border-top: solid 1px #383e48;
-    background: #7c8697 url(http://cdn.last.fm/mobile/iphone/footer_bg.png) left top repeat-x;
+    background: #7c8697 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAtCAIAAABTUb6JAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAH5JREFUeNrsl8ENgDAMA+20/BBiL34swP5TlCnQSThZ4OQmsVNf9yOi5n6cDHjMjQIPBuxlCFxiwJLDwC4KvKgem1JsUeAKU8ytk9Ms09hT51lm3lQ7rseUYi4W06Yacmpyqou6QERdIOW4nwR33rZz/T0ksD3udGrFX9UrwACBrQRFy4ltVgAAAABJRU5ErkJggg%3D%3D) left top repeat-x;
     color: #fff;
     text-shadow: #42464C 0 1px 1px;
     font-weight: bold;
-    height: 60px;
+    height: 40px;
 }
 
 #footer a {

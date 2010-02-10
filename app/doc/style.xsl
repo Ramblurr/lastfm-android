@@ -61,8 +61,8 @@
         <xsl:with-param name="object" select="$prev"/>
       </xsl:call-template>
     </xsl:attribute>
-    &lt;
-	<xsl:apply-templates select="$prev" mode="object.title.markup"/>
+    &lt; Previous
+	<!-- <xsl:apply-templates select="$prev" mode="object.title.markup"/> -->
   </a>
 </td>
 </xsl:if>
@@ -74,8 +74,8 @@
         <xsl:with-param name="object" select="$next"/>
       </xsl:call-template>
     </xsl:attribute>
-	<xsl:apply-templates select="$next" mode="object.title.markup"/>
-	&gt;
+	<!-- <xsl:apply-templates select="$next" mode="object.title.markup"/> -->
+	Next &gt;
   </a>
 </td>
 </xsl:if>
@@ -83,7 +83,7 @@
 </table>
 <div id="footer">
     <small>
-        (C) 2010 Last.fm Ltd.
+        © 2010 Last.fm Ltd.
     </small>
 </div>
 </xsl:template>
