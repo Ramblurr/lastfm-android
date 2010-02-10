@@ -36,9 +36,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -62,6 +64,7 @@ import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
+import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
@@ -791,6 +794,48 @@ public class RadioPlayerService extends Service {
 		wifiLock.acquire();
 
 		currentStationURL = url;
+
+		//Stop the standard media player
+		bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+			public void onServiceConnected(ComponentName comp, IBinder binder) {
+				com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+
+				try {
+					if (s.isPlaying()) {
+						s.stop();
+						sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+					}
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				unbindService(this);
+			}
+
+			public void onServiceDisconnected(ComponentName comp) {
+			}
+		}, 0);
+
+		//Stop the HTC media player
+		bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
+			public void onServiceConnected(ComponentName comp, IBinder binder) {
+				com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+
+				try {
+					if (s.isPlaying()) {
+						s.stop();
+						sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+					}
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				unbindService(this);
+			}
+
+			public void onServiceDisconnected(ComponentName comp) {
+			}
+		}, 0);
 
 		tuningNotify();
 
