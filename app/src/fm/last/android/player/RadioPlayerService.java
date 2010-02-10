@@ -332,6 +332,11 @@ public class RadioPlayerService extends Service {
 		clearNotification();
 		unregisterReceiver(connectivityListener);
 		unregisterReceiver(prebufferListener);
+		if (mPreBufferIntent != null) {
+			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			am.cancel(mPreBufferIntent);
+			mPreBufferIntent = null;
+		}
 	}
 
 	public IBinder getBinder() {
