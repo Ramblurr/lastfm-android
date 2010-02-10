@@ -9,6 +9,7 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.android.activity.AccountAccessPrompt;
 import fm.last.android.activity.AccountFailActivity;
 import fm.last.api.LastFmServer;
 import fm.last.api.LastFmServerFactory;
@@ -85,7 +86,6 @@ public class AccountAuthenticatorService extends Service {
 		public Bundle addAccount(AccountAuthenticatorResponse response, String accountType, String authTokenType, String[] requiredFeatures, Bundle options)
 				throws NetworkErrorException {
 			Bundle result;
-			Session session = LastFMApplication.getInstance().session;
 			
 			if(hasLastfmAccount(mContext)) {
 				result = new Bundle();
@@ -93,10 +93,6 @@ public class AccountAuthenticatorService extends Service {
 				i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
 				result.putParcelable(AccountManager.KEY_INTENT, i);
 				return result;
-			}
-			
-			if(session != null && session.getKey().length() > 0) {
-				result = addAccount(mContext, session.getName(), session.getKey());
 			} else {
 				result = new Bundle();
 				Intent i = new Intent(mContext, LastFm.class);
@@ -134,26 +130,21 @@ public class AccountAuthenticatorService extends Service {
 		public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
 			String api_key = options.getString("api_key");
 			String api_secret = options.getString("api_secret");
-			
-			LastFmServer server = LastFmServerFactory.getServer("http://ws.audioscrobbler.com/2.0/", api_key, api_secret);
+
 			AccountManager am = AccountManager.get(mContext);
 			String user = account.name.toLowerCase().trim();
 			String md5Password = MD5.getInstance().hash(am.getPassword(account));
 			String authToken = MD5.getInstance().hash(user + md5Password);
 
-			try {
-				Session session = server.getMobileSession(user, authToken);
-				if(session != null) {
-					Bundle result = new Bundle();
-					result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-					result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-					result.putString(AccountManager.KEY_AUTHTOKEN, session.getKey());
-					return result;
-				}
-			} catch (IOException e) {
-				throw new NetworkErrorException(e);
-			}
-			return null;
+			Bundle result = new Bundle();
+			Intent i = new Intent(mContext, AccountAccessPrompt.class);
+			i.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+			i.putExtra("api_key", api_key);
+			i.putExtra("api_secret", api_secret);
+			i.putExtra("user", user);
+			i.putExtra("authToken", authToken);
+			result.putParcelable(AccountManager.KEY_INTENT, i);
+			return result;
 		}
 
 		/* (non-Javadoc)

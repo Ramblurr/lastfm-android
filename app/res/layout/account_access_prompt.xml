@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<TextView android:layout_height="wrap_content" android:layout_width="fill_parent" android:layout_marginBottom="6dip" android:gravity="center" android:text="@string/account_access_body"></TextView><LinearLayout android:layout_height="wrap_content" android:background="#dddddd" android:layout_width="fill_parent"><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/yes" android:text="@string/common_yes"></Button><Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/common_no" android:id="@+id/no"></Button>
+</LinearLayout>
+
+
+</LinearLayout>
