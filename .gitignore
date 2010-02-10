@@ -7,5 +7,7 @@ app/src/fm/last/util
 app/src/fm/last/xml
 app/.externalToolBuilders
 app/assets
+LastFmAuthTest/bin
+LastFmAuthTest/gen
 *.apk
 *.keystore

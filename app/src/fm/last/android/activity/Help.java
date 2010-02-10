@@ -15,6 +15,7 @@ public class Help extends Activity {
 	WebView mWebView;
 	String mLastUrl;
 	
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -39,12 +40,14 @@ public class Help extends Activity {
 	    });
 	}
 	
+	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putString("url", mLastUrl);
 		super.onSaveInstanceState(outState);
 	}
 
 	
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 	    if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
 	        mWebView.goBack();

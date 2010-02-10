@@ -59,6 +59,7 @@ public class QuickContactProfileBubble extends ProfileBubble {
 		}
 	}
 	
+	@Override
 	public void setUser(User user) {
 		super.setUser(user);
 

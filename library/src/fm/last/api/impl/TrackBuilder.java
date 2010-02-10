@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
-import android.util.Log;
-
 import fm.last.api.Artist;
 import fm.last.api.ImageUrl;
 import fm.last.api.Track;

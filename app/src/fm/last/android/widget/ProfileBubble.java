@@ -24,16 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.provider.ContactsContract;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import fm.last.android.R;
 import fm.last.api.User;

@@ -3,32 +3,25 @@
  */
 package fm.last.android.sync;
 
-import java.io.IOException;
-
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.activity.AccountAccessPrompt;
 import fm.last.android.activity.AccountFailActivity;
-import fm.last.api.LastFmServer;
-import fm.last.api.LastFmServerFactory;
 import fm.last.api.MD5;
-import fm.last.api.Session;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
 import android.accounts.AccountManager;
 import android.accounts.NetworkErrorException;
 import android.app.Service;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.Parcelable;
+import android.provider.ContactsContract;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * @author sam
@@ -53,6 +46,8 @@ public class AccountAuthenticatorService extends Service {
 		public static Bundle addAccount(Context ctx, String username, String session_key) {
 			Bundle result = null;
 			Account account = new Account(username, ctx.getString(R.string.ACCOUNT_TYPE));
+			ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
+            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
 			AccountManager am = AccountManager.get(ctx);
 			if (am.addAccountExplicitly(account, session_key, null)) {
 				result = new Bundle();
@@ -178,6 +173,7 @@ public class AccountAuthenticatorService extends Service {
 		}
 	}
 
+	@Override
 	public IBinder onBind(Intent intent) { 
 		IBinder ret = null;
 		if (intent.getAction().equals(android.accounts.AccountManager.ACTION_AUTHENTICATOR_INTENT)) 
