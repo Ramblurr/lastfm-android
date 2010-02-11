@@ -82,7 +82,7 @@ public class LastFm extends Activity {
 
 		new CheckUpdatesTask().execute((Void) null);
 
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+		if(Integer.decode(Build.VERSION.SDK) >= 6) {
 			if(!AccountAuthenticatorService.hasLastfmAccount(this)) {
 				session_key = "";
 				LastFMApplication.getInstance().logout();
@@ -248,7 +248,7 @@ public class LastFm extends Activity {
 			Session session = server.getMobileSession(user, authToken);
 			if (session == null)
 				throw (new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
-			else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				Parcelable authResponse = null;
 				if(getIntent() != null && getIntent().getExtras() != null)
 					authResponse = getIntent().getExtras().getParcelable("accountAuthenticatorResponse");

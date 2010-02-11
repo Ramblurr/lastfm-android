@@ -79,7 +79,7 @@ public class LastFMApplication extends Application {
 		} catch (Exception e) {
 			version = "";
 		}
-
+		
 		UrlUtil.useragent = "MobileLastFM" + version + " (" + android.os.Build.MODEL + "; " + Locale.getDefault().getCountry().toLowerCase() + "; "
 				+ "Android " + android.os.Build.VERSION.RELEASE + ")";
 
@@ -361,7 +361,7 @@ public class LastFMApplication extends Application {
 			deleteDatabase(LastFm.DB_NAME);
 			deleteFile("currentTrack.dat");
 			deleteFile("queue.dat");
-			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ECLAIR) {
+			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				AccountAuthenticatorService.removeLastfmAccount(this);
 			}
 		} catch (Exception e) {
