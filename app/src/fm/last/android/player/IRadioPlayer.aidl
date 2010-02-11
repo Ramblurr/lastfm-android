@@ -39,6 +39,7 @@ interface IRadioPlayer {
 	String getArtUrl();
 	long   getDuration();
 	boolean getLoved();
+	void setLoved(boolean loved);
 	long   getPosition();
 	int	   getBufferPercent();
 	

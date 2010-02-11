@@ -314,8 +314,29 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			Intent i = new Intent("fm.last.android.LOVE");
 			sendBroadcast(i);
-			mLoveButton.setImageResource(R.drawable.loved);
+			bindService(new Intent(Player.this,
+					fm.last.android.player.RadioPlayerService.class),
+					new ServiceConnection() {
+						public void onServiceConnected(ComponentName comp,
+								IBinder binder) {
+							IRadioPlayer player = IRadioPlayer.Stub
+									.asInterface(binder);
+							try {
+								if (player.isPlaying())
+									player.setLoved(true);
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							unbindService(this);
+						}
 
+						public void onServiceDisconnected(ComponentName comp) {
+						}
+					}, 0);
+			mLoveButton.setImageResource(R.drawable.loved);
+			loved = true;
+			
 			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
 					"player-love", // Action
 					"", // Label

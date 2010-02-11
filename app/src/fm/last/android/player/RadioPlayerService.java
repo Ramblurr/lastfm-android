@@ -961,6 +961,11 @@ public class RadioPlayerService extends Service {
 			return currentTrack != null ? currentTrack.getLoved() : false;
 		}
 		
+		public void setLoved(boolean loved) throws RemoteException {
+			if(currentTrack != null)
+				currentTrack.setLoved(loved);
+		}
+		
 		public String getArtistName() throws RemoteException {
 
 			if (currentTrack != null)

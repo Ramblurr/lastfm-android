@@ -102,4 +102,8 @@ public class RadioTrack implements Serializable {
 	public Boolean getLoved() {
 		return loved;
 	}
+
+	public void setLoved(boolean loved) {
+		this.loved = loved;
+	}
 }
