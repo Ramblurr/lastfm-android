@@ -220,7 +220,7 @@ public class ContactsSyncAdapterService extends Service {
 			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 			for (User user : friends.getFriends()) {
 				if (localContacts.containsKey(user.getName())) {
-					if (!localAvatars.containsKey(user.getName())) {
+					if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
 						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
 					}
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
