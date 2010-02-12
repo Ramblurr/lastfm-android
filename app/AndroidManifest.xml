@@ -134,7 +134,13 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.AccountAccessPrompt"
-			android:label="@string/account_access_title"
+			android:theme="@android:style/Theme.Dialog">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+		<activity android:name=".activity.SyncPrompt"
 			android:theme="@android:style/Theme.Dialog">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />

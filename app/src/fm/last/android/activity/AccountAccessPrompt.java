@@ -69,10 +69,4 @@ public class AccountAccessPrompt extends Activity {
 			
 		});
 	}
-	
-	/*
-	 * 			
-			return null;
-
-	 */
 }

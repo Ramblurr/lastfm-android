@@ -245,4 +245,9 @@
 	<!-- third party account access -->
 	<string name="account_access_title">Last.fm Account Access</string>
 	<string name="account_access_body">An application has requested access to your Last.fm profile.  Would you like to allow access?  Your password will not be shared.</string>
+	
+	<!-- sync provider -->
+	<string name="sync_only_one_account">Only one Last.fm account is supported.</string>
+	<string name="sync_prompt_title">Sync Last.fm Contacts</string>
+	<string name="sync_prompt_body">Would you like to sync your Last.fm friends with your Android contacts?  This gives you quick access to your friends\' Last.fm status and profile information.  You can enable or disable this option at any time through the \'Accounts &amp; Sync\' settings page.</string>
 </resources>

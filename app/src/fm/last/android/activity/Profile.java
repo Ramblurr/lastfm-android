@@ -40,6 +40,7 @@ import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -71,6 +72,7 @@ import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
+import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
@@ -154,11 +156,22 @@ public class Profile extends ListActivity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.home);
 		Session session = LastFMApplication.getInstance().session;
-		if (session == null) {
+		if (session == null || (Integer.decode(Build.VERSION.SDK) >= 6 && !AccountAuthenticatorService.hasLastfmAccount(this))) {
 			LastFMApplication.getInstance().logout();
 			Intent intent = new Intent(Profile.this, LastFm.class);
 			startActivity(intent);
 			finish();
+		}
+		
+		if(Integer.decode(Build.VERSION.SDK) >= 6) {
+			SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+			if(!settings.getBoolean("sync_nag", false)) {
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("sync_nag", true);
+				editor.commit();
+				Intent intent = new Intent(Profile.this, SyncPrompt.class);
+				startActivity(intent);
+			}
 		}
 		
 		if(getIntent().getData() != null) {

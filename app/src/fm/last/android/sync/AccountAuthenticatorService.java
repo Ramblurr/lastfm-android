@@ -46,8 +46,6 @@ public class AccountAuthenticatorService extends Service {
 		public static Bundle addAccount(Context ctx, String username, String session_key) {
 			Bundle result = null;
 			Account account = new Account(username, ctx.getString(R.string.ACCOUNT_TYPE));
-			ContentResolver.setIsSyncable(account, ContactsContract.AUTHORITY, 1);
-            ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
 			AccountManager am = AccountManager.get(ctx);
 			if (am.addAccountExplicitly(account, session_key, null)) {
 				result = new Bundle();
