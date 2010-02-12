@@ -3,6 +3,9 @@
  */
 package fm.last.android.sync;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,6 +15,7 @@ import fm.last.api.Friends;
 import fm.last.api.LastFmServer;
 import fm.last.api.Track;
 import fm.last.api.User;
+import fm.last.util.UrlUtil;
 
 import android.accounts.Account;
 import android.accounts.OperationCanceledException;
@@ -25,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -77,8 +82,7 @@ public class ContactsSyncAdapterService extends Service {
 		return sSyncAdapter;
 	}
 
-	private static void addContact(Account account, String name, String username) {
-		Log.i(TAG, "Adding contact: " + name);
+	private static long addContact(Account account, String name, String username) {
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 
 		ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
@@ -110,10 +114,19 @@ public class ContactsSyncAdapterService extends Service {
 
 		try {
 			mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
+			// Load the local Last.fm contacts
+			Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
+					RawContacts.ACCOUNT_TYPE, account.type).build();
+			Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1 }, RawContacts.SYNC1 + " = '" + username + "'", null, null);
+			if (c1.moveToNext()) {
+				return c1.getLong(0);
+			}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return -1;
 	}
 
 	private static void updateContactStatus(ArrayList<ContentProviderOperation> operationList, long rawContactId, Track track) {
@@ -155,28 +168,61 @@ public class ContactsSyncAdapterService extends Service {
 		}
 	}
 
+	private static void updateContactPhoto(ArrayList<ContentProviderOperation> operationList, long rawContactId, String url) {
+		byte[] image;
+		try {
+			image = UrlUtil.doGetAndReturnBytes(new URL(url), 65535);
+			if(image.length > 0) {
+				ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+				builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
+				builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+				builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, image);
+				operationList.add(builder.build());
+
+				builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
+				builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
+				builder.withValue(ContactsContract.RawContacts.SYNC2, url);
+				operationList.add(builder.build());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private static void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult)
 			throws OperationCanceledException {
 		HashMap<String, Long> localContacts = new HashMap<String, Long>();
+		HashMap<String, String> localAvatars = new HashMap<String, String>();
 		mContentResolver = context.getContentResolver();
-		Log.i(TAG, "performSync: " + account.toString());
 
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
-		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1 }, null, null, null);
+		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1, RawContacts.SYNC2 }, null, null, null);
 		while (c1.moveToNext()) {
 			localContacts.put(c1.getString(1), c1.getLong(0));
+			if(c1.getString(2) != null)
+				localAvatars.put(c1.getString(1), c1.getString(2));
 		}
 
-		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		try {
 			Friends friends = server.getFriends(account.name, null, null);
 			for (User user : friends.getFriends()) {
 				if (!localContacts.containsKey(user.getName())) {
-					addContact(account, user.getRealName(), user.getName());
-				} else {
+					long id = addContact(account, user.getRealName(), user.getName());
+					if(id != -1)
+						localContacts.put(user.getName(), id);
+				}
+			}
+
+			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+			for (User user : friends.getFriends()) {
+				if (localContacts.containsKey(user.getName())) {
+					if (!localAvatars.containsKey(user.getName())) {
+						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
+					}
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
 					if (tracks.length > 0) {
 						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
