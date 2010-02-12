@@ -45,14 +45,4 @@ public class Help extends Activity {
 		outState.putString("url", mLastUrl);
 		super.onSaveInstanceState(outState);
 	}
-
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-	    if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
-	        mWebView.goBack();
-	        return true;
-	    }
-	    return super.onKeyDown(keyCode, event);
-	}
 }
