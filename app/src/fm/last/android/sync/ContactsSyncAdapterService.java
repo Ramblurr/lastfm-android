@@ -208,7 +208,7 @@ public class ContactsSyncAdapterService extends Service {
 
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		try {
-			Friends friends = server.getFriends(account.name, null, null);
+			Friends friends = server.getFriends(account.name, null, "1024");
 			for (User user : friends.getFriends()) {
 				if (!localContacts.containsKey(user.getName())) {
 					long id = addContact(account, user.getRealName(), user.getName());

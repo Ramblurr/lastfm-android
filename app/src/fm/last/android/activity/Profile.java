@@ -1084,7 +1084,7 @@ public class Profile extends ListActivity {
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
-				User[] friends = mServer.getFriends(mUser.getName(), null, null).getFriends();
+				User[] friends = mServer.getFriends(mUser.getName(), null, "1024").getFriends();
 				if (friends.length == 0)
 					return null;
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
