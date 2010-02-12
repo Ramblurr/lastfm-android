@@ -66,7 +66,11 @@ public class LastFMApplication extends Application {
 	private static LastFMApplication instance = null;
 
 	public static LastFMApplication getInstance() {
-		return instance;
+		if(instance != null) {
+			return instance;
+		} else {
+			return new LastFMApplication();
+		}
 	}
 
 	@Override
