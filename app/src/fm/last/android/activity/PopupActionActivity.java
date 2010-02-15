@@ -3,16 +3,21 @@
  */
 package fm.last.android.activity;
 
+import java.util.ArrayList;
+
 import android.app.ListActivity;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import fm.last.android.Amazon;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.adapter.ListAdapter;
+import fm.last.android.adapter.ListEntry;
+import fm.last.android.utils.ImageCache;
 
 /**
  * @author sam
@@ -26,18 +31,36 @@ public class PopupActionActivity extends ListActivity {
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-
+		setContentView(R.layout.popup);
+		
 		mArtistName = getIntent().getStringExtra("lastfm.artist");
 		mTrackName = getIntent().getStringExtra("lastfm.track");
-		String[] actions = new String[(Amazon.getAmazonVersion(this) > 0) ? 5 : 4];
-		actions[0] = getString(R.string.action_viewinfo);
-		actions[1] = getString(R.string.action_share);
-		actions[2] = getString(R.string.action_tag);
-		actions[3] = getString(R.string.action_addplaylist);
+		
+		ListAdapter adapter = new ListAdapter(this, new ImageCache());
+		ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+
+		ListEntry entry = new ListEntry(R.string.action_viewinfo, R.drawable.info_dark, getResources().getString(R.string.action_viewinfo));
+		iconifiedEntries.add(entry);
+
+		entry = new ListEntry(R.string.action_share, R.drawable.share_dark, getString(R.string.action_share));
+		iconifiedEntries.add(entry);
+
+		entry = new ListEntry(R.string.action_tagtrack, R.drawable.tag_dark, getString(R.string.action_tagtrack));
+		iconifiedEntries.add(entry);
+
+		entry = new ListEntry(R.string.action_addplaylist, R.drawable.playlist_dark, getString(R.string.action_addplaylist));
+		iconifiedEntries.add(entry);
+
 		if (Amazon.getAmazonVersion(this) > 0) {
-			actions[4] = getString(R.string.action_amazon);
+			entry = new ListEntry(R.string.action_amazon, R.drawable.shopping_cart_dark, getString(R.string.action_amazon)); // TODO
+			iconifiedEntries.add(entry);
 		}
-		this.setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, actions));
+
+		adapter.setSourceIconified(iconifiedEntries);
+		adapter.setIconsUnscaled();
+		adapter.disableLoadBar();
+		setListAdapter(adapter);
+		getListView().setDivider(new ColorDrawable(0xffd9d7d7));
 	}
 
 	@Override
