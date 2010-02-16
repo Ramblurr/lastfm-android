@@ -58,15 +58,15 @@
 			android:dialogLayout="@layout/bugreport"
 			android:negativeButtonText="@string/common_cancel" android:positiveButtonText="@string/prefs_bugreport_send"/>
 		<Preference
-			android:title="Terms Of Service"
+			android:title="@string/prefs_tos_title"
 			android:key="tos"
 			/>
 		<Preference
-			android:title="Privacy Policy"
+			android:title="@string/prefs_privacy_title"
 			android:key="privacy"
 			/>
 		<Preference
-			android:title="Version"
+			android:title="@string/prefs_version_title"
 			android:key="version"
 			/>
 	</PreferenceCategory>

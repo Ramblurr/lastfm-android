@@ -1140,7 +1140,7 @@ public class Profile extends ListActivity {
 		MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.action_settings));
 		settings.setIcon(android.R.drawable.ic_menu_preferences);
 
-		MenuItem help = menu.add(Menu.NONE, 2, Menu.NONE, "Help");
+		MenuItem help = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.action_help));
 		help.setIcon(android.R.drawable.ic_menu_help);
 
 		MenuItem nowPlaying = menu.add(Menu.NONE, 3, Menu.NONE, getString(R.string.action_nowplaying));

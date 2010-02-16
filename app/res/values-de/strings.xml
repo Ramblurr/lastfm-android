@@ -15,13 +15,14 @@
     <string name="action_tag">Taggen</string>
     <string name="action_love">Titel lieben</string>
     <string name="action_ban">Titel bannen</string>
+    <string name="action_help">Hilfe</string>
 
 	<!-- LastFm main activity -->
 	<string name="main_username">Benutzername</string>
 	<string name="main_password">Passwort</string>
 	<string name="main_login">Anmelden</string>
 	<string name="main_signup">Registrieren</string>
-	<string name="main_newaccount">&quot;Hast du noch keinen Account?&quot;</string>
+	<string name="main_newaccount">&quot;Hast du noch kein Konto?&quot;</string>
 	<string name="main_authenticating">Authentifiziere</string>
 	<string name="main_forgotpassword">Passwort vergessen</string>
 	
@@ -60,6 +61,8 @@
     <string name="prefs_label">Last.fm: Einstellungen</string>
 	<string name="prefs_cat_scrobbler_title">Scrobbler</string>
 	<string name="prefs_scrobble_title">Scrobbeln aktivieren</string>
+	<string name="prefs_scrobble_percentage">Der Prozentsatz der Laufzeit eines Titels bei dem gescrobbelt wird.</string>
+    <string name="prefs_scrobble_perc_title">Scrobbel-Prozentsatz</string>	
 	<string name="prefs_scrobble_summary">Aktualisiere dein Last.fm Profil während du Musik hörst</string>
 	<string name="prefs_scrobble_music_player_title">Scrobbel Android Player</string>
 	<string name="prefs_scrobble_music_player_summary">Scrobbel den Android Musik-Player</string>
@@ -70,10 +73,14 @@
 	<string name="prefs_cat_player_title">Player</string>
 	<string name="prefs_highquality_title">High-Quality-Audio</string>
 	<string name="prefs_highquality_summary">Verwende High-Quality-Audio über Handy</string>
-	<string name="prefs_cat_feedback_title">Feedback</string>
+	<string name="prefs_cat_about_title">Über Last.fm für Android</string>
 	<string name="prefs_bugreport_title">Melde einen Bug</string>
 	<string name="prefs_bugreport_summary">Sende E-Mail an Last.fm</string>
 	<string name="prefs_bugreport_send">Senden</string>
+    <string name="prefs_noisy_title">Headset-Unterbrechung</string>
+    <string name="prefs_noisy_summary">Stoppt die Musik, wenn das Headset entfernt wird.</string>
+	<string name="prefs_tos_title">Nutzungsbedingungen</string>
+	<string name="prefs_privacy_title">Datenschutz</string>
 	
 	<!-- bugreport -->
 	<string name="bugreport_description">Bitte beschreibe den Fehler:</string>
@@ -201,6 +208,8 @@
 	<string name="common_cancel">Abbrechen</string>
 	<string name="common_ok">OK</string>
 	<string name="common_save">Speichern</string>
+	<string name="common_yes">Ja</string>
+    <string name="common_no">Nein</string>
 
     <!-- error message dialogs -->	
 	<string name="ERROR_AUTH">Anmeldung bei Last.fm ist fehlgeschlagen.  Bitte überprüfe Benutzername und Passwort und versuche es nochmal.</string>
@@ -210,7 +219,7 @@
 	<string name="ERROR_INSUFFICIENT_FANS">Dieser Künstler hat nicht genug Fans, um die Station abzuspielen.  Bitte versuche einen anderen Künstler.</string>
 	<string name="ERROR_INSUFFICIENT_MEMBERS">Die Gruppe hat nicht genug Mitglieder, um die Station abzuspielen.  Bitte versuche eine andere Gruppe.</string>
 	<string name="ERROR_INSUFFICIENT_NEIGHBOURS">&quot;Deine Nachbarn konnten noch nicht berechnet werden.  Höre mehr Musik und versuch es in ein paar Tagen noch einmal.&quot;</string>
-	<string name="ERROR_MISSINGINFO">&quot;Du must einen gültigen Benutzernamen und Passwort eingeben. Wenn du keinen Account hast, klicke auf \'Registrieren\'.&quot;</string>
+	<string name="ERROR_MISSINGINFO">&quot;Du must einen gültigen Benutzernamen und Passwort eingeben. Wenn du kein Konto hast, klicke auf \'Registrieren\'.&quot;</string>
 	<string name="ERROR_MISSINGINFO_TITLE">Fehlende Information</string>
 	<string name="ERROR_NONETWORK">Diese Funktion benötigt eine aktive Internetverbindung.  Bitte aktiviere die Internetverbindung und versuch es noch einmal.</string>
 	<string name="ERROR_NONETWORK_TITLE">Keine Netzwerkverbindung</string>
@@ -231,4 +240,13 @@
 	<string name="ERROR_SIGNUP_TITLE">Registrierung fehlgeschlagen</string>
 	<string name="ERROR_AMAZON">Amazon MP3-Downloads stehen auf diesem Gerät nicht zur Verfügung.</string>
     <string name="ERROR_AMAZON_TITLE">Amazon nicht verfügbar</string>
+    
+    <!-- third party account access -->
+    <string name="account_access_title">Zugriff Last.fm-Konto</string>
+    <string name="account_access_body">Eine Anwendung möchte auf dein Last.fm-Profil zugreifen.  Möchtest du das zulassen?  Dein Passwort wird nicht weitergegeben.</string>
+    
+    <!-- sync provider -->
+    <string name="sync_only_one_account">Nur ein Last.fm-Konto wird unterstützt.</string>
+    <string name="sync_prompt_title">Last.fm-Kontakte abgleichen</string>
+    <string name="sync_prompt_body">Möchtest du deine Freunde auf Last.fm mit deinen Android-Kontakten abgleichen?  Dies ermöglicht dir einen schnellen Zugriff auf Status und Profile deiner Freunde.  Du kannst dies jederzeit unter \'Konten und Synchronisierung\' ändern.</string>
 </resources>

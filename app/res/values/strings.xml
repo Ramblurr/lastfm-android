@@ -17,6 +17,7 @@
     <string name="action_tag">Tag</string>
     <string name="action_love">Love Track</string>
     <string name="action_ban">Ban Track</string>
+    <string name="action_help">Help</string>
 
 	<!-- LastFm main activity -->
 	<string name="main_username">Username</string>
@@ -82,6 +83,9 @@
 	<string name="prefs_noisy_summary">Stops music playback when headset is disconnected</string>
 	<string name="prefs_discovery_title">Discovery mode</string>
 	<string name="prefs_discovery_summary">Only play songs you\'ve never heard before</string>
+	<string name="prefs_tos_title">Terms of Service</string>
+	<string name="prefs_privacy_title">Privacy Policy</string>
+	<string name="prefs_version_title">Version</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
