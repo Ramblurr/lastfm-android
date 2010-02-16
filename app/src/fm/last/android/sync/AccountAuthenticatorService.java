@@ -43,11 +43,11 @@ public class AccountAuthenticatorService extends Service {
 			mContext = context;
 		}
 		
-		public static Bundle addAccount(Context ctx, String username, String session_key) {
+		public static Bundle addAccount(Context ctx, String username, String password) {
 			Bundle result = null;
 			Account account = new Account(username, ctx.getString(R.string.ACCOUNT_TYPE));
 			AccountManager am = AccountManager.get(ctx);
-			if (am.addAccountExplicitly(account, session_key, null)) {
+			if (am.addAccountExplicitly(account, MD5.getInstance().hash(password), null)) {
 				result = new Bundle();
 				result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
 				result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
@@ -126,7 +126,7 @@ public class AccountAuthenticatorService extends Service {
 
 			AccountManager am = AccountManager.get(mContext);
 			String user = account.name.toLowerCase().trim();
-			String md5Password = MD5.getInstance().hash(am.getPassword(account));
+			String md5Password = am.getPassword(account);
 			String authToken = MD5.getInstance().hash(user + md5Password);
 
 			Bundle result = new Bundle();
