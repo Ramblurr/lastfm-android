@@ -155,6 +155,22 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						"widget-love", // Action
 						"", // Label
 						0); // Value
+				LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+						try {
+							if (player.isPlaying())
+								player.setLoved(true);
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LastFMApplication.getInstance().unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName arg0) {
+					}
+				}, 0);
 			} else if (action.equals("fm.last.android.widget.BAN")) {
 				Intent i = new Intent("fm.last.android.BAN");
 				context.sendBroadcast(i);
@@ -271,7 +287,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
-	public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering) {
+	public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering, boolean loved) {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
@@ -288,6 +304,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
 		views.setTextViewText(R.id.widgettext, artist + " - " + title);
 		views.setImageViewResource(R.id.stop, R.drawable.stop);
+		if(loved)
+			views.setImageViewResource(R.id.love, R.drawable.loved);
+		else
+			views.setImageViewResource(R.id.love, R.drawable.love);
 
 		if (mAlarmIntent == null) {
 			Intent intent = new Intent("fm.last.android.widget.UPDATE");
@@ -311,13 +331,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						long duration = player.getDuration();
 						long pos = player.getPosition();
 						boolean buffering = true;
+						boolean loved = player.getLoved();
 						if ((pos >= 0) && (duration > 0) && (pos <= duration)) {
 							buffering = false;
 						}
 						if (player.getTrackName().equals(RadioPlayerService.UNKNOWN))
 							updateAppWidget_idle(ctx, player.getStationName(), true);
 						else
-							updateAppWidget_playing(ctx, player.getTrackName(), player.getArtistName(), pos, duration, buffering);
+							updateAppWidget_playing(ctx, player.getTrackName(), player.getArtistName(), pos, duration, buffering, loved);
 					} else {
 						String stationName = player.getStationName();
 						if (stationName == null) {

@@ -521,7 +521,7 @@ public class RadioPlayerService extends Service {
 
 			if (p == mp) {
 				currentTrack = track;
-				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true);
+				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true, track.getLoved());
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
