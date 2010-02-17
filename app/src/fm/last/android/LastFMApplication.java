@@ -164,7 +164,7 @@ public class LastFMApplication extends Application {
 		SQLiteDatabase db = null;
 		try {
 			db = this.openOrCreateDatabase(LastFm.DB_NAME, MODE_PRIVATE, null);
-			Cursor c = db.rawQuery("SELECT * FROM " + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null);
+			Cursor c = db.rawQuery("SELECT * FROM " + LastFm.DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 10", null);
 			int urlColumn = c.getColumnIndex("Url");
 			int nameColumn = c.getColumnIndex("Name");
 			Station[] stations = new Station[c.getCount()];
