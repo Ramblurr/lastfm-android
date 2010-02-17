@@ -3,11 +3,10 @@
  */
 package fm.last.android.sync;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.R;
@@ -29,22 +28,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.ContactsContract.RawContacts.Entity;
-import android.util.Log;
 
 /**
  * @author sam
  * 
  */
 public class ContactsSyncAdapterService extends Service {
-	private static final String TAG = "ContactsSyncAdapterService";
 	private static SyncAdapterImpl sSyncAdapter = null;
 	private static ContentResolver mContentResolver = null;
 
@@ -132,35 +129,32 @@ public class ContactsSyncAdapterService extends Service {
 	private static void updateContactStatus(ArrayList<ContentProviderOperation> operationList, long rawContactId, Track track) {
 		Uri rawContactUri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId);
 		Uri entityUri = Uri.withAppendedPath(rawContactUri, Entity.CONTENT_DIRECTORY);
-		Cursor c = mContentResolver.query(entityUri, new String[] { RawContacts.SOURCE_ID, Entity.DATA_ID, Entity.MIMETYPE, Entity.DATA1 }, null, null, null);
+		Cursor c = mContentResolver.query(entityUri, new String[] { Entity.DATA_ID }, Entity.MIMETYPE + " = 'vnd.android.cursor.item/vnd.fm.last.android.profile'", null, null);
 		try {
-			while (c.moveToNext()) {
-				if (!c.isNull(1)) {
-					String mimeType = c.getString(2);
+			if (c.moveToNext()) {
+				if (!c.isNull(0)) {
 					String status = "";
 					if (track.getNowPlaying() != null && track.getNowPlaying().equals("true"))
 						status = "Listening to " + track.getName() + " by " + track.getArtist().getName();
 					else
 						status = "Listened to " + track.getName() + " by " + track.getArtist().getName();
 
-					if (mimeType.equals("vnd.android.cursor.item/vnd.fm.last.android.profile")) {
-						ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
-						builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(1));
-						builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
-						builder.withValue(ContactsContract.StatusUpdates.STATUS_RES_PACKAGE, "fm.last.android");
-						builder.withValue(ContactsContract.StatusUpdates.STATUS_LABEL, R.string.app_name);
-						builder.withValue(ContactsContract.StatusUpdates.STATUS_ICON, R.drawable.icon);
-						if (track.getDate() != null) {
-							long date = Long.parseLong(track.getDate()) * 1000;
-							builder.withValue(ContactsContract.StatusUpdates.STATUS_TIMESTAMP, date);
-						}
-						operationList.add(builder.build());
-
-						builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
-						builder.withSelection(BaseColumns._ID + " = '" + c.getLong(1) + "'", null);
-						builder.withValue(ContactsContract.Data.DATA3, status);
-						operationList.add(builder.build());
+					ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
+					builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(0));
+					builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
+					builder.withValue(ContactsContract.StatusUpdates.STATUS_RES_PACKAGE, "fm.last.android");
+					builder.withValue(ContactsContract.StatusUpdates.STATUS_LABEL, R.string.app_name);
+					builder.withValue(ContactsContract.StatusUpdates.STATUS_ICON, R.drawable.icon);
+					if (track.getDate() != null) {
+						long date = Long.parseLong(track.getDate()) * 1000;
+						builder.withValue(ContactsContract.StatusUpdates.STATUS_TIMESTAMP, date);
 					}
+					operationList.add(builder.build());
+
+					builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
+					builder.withSelection(BaseColumns._ID + " = '" + c.getLong(0) + "'", null);
+					builder.withValue(ContactsContract.Data.DATA3, status);
+					operationList.add(builder.build());
 				}
 			}
 		} finally {
@@ -168,12 +162,39 @@ public class ContactsSyncAdapterService extends Service {
 		}
 	}
 
+	private static void updateContactName(ArrayList<ContentProviderOperation> operationList, long rawContactId, String name, String username) {
+		ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI);
+		builder.withSelection(ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId 
+				+ "' AND (" + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE + "'"
+				+ " OR " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE + "')", null);
+		operationList.add(builder.build());
+
+		if(name.length() > 0) {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValue(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, rawContactId);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, name);
+			operationList.add(builder.build());
+		} else {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.RAW_CONTACT_ID, rawContactId);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Nickname.NAME, username);
+			operationList.add(builder.build());
+		}
+	}
+
 	private static void updateContactPhoto(ArrayList<ContentProviderOperation> operationList, long rawContactId, String url) {
 		byte[] image;
+		ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI);
+		builder.withSelection(ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId 
+				+ "' AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'", null);
+		operationList.add(builder.build());
+
 		try {
 			image = UrlUtil.doGetAndReturnBytes(new URL(url), 65535);
 			if(image.length > 0) {
-				ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+				builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 				builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
 				builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
 				builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, image);
@@ -182,6 +203,7 @@ public class ContactsSyncAdapterService extends Service {
 				builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
 				builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
 				builder.withValue(ContactsContract.RawContacts.SYNC2, url);
+				builder.withValue(ContactsContract.RawContacts.SYNC3, String.valueOf(System.currentTimeMillis()));
 				operationList.add(builder.build());
 			}
 		} catch (Exception e) {
@@ -189,20 +211,28 @@ public class ContactsSyncAdapterService extends Service {
 			e.printStackTrace();
 		}
 	}
+	
+	private static void deleteContact(Context context, long rawContactId) throws RemoteException {
+		Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId).buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build();
+		ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
+		client.delete(uri, null, null);
+		client.release();
+	}
 
 	private static void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult)
 			throws OperationCanceledException {
 		HashMap<String, Long> localContacts = new HashMap<String, Long>();
 		HashMap<String, String> localAvatars = new HashMap<String, String>();
+		ArrayList<String> lastfmFriends = new ArrayList<String>();
 		mContentResolver = context.getContentResolver();
 
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
-		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1, RawContacts.SYNC2 }, null, null, null);
+		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1, RawContacts.SYNC2, RawContacts.SYNC3 }, null, null, null);
 		while (c1.moveToNext()) {
 			localContacts.put(c1.getString(1), c1.getLong(0));
-			if(c1.getString(2) != null)
+			if(c1.getString(2) != null && (c1.getString(3) == null || Long.parseLong(c1.getString(3)) > (System.currentTimeMillis() + 604800000))) //Refresh avatars weekly
 				localAvatars.put(c1.getString(1), c1.getString(2));
 		}
 
@@ -219,6 +249,8 @@ public class ContactsSyncAdapterService extends Service {
 
 			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 			for (User user : friends.getFriends()) {
+				lastfmFriends.add(user.getName());
+				
 				if (localContacts.containsKey(user.getName())) {
 					if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
 						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
@@ -227,10 +259,19 @@ public class ContactsSyncAdapterService extends Service {
 					if (tracks.length > 0) {
 						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
 					}
+					updateContactName(operationList, localContacts.get(user.getName()), user.getRealName(), user.getName());
 				}
 			}
+
 			if(operationList.size() > 0)
 				mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
+			
+			Iterator<String> i = localContacts.keySet().iterator();
+			while(i.hasNext()) {
+				String user = i.next();
+				if(!lastfmFriends.contains(user))
+					deleteContact(context, localContacts.get(user));
+			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
