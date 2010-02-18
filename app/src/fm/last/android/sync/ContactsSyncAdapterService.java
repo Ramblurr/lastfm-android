@@ -297,15 +297,13 @@ public class ContactsSyncAdapterService extends Service {
 				if (localContacts.containsKey(user.getName())) {
 					if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
 						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
-
-						//Update this along with the photo so it only refreshes weekly
-						Tasteometer taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
-						updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
 					}
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
 					if (tracks.length > 0) {
 						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
 					}
+					Tasteometer taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
+					updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
 					updateContactName(operationList, localContacts.get(user.getName()), user.getRealName(), user.getName());
 				}
 			}
