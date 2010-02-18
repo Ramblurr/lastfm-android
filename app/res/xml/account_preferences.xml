@@ -2,4 +2,17 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory
+            android:title="Account Settings" />
+
+    <PreferenceScreen
+        android:key="account_settings"
+        android:title="Last.fm Settings"
+        android:summary="Configure player, scrobbler, and sync settings">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="fm.last.android"
+            android:targetClass="fm.last.android.activity.Preferences" />
+    </PreferenceScreen>
+    
 </PreferenceScreen>
