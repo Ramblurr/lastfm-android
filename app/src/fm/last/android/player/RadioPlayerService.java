@@ -332,6 +332,9 @@ public class RadioPlayerService extends Service {
 		if (mp.isPlaying())
 			mp.stop();
 		mp.release();
+		if (next_mp != null) {
+			next_mp.release();
+		}
 		clearNotification();
 		unregisterReceiver(connectivityListener);
 		unregisterReceiver(prebufferListener);
