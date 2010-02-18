@@ -5,4 +5,9 @@
 		android:summaryColumn="data2"
 		android:detailColumn="data3"
 		android:detailSocialSummary="true" />
+	<ContactsDataKind
+		android:icon="@drawable/icon"
+		android:mimeType="vnd.android.cursor.item/vnd.fm.last.android.tasteometer"
+		android:summaryColumn="data2"
+		android:detailColumn="data3" />
 </ContactsSource> 

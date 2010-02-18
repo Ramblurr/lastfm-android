@@ -86,6 +86,11 @@
 	<string name="prefs_tos_title">Terms of Service</string>
 	<string name="prefs_privacy_title">Privacy Policy</string>
 	<string name="prefs_version_title">Version</string>
+	<string name="prefs_cat_sync_title">Synchronization</string>
+	<string name="prefs_sync_names_title">Sync real names</string>
+	<string name="prefs_sync_names_summary">Display real names instead of usernames</string>
+	<string name="prefs_sync_taste_title">Sync taste-o-meter</string>
+	<string name="prefs_sync_taste_summary">Display music compatibility in Contacts</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>

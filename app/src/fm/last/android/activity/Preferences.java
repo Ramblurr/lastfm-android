@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -21,8 +22,11 @@ public class Preferences extends PreferenceActivity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
-		addPreferencesFromResource(R.xml.preferences);
-
+		if(Integer.decode(Build.VERSION.SDK) >= 6) {
+			addPreferencesFromResource(R.xml.preferences_2);
+		} else {
+			addPreferencesFromResource(R.xml.preferences);
+		}
 		findPreference("scrobble").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("scrobble_music_player").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("tos").setOnPreferenceClickListener(urlClick);

@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import fm.last.android.AndroidLastFmServerFactory;
+import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.api.Friends;
 import fm.last.api.LastFmServer;
+import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.util.UrlUtil;
@@ -32,6 +34,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
@@ -169,7 +172,7 @@ public class ContactsSyncAdapterService extends Service {
 				+ " OR " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE + "')", null);
 		operationList.add(builder.build());
 
-		if(name.length() > 0) {
+		if(name.length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_names", true)) {
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 			builder.withValue(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, rawContactId);
 			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
@@ -206,6 +209,46 @@ public class ContactsSyncAdapterService extends Service {
 				builder.withValue(ContactsContract.RawContacts.SYNC3, String.valueOf(System.currentTimeMillis()));
 				operationList.add(builder.build());
 			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private static void updateTasteometer(ArrayList<ContentProviderOperation> operationList, long rawContactId, String username, Tasteometer taste) {
+		ContentProviderOperation.Builder builder = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI);
+		builder.withSelection(ContactsContract.Data.RAW_CONTACT_ID + " = '" + rawContactId 
+				+ "' AND " + ContactsContract.Data.MIMETYPE + " = 'vnd.android.cursor.item/vnd.fm.last.android.tasteometer'", null);
+		operationList.add(builder.build());
+
+		if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_taste", true))
+			return;
+		
+		String tastes[] = { "very low", "low", "medium", "high", "super" };
+		String artists = "";
+		
+		for(String artist : taste.getResults()) {
+			if(artists.length() > 0)
+				artists += ", ";
+			artists += artist;
+		}
+		
+		try {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+			builder.withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/vnd.fm.last.android.tasteometer");
+			builder.withValue(ContactsContract.Data.DATA1, username );
+			builder.withValue(ContactsContract.Data.DATA2, "Musical Compatibility" );
+			builder.withValue(ContactsContract.Data.DATA3, "Your musical compatibility is " + tastes[(int)(taste.getScore() * 5)]);
+			operationList.add(builder.build());
+
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValue(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+			builder.withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/vnd.fm.last.android.tasteometer");
+			builder.withValue(ContactsContract.Data.DATA1, username );
+			builder.withValue(ContactsContract.Data.DATA2, "Common Artists" );
+			builder.withValue(ContactsContract.Data.DATA3, artists);
+			operationList.add(builder.build());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -254,6 +297,10 @@ public class ContactsSyncAdapterService extends Service {
 				if (localContacts.containsKey(user.getName())) {
 					if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
 						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
+
+						//Update this along with the photo so it only refreshes weekly
+						Tasteometer taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
+						updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
 					}
 					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
 					if (tracks.length > 0) {

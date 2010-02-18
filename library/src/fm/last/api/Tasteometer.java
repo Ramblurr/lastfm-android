@@ -33,8 +33,8 @@ public class Tasteometer {
 		this.results = results;
 	}
 
-	public String getScore() {
-		return score;
+	public Float getScore() {
+		return Float.valueOf(score);
 	}
 
 	public String[] getResults() {
