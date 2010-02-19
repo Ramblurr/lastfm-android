@@ -3,6 +3,7 @@
  */
 package fm.last.android.sync;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -195,19 +196,21 @@ public class ContactsSyncAdapterService extends Service {
 		operationList.add(builder.build());
 
 		try {
-			image = UrlUtil.doGetAndReturnBytes(new URL(url), 65535);
-			if(image.length > 0) {
-				builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-				builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
-				builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
-				builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, image);
-				operationList.add(builder.build());
-
-				builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
-				builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
-				builder.withValue(ContactsContract.RawContacts.SYNC2, url);
-				builder.withValue(ContactsContract.RawContacts.SYNC3, String.valueOf(System.currentTimeMillis()));
-				operationList.add(builder.build());
+			if(url != null && url.length() > 0) {
+				image = UrlUtil.doGetAndReturnBytes(new URL(url), 65535);
+				if(image.length > 0) {
+					builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+					builder.withValue(ContactsContract.CommonDataKinds.Photo.RAW_CONTACT_ID, rawContactId);
+					builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+					builder.withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, image);
+					operationList.add(builder.build());
+	
+					builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
+					builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
+					builder.withValue(ContactsContract.RawContacts.SYNC2, url);
+					builder.withValue(ContactsContract.RawContacts.SYNC3, String.valueOf(System.currentTimeMillis()));
+					operationList.add(builder.build());
+				}
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -221,8 +224,9 @@ public class ContactsSyncAdapterService extends Service {
 				+ "' AND " + ContactsContract.Data.MIMETYPE + " = 'vnd.android.cursor.item/vnd.fm.last.android.tasteometer'", null);
 		operationList.add(builder.build());
 
-		if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_taste", true))
+		if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_taste", true)) {
 			return;
+		}
 		
 		String tastes[] = { "very low", "low", "medium", "high", "super" };
 		String artists = "";
@@ -255,10 +259,15 @@ public class ContactsSyncAdapterService extends Service {
 		}
 	}
 	
-	private static void deleteContact(Context context, long rawContactId) throws RemoteException {
+	private static void deleteContact(Context context, long rawContactId) {
 		Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, rawContactId).buildUpon().appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER, "true").build();
 		ContentProviderClient client = context.getContentResolver().acquireContentProviderClient(ContactsContract.AUTHORITY_URI);
-		client.delete(uri, null, null);
+		try {
+			client.delete(uri, null, null);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		client.release();
 	}
 
@@ -269,6 +278,8 @@ public class ContactsSyncAdapterService extends Service {
 		ArrayList<String> lastfmFriends = new ArrayList<String>();
 		mContentResolver = context.getContentResolver();
 
+		account = new Account("jonocole", "fm.last.android");
+		
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
@@ -280,8 +291,9 @@ public class ContactsSyncAdapterService extends Service {
 		}
 
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
+		Friends friends = null;
 		try {
-			Friends friends = server.getFriends(account.name, null, "1024");
+			friends = server.getFriends(account.name, null, "1024");
 			for (User user : friends.getFriends()) {
 				if (!localContacts.containsKey(user.getName())) {
 					long id = addContact(account, user.getRealName(), user.getName());
@@ -289,37 +301,62 @@ public class ContactsSyncAdapterService extends Service {
 						localContacts.put(user.getName(), id);
 				}
 			}
-
-			ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-			for (User user : friends.getFriends()) {
-				lastfmFriends.add(user.getName());
-				
-				if (localContacts.containsKey(user.getName())) {
-					if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
-						updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
-					}
-					Track[] tracks = server.getUserRecentTracks(user.getName(), "true", 1);
-					if (tracks.length > 0) {
-						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
-					}
-					Tasteometer taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
-					updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
-					updateContactName(operationList, localContacts.get(user.getName()), user.getRealName(), user.getName());
-				}
-			}
-
-			if(operationList.size() > 0)
-				mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
-			
-			Iterator<String> i = localContacts.keySet().iterator();
-			while(i.hasNext()) {
-				String user = i.next();
-				if(!lastfmFriends.contains(user))
-					deleteContact(context, localContacts.get(user));
-			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return;
+		}
+
+		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+		for (User user : friends.getFriends()) {
+			lastfmFriends.add(user.getName());
+			
+			if (localContacts.containsKey(user.getName())) {
+				if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
+					updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
+				}
+				try {
+					Track[] tracks = null;
+					tracks = server.getUserRecentTracks(user.getName(), "true", 1);
+					if (tracks.length > 0) {
+						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				try {
+					Tasteometer taste;
+					taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
+					updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				updateContactName(operationList, localContacts.get(user.getName()), user.getRealName(), user.getName());
+			}
+
+			if(operationList.size() >= 50) {
+				try {
+					mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				operationList.clear();
+			}
+		}
+
+		if(operationList.size() > 0) {
+			try {
+				mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		Iterator<String> i = localContacts.keySet().iterator();
+		while(i.hasNext()) {
+			String user = i.next();
+			if(!lastfmFriends.contains(user))
+				deleteContact(context, localContacts.get(user));
 		}
 	}
 }
