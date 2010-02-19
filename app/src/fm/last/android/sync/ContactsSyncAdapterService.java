@@ -120,13 +120,15 @@ public class ContactsSyncAdapterService extends Service {
 		builder.withValue(ContactsContract.Data.DATA3, "View profile");
 		operationList.add(builder.build());
 
-		builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
-		builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
-		builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
-		builder.withValue(ContactsContract.CommonDataKinds.Website.TYPE, ContactsContract.CommonDataKinds.Website.TYPE_PROFILE);
-		builder.withValue(ContactsContract.CommonDataKinds.Website.URL, "http://www.last.fm/user/" + username);
-		operationList.add(builder.build());
-
+		if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_website", true)) {
+			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
+			builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0);
+			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.TYPE, ContactsContract.CommonDataKinds.Website.TYPE_PROFILE);
+			builder.withValue(ContactsContract.CommonDataKinds.Website.URL, "http://www.last.fm/user/" + username);
+			operationList.add(builder.build());
+		}
+		
 		try {
 			mContentResolver.applyBatch(ContactsContract.AUTHORITY, operationList);
 			// Load the local Last.fm contacts

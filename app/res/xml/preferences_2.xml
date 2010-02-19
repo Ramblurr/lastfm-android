@@ -64,6 +64,10 @@
 			android:key="sync_taste"
 			android:defaultValue="true"
 			android:summary="@string/prefs_sync_taste_summary" android:title="@string/prefs_sync_taste_title"/>
+		<CheckBoxPreference
+			android:key="sync_website"
+			android:defaultValue="true"
+			android:summary="@string/prefs_sync_website_summary" android:title="@string/prefs_sync_website_title"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/prefs_cat_about_title">

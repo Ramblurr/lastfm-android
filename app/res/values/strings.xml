@@ -93,6 +93,8 @@
 	<string name="prefs_sync_taste_summary">Display contacts\' music compatibility</string>
 	<string name="prefs_sync_icons_title">Sync avatars</string>
 	<string name="prefs_sync_icons_summary">Display contacts\' last.fm avatars</string>
+	<string name="prefs_sync_website_title">Sync website</string>
+	<string name="prefs_sync_website_summary">Display contacts\' last.fm profile URLs</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
