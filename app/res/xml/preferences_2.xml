@@ -53,6 +53,10 @@
 
 	<PreferenceCategory android:title="@string/prefs_cat_sync_title">
 		<CheckBoxPreference
+			android:key="sync_icons"
+			android:defaultValue="true"
+			android:summary="@string/prefs_sync_icons_summary" android:title="@string/prefs_sync_icons_title"/>
+		<CheckBoxPreference
 			android:key="sync_names"
 			android:defaultValue="true"
 			android:summary="@string/prefs_sync_names_summary" android:title="@string/prefs_sync_names_title"/>

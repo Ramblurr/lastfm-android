@@ -90,7 +90,9 @@
 	<string name="prefs_sync_names_title">Sync real names</string>
 	<string name="prefs_sync_names_summary">Display real names instead of usernames</string>
 	<string name="prefs_sync_taste_title">Sync taste-o-meter</string>
-	<string name="prefs_sync_taste_summary">Display music compatibility in Contacts</string>
+	<string name="prefs_sync_taste_summary">Display contacts\' music compatibility</string>
+	<string name="prefs_sync_icons_title">Sync avatars</string>
+	<string name="prefs_sync_icons_summary">Display contacts\' last.fm avatars</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>

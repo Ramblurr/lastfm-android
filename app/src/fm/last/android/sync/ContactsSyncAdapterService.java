@@ -195,6 +195,10 @@ public class ContactsSyncAdapterService extends Service {
 				+ "' AND " + ContactsContract.Data.MIMETYPE + " = '" + ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE + "'", null);
 		operationList.add(builder.build());
 
+		if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_icons", true)) {
+			return;
+		}
+		
 		try {
 			if(url != null && url.length() > 0) {
 				image = UrlUtil.doGetAndReturnBytes(new URL(url), 65535);
@@ -277,7 +281,7 @@ public class ContactsSyncAdapterService extends Service {
 		HashMap<String, String> localAvatars = new HashMap<String, String>();
 		ArrayList<String> lastfmFriends = new ArrayList<String>();
 		mContentResolver = context.getContentResolver();
-
+		
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
