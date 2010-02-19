@@ -30,6 +30,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,6 +49,11 @@ import android.provider.ContactsContract.RawContacts.Entity;
 public class ContactsSyncAdapterService extends Service {
 	private static SyncAdapterImpl sSyncAdapter = null;
 	private static ContentResolver mContentResolver = null;
+	private static String UsernameColumn = ContactsContract.RawContacts.SYNC1;
+	private static String PhotoUrlColumn = ContactsContract.RawContacts.SYNC2;
+	private static String PhotoTimestampColumn = ContactsContract.RawContacts.SYNC3;
+	private static String TasteTimestampColumn = ContactsContract.RawContacts.SYNC4;
+	private static Integer syncSchema = 1;
 
 	public ContactsSyncAdapterService() {
 		super();
@@ -89,7 +95,7 @@ public class ContactsSyncAdapterService extends Service {
 		ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(RawContacts.CONTENT_URI);
 		builder.withValue(RawContacts.ACCOUNT_NAME, account.name);
 		builder.withValue(RawContacts.ACCOUNT_TYPE, account.type);
-		builder.withValue(RawContacts.SYNC1, username);
+		builder.withValue(UsernameColumn, username);
 		operationList.add(builder.build());
 
 		if(name.length() > 0) {
@@ -118,7 +124,7 @@ public class ContactsSyncAdapterService extends Service {
 			// Load the local Last.fm contacts
 			Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 					RawContacts.ACCOUNT_TYPE, account.type).build();
-			Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1 }, RawContacts.SYNC1 + " = '" + username + "'", null, null);
+			Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, UsernameColumn }, UsernameColumn + " = '" + username + "'", null, null);
 			if (c1.moveToNext()) {
 				return c1.getLong(0);
 			}
@@ -211,8 +217,8 @@ public class ContactsSyncAdapterService extends Service {
 	
 					builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
 					builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
-					builder.withValue(ContactsContract.RawContacts.SYNC2, url);
-					builder.withValue(ContactsContract.RawContacts.SYNC3, String.valueOf(System.currentTimeMillis()));
+					builder.withValue(PhotoUrlColumn, url);
+					builder.withValue(PhotoTimestampColumn, String.valueOf(System.currentTimeMillis()));
 					operationList.add(builder.build());
 				}
 			}
@@ -256,6 +262,12 @@ public class ContactsSyncAdapterService extends Service {
 			builder.withValue(ContactsContract.Data.DATA1, username );
 			builder.withValue(ContactsContract.Data.DATA2, "Common Artists" );
 			builder.withValue(ContactsContract.Data.DATA3, artists);
+			
+			builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
+			builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
+			builder.withValue(TasteTimestampColumn, String.valueOf(System.currentTimeMillis()));
+			operationList.add(builder.build());
+
 			operationList.add(builder.build());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -275,23 +287,48 @@ public class ContactsSyncAdapterService extends Service {
 		client.release();
 	}
 
+	private static class SyncEntry {
+		public Long raw_id = 0L;
+		public String photo_url = null;
+		public Long photo_timestamp = null;
+		public Long taste_timestamp = null;
+	}
+	
 	private static void performSync(Context context, Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult)
 			throws OperationCanceledException {
-		HashMap<String, Long> localContacts = new HashMap<String, Long>();
-		HashMap<String, String> localAvatars = new HashMap<String, String>();
+		HashMap<String, SyncEntry> localContacts = new HashMap<String, SyncEntry>();
 		ArrayList<String> lastfmFriends = new ArrayList<String>();
 		mContentResolver = context.getContentResolver();
+
+		//If our app has requested a full sync, we're going to delete all our local contacts and start over
+		boolean is_full_sync = PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("do_full_sync", true);
+		
+		//If our schema is out-of-date, do a fresh sync
+		if(PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getInt("sync_schema", 0) < syncSchema)
+			is_full_sync = true;
 		
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
-		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, RawContacts.SYNC1, RawContacts.SYNC2, RawContacts.SYNC3 }, null, null, null);
+		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, UsernameColumn, PhotoUrlColumn, PhotoTimestampColumn, TasteTimestampColumn }, null, null, null);
 		while (c1.moveToNext()) {
-			localContacts.put(c1.getString(1), c1.getLong(0));
-			if(c1.getString(2) != null && (c1.getString(3) == null || Long.parseLong(c1.getString(3)) > (System.currentTimeMillis() + 604800000))) //Refresh avatars weekly
-				localAvatars.put(c1.getString(1), c1.getString(2));
+			if(is_full_sync) {
+				deleteContact(context, c1.getLong(0));
+			} else {
+				SyncEntry entry = new SyncEntry();
+				entry.raw_id = c1.getLong(0);
+				entry.photo_url = c1.getString(2);
+				entry.photo_timestamp = c1.getLong(3);
+				entry.taste_timestamp = c1.getLong(4);
+				localContacts.put(c1.getString(1), entry);
+			}
 		}
 
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).edit();
+		editor.remove("do_full_sync");
+		editor.putInt("sync_schema", syncSchema);
+		editor.commit();
+		
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		Friends friends = null;
 		try {
@@ -299,8 +336,11 @@ public class ContactsSyncAdapterService extends Service {
 			for (User user : friends.getFriends()) {
 				if (!localContacts.containsKey(user.getName())) {
 					long id = addContact(account, user.getRealName(), user.getName());
-					if(id != -1)
-						localContacts.put(user.getName(), id);
+					if(id != -1) {
+						SyncEntry entry = new SyncEntry();
+						entry.raw_id = id;
+						localContacts.put(user.getName(), entry);
+					}
 				}
 			}
 		} catch (Exception e1) {
@@ -311,29 +351,38 @@ public class ContactsSyncAdapterService extends Service {
 
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 		for (User user : friends.getFriends()) {
-			lastfmFriends.add(user.getName());
+			String username = user.getName();
+			lastfmFriends.add(username);
 			
-			if (localContacts.containsKey(user.getName())) {
-				if (!localAvatars.containsKey(user.getName()) && user.getImages().length > 0) {
-					updateContactPhoto(operationList, localContacts.get(user.getName()), user.getImages()[0].getUrl());
+			if (localContacts.containsKey(username)) {
+				SyncEntry entry = localContacts.get(username);
+				
+				if (entry.photo_timestamp == null || System.currentTimeMillis() > (entry.photo_timestamp + 604800000L)) {
+					String url = null;
+					if(user.getImages().length > 0)
+						url = user.getImages()[0].getUrl();
+					if(entry.photo_url != url)
+						updateContactPhoto(operationList, entry.raw_id, url);
 				}
 				try {
 					Track[] tracks = null;
-					tracks = server.getUserRecentTracks(user.getName(), "true", 1);
+					tracks = server.getUserRecentTracks(username, "true", 1);
 					if (tracks.length > 0) {
-						updateContactStatus(operationList, localContacts.get(user.getName()), tracks[0]);
+						updateContactStatus(operationList, entry.raw_id, tracks[0]);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				try {
-					Tasteometer taste;
-					taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), user.getName(), 3);
-					updateTasteometer(operationList, localContacts.get(user.getName()), user.getName(), taste);
+					if (entry.taste_timestamp == null || System.currentTimeMillis() > (entry.taste_timestamp + 2628000000L)) {
+						Tasteometer taste;
+						taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), username, 3);
+						updateTasteometer(operationList, entry.raw_id, username, taste);
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				updateContactName(operationList, localContacts.get(user.getName()), user.getRealName(), user.getName());
+				updateContactName(operationList, entry.raw_id, user.getRealName(), username);
 			}
 
 			if(operationList.size() >= 50) {
@@ -358,7 +407,7 @@ public class ContactsSyncAdapterService extends Service {
 		while(i.hasNext()) {
 			String user = i.next();
 			if(!lastfmFriends.contains(user))
-				deleteContact(context, localContacts.get(user));
+				deleteContact(context, localContacts.get(user).raw_id);
 		}
 	}
 }

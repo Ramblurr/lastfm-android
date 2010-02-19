@@ -5,25 +5,33 @@ package fm.last.android.activity;
 
 import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.sync.AccountAuthenticatorService;
 
 /**
  * @author sam
  * 
  */
 public class Preferences extends PreferenceActivity {
+	private boolean shouldForceSync = false;
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		if(Integer.decode(Build.VERSION.SDK) >= 6) {
 			addPreferencesFromResource(R.xml.preferences_2);
+			findPreference("sync_icons").setOnPreferenceChangeListener(syncToggle);
+			findPreference("sync_names").setOnPreferenceChangeListener(syncToggle);
+			findPreference("sync_taste").setOnPreferenceChangeListener(syncToggle);
 		} else {
 			addPreferencesFromResource(R.xml.preferences);
 		}
@@ -38,6 +46,21 @@ public class Preferences extends PreferenceActivity {
 			e.printStackTrace();
 		}
 	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		if(shouldForceSync) {
+			AccountAuthenticatorService.resyncAccount(this);
+		}
+	}
+
+	Preference.OnPreferenceChangeListener syncToggle = new Preference.OnPreferenceChangeListener() {
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			shouldForceSync = true;
+			return true;
+		}
+	};
 
 	Preference.OnPreferenceClickListener urlClick = new Preference.OnPreferenceClickListener() {
 

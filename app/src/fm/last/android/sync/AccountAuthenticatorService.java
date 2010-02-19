@@ -3,10 +3,12 @@
  */
 package fm.last.android.sync;
 
+import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.activity.AccountAccessPrompt;
 import fm.last.android.activity.AccountFailActivity;
+import fm.last.android.activity.SyncPrompt;
 import fm.last.api.MD5;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -17,9 +19,11 @@ import android.app.Service;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
 
@@ -192,6 +196,19 @@ public class AccountAuthenticatorService extends Service {
 	
 	public static void removeLastfmAccount(Context ctx) {
 		AccountAuthenticatorImpl.removeLastfmAccount(ctx);
+	}
+	
+	public static void resyncAccount(Context context) {
+		Editor editor = PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).edit();
+		editor.putBoolean("do_full_sync", true);
+		editor.commit();
+		AccountManager am = AccountManager.get(context);
+		Account[] accounts = am.getAccountsByType(context.getString(R.string.ACCOUNT_TYPE));
+		if(ContentResolver.getSyncAutomatically(accounts[0], ContactsContract.AUTHORITY)) {
+			//Try turning it off and on again
+	        ContentResolver.setSyncAutomatically(accounts[0], ContactsContract.AUTHORITY, false);
+	        ContentResolver.setSyncAutomatically(accounts[0], ContactsContract.AUTHORITY, true);
+		}
 	}
 	
 	private AccountAuthenticatorImpl getAuthenticator() { 
