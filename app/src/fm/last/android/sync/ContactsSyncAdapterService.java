@@ -278,8 +278,6 @@ public class ContactsSyncAdapterService extends Service {
 		ArrayList<String> lastfmFriends = new ArrayList<String>();
 		mContentResolver = context.getContentResolver();
 
-		account = new Account("jonocole", "fm.last.android");
-		
 		// Load the local Last.fm contacts
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
