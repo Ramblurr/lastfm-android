@@ -248,6 +248,9 @@ public class ContactsSyncAdapterService extends Service {
 		
 		String tastes[] = { "very low", "low", "medium", "high", "super" };
 		String artists = "";
+		Integer tasteIdx = (int)(taste.getScore() * 5);
+		if(tasteIdx > 4)
+			tasteIdx = 4;
 		
 		for(String artist : taste.getResults()) {
 			if(artists.length() > 0)
@@ -261,7 +264,7 @@ public class ContactsSyncAdapterService extends Service {
 			builder.withValue(ContactsContract.Data.MIMETYPE, "vnd.android.cursor.item/vnd.fm.last.android.tasteometer");
 			builder.withValue(ContactsContract.Data.DATA1, username );
 			builder.withValue(ContactsContract.Data.DATA2, "Musical Compatibility" );
-			builder.withValue(ContactsContract.Data.DATA3, "Your musical compatibility is " + tastes[(int)(taste.getScore() * 5)]);
+			builder.withValue(ContactsContract.Data.DATA3, "Your musical compatibility is " + tastes[tasteIdx]);
 			operationList.add(builder.build());
 
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
@@ -338,10 +341,19 @@ public class ContactsSyncAdapterService extends Service {
 		editor.commit();
 		
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
-		Friends friends = null;
+		ArrayList<User> friends = null;
 		try {
-			friends = server.getFriends(account.name, null, "1024");
-			for (User user : friends.getFriends()) {
+			friends = new ArrayList<User>();
+			
+			Friends f = server.getFriends(account.name, null, "1024");
+			for (User user : f.getFriends()) {
+				friends.add(user);
+			}
+			
+			User self = server.getUserInfo(account.name, LastFMApplication.getInstance().session.getKey());
+			friends.add(self);
+			
+			for (User user : friends) {
 				if (!localContacts.containsKey(user.getName())) {
 					long id = addContact(account, user.getRealName(), user.getName());
 					if(id != -1) {
@@ -358,7 +370,7 @@ public class ContactsSyncAdapterService extends Service {
 		}
 
 		ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
-		for (User user : friends.getFriends()) {
+		for (User user : friends) {
 			String username = user.getName();
 			lastfmFriends.add(username);
 			
