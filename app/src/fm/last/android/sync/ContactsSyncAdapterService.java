@@ -12,6 +12,7 @@ import java.util.Iterator;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Friends;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tasteometer;
@@ -98,7 +99,7 @@ public class ContactsSyncAdapterService extends Service {
 		builder.withValue(UsernameColumn, username);
 		operationList.add(builder.build());
 
-		if(name.length() > 0) {
+		if(name.length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("sync_names", true)) {
 			builder = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI);
 			builder.withValueBackReference(ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID, 0);
 			builder.withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE);
@@ -154,11 +155,24 @@ public class ContactsSyncAdapterService extends Service {
 			if (c.moveToNext()) {
 				if (!c.isNull(0)) {
 					String status = "";
-					if (track.getNowPlaying() != null && track.getNowPlaying().equals("true"))
-						status = "Listening to " + track.getName() + " by " + track.getArtist().getName();
-					else
-						status = "Listened to " + track.getName() + " by " + track.getArtist().getName();
+					Boolean gotTrack = false;
+					if (track.getNowPlaying() != null && track.getNowPlaying().equals("true")) {
+						status = "Listening to ";
+					} else {
+						status = "Listened to ";
+					}
 
+					if(track.getName() != null && !track.getName().equals(RadioPlayerService.UNKNOWN)) {
+						status += track.getName();
+						gotTrack = true;
+					}
+
+					if(track.getArtist() != null && track.getArtist().getName() != null && !track.getArtist().getName().equals(RadioPlayerService.UNKNOWN)) {
+						if(gotTrack)
+							status += " by ";
+						status += track.getArtist().getName();
+					}
+					
 					ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(ContactsContract.StatusUpdates.CONTENT_URI);
 					builder.withValue(ContactsContract.StatusUpdates.DATA_ID, c.getLong(0));
 					builder.withValue(ContactsContract.StatusUpdates.STATUS, status);
@@ -275,12 +289,11 @@ public class ContactsSyncAdapterService extends Service {
 			builder.withValue(ContactsContract.Data.DATA1, username );
 			builder.withValue(ContactsContract.Data.DATA2, "Common Artists" );
 			builder.withValue(ContactsContract.Data.DATA3, artists);
+			operationList.add(builder.build());
 			
 			builder = ContentProviderOperation.newUpdate(ContactsContract.RawContacts.CONTENT_URI);
 			builder.withSelection(ContactsContract.RawContacts.CONTACT_ID + " = '" + rawContactId + "'", null);
 			builder.withValue(TasteTimestampColumn, String.valueOf(System.currentTimeMillis()));
-			operationList.add(builder.build());
-
 			operationList.add(builder.build());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -398,7 +411,7 @@ public class ContactsSyncAdapterService extends Service {
 				try {
 					if (entry.taste_timestamp == null || System.currentTimeMillis() > (entry.taste_timestamp + 2628000000L)) {
 						Tasteometer taste;
-						taste = server.tasteometerCompare(LastFMApplication.getInstance().session.getName(), username, 3);
+						taste = server.tasteometerCompare(account.name, username, 3);
 						updateTasteometer(operationList, entry.raw_id, username, taste);
 					}
 				} catch (IOException e) {
