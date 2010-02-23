@@ -45,6 +45,10 @@
 			android:key="handle_noisy"
 			android:defaultValue="true"
 			android:summary="@string/prefs_noisy_summary" android:title="@string/prefs_noisy_title"/>
+		<CheckBoxPreference
+			android:key="headset_controls"
+			android:defaultValue="true"
+			android:summary="@string/prefs_headset_controls_summary" android:title="@string/prefs_headset_controls_title"/>
 		<!--  <CheckBoxPreference
 			android:key="discovery"
 			android:defaultValue="false"

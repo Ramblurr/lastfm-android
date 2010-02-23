@@ -17,7 +17,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		IBinder service = peekService(context, new Intent(context, RadioPlayerService.class));
-		if (service == null) {
+		if (service == null || !PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("headset_controls", true)) {
 			Log.i(TAG, "LastFM-Player not active, don't handling media keys.");
 			return;
 		}

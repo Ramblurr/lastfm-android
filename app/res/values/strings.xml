@@ -95,6 +95,8 @@
 	<string name="prefs_sync_icons_summary">Display contacts\' last.fm avatars</string>
 	<string name="prefs_sync_website_title">Sync website</string>
 	<string name="prefs_sync_website_summary">Display contacts\' last.fm profile URLs</string>
+	<string name="prefs_headset_controls_title">Headset Controls</string>
+	<string name="prefs_headset_controls_summary">Respond to headset stop and skip buttons during playback</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
