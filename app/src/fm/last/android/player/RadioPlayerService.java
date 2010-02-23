@@ -75,7 +75,7 @@ import fm.last.api.WSError;
 
 public class RadioPlayerService extends Service {
 
-	private MediaPlayer mp = new MediaPlayer();
+	private MediaPlayer mp = null;
 	private MediaPlayer next_mp = null;
 	private boolean mNextPrepared = false;
 	private boolean mNextFullyBuffered = false;
@@ -140,7 +140,7 @@ public class RadioPlayerService extends Service {
 
 		nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		bufferPercent = 0;
-		mp.setScreenOnWhilePlaying(true); // we dont want to sleep while we're
+
 		// playing
 		currentQueue = new ArrayBlockingQueue<RadioTrack>(20);
 
@@ -222,24 +222,7 @@ public class RadioPlayerService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mPreBufferIntent = null;
-
-			// Check if we're running low on tracks
-			if (currentQueue.size() < 2) {
-				mPlaylistRetryCount = 0;
-				try {
-					// Please to be working?
-					refreshPlaylist();
-				} catch (WSError e) {
-					logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
-				} catch (Exception e) {
-				}
-			}
-			if (currentQueue.size() > 1) {
-				mNextPrepared = false;
-				mNextFullyBuffered = false;
-				next_mp = new MediaPlayer();
-				playTrack((currentQueue.peek()), next_mp);
-			}
+			new PreBufferTask().execute();
 		}
 	};
 
@@ -296,7 +279,7 @@ public class RadioPlayerService extends Service {
 					logger.info("New data connection attached! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: "
 							+ ni.getExtraInfo() + " Reason: " + ni.getReason());
 					mState = STATE_TUNING;
-					nextSong();
+					new NextTrackTask().execute();
 				}
 			}
 		}
@@ -308,20 +291,7 @@ public class RadioPlayerService extends Service {
 			String stationURL = intent.getStringExtra("station");
 			Session session = intent.getParcelableExtra("session");
 			if (stationURL.length() > 0 && session != null) {
-				try {
-					tune(stationURL, session);
-					currentTrack = null;
-					nextSong();
-				} catch (WSError e) {
-					mError = e;
-					currentStationURL = null;
-					Intent i = new Intent("fm.last.android.ERROR");
-					i.putExtra("error", (Parcelable) e);
-					sendBroadcast(i);
-					logger.severe("Tuning error: " + e.getMessage());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				new TuneRadioTask(stationURL, session).execute();
 			}
 		}
 	}
@@ -329,9 +299,11 @@ public class RadioPlayerService extends Service {
 	@Override
 	public void onDestroy() {
 		logger.info("Player service shutting down");
-		if (mp.isPlaying())
-			mp.stop();
-		mp.release();
+		if (mp != null) {
+			if (mp.isPlaying())
+				mp.stop();
+			mp.release();
+		}
 		if (next_mp != null) {
 			next_mp.release();
 		}
@@ -798,6 +770,9 @@ public class RadioPlayerService extends Service {
 
 		currentStationURL = url;
 
+		if(mp == null)
+			mp = new MediaPlayer();
+		
 		//Stop the standard media player
 		bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 			public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -871,6 +846,60 @@ public class RadioPlayerService extends Service {
 			currentStationURL = null;
 			wakeLock.release();
 			wifiLock.release();
+		}
+	}
+	
+	private class TuneRadioTask extends UserTask<Void, Void, Void> {
+		String mStationURL = "";
+		Session mSession = null;
+		
+		public TuneRadioTask(String stationURL, Session session) {
+			mStationURL = stationURL;
+			mSession = session;
+		}
+		
+		@Override
+		public Void doInBackground(Void... input) {
+			try {
+				tune(mStationURL, mSession);
+				currentTrack = null;
+				nextSong();
+			} catch (WSError e) {
+				mError = e;
+				currentStationURL = null;
+				Intent i = new Intent("fm.last.android.ERROR");
+				i.putExtra("error", (Parcelable) e);
+				sendBroadcast(i);
+				logger.severe("Tuning error: " + e.getMessage());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+	}
+	
+	private class PreBufferTask extends UserTask<Void, Void, Void> {
+
+		@Override
+		public Void doInBackground(Void... input) {
+			// Check if we're running low on tracks
+			if (currentQueue.size() < 2) {
+				mPlaylistRetryCount = 0;
+				try {
+					// Please to be working?
+					refreshPlaylist();
+				} catch (WSError e) {
+					logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
+				} catch (Exception e) {
+				}
+			}
+			if (currentQueue.size() > 1) {
+				mNextPrepared = false;
+				mNextFullyBuffered = false;
+				next_mp = new MediaPlayer();
+				playTrack((currentQueue.peek()), next_mp);
+			}
+			return null;
 		}
 	}
 
