@@ -224,9 +224,13 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	public void onDisabled(Context context) {
 	}
 
-	private static void bindButtonIntents(Context context) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+	private static void bindButtonIntents(Context context, RemoteViews views) {
+		AppWidgetManager appWidgetManager = null;
+		
+		if(views == null) {
+			AppWidgetManager.getInstance(context);
+			views = new RemoteViews(context.getPackageName(), R.layout.widget);
+		}
 		PendingIntent pendingIntent;
 		Intent intent;
 
@@ -250,12 +254,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 		views.setOnClickPendingIntent(R.id.menu, pendingIntent);
 
-		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
+		if(appWidgetManager != null)
+			appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
 	public static void updateAppWidget_idle(Context context, String stationName, boolean tuning) {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+		bindButtonIntents(context, views);
 
 		views.setViewVisibility(R.id.totaltime, View.GONE);
 		if (stationName != null) {
@@ -290,6 +296,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering, boolean loved) {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+		bindButtonIntents(context, views);
 
 		if (buffering) {
 			views.setViewVisibility(R.id.totaltime, View.GONE);
@@ -321,7 +328,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
 	public static void updateAppWidget(Context context) {
 		final Context ctx = context;
-		bindButtonIntents(context);
+		bindButtonIntents(context, null);
 
 		LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
 			public void onServiceConnected(ComponentName comp, IBinder binder) {
