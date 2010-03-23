@@ -82,7 +82,6 @@ public class Player extends Activity {
 	private boolean paused;
 	private boolean loved = false;
 
-	private ProgressDialog mBufferingDialog;
 	private ProgressDialog mTuningDialog;
 
 	private String mCachedArtist = null;
@@ -489,10 +488,6 @@ public class Player extends Activity {
 			} else if (action.equals(RadioPlayerService.PLAYBACK_ERROR)) {
 				// TODO add a skip counter and try to skip 3 times before
 				// display an error message
-				if (mBufferingDialog != null) {
-					mBufferingDialog.dismiss();
-					mBufferingDialog = null;
-				}
 				if (mTuningDialog != null) {
 					mTuningDialog.dismiss();
 					mTuningDialog = null;
@@ -623,10 +618,7 @@ public class Player extends Activity {
 										mDuration / 1000));
 								mProgress
 										.setProgress((int) (1000 * pos / mDuration));
-								if (mBufferingDialog != null) {
-									mBufferingDialog.dismiss();
-									mBufferingDialog = null;
-								}
+								mProgress.setSecondaryProgress(player.getBufferPercent() * 10);
 								if (mTuningDialog != null) {
 									mTuningDialog.dismiss();
 									mTuningDialog = null;
@@ -635,21 +627,10 @@ public class Player extends Activity {
 								mCurrentTime.setText("--:--");
 								mTotalTime.setText("--:--");
 								mProgress.setProgress(0);
-								if (mBufferingDialog == null
-										&& player.isPlaying()) {
-									if (mTuningDialog != null) {
-										mTuningDialog.dismiss();
-										mTuningDialog = null;
-									}
-									mBufferingDialog = ProgressDialog
-											.show(
-													Player.this,
-													"",
-													getString(R.string.player_buffering),
-													true, false);
-									mBufferingDialog
-											.setVolumeControlStream(android.media.AudioManager.STREAM_MUSIC);
-									mBufferingDialog.setCancelable(true);
+								mProgress.setSecondaryProgress(player.getBufferPercent() * 10);
+								if (player.isPlaying() && mTuningDialog != null) {
+									mTuningDialog.dismiss();
+									mTuningDialog = null;
 								}
 							}
 							// return the number of milliseconds until the next
