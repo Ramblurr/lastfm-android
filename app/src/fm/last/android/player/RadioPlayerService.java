@@ -500,11 +500,11 @@ public class RadioPlayerService extends Service {
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
-			p.setDataSource(track.getLocationUrl());
 			p.setOnCompletionListener(mOnCompletionListener);
 			p.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
 			p.setOnPreparedListener(mOnPreparedListener);
 			p.setOnErrorListener(mOnErrorListener);
+			p.setDataSource(track.getLocationUrl());
 
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a
@@ -527,6 +527,8 @@ public class RadioPlayerService extends Service {
 		if (mp != null) {
 			try {
 				mp.stop();
+				mp.release();
+				mp = null;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
