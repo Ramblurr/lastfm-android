@@ -41,6 +41,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -772,6 +774,18 @@ public class RadioPlayerService extends Service {
 		sendBroadcast(i);
 	}
 
+	public static int getHTCMusicVersion(Context ctx) {
+		PackageManager pm = ctx.getPackageManager();
+		int result = -1;
+		try {
+			PackageInfo pi = pm.getPackageInfo("com.htc.music", PackageManager.GET_ACTIVITIES);
+			result = pi.versionCode;
+		} catch (Exception e) {
+			result = -1;
+		}
+		return result;
+	}
+	
 	private void tune(String url, Session session) throws Exception, WSError {
 		wakeLock.acquire();
 		wifiLock.acquire();
@@ -803,26 +817,28 @@ public class RadioPlayerService extends Service {
 		}, 0);
 
 		//Stop the HTC media player
-		bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
-			public void onServiceConnected(ComponentName comp, IBinder binder) {
-				com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
-
-				try {
-					if (s.isPlaying()) {
-						s.stop();
-						sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+		if(getHTCMusicVersion(this) > -1) {
+			bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+	
+					try {
+						if (s.isPlaying()) {
+							s.stop();
+							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+						}
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					unbindService(this);
 				}
-				unbindService(this);
-			}
-
-			public void onServiceDisconnected(ComponentName comp) {
-			}
-		}, 0);
-
+	
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
+		}
+		
 		tuningNotify();
 
 		logger.info("Tuning to station: " + url);
