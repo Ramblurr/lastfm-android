@@ -699,7 +699,7 @@ public class Player extends Activity {
 			try {
 				String artistName = params[1];
 				String albumName = params[2];
-				if (albumName != null && albumName.length() > 0) {
+				if (!artistName.equals(RadioPlayerService.UNKNOWN) && albumName != null && albumName.length() > 0) {
 					album = mServer.getAlbumInfo(artistName, albumName);
 					if (album != null) {
 						for (ImageUrl image : album.getImages()) {
