@@ -253,6 +253,12 @@ public class ScrobblerService extends Service {
 	}
 
 	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		onStart(intent, startId);
+		return START_NOT_STICKY;
+	}
+	
+	@Override
 	public void onStart(Intent intent, int startId) {
 		final Intent i = intent;
 		if (mScrobbler == null) {

@@ -286,6 +286,12 @@ public class RadioPlayerService extends Service {
 	};
 
 	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		onStart(intent, startId);
+		return START_NOT_STICKY;
+	}
+
+	@Override
 	public void onStart(Intent intent, int startId) {
 		if (intent.getAction().equals("fm.last.android.PLAY")) {
 			String stationURL = intent.getStringExtra("station");
