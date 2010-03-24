@@ -323,6 +323,11 @@ public class RadioPlayerService extends Service {
 			am.cancel(mPreBufferIntent);
 			mPreBufferIntent = null;
 		}
+		if(wakeLock != null && wakeLock.isHeld())
+			wakeLock.release();
+		
+		if(wifiLock != null && wifiLock.isHeld())
+			wifiLock.release();
 	}
 
 	public IBinder getBinder() {
@@ -578,8 +583,11 @@ public class RadioPlayerService extends Service {
 
 		if (mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
-			if (mp.isPlaying())
+			if (mp.isPlaying()) {
 				mp.stop();
+				mp.release();
+				mp = null;
+			}
 		}
 
 		if (mPreBufferIntent != null) {
@@ -596,18 +604,8 @@ public class RadioPlayerService extends Service {
 				refreshPlaylist();
 			} catch (WSError e) {
 				mError = e;
-				clearNotification();
-				notifyChange(PLAYBACK_ERROR);
-				mState = STATE_ERROR;
-				Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.playerservice_error_ticker_text), System
-						.currentTimeMillis());
-				PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Profile.class), 0);
-				notification.setLatestEventInfo(this, getString(R.string.ERROR_INSUFFICIENT_CONTENT_TITLE), getString(R.string.ERROR_INSUFFICIENT_CONTENT),
-						contentIntent);
-				nm.notify(NOTIFY_ID, notification);
-				return;
 			} catch (Exception e) {
-				return;
+				e.printStackTrace();
 			}
 		}
 
@@ -635,15 +633,22 @@ public class RadioPlayerService extends Service {
 			// playTrack will check if mStopping is true, and stop us if the
 			// user has
 			// pressed stop while we were fetching the playlist
+			if(mp == null) {
+				mp = new MediaPlayer();
+			}
 			playTrack(currentQueue.poll(), mp);
 			notifyChange(META_CHANGED);
 		} else {
-			// radio finished
-			notifyChange(PLAYBACK_FINISHED);
+			// we ran out of tracks, display a NEC error and stop
 			clearNotification();
-			wakeLock.release();
-			wifiLock.release();
-			mState = STATE_STOPPED;
+			notifyChange(PLAYBACK_ERROR);
+			mState = STATE_ERROR;
+			Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.playerservice_error_ticker_text), System
+					.currentTimeMillis());
+			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Profile.class), 0);
+			notification.setLatestEventInfo(this, getString(R.string.ERROR_INSUFFICIENT_CONTENT_TITLE), getString(R.string.ERROR_INSUFFICIENT_CONTENT),
+					contentIntent);
+			nm.notify(NOTIFY_ID, notification);
 			stopSelf();
 		}
 	}
@@ -792,9 +797,6 @@ public class RadioPlayerService extends Service {
 
 		currentStationURL = url;
 
-		if(mp == null)
-			mp = new MediaPlayer();
-		
 		//Stop the standard media player
 		bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 			public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -870,6 +872,7 @@ public class RadioPlayerService extends Service {
 			currentStationURL = null;
 			wakeLock.release();
 			wifiLock.release();
+			stopSelf();
 		}
 	}
 	
@@ -895,6 +898,8 @@ public class RadioPlayerService extends Service {
 				i.putExtra("error", (Parcelable) e);
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
+				clearNotification();
+				stopSelf();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -936,9 +941,11 @@ public class RadioPlayerService extends Service {
 				nextSong();
 				success = true;
 			} catch (WSError e) {
+				e.printStackTrace();
 				mError = e;
 				success = false;
 			} catch (Exception e) {
+				e.printStackTrace();
 				success = false;
 			}
 			return success;
