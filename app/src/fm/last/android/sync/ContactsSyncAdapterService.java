@@ -327,7 +327,7 @@ public class ContactsSyncAdapterService extends Service {
 		mContentResolver = context.getContentResolver();
 
 		//If our app has requested a full sync, we're going to delete all our local contacts and start over
-		boolean is_full_sync = PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("do_full_sync", true);
+		boolean is_full_sync = PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("do_full_sync", false);
 		
 		//If our schema is out-of-date, do a fresh sync
 		if(PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getInt("sync_schema", 0) < syncSchema)
