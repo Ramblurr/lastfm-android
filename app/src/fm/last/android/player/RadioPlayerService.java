@@ -43,6 +43,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -517,6 +518,7 @@ public class RadioPlayerService extends Service {
 			p.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
 			p.setOnPreparedListener(mOnPreparedListener);
 			p.setOnErrorListener(mOnErrorListener);
+			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 
 			// We do this because there has been bugs in our phonecall fade code

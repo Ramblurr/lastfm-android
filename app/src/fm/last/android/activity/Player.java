@@ -720,7 +720,6 @@ public class Player extends Activity {
 		@Override
 		public void onPostExecute(Boolean result) {
 			if (artUrl != RadioPlayerService.UNKNOWN) {
-				Log.i("LastFm", "Fetching art:" + artUrl);
 				mAlbum.fetch(artUrl);
 			} else {
 				mAlbum.setDefaultImageResource(R.drawable.no_artwork);
