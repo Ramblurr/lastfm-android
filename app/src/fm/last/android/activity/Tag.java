@@ -47,8 +47,6 @@ import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.adapter.TagListAdapter;
 import fm.last.android.utils.UserTask;
-import fm.last.android.widget.TabBar;
-import fm.last.android.widget.TabBarListener;
 import fm.last.android.widget.TagLayout;
 import fm.last.android.widget.TagLayoutListener;
 import fm.last.api.LastFmServer;

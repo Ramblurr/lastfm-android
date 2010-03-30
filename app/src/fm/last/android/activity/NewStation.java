@@ -28,15 +28,19 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TabHost.OnTabChangeListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -44,14 +48,12 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
-import fm.last.android.widget.TabBar;
-import fm.last.android.widget.TabBarListener;
 import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
 import fm.last.api.User;
 
-public class NewStation extends ListActivity implements TabBarListener, Serializable {
+public class NewStation extends ListActivity implements Serializable {
 	private static final long serialVersionUID = 2513501434143727293L;
 
 	private enum SearchType {
@@ -65,7 +67,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 	private EditText searchBar;
 	private ListAdapter mListAdapters[] = new ListAdapter[3];
 	private Button mSearchButton;
-	private TabBar mTabBar;
+	private TabHost mTabHost;
 	private ImageCache mImageCache;
 	private TextView mHint;
 
@@ -75,6 +77,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 	private final int TAB_TAG = 1;
 	private final int TAB_USER = 2;
 
+	private int index = 0;
+	
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
@@ -94,18 +98,48 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 				}
 			}
 		});
+		
+		searchBar.setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				searchBar.requestFocusFromTouch();
+				return true;
+			}
+		});
 
 		mSearchButton = (Button) findViewById(R.id.search);
 		mSearchButton.setOnClickListener(mNewStation);
 
 		mHint = (TextView) findViewById(R.id.search_hint);
 
-		mTabBar = (TabBar) findViewById(R.id.TabBar);
-		mTabBar.setListener(this);
-		mTabBar.addTab(getString(R.string.newstation_artist), R.drawable.similar_artists).setId(TAB_ARTIST);
-		mTabBar.addTab(getString(R.string.newstation_tag), R.drawable.tags).setId(TAB_TAG);
-		mTabBar.addTab(getString(R.string.newstation_user), R.drawable.top_listeners).setId(TAB_USER);
-		tabChanged(TAB_ARTIST, TAB_ARTIST);
+		mTabHost = (TabHost)findViewById(R.id.TabBar);
+		mTabHost.setup();
+
+		mTabHost.addTab(mTabHost.newTabSpec("artist")
+                .setIndicator(getString(R.string.newstation_artist), getResources().getDrawable(R.drawable.similar_artists))
+                .setContent(R.id.dummy));
+		mTabHost.addTab(mTabHost.newTabSpec("tag")
+                .setIndicator(getString(R.string.newstation_tag), getResources().getDrawable(R.drawable.tags))
+                .setContent(R.id.dummy));
+		mTabHost.addTab(mTabHost.newTabSpec("user")
+                .setIndicator(getString(R.string.newstation_user), getResources().getDrawable(R.drawable.top_listeners))
+                .setContent(R.id.dummy));
+		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
+
+			public void onTabChanged(String tabId) {
+				int previousIndex = index;
+				
+				if(tabId.equals("artist"))
+					index = TAB_ARTIST;
+				
+				if(tabId.equals("tag"))
+					index = TAB_TAG;
+				
+				if(tabId.equals("user"))
+					index = TAB_USER;
+
+				tabChanged(index, previousIndex);
+			}
+		});
 
 		mImageCache = new ImageCache();
 
@@ -132,6 +166,8 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 
 		});
+		
+		tabChanged(TAB_ARTIST, TAB_ARTIST);
 	}
 
 	@Override
@@ -153,7 +189,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 		if (isFinishing())
 			return;
 
-		outState.putInt("selected_tab", mTabBar.getActive());
+		outState.putInt("selected_tab", mTabHost.getCurrentTab());
 		if (mListAdapters != null)
 			outState.putSerializable("results", mListAdapters);
 
@@ -167,7 +203,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
 		int selectedTab = icicle.getInt("selected_tab", -1);
 		if (selectedTab >= 0) {
-			mTabBar.setActive(selectedTab);
+			mTabHost.setCurrentTab(selectedTab);
 			if (icicle.containsKey("results")) {
 				Object[] results = (Object[]) icicle.getSerializable("results");
 				for (int i = 0; i < results.length; i++) {
@@ -183,11 +219,9 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 
 				setListAdapter(mListAdapters[selectedTab]);
 			}
-
-			tabChanged(selectedTab, TAB_ARTIST);
 		}
 	}
-
+	
 	public void tabChanged(int index, int previousIndex) {
 		mSearchText[previousIndex] = searchBar.getText().toString();
 		if (mSearchText[index] != null) {
@@ -196,7 +230,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 		} else {
 			searchBar.setText("");
 		}
-
+ 
 		if (index == TAB_ARTIST) {
 			searching = SearchType.Artist;
 			searchBar.setHint(getString(R.string.newstation_edithint_artist));
@@ -210,7 +244,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			searchBar.setHint(getString(R.string.newstation_edithint_user));
 			mHint.setText(getString(R.string.newstation_hint_user));
 		}
-
+ 
 		setListAdapter(mListAdapters[index]);
 		if (mListAdapters[index] == null || mListAdapters[index].isEmpty()) {
 			getListView().setVisibility(View.GONE);
@@ -282,7 +316,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 			searchBar.setEnabled(true);
 			mSearchButton.setEnabled(true);
-			mTabBar.setActive(TAB_TAG);
+			tabChanged(TAB_TAG, TAB_TAG);
 		}
 	}
 
@@ -328,7 +362,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 			searchBar.setEnabled(true);
 			mSearchButton.setEnabled(true);
-			mTabBar.setActive(TAB_ARTIST);
+			tabChanged(TAB_ARTIST, TAB_ARTIST);
 		}
 	}
 
@@ -366,7 +400,7 @@ public class NewStation extends ListActivity implements TabBarListener, Serializ
 			}
 			searchBar.setEnabled(true);
 			mSearchButton.setEnabled(true);
-			mTabBar.setActive(TAB_USER);
+			tabChanged(TAB_USER, TAB_USER);
 		}
 	}
 

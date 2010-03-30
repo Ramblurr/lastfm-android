@@ -59,7 +59,6 @@ import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
-import fm.last.android.widget.TabBar;
 import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;

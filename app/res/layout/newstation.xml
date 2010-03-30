@@ -2,12 +2,29 @@
 <RelativeLayout android:id="@+id/station_layout"
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
-	<fm.last.android.widget.TabBar
-		android:id="@+id/TabBar" android:layout_width="fill_parent"
-		android:layout_height="59dip" android:layout_marginTop="5dip" 
-		android:background="#000"
-		android:layout_marginLeft="3dip"
-		android:layout_marginRight="8dip"/>
+	<TabHost
+		android:id="@+id/TabBar" 
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+		
+		<TabWidget
+			android:id="@android:id/tabs"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"/>
+			
+		<FrameLayout
+			android:id="@android:id/tabcontent"
+		    android:layout_width="fill_parent"
+		    android:paddingTop="64dip"
+		    android:layout_height="wrap_content">
+
+		<LinearLayout
+			android:id="@+id/dummy"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"/>
+
+	    </FrameLayout>
+    </TabHost>
 	<LinearLayout android:id="@+id/SearchBar" 
 		android:background="@drawable/tab_bar_rest"
 		android:layout_width="fill_parent"
