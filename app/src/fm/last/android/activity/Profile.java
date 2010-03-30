@@ -56,6 +56,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
@@ -77,7 +78,6 @@ import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.android.widget.ProfileBubble;
 import fm.last.android.widget.QuickContactProfileBubble;
-import fm.last.android.widget.TabBar;
 import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
@@ -118,8 +118,7 @@ public class Profile extends ListActivity {
 	private boolean isAuthenticatedUser;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
-	TabBar mTabBar;
-	ViewFlipper mViewFlipper;
+	TabHost mTabHost;
 	ViewFlipper mNestedViewFlipper;
 	ListView mProfileList;
 	ProfileBubble mProfileBubble;
@@ -216,21 +215,31 @@ public class Profile extends ListActivity {
 		}
 
 		mViewHistory = new Stack<Integer>();
-		mTabBar = (TabBar) findViewById(R.id.TabBar);
-		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
 		mNestedViewFlipper.setAnimateFirstView(false);
 		mNestedViewFlipper.setAnimationCacheEnabled(false);
 
-		mTabBar.setViewFlipper(mViewFlipper);
+		mTabHost = (TabHost)findViewById(R.id.TabBar);
+		mTabHost.setup();
+		
 		if (isAuthenticatedUser) {
-			mTabBar.addTab(getString(R.string.profile_myradio), R.drawable.radio);
-			mTabBar.addTab(getString(R.string.profile_myprofile), R.drawable.profile);
+			mTabHost.addTab(mTabHost.newTabSpec("radio")
+	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.radio))
+	                .setContent(android.R.id.list));
+			mTabHost.addTab(mTabHost.newTabSpec("profile")
+	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.profile))
+	                .setContent(R.id.NestedViewFlipper));
 		} else {
-			mTabBar.addTab(getString(R.string.profile_userradio, mUsername), R.drawable.radio);
-			mTabBar.addTab(getString(R.string.profile_userprofile, mUsername), R.drawable.profile);
+			mTabHost.addTab(mTabHost.newTabSpec("radio")
+	                .setIndicator(getString(R.string.profile_userradio), getResources().getDrawable(R.drawable.radio))
+	                .setContent(android.R.id.list));
+			mTabHost.addTab(mTabHost.newTabSpec("profile")
+	                .setIndicator(getString(R.string.profile_userprofile), getResources().getDrawable(R.drawable.profile))
+	                .setContent(R.id.NestedViewFlipper));
 		}
 
+		getListView().requestFocus();
+		
 		mMyRecentAdapter = new LastFMStreamAdapter(this);
 
 		new LoadUserTask().execute((Void) null);
@@ -303,7 +312,7 @@ public class Profile extends ListActivity {
 		if (mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
 			mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
 
-		outState.putInt("selected_tab", mTabBar.getActive());
+		outState.putString("selected_tab", mTabHost.getCurrentTabTag());
 		outState.putInt("displayed_view", mNestedViewFlipper.getDisplayedChild());
 		outState.putSerializable("view_history", mViewHistory);
 
@@ -324,7 +333,7 @@ public class Profile extends ListActivity {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onRestoreInstanceState(Bundle state) {
-		mTabBar.setActive(state.getInt("selected_tab"));
+		mTabHost.setCurrentTabByTag(state.getString("selected_tab"));
 		mNestedViewFlipper.setDisplayedChild(state.getInt("displayed_view"));
 
 		if (state.containsKey("view_history"))
@@ -644,7 +653,7 @@ public class Profile extends ListActivity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (mTabBar.getActive() == R.drawable.profile && !mViewHistory.isEmpty()) {
+			if (mTabHost.getCurrentTabTag().equals("profile") && !mViewHistory.isEmpty()) {
 				setPreviousAnimation();
 				mProfileAdapter.disableLoadBar();
 				mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
