@@ -39,7 +39,9 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TabHost.OnTabChangeListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -57,7 +59,7 @@ import fm.last.api.Session;
  * 
  * @author Lukasz Wisniewski
  */
-public class Tag extends Activity implements TabBarListener {
+public class Tag extends Activity {
 	String mArtist;
 	String mTrack;
 
@@ -83,7 +85,7 @@ public class Tag extends Activity implements TabBarListener {
 	Button mTagForwardButton;
 	Button mTagButton;
 	TagLayout mTagLayout;
-	TabBar mTabBar;
+	TabHost mTabHost;
 	ListView mTagList;
 
 	ProgressDialog mSaveDialog;
@@ -109,20 +111,34 @@ public class Tag extends Activity implements TabBarListener {
 		mTagButton = (Button) findViewById(R.id.tag_add_button);
 		mTagLayout = (TagLayout) findViewById(R.id.TagLayout);
 		mTagList = (ListView) findViewById(R.id.TagList);
-		mTabBar = (TabBar) findViewById(R.id.TabBar);
+		mTabHost = (TabHost)findViewById(R.id.TabBar);
+		mTabHost.setup();
 
 		// loading & setting animations
 		mFadeOutAnimation = AnimationUtils.loadAnimation(this, R.anim.tag_row_fadeout);
 		mTagLayout.setAnimationsEnabled(true);
 
 		// configure the tabs
-		mTabBar.addTab(getString(R.string.tag_suggestedtags), R.drawable.list_add_to_playlist);
-		mTabBar.addTab(getString(R.string.tag_mytags), R.drawable.profile);
-		mTabBar.setListener(this);
+		mTabHost.addTab(mTabHost.newTabSpec("suggested")
+                .setIndicator(getString(R.string.tag_suggestedtags), getResources().getDrawable(R.drawable.list_add_to_playlist))
+                .setContent(R.id.dummy));
+		mTabHost.addTab(mTabHost.newTabSpec("mine")
+                .setIndicator(getString(R.string.tag_mytags), getResources().getDrawable(R.drawable.profile))
+                .setContent(R.id.dummy));
+		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 
+			public void onTabChanged(String tabId) {
+				if(tabId.equals("mine")) {
+					mTagList.setAdapter(mUserTagListAdapter);
+				} else {
+					mTagList.setAdapter(mTopTagListAdapter);
+				}
+			}
+		});
+		
 		// restoring or creatingData
 		restoreMe();
-
+		
 		// add callback listeners
 		mTagEditText.setOnKeyListener(new View.OnKeyListener() {
 
@@ -184,6 +200,9 @@ public class Tag extends Activity implements TabBarListener {
 			}
 
 		});
+		
+		mTabHost.setCurrentTabByTag("suggested");
+		mTagList.requestFocus();
 	}
 
 	@Override
@@ -363,18 +382,6 @@ public class Tag extends Activity implements TabBarListener {
 			break;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	// / @see TabBarListener
-	public void tabChanged(int id, int previousId) {
-		switch (id) {
-		case R.drawable.profile:
-			mTagList.setAdapter(mUserTagListAdapter);
-			break;
-		case R.drawable.list_add_to_playlist:
-			mTagList.setAdapter(mTopTagListAdapter);
-			break;
-		}
 	}
 
 	/**
