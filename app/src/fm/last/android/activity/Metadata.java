@@ -43,6 +43,7 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
@@ -86,8 +87,7 @@ public class Metadata extends Activity {
 	private boolean mIsPlaying = false;
 
 	TextView mTextView;
-	TabBar mTabBar;
-	ViewFlipper mViewFlipper;
+	TabHost mTabHost;
 	WebView mWebView;
 	ListView mSimilarList;
 	ListView mTagList;
@@ -108,25 +108,35 @@ public class Metadata extends Activity {
 		mArtistName = getIntent().getStringExtra("artist");
 		mTrackName = getIntent().getStringExtra("track");
 
-		mTabBar = (TabBar) findViewById(R.id.TabBar);
-		mViewFlipper = (ViewFlipper) findViewById(R.id.ViewFlipper);
+		mTabHost = (TabHost)findViewById(R.id.TabBar);
+		mTabHost.setup();
+
 		mWebView = (WebView) findViewById(R.id.webview);
 		mSimilarList = (ListView) findViewById(R.id.similar_list_view);
 		mTagList = (ListView) findViewById(R.id.tags_list_view);
 		mFanList = (ListView) findViewById(R.id.listeners_list_view);
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 
-		mTabBar.setViewFlipper(mViewFlipper);
-		mTabBar.addTab(getString(R.string.metadata_bio), R.drawable.bio);
-		mTabBar.addTab(getString(R.string.metadata_similar), R.drawable.similar_artists);
-		mTabBar.addTab(getString(R.string.metadata_tags), R.drawable.tags);
-		mTabBar.addTab(getString(R.string.metadata_events), R.drawable.events);
-		mTabBar.addTab(getString(R.string.metadata_Fans), R.drawable.top_listeners);
+		mTabHost.addTab(mTabHost.newTabSpec("bio")
+                .setIndicator(getString(R.string.metadata_bio), getResources().getDrawable(R.drawable.bio))
+                .setContent(R.id.webview));
+		mTabHost.addTab(mTabHost.newTabSpec("similar")
+                .setIndicator(getString(R.string.metadata_similar), getResources().getDrawable(R.drawable.similar_artists))
+                .setContent(R.id.similar_list_view));
+		mTabHost.addTab(mTabHost.newTabSpec("tags")
+                .setIndicator(getString(R.string.metadata_tags), getResources().getDrawable(R.drawable.tags))
+                .setContent(R.id.tags_list_view));
+		mTabHost.addTab(mTabHost.newTabSpec("events")
+                .setIndicator(getString(R.string.metadata_events), getResources().getDrawable(R.drawable.events))
+                .setContent(R.id.events_list_view));
+		mTabHost.addTab(mTabHost.newTabSpec("fans")
+                .setIndicator(getString(R.string.metadata_Fans), getResources().getDrawable(R.drawable.top_listeners))
+                .setContent(R.id.listeners_list_view));
 
 		populateMetadata();
 
 		if (getIntent().hasExtra("show_events"))
-			mTabBar.setActive(R.drawable.events);
+			mTabHost.setCurrentTabByTag("events");
 
 		mIsPlaying = false;
 
@@ -229,7 +239,7 @@ public class Metadata extends Activity {
 		new LoadTagsTask().execute((Void) null);
 		new LoadEventsTask().execute((Void) null);
 
-		mTabBar.setActive(R.drawable.bio);
+		mTabHost.setCurrentTabByTag("bio");
 	}
 
 	private ImageCache getImageCache() {
