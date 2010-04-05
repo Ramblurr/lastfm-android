@@ -44,6 +44,8 @@
 				<data android:mimeType="vnd.android.cursor.item/vnd.fm.last.android.profile" />
 			</intent-filter>
 		</activity>
+		<activity android:name=".activity.Profile_RadioTab"/>
+		<activity android:name=".activity.Profile_ChartsTab"/>
 		<activity android:name=".activity.NewStation" android:label="@string/newstation_label"
 			android:configChanges="keyboardHidden">
 			<intent-filter>

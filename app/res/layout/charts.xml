@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewFlipper android:id="@+id/NestedViewFlipper"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<!-- Profile tab -->
+	<ListView android:id="@android:id/list"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:divider="#d9d7d7"
+	android:listSelector="#00000000"/>
+	<!-- Top Artists list -->
+	<ListView android:id="@+id/topartists_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- Top Albums list -->
+	<ListView android:id="@+id/topalbums_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- Top Tracks list -->
+	<ListView android:id="@+id/toptracks_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- Recently Played list -->
+	<ListView android:id="@+id/recenttracks_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- User's Events list -->
+	<ListView android:id="@+id/profileevents_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- User's Friends list -->
+	<ListView android:id="@+id/profilefriends_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<!-- User's Tags list -->
+	<ListView android:id="@+id/profiletags_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+</ViewFlipper>
