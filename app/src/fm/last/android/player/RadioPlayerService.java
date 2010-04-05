@@ -613,7 +613,8 @@ public class RadioPlayerService extends Service {
 
 		if (next_mp != null) {
 			logger.info("Skipping to pre-buffered track");
-			mp.release();
+			if(mp != null)
+				mp.release();
 			mp = next_mp;
 			next_mp = null;
 			mState = STATE_PREPARING;
