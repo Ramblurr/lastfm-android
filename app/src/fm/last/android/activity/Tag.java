@@ -118,10 +118,10 @@ public class Tag extends Activity {
 
 		// configure the tabs
 		mTabHost.addTab(mTabHost.newTabSpec("suggested")
-                .setIndicator(getString(R.string.tag_suggestedtags), getResources().getDrawable(R.drawable.list_add_to_playlist))
+                .setIndicator(getString(R.string.tag_suggestedtags), getResources().getDrawable(R.drawable.ic_tab_tags))
                 .setContent(R.id.dummy));
 		mTabHost.addTab(mTabHost.newTabSpec("mine")
-                .setIndicator(getString(R.string.tag_mytags), getResources().getDrawable(R.drawable.profile))
+                .setIndicator(getString(R.string.tag_mytags), getResources().getDrawable(R.drawable.ic_tab_profile))
                 .setContent(R.id.dummy));
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 

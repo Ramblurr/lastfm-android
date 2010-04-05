@@ -117,19 +117,19 @@ public class Metadata extends Activity {
 		mEventList = (ListView) findViewById(R.id.events_list_view);
 
 		mTabHost.addTab(mTabHost.newTabSpec("bio")
-                .setIndicator(getString(R.string.metadata_bio), getResources().getDrawable(R.drawable.bio))
+                .setIndicator(getString(R.string.metadata_bio), getResources().getDrawable(R.drawable.ic_tab_bio))
                 .setContent(R.id.webview));
 		mTabHost.addTab(mTabHost.newTabSpec("similar")
-                .setIndicator(getString(R.string.metadata_similar), getResources().getDrawable(R.drawable.similar_artists))
+                .setIndicator(getString(R.string.metadata_similar), getResources().getDrawable(R.drawable.ic_tab_similar_artists))
                 .setContent(R.id.similar_list_view));
 		mTabHost.addTab(mTabHost.newTabSpec("tags")
-                .setIndicator(getString(R.string.metadata_tags), getResources().getDrawable(R.drawable.tags))
+                .setIndicator(getString(R.string.metadata_tags), getResources().getDrawable(R.drawable.ic_tab_tags))
                 .setContent(R.id.tags_list_view));
 		mTabHost.addTab(mTabHost.newTabSpec("events")
-                .setIndicator(getString(R.string.metadata_events), getResources().getDrawable(R.drawable.events))
+                .setIndicator(getString(R.string.metadata_events), getResources().getDrawable(R.drawable.ic_tab_events))
                 .setContent(R.id.events_list_view));
 		mTabHost.addTab(mTabHost.newTabSpec("fans")
-                .setIndicator(getString(R.string.metadata_Fans), getResources().getDrawable(R.drawable.top_listeners))
+                .setIndicator(getString(R.string.metadata_Fans), getResources().getDrawable(R.drawable.ic_tab_top_listeners))
                 .setContent(R.id.listeners_list_view));
 
 		populateMetadata();

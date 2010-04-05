@@ -101,20 +101,20 @@ public class Profile extends ActivityGroup {
 		
 		if (isAuthenticatedUser) {
 			mTabHost.addTab(mTabHost.newTabSpec("radio")
-	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.radio))
+	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.ic_tab_radio))
 	                .setContent(radioTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
-	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.profile))
+	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.ic_tab_profile))
 	                .setContent(chartsTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("events")
-	                .setIndicator("Events", getResources().getDrawable(R.drawable.events))
+	                .setIndicator("Events", getResources().getDrawable(R.drawable.ic_tab_events))
 	                .setContent(eventsTabIntent));
 		} else {
 			mTabHost.addTab(mTabHost.newTabSpec("radio")
-	                .setIndicator(getString(R.string.profile_userradio, username), getResources().getDrawable(R.drawable.radio))
+	                .setIndicator(getString(R.string.profile_userradio, username), getResources().getDrawable(R.drawable.ic_tab_radio))
 	                .setContent(radioTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
-	                .setIndicator(getString(R.string.profile_userprofile, username), getResources().getDrawable(R.drawable.profile))
+	                .setIndicator(getString(R.string.profile_userprofile, username), getResources().getDrawable(R.drawable.ic_tab_profile))
 	                .setContent(chartsTabIntent));
 		}
 

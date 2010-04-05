@@ -115,13 +115,13 @@ public class NewStation extends ListActivity implements Serializable {
 		mTabHost.setup();
 
 		mTabHost.addTab(mTabHost.newTabSpec("artist")
-                .setIndicator(getString(R.string.newstation_artist), getResources().getDrawable(R.drawable.similar_artists))
+                .setIndicator(getString(R.string.newstation_artist), getResources().getDrawable(R.drawable.ic_tab_similar_artists))
                 .setContent(R.id.dummy));
 		mTabHost.addTab(mTabHost.newTabSpec("tag")
-                .setIndicator(getString(R.string.newstation_tag), getResources().getDrawable(R.drawable.tags))
+                .setIndicator(getString(R.string.newstation_tag), getResources().getDrawable(R.drawable.ic_tab_tags))
                 .setContent(R.id.dummy));
 		mTabHost.addTab(mTabHost.newTabSpec("user")
-                .setIndicator(getString(R.string.newstation_user), getResources().getDrawable(R.drawable.top_listeners))
+                .setIndicator(getString(R.string.newstation_user), getResources().getDrawable(R.drawable.ic_tab_top_listeners))
                 .setContent(R.id.dummy));
 		mTabHost.setOnTabChangedListener(new OnTabChangeListener() {
 
