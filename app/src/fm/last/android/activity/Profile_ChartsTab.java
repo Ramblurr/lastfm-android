@@ -123,7 +123,7 @@ public class Profile_ChartsTab extends ListActivity {
 		getListView().requestFocus();
 		
 		String[] mStrings = new String[] { this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
-				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed), this.getString(R.string.profile_events),
+				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed),
 				this.getString(R.string.profile_friends), this.getString(R.string.profile_tags) }; // this
 																									// order
 																									// must
