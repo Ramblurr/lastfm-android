@@ -175,6 +175,8 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		case EVENTS_NEARME:
 			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Nearby");
 			LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+			mLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			new LoadNearbyEventsTask().execute((Void) null);
 			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000L, 500.0f, this);
 			break;
 		default:
