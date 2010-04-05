@@ -339,6 +339,7 @@ final class LastFmServerImpl implements LastFmServer {
 		Map<String, String> params = createParams("geo.getEvents");
 		params.put("lat", latitude);
 		params.put("long", longitude);
+		params.put("distance", "50");
 		return UserFunctions.getUserEvents(baseUrl, params);
 	}
 
