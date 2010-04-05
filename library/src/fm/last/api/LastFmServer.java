@@ -244,6 +244,10 @@ public interface LastFmServer {
 	 */
 	public Event[] getUserEvents(String user) throws IOException;
 
+	public Event[] getUserRecommendedEvents(String user, String sk) throws IOException;
+	public Event[] getNearbyEvents(String latitude, String longitude) throws IOException;
+
+	
 	/**
 	 * See http://www.lastfm.pl/api/show?service=307
 	 * 

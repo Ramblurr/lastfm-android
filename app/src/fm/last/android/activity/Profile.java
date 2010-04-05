@@ -96,6 +96,9 @@ public class Profile extends ActivityGroup {
 		Intent chartsTabIntent = new Intent(this, Profile_ChartsTab.class);
 		chartsTabIntent.putExtra("user", username);
 		
+		Intent eventsTabIntent = new Intent(this, Profile_EventsTab.class);
+		eventsTabIntent.putExtra("user", username);
+		
 		if (isAuthenticatedUser) {
 			mTabHost.addTab(mTabHost.newTabSpec("radio")
 	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.radio))
@@ -103,6 +106,9 @@ public class Profile extends ActivityGroup {
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.profile))
 	                .setContent(chartsTabIntent));
+			mTabHost.addTab(mTabHost.newTabSpec("events")
+	                .setIndicator("Events", getResources().getDrawable(R.drawable.events))
+	                .setContent(eventsTabIntent));
 		} else {
 			mTabHost.addTab(mTabHost.newTabSpec("radio")
 	                .setIndicator(getString(R.string.profile_userradio, username), getResources().getDrawable(R.drawable.radio))

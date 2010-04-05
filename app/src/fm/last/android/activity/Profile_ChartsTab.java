@@ -29,20 +29,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
@@ -55,18 +49,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.Amazon;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.activity.Event.EventActivityResult;
-import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.api.Album;
 import fm.last.api.Artist;
-import fm.last.api.Event;
 import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
@@ -81,9 +71,8 @@ public class Profile_ChartsTab extends ListActivity {
 	private static final int PROFILE_TOPALBUMS = 1;
 	private static final int PROFILE_TOPTRACKS = 2;
 	private static final int PROFILE_RECENTLYPLAYED = 3;
-	private static final int PROFILE_EVENTS = 4;
-	private static final int PROFILE_FRIENDS = 5;
-	private static final int PROFILE_TAGS = 6;
+	private static final int PROFILE_FRIENDS = 4;
+	private static final int PROFILE_TAGS = 5;
 
 	private static final int DIALOG_ALBUM = 0;
 	private static final int DIALOG_TRACK = 1;
@@ -107,7 +96,7 @@ public class Profile_ChartsTab extends ListActivity {
 	Animation mPushLeftIn;
 	Animation mPushLeftOut;
 
-	ListView[] mProfileLists = new ListView[7];
+	ListView[] mProfileLists = new ListView[6];
 
 	private ImageCache mImageCache = null;
 
@@ -117,8 +106,6 @@ public class Profile_ChartsTab extends ListActivity {
 	private Album mAlbumInfo; // Ditto
 
 	private IntentFilter mIntentFilter;
-
-	private boolean mIsPlaying = false;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -146,7 +133,6 @@ public class Profile_ChartsTab extends ListActivity {
 																									// enum
 		mProfileAdapter = new ListAdapter(Profile_ChartsTab.this, mStrings);
 		getListView().setAdapter(mProfileAdapter);
-		getListView().setOnItemClickListener(mProfileClickListener);
 
 		// TODO should be functions and not member variables, caching is evil
 		mProfileLists[PROFILE_TOPARTISTS] = (ListView) findViewById(R.id.topartists_list_view);
@@ -160,9 +146,6 @@ public class Profile_ChartsTab extends ListActivity {
 
 		mProfileLists[PROFILE_RECENTLYPLAYED] = (ListView) findViewById(R.id.recenttracks_list_view);
 		mProfileLists[PROFILE_RECENTLYPLAYED].setOnItemClickListener(mTrackListItemClickListener);
-
-		mProfileLists[PROFILE_EVENTS] = (ListView) findViewById(R.id.profileevents_list_view);
-		mProfileLists[PROFILE_EVENTS].setOnItemClickListener(mEventItemClickListener);
 
 		mProfileLists[PROFILE_FRIENDS] = (ListView) findViewById(R.id.profilefriends_list_view);
 		mProfileLists[PROFILE_FRIENDS].setOnItemClickListener(mUserItemClickListener);
@@ -184,12 +167,6 @@ public class Profile_ChartsTab extends ListActivity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		// the event list adapter (a SeparatedListAdapter) doesn't serialise,
-		// so move away from it if we happen to be looking at it now.
-		// FIXME: make the SeparatedListAdapter serialize.
-		if (mNestedViewFlipper.getDisplayedChild() == (PROFILE_EVENTS + 1))
-			mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
-
 		outState.putInt("displayed_view", mNestedViewFlipper.getDisplayedChild());
 		outState.putSerializable("view_history", mViewHistory);
 
@@ -275,25 +252,6 @@ public class Profile_ChartsTab extends ListActivity {
 		if (mDialogAdapter != null)
 			mDialogAdapter.disableLoadBar();
 
-		mIsPlaying = false;
-
-		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-				new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-						try {
-							mIsPlaying = player.isPlaying();
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						LastFMApplication.getInstance().unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, Context.BIND_AUTO_CREATE);
-
 		super.onResume();
 	}
 
@@ -349,48 +307,39 @@ public class Profile_ChartsTab extends ListActivity {
 		mNestedViewFlipper.setOutAnimation(mPushRightOut);
 	}
 
-	private OnItemClickListener mProfileClickListener = new OnItemClickListener() {
-
-		public void onItemClick(AdapterView<?> arg0, View arg1, int position, long id) {
-			setNextAnimation();
-			mProfileAdapter.enableLoadBar(position);
-			switch (position) {
-			case PROFILE_TOPARTISTS: // "Top Artists"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
-				new LoadTopArtistsTask().execute((Void) null);
-				break;
-			case PROFILE_TOPALBUMS: // "Top Albums"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
-				new LoadTopAlbumsTask().execute((Void) null);
-				break;
-			case PROFILE_TOPTRACKS: // "Top Tracks"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
-				new LoadTopTracksTask().execute((Void) null);
-				break;
-			case PROFILE_RECENTLYPLAYED: // "Recently Played"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
-				new LoadRecentTracksTask().execute((Void) null);
-				break;
-			case PROFILE_EVENTS: // "Events"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events");
-				new LoadEventsTask().execute((Void) null);
-				break;
-			case PROFILE_FRIENDS: // "Friends"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
-				new LoadFriendsTask().execute((Void) null);
-				break;
-			case PROFILE_TAGS: // "Tags"
-				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
-				new LoadTagsTask().execute((Void) null);
-				break;
-			default:
-				break;
-
-			}
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		setNextAnimation();
+		mProfileAdapter.enableLoadBar(position);
+		switch (position) {
+		case PROFILE_TOPARTISTS: // "Top Artists"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
+			new LoadTopArtistsTask().execute((Void) null);
+			break;
+		case PROFILE_TOPALBUMS: // "Top Albums"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
+			new LoadTopAlbumsTask().execute((Void) null);
+			break;
+		case PROFILE_TOPTRACKS: // "Top Tracks"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
+			new LoadTopTracksTask().execute((Void) null);
+			break;
+		case PROFILE_RECENTLYPLAYED: // "Recently Played"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
+			new LoadRecentTracksTask().execute((Void) null);
+			break;
+		case PROFILE_FRIENDS: // "Friends"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
+			new LoadFriendsTask().execute((Void) null);
+			break;
+		case PROFILE_TAGS: // "Tags"
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
+			new LoadTagsTask().execute((Void) null);
+			break;
+		default:
+			break;
 
 		}
-
-	};
+	}
 
 	private OnItemClickListener mArtistListItemClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
@@ -447,25 +396,6 @@ public class Profile_ChartsTab extends ListActivity {
 					LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://globaltags/" + Uri.encode(tag.getName()), true);
 			} catch (ClassCastException e) {
 				// when the list item is not a tag
-			}
-		}
-
-	};
-
-	private OnItemClickListener mEventItemClickListener = new OnItemClickListener() {
-
-		public void onItemClick(final AdapterView<?> parent, final View v, final int position, long id) {
-			try {
-				final Event event = (Event) parent.getAdapter().getItem(position);
-				mOnEventActivityResult = new EventActivityResult() {
-					public void onEventStatus(int status) {
-						event.setStatus(String.valueOf(status));
-						mOnEventActivityResult = null;
-					}
-				};
-				startActivityForResult(fm.last.android.activity.Event.intentFromEvent(Profile_ChartsTab.this, event), 0);
-			} catch (ClassCastException e) {
-				// when the list item is not an event
 			}
 		}
 
@@ -678,46 +608,6 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadEventsTask extends AsyncTask<Void, Void, EventListAdapter> {
-
-		@Override
-		public EventListAdapter doInBackground(Void... params) {
-
-			try {
-				fm.last.api.Event[] events = mServer.getUserEvents(mUsername);
-				if (events.length > 0) {
-					EventListAdapter result = new EventListAdapter(Profile_ChartsTab.this);
-					result.setEventsSource(events);
-					return result;
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		@Override
-		public void onPostExecute(EventListAdapter result) {
-			if (result != null) {
-				mProfileLists[PROFILE_EVENTS].setAdapter(result);
-				// mEventsList.setOnScrollListener(mEventsAdapter.getOnScrollListener());
-			} else {
-				String[] strings = new String[] { getString(R.string.profile_noevents) };
-				ListAdapter adapter = new ListAdapter(Profile_ChartsTab.this, strings);
-				adapter.disableDisclosureIcons();
-				adapter.setDisabled();
-				mProfileLists[PROFILE_EVENTS].setAdapter(adapter);
-			}
-			mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save
-																		// the
-																		// current
-																		// view
-			mNestedViewFlipper.setDisplayedChild(PROFILE_EVENTS + 1);
-		}
-	}
-
 	private class LoadTagsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
@@ -804,63 +694,6 @@ public class Profile_ChartsTab extends ListActivity {
 																		// view
 			mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-
-		// Parameters for menu.add are:
-		// group -- Not used here.
-		// id -- Used only when you want to handle and identify the click
-		// yourself.
-		// title
-		MenuItem logout = menu.add(Menu.NONE, 0, Menu.NONE, getString(R.string.action_logout));
-		logout.setIcon(R.drawable.logout);
-
-		MenuItem settings = menu.add(Menu.NONE, 1, Menu.NONE, getString(R.string.action_settings));
-		settings.setIcon(android.R.drawable.ic_menu_preferences);
-
-		//TODO: Finish the help document and then re-enable this item
-		//MenuItem help = menu.add(Menu.NONE, 2, Menu.NONE, getString(R.string.action_help));
-		//help.setIcon(android.R.drawable.ic_menu_help);
-
-		MenuItem nowPlaying = menu.add(Menu.NONE, 3, Menu.NONE, getString(R.string.action_nowplaying));
-		nowPlaying.setIcon(R.drawable.view_artwork);
-		return true;
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(3).setEnabled(mIsPlaying);
-
-		return super.onPrepareOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent;
-		switch (item.getItemId()) {
-		case 0:
-			LastFMApplication.getInstance().logout();
-			intent = new Intent(Profile_ChartsTab.this, LastFm.class);
-			startActivity(intent);
-			finish();
-			break;
-		case 1:
-			intent = new Intent(Profile_ChartsTab.this, Preferences.class);
-			startActivity(intent);
-			return true;
-		case 2:
-			intent = new Intent(Profile_ChartsTab.this, Help.class);
-			startActivity(intent);
-			return true;
-		case 3:
-			intent = new Intent(Profile_ChartsTab.this, Player.class);
-			startActivity(intent);
-			return true;
-		}
-		return false;
 	}
 
 	private void showTrackDialog(Track track) {

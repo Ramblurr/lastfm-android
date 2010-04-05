@@ -327,6 +327,21 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserEvents(baseUrl, params);
 	}
 
+	public Event[] getUserRecommendedEvents(String user, String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("user.getRecommendedEvents");
+		params.put("user", user);
+		params.put("sk", sk);
+		signParams(params);
+		return UserFunctions.getUserEvents(baseUrl, params);
+	}
+
+	public Event[] getNearbyEvents(String latitude, String longitude) throws IOException, WSError {
+		Map<String, String> params = createParams("geo.getEvents");
+		params.put("lat", latitude);
+		params.put("long", longitude);
+		return UserFunctions.getUserEvents(baseUrl, params);
+	}
+
 	public void attendEvent(String event, String status, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("event.attend");
 		params.put("event", event);

@@ -13,6 +13,7 @@
 	<uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
 	<uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
 	<uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 	<supports-screens android:smallScreens="true"
 		android:normalScreens="true" android:largeScreens="true"
@@ -46,6 +47,7 @@
 		</activity>
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
+		<activity android:name=".activity.Profile_EventsTab"/>
 		<activity android:name=".activity.NewStation" android:label="@string/newstation_label"
 			android:configChanges="keyboardHidden">
 			<intent-filter>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewFlipper android:id="@+id/NestedViewFlipper"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:background="#fff">
+	<ListView android:id="@android:id/list"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:divider="#d9d7d7"
+	android:listSelector="#00000000"/>
+	<ListView android:id="@+id/myevents_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<ListView android:id="@+id/recommended_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+	<ListView android:id="@+id/nearme_list_view"
+		android:background="#fff"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"></ListView>
+</ViewFlipper>
