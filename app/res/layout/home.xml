@@ -15,8 +15,6 @@
 		android:id="@+id/TabBar" 
 		android:layout_width="fill_parent"
 		android:layout_height="fill_parent" 
-		android:layout_marginLeft="4dip"
-		android:layout_marginRight="11dip"
 		android:layout_marginTop="5dip"
 		android:layout_below="@id/AdArea">
 		
@@ -31,15 +29,4 @@
 		    android:paddingTop="64dip"
 		    android:layout_height="fill_parent"/>
     </TabHost>
-	<!-- <LinearLayout android:id="@+id/TabBarSpacer"
-		android:background="@drawable/tab_bar_rest" android:layout_width="fill_parent"
-		android:layout_height="5dip"
-		android:layout_below="@id/TabBar"/>
-	<ViewFlipper android:id="@+id/ViewFlipper"
-		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:layout_below="@id/TabBarSpacer">
-
-
-	</ViewFlipper>-->
-	
 </RelativeLayout>
