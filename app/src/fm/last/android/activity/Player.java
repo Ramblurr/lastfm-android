@@ -751,7 +751,7 @@ public class Player extends Activity {
 				if (events.length > 0)
 					result = true;
 
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return result;
