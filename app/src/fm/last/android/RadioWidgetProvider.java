@@ -247,7 +247,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		
 								try {
 									if (s.isPlaying()) {
-										s.stop();
+										s.pause();
 										mediaPlayerPlaying = false;
 									}
 								} catch (RemoteException e) {
@@ -267,7 +267,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					
 									try {
 										if (s.isPlaying()) {
-											s.stop();
+											s.pause();
 											mediaPlayerPlaying = false;
 										}
 									} catch (RemoteException e) {

@@ -796,7 +796,7 @@ public class RadioPlayerService extends Service {
 	
 					try {
 						if (s.isPlaying()) {
-							s.stop();
+							s.pause();
 							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
 						}
 					} catch (RemoteException e) {
@@ -819,7 +819,7 @@ public class RadioPlayerService extends Service {
 	
 					try {
 						if (s.isPlaying()) {
-							s.stop();
+							s.pause();
 							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
 						}
 					} catch (RemoteException e) {
