@@ -6,6 +6,7 @@ package fm.last.android.widget;
 import java.net.URL;
 
 import fm.last.android.R;
+import fm.last.android.activity.Profile;
 import fm.last.android.utils.UserTask;
 import fm.last.api.User;
 import fm.last.util.UrlUtil;
@@ -31,6 +32,9 @@ public class QuickContactProfileBubble extends ProfileBubble {
 	 */
 	public QuickContactProfileBubble(Context context) {
 		super(context);
+		if(Profile.isHTCContactsInstalled(context)) {
+			throw new java.lang.VerifyError(); //Fall back to the non-quickcontact version if HTC SenseUI is running
+		}
 		init();
 	}
 

@@ -22,10 +22,11 @@ package fm.last.android.activity;
 
 import java.io.File;
 
-import android.app.Activity;
 import android.app.ActivityGroup;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,16 @@ public class Profile extends ActivityGroup {
 	private TabHost mTabHost;
 	private boolean mIsPlaying = false;
 	
+	public static boolean isHTCContactsInstalled(Context ctx) {
+		try {
+			PackageManager pm = ctx.getPackageManager();
+			pm.getPackageInfo("com.android.htccontacts", 0);
+			return true;
+		} catch (Exception e) {
+		}
+		return false;
+	}
+
 	@Override
 	public void onCreate(Bundle icicle) {
 		String username = "";
@@ -60,7 +71,7 @@ public class Profile extends ActivityGroup {
 			finish();
 		}
 		
-		if(Integer.decode(Build.VERSION.SDK) >= 6) {
+		if(Integer.decode(Build.VERSION.SDK) >= 6 && !isHTCContactsInstalled(this)) {
 			SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
 			if(!settings.getBoolean("sync_nag", false)) {
 				SharedPreferences.Editor editor = settings.edit();
