@@ -520,7 +520,7 @@ public class RadioPlayerService extends Service {
 			p.setOnErrorListener(mOnErrorListener);
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
-
+			
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a
 			// call.
