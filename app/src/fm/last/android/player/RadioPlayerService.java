@@ -782,18 +782,6 @@ public class RadioPlayerService extends Service {
 		sendBroadcast(i);
 	}
 
-	public static int getHTCMusicVersion(Context ctx) {
-		PackageManager pm = ctx.getPackageManager();
-		int result = -1;
-		try {
-			PackageInfo pi = pm.getPackageInfo("com.htc.music", PackageManager.GET_ACTIVITIES);
-			result = pi.versionCode;
-		} catch (Exception e) {
-			result = -1;
-		}
-		return result;
-	}
-	
 	private void tune(String url, Session session) throws Exception, WSError {
 		wakeLock.acquire();
 		wifiLock.acquire();
@@ -801,28 +789,30 @@ public class RadioPlayerService extends Service {
 		currentStationURL = url;
 
 		//Stop the standard media player
-		bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-			public void onServiceConnected(ComponentName comp, IBinder binder) {
-				com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-
-				try {
-					if (s.isPlaying()) {
-						s.stop();
-						sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+		if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
+			bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+				public void onServiceConnected(ComponentName comp, IBinder binder) {
+					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+	
+					try {
+						if (s.isPlaying()) {
+							s.stop();
+							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+						}
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					unbindService(this);
 				}
-				unbindService(this);
-			}
-
-			public void onServiceDisconnected(ComponentName comp) {
-			}
-		}, 0);
-
+	
+				public void onServiceDisconnected(ComponentName comp) {
+				}
+			}, 0);
+		}
+		
 		//Stop the HTC media player
-		if(getHTCMusicVersion(this) > -1) {
+		if(RadioWidgetProvider.isHTCMusicInstalled(this)) {
 			bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);

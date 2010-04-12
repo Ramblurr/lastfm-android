@@ -163,6 +163,13 @@
     			<action android:name="fm.last.android.widget.LOVE"/>
     			<action android:name="fm.last.android.widget.BAN"/>
     			<action android:name="fm.last.android.widget.UPDATE"/>
+				<action android:name="com.android.music.playstatechanged" />
+				<action android:name="com.android.music.playbackcomplete" />
+				<action android:name="com.android.music.metachanged" />
+				<action android:name="com.android.music.queuechanged" />
+				<action android:name="com.htc.music.metachanged" />
+				<action android:name="com.htc.music.playbackcomplete" />
+				<action android:name="com.htc.music.playstatechanged" />
 		    </intent-filter>
 		    <meta-data android:name="android.appwidget.provider"
 		                android:resource="@xml/radiowidget_info"
