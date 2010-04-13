@@ -152,7 +152,7 @@
 			</intent-filter>
 		</activity>
 		<receiver android:name="RadioWidgetProvider"
-		            android:label="Last.fm Radio"
+		            android:label="@string/app_name"
 		            android:icon="@drawable/icon"
 		            >
 		    <intent-filter>
