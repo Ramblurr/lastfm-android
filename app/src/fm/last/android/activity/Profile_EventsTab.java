@@ -76,7 +76,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 
 	private EventActivityResult mOnEventActivityResult;
 
-	Location mLocation;
+	Location mLocation = null;
 	
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -295,13 +295,15 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		public EventListAdapter doInBackground(Void... params) {
 
 			try {
-				String latitude = String.valueOf(mLocation.getLatitude());
-				String longitude = String.valueOf(mLocation.getLongitude());
-				fm.last.api.Event[] events = mServer.getNearbyEvents(latitude, longitude);
-				if (events.length > 0) {
-					EventListAdapter result = new EventListAdapter(Profile_EventsTab.this);
-					result.setEventsSource(events);
-					return result;
+				if(mLocation != null) {
+					String latitude = String.valueOf(mLocation.getLatitude());
+					String longitude = String.valueOf(mLocation.getLongitude());
+					fm.last.api.Event[] events = mServer.getNearbyEvents(latitude, longitude);
+					if (events.length > 0) {
+						EventListAdapter result = new EventListAdapter(Profile_EventsTab.this);
+						result.setEventsSource(events);
+						return result;
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -333,8 +335,10 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 	}
 
 	public void onLocationChanged(Location location) {
-		mLocation = location;
-		new LoadNearbyEventsTask().execute((Void) null);
+		if(location != null) {
+			mLocation = location;
+			new LoadNearbyEventsTask().execute((Void) null);
+		}
 	}
 
 	public void onProviderDisabled(String arg0) {
