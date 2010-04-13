@@ -144,7 +144,6 @@ public class TrackFunctions {
 			List<Track> tracks = new ArrayList<Track>();
 			for (Node node : elnodes) {
 				Track trackObject = trackBuilder.build(node);
-				System.out.println("Got Track: " + trackObject.getName());
 				tracks.add(trackObject);
 			}
 			return tracks.toArray(new Track[tracks.size()]);
