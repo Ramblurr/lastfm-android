@@ -83,6 +83,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
 										i.putExtra("lastfm.artist", artist);
 										i.putExtra("lastfm.track", track);
+										i.putExtra("lastfm.nowplaying", true);
 										i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 										LastFMApplication.getInstance().startActivity(i);
 									}
@@ -109,6 +110,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
 										i.putExtra("lastfm.artist", artist);
 										i.putExtra("lastfm.track", track);
+										i.putExtra("lastfm.nowplaying", true);
 										i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 										LastFMApplication.getInstance().startActivity(i);
 									}
@@ -135,6 +137,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 											Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
 											i.putExtra("lastfm.artist", artist);
 											i.putExtra("lastfm.track", track);
+											i.putExtra("lastfm.nowplaying", true);
 											i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 											LastFMApplication.getInstance().startActivity(i);
 										} else {

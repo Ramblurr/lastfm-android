@@ -25,14 +25,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,10 +40,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
-import fm.last.android.Amazon;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
@@ -74,9 +69,6 @@ public class Profile_ChartsTab extends ListActivity {
 	private static final int PROFILE_FRIENDS = 4;
 	private static final int PROFILE_TAGS = 5;
 
-	private static final int DIALOG_ALBUM = 0;
-	private static final int DIALOG_TRACK = 1;
-
 	private ListAdapter mProfileAdapter;
 	private String mUsername; // store this separate so we have access to it
 								// before User obj is retrieved
@@ -86,9 +78,6 @@ public class Profile_ChartsTab extends ListActivity {
 	private Stack<Integer> mViewHistory;
 
 	View previousSelectedView = null;
-
-	ListView mDialogList;
-	private ListAdapter mDialogAdapter;
 
 	// Animations
 	Animation mPushRightIn;
@@ -101,9 +90,6 @@ public class Profile_ChartsTab extends ListActivity {
 	private ImageCache mImageCache = null;
 
 	private EventActivityResult mOnEventActivityResult;
-
-	private Track mTrackInfo; // For the profile actions' dialog
-	private Album mAlbumInfo; // Ditto
 
 	private IntentFilter mIntentFilter;
 
@@ -180,8 +166,6 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 
 		outState.putSerializable("adapters", adapters);
-		outState.putSerializable("info_album", mAlbumInfo);
-		outState.putSerializable("info_track", mTrackInfo);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -219,9 +203,6 @@ public class Profile_ChartsTab extends ListActivity {
 				mProfileLists[key].setAdapter(adapter);
 			}
 		}
-
-		mAlbumInfo = (Album) state.getSerializable("info_album");
-		mTrackInfo = (Track) state.getSerializable("info_track");
 	}
 
 	@Override
@@ -249,9 +230,6 @@ public class Profile_ChartsTab extends ListActivity {
 			}
 		}
 
-		if (mDialogAdapter != null)
-			mDialogAdapter.disableLoadBar();
-
 		super.onResume();
 	}
 
@@ -272,9 +250,6 @@ public class Profile_ChartsTab extends ListActivity {
 					if (list.getAdapter() != null)
 						((ListAdapter) list.getAdapter()).disableLoadBar();
 				}
-
-				if (mDialogAdapter != null)
-					mDialogAdapter.disableLoadBar();
 			}
 		}
 	};
@@ -359,7 +334,10 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Album album = (Album) l.getAdapter().getItem(position);
-				showAlbumDialog(album);
+				Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
+				i.putExtra("lastfm.artist", album.getArtist());
+				i.putExtra("lastfm.album", album.getTitle());
+				startActivity(i);
 			} catch (ClassCastException e) {
 				// (Album) cast can fail, like when the list contains a string
 				// saying: "no items"
@@ -372,7 +350,10 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Track track = (Track) l.getAdapter().getItem(position);
-				showTrackDialog(track);
+				Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
+				i.putExtra("lastfm.artist", track.getArtist().getName());
+				i.putExtra("lastfm.track", track.getName());
+				startActivity(i);
 			} catch (ClassCastException e) {
 				// (Track) cast can fail, like when the list contains a string
 				// saying: "no items"
@@ -694,182 +675,6 @@ public class Profile_ChartsTab extends ListActivity {
 																		// view
 			mNestedViewFlipper.setDisplayedChild(PROFILE_FRIENDS + 1);
 		}
-	}
-
-	private void showTrackDialog(Track track) {
-		mTrackInfo = track;
-		showDialog(DIALOG_TRACK);
-	}
-
-	private void showAlbumDialog(Album album) {
-		mAlbumInfo = album;
-		showDialog(DIALOG_ALBUM);
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		final int dialogId = id;
-		mDialogList = new ListView(Profile_ChartsTab.this);
-		mDialogAdapter = new ListAdapter(Profile_ChartsTab.this, getImageCache());
-
-		ArrayList<ListEntry> entries = prepareProfileActions(id);
-		mDialogAdapter.setSourceIconified(entries);
-		mDialogAdapter.setIconsUnscaled();
-		mDialogAdapter.disableLoadBar();
-		mDialogList.setAdapter(mDialogAdapter);
-		mDialogList.setDivider(new ColorDrawable(0xffd9d7d7));
-		mDialogList.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> l, View v, int position, long id) {
-				if (dialogId == DIALOG_TRACK) {
-					switch (position) {
-					case 0: // Similar
-						mDialogAdapter.enableLoadBar(position);
-						playSimilar(dialogId);
-						break;
-					case 1: // Share
-						shareItem();
-						break;
-					case 2: // Tag
-						tagItem(dialogId);
-						break;
-					case 3: // Add to Playlist
-						addItemToPlaylist();
-						break;
-					case 4: // Love
-						try {
-							LastFmServer server = AndroidLastFmServerFactory.getServer();
-							server.loveTrack(mTrackInfo.getArtist().getName(), mTrackInfo.getName(), LastFMApplication.getInstance().session.getKey());
-							Toast.makeText(Profile_ChartsTab.this, getString(R.string.scrobbler_trackloved), Toast.LENGTH_SHORT).show();
-						} catch (Exception e) {
-						}
-						break;
-					case 5: // Ban
-						try {
-							LastFmServer server = AndroidLastFmServerFactory.getServer();
-							server.banTrack(mTrackInfo.getArtist().getName(), mTrackInfo.getName(), LastFMApplication.getInstance().session.getKey());
-							Toast.makeText(Profile_ChartsTab.this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
-						} catch (Exception e) {
-						}
-						break;
-					case 6: // Buy on Amazon
-						buyAmazon(dialogId);
-						break;
-					}
-				}
-				if (dialogId == DIALOG_ALBUM) {
-					switch (position) {
-					case 0: // Similar
-						mDialogAdapter.enableLoadBar(position);
-						playSimilar(dialogId);
-						break;
-					case 1: // Amazon
-						buyAmazon(dialogId);
-						break;
-					}
-				}
-
-				((Dialog) mDialogList.getTag()).dismiss();
-			}
-		});
-
-		AlertDialog dialog = new AlertDialog.Builder(Profile_ChartsTab.this).setTitle(getString(R.string.profile_selectaction)).setView(mDialogList).create();
-		mDialogList.setTag(dialog);
-
-		return dialog;
-	}
-
-	void buyAmazon(int type) {
-		LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-				"charts-buy", // Action
-				"", // Label
-				0); // Value
-		if (type == DIALOG_ALBUM) {
-			Amazon.searchForAlbum(this, mAlbumInfo.getArtist(), mAlbumInfo.getTitle());
-		} else if (type == DIALOG_TRACK) {
-			Amazon.searchForTrack(this, mTrackInfo.getName(), mTrackInfo.getArtist().getName());
-		}
-	}
-
-	void shareItem() {
-		Intent intent = new Intent(this, ShareResolverActivity.class);
-		intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
-		intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
-		startActivity(intent);
-	}
-
-	void addItemToPlaylist() {
-		Intent intent = new Intent(this, AddToPlaylist.class);
-		intent.putExtra(Share.INTENT_EXTRA_ARTIST, mTrackInfo.getArtist().getName());
-		intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackInfo.getName());
-		startActivity(intent);
-	}
-
-	void tagItem(int type) {
-		if (type != DIALOG_TRACK)
-			return; // temporary until the Tag activity supports albums.
-		String artist = null;
-		String track = null;
-		if (type == DIALOG_ALBUM) {
-			artist = mAlbumInfo.getArtist();
-
-		} else if (type == DIALOG_TRACK) {
-			artist = mTrackInfo.getArtist().getName();
-			track = mTrackInfo.getName();
-		}
-		if (artist != null) {
-			Intent myIntent = new Intent(this, fm.last.android.activity.Tag.class);
-			myIntent.putExtra("lastfm.artist", artist);
-			myIntent.putExtra("lastfm.track", track);
-			startActivity(myIntent);
-		}
-	}
-
-	void playSimilar(int type) {
-		String artist = null;
-		if (type == DIALOG_ALBUM) {
-			artist = mAlbumInfo.getArtist();
-
-		} else if (type == DIALOG_TRACK) {
-			artist = mTrackInfo.getArtist().getName();
-		}
-
-		if (artist != null)
-			LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://artist/" + Uri.encode(artist) + "/similarartists", true);
-		// dismissDialog(type);
-
-	}
-
-	ArrayList<ListEntry> prepareProfileActions(int type) {
-		ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
-
-		ListEntry entry = new ListEntry(R.string.action_similar, R.drawable.radio, getResources().getString(R.string.action_similar));
-		iconifiedEntries.add(entry);
-
-		if (type == DIALOG_TRACK) {
-			entry = new ListEntry(R.string.action_share, R.drawable.share_dark, getString(R.string.action_share));
-			iconifiedEntries.add(entry);
-
-			entry = new ListEntry(R.string.action_tagtrack, R.drawable.tag_dark, getString(R.string.action_tagtrack));
-			iconifiedEntries.add(entry);
-
-			entry = new ListEntry(R.string.action_addplaylist, R.drawable.playlist_dark, getString(R.string.action_addplaylist));
-			iconifiedEntries.add(entry);
-
-			entry = new ListEntry(R.string.action_love, R.drawable.love, getString(R.string.action_love));
-			iconifiedEntries.add(entry);
-
-			entry = new ListEntry(R.string.action_ban, R.drawable.ban, getString(R.string.action_ban));
-			iconifiedEntries.add(entry);
-		}
-
-		if (Amazon.getAmazonVersion(this) > 0) {
-			entry = new ListEntry(R.string.action_amazon, R.drawable.shopping_cart_dark, getString(R.string.action_amazon)); // TODO
-																																// need
-																																// amazon
-																																// icon
-			iconifiedEntries.add(entry);
-		}
-		return iconifiedEntries;
 	}
 
 	private ImageCache getImageCache() {
