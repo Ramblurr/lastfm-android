@@ -129,6 +129,13 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 			}
 		}
 	}
+	
+	@Override
+	protected void onPause() {
+		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+		lm.removeUpdates(this);
+		super.onPause();
+	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
