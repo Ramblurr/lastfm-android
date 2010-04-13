@@ -120,7 +120,8 @@ public class LastFMApplication extends Application {
 	}
 
 	public void unbindPlayerService() {
-		unbindService(mConnection);
+		if(player != null && player.asBinder().isBinderAlive())
+			unbindService(mConnection);
 		player = null;
 	}
 
