@@ -225,7 +225,8 @@ public class RadioPlayerService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mPreBufferIntent = null;
-			new PreBufferTask().execute();
+			if(mState != STATE_STOPPED)
+				new PreBufferTask().execute();
 		}
 	};
 
