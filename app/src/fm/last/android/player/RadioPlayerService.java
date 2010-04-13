@@ -492,7 +492,8 @@ public class RadioPlayerService extends Service {
 				}
 			} else {
 				logger.info("Encountered an error during pre-buffer");
-				next_mp.release();
+				if(next_mp != null)
+					next_mp.release();
 				next_mp = null;
 				mNextPrepared = false;
 				mNextFullyBuffered = false;
