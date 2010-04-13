@@ -91,7 +91,6 @@ public class AlbumFunctions {
 			List<Album> albums = new ArrayList<Album>();
 			for (Node node : elnodes) {
 				Album albumObject = albumBuilder.buildFromTopList(node);
-				System.out.println("Got Album: " + albumObject.getTitle());
 				albums.add(albumObject);
 			}
 			return albums.toArray(new Album[albums.size()]);
