@@ -225,7 +225,7 @@ public class RadioPlayerService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			mPreBufferIntent = null;
-			if(mState != STATE_STOPPED)
+			if(mState == STATE_PLAYING)
 				new PreBufferTask().execute();
 		}
 	};
@@ -236,7 +236,7 @@ public class RadioPlayerService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
-			if (ni.getState() == NetworkInfo.State.DISCONNECTED) {
+			if (ni.getState() == NetworkInfo.State.DISCONNECTED || ni.getState() == NetworkInfo.State.SUSPENDED) {
 				if (mState != STATE_STOPPED) {
 					// Ignore disconnections that don't change our WiFi / cell
 					// state
@@ -490,6 +490,10 @@ public class RadioPlayerService extends Service {
 						mState = STATE_ERROR;
 						new NextTrackTask().execute((Void) null);
 					}
+					if (mState == STATE_PAUSED) {
+						logger.severe("Playback error while paused, data connection probably timed out.");
+						mState = STATE_NODATA;
+					}
 				}
 			} else {
 				logger.info("Encountered an error during pre-buffer");
@@ -659,7 +663,7 @@ public class RadioPlayerService extends Service {
 	}
 
 	private void pause() {
-		if (mState == STATE_STOPPED)
+		if (mState == STATE_STOPPED || mState == STATE_NODATA || mState == STATE_ERROR)
 			return;
 
 		// TODO: This should not be exposed in the UI, only used to pause
