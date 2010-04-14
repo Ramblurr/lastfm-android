@@ -193,6 +193,8 @@
 				<action android:name="fm.last.android.LOVE" />
 				<action android:name="fm.last.android.BAN" />
 				<action android:name="fm.last.android.scrobbler.FLUSH" />
+				<action android:name="com.adam.aslfms.notify.playstatechanged" />
+				<action android:name="net.jjc1138.android.scrobbler.action.MUSIC_STATUS" />
 			</intent-filter>
 		</receiver>
 		<service android:name=".scrobbler.ScrobblerService"

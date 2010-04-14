@@ -23,6 +23,18 @@
 			android:summary="@string/prefs_scrobble_music_player_summary" android:title="@string/prefs_scrobble_music_player_title"/>
 
 		<CheckBoxPreference
+			android:key="scrobble_sls"
+			android:defaultValue="true"
+			android:dependency="scrobble"
+			android:summary="@string/prefs_scrobble_sls_summary" android:title="@string/prefs_scrobble_sls_title"/>
+
+		<CheckBoxPreference
+			android:key="scrobble_sdroid"
+			android:defaultValue="true"
+			android:dependency="scrobble"
+			android:summary="@string/prefs_scrobble_sdroid_summary" android:title="@string/prefs_scrobble_sdroid_title"/>
+
+		<CheckBoxPreference
 			android:key="scrobble_realtime"
 			android:defaultValue="true"
 			android:dependency="scrobble_music_player"

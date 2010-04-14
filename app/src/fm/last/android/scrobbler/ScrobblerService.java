@@ -36,15 +36,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -347,7 +350,80 @@ public class ScrobblerService extends Service {
 				mCurrentTrack = null;
 				stopIfReady();
 			}
-		} else {
+		} else if(intent.getAction().equals("com.adam.aslfms.notify.playstatechanged")) {
+			int state = intent.getIntExtra("state", -1);
+			if(state > -1) {
+				if(state < 2) { //start or resume
+					i.setAction(META_CHANGED);
+					//convert the duration from int to long
+					long duration = intent.getIntExtra("duration", 0);
+					i.removeExtra("duration");
+					i.putExtra("duration", duration * 1000);
+				} else if(state == 2) { //pause
+					i.setAction(PLAYBACK_PAUSED);
+				} else if(state == 3) { //complete
+					i.setAction(PLAYBACK_FINISHED);
+				}
+				handleIntent(i);
+			}
+		} else if(intent.getAction().equals("net.jjc1138.android.scrobbler.action.MUSIC_STATUS")) {
+			boolean playing = intent.getBooleanExtra("playing", false);
+
+			if(!playing) {
+				i.setAction(PLAYBACK_FINISHED);
+			} else {
+				i.setAction(META_CHANGED);
+				int id = intent.getIntExtra("id", -1);
+
+				if(id != -1) {
+					final String[] columns = new String[] {
+						MediaStore.Audio.AudioColumns.ARTIST,
+						MediaStore.Audio.AudioColumns.TITLE,
+						MediaStore.Audio.AudioColumns.DURATION,
+						MediaStore.Audio.AudioColumns.ALBUM,
+						MediaStore.Audio.AudioColumns.TRACK, };
+				
+					Cursor cur = getContentResolver().query(
+						ContentUris.withAppendedId(
+							MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+							id), columns, null, null, null);
+					
+					if (cur == null) {
+						logger.severe("could not open cursor to media in media store");
+						return;
+					}
+		
+		            try {
+						if (!cur.moveToFirst()) {
+						        logger.severe("no such media in media store");
+						        cur.close();
+						        return;
+						}
+						String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
+						i.putExtra("artist", artist);
+						
+						String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
+						i.putExtra("track", track);
+						
+						String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
+						i.putExtra("album", album);
+						
+						long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
+						if (duration != 0) {
+						    i.putExtra("duration", duration);
+						}
+		            } finally {
+		                    cur.close();
+		            }
+	            } else {
+					//convert the duration from int to long
+					long duration = intent.getIntExtra("secs", 0);
+					i.removeExtra("secs");
+					i.putExtra("duration", duration * 1000);
+				}
+			}
+			handleIntent(i);
+		} else { //
 			handleIntent(i);
 		}
 	}
@@ -440,7 +516,7 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.rating = "B";
 			Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH")) {
+		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || mQueue.size() > 0) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);

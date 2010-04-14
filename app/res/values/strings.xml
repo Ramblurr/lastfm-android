@@ -68,6 +68,10 @@
 	<string name="prefs_scrobble_summary">Update your Last.fm profile as you listen to music</string>
 	<string name="prefs_scrobble_music_player_title">Scrobble Android player</string>
 	<string name="prefs_scrobble_music_player_summary">Scrobble the built-in Android music player</string>
+	<string name="prefs_scrobble_sls_title">Receive SLS scrobbles</string>
+	<string name="prefs_scrobble_sls_summary">Scrobble apps that use the Simple Last.fm Scrobbler API</string>
+	<string name="prefs_scrobble_sdroid_title">Receive ScrobbleDroid scrobbles</string>
+	<string name="prefs_scrobble_sdroid_summary">Scrobble apps that use the ScrobbleDroid API</string>
 	<string name="prefs_scrobble_realtime_title">Scrobble in real-time</string>
 	<string name="prefs_scrobble_realtime_summary">Sends now-playing information and uploads scrobbles immediately.</string>
 	<string name="prefs_scrobble_wifi_only_title">Scrobble only on Wi-Fi</string>

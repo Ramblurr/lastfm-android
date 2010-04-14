@@ -118,7 +118,10 @@ public class AudioscrobblerService extends Object {
 		params.put("a", t.getCreator());
 		params.put("t", t.getTitle());
 		params.put("b", t.getAlbum());
-		params.put("l", new Integer(t.getDuration() / 1000).toString());
+		if(t.getDuration() > 0)
+			params.put("l", new Integer(t.getDuration() / 1000).toString());
+		else
+			params.put("l", "");
 
 		String response = UrlUtil.doPost(mNpUrl, UrlUtil.buildQuery(params));
 		Log.i("np query: " + UrlUtil.buildQuery(params));
@@ -145,7 +148,10 @@ public class AudioscrobblerService extends Object {
 		params.put("a[0]", t.getCreator());
 		params.put("t[0]", t.getTitle());
 		params.put("b[0]", t.getAlbum());
-		params.put("l[0]", new Integer(t.getDuration() / 1000).toString());
+		if(t.getDuration() > 0)
+			params.put("l[0]", new Integer(t.getDuration() / 1000).toString());
+		else
+			params.put("l[0]", "");
 		params.put("i[0]", new Long(timestamp).toString());
 		if (t.getTrackAuth().length() > 0)
 			params.put("o[0]", "L" + t.getTrackAuth());
