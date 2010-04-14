@@ -102,7 +102,7 @@ public class NewStation extends ListActivity implements Serializable {
 		searchBar.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent event) {
 				searchBar.requestFocusFromTouch();
-				return true;
+				return false;
 			}
 		});
 
