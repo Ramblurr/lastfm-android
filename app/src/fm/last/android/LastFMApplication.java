@@ -218,8 +218,8 @@ public class LastFMApplication extends Application {
 			db = this.openOrCreateDatabase(LastFm.DB_NAME, MODE_PRIVATE, null);
 			db.execSQL("CREATE TABLE IF NOT EXISTS " + LastFm.DB_TABLE_RECENTSTATIONS
 					+ " (Url VARCHAR UNIQUE NOT NULL PRIMARY KEY, Name VARCHAR NOT NULL, Timestamp INTEGER NOT NULL);");
-			db.execSQL("DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS + " WHERE Url = '" + url + "'");
-			db.execSQL("INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS + "(Url, Name, Timestamp) " + "VALUES ('" + url + "', '" + name + "', "
+			db.execSQL("DELETE FROM " + LastFm.DB_TABLE_RECENTSTATIONS + " WHERE Url = \"" + url + "\"");
+			db.execSQL("INSERT INTO " + LastFm.DB_TABLE_RECENTSTATIONS + "(Url, Name, Timestamp) " + "VALUES (\"" + url + "\", \"" + name + "\", "
 					+ System.currentTimeMillis() + ")");
 			db.close();
 		} catch (Exception e) {
