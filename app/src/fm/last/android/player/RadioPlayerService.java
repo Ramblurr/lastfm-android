@@ -464,6 +464,9 @@ public class RadioPlayerService extends Service {
 
 	private OnErrorListener mOnErrorListener = new OnErrorListener() {
 		public boolean onError(MediaPlayer p, int what, int extra) {
+			if(mState == STATE_STOPPED)
+				return true;
+			
 			if (mp == p) {
 				if (mAutoSkipCount++ > 4) {
 					// If we weren't able to start playing after 3 attempts,
@@ -545,6 +548,7 @@ public class RadioPlayerService extends Service {
 	}
 
 	private void stop() {
+		mState = STATE_STOPPED;
 		if (mp != null) {
 			try {
 				mp.stop();
@@ -571,7 +575,6 @@ public class RadioPlayerService extends Service {
 			mPreBufferIntent = null;
 		}
 		clearNotification();
-		mState = STATE_STOPPED;
 		notifyChange(PLAYBACK_FINISHED);
 		if (wakeLock.isHeld())
 			wakeLock.release();
