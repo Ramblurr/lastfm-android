@@ -581,8 +581,10 @@ public class RadioPlayerService extends Service {
 
 		if (wifiLock.isHeld())
 			wifiLock.release();
+		
 		currentQueue.clear();
-		RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
+		if(currentStation != null)
+			RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
 		stopSelf();
 	}
 
