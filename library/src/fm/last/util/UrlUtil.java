@@ -151,8 +151,13 @@ public class UrlUtil {
 
 			// Dispatch any queued Analytics data while we've got the network
 			// open
-			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
-			tracker.dispatch();
+			try {
+				GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+				if(tracker != null)
+					tracker.dispatch();
+			} catch (Exception e1) {
+				//ignore any exceptions thrown by analytics
+			}
 		}
 	}
 
