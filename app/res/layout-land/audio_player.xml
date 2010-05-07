@@ -43,6 +43,7 @@
 			       android:layout_below="@id/AdArea"
 			       android:layout_alignParentRight="true"
 			       android:background="@null"
+					android:contentDescription="@string/action_ontour"
 			       android:visibility="gone"/>
 
 				<TableLayout android:id="@+id/track_metadata"
@@ -133,10 +134,10 @@
                android:layout_width="fill_parent"
                android:layout_height="62dip"
                android:gravity="center"
-               android:layout_alignParentBottom="true">           
-               <ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love"/>
-               <ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban"/>
-               <ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop"/>
-               <ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip"/>
+               android:layout_alignParentBottom="true">
+				<ImageButton android:id="@+id/love" style="@+style/LastFMButton.Love" android:contentDescription="@string/action_love"/>
+				<ImageButton android:id="@+id/ban" style="@+style/LastFMButton.Ban" android:contentDescription="@string/action_ban"/>
+				<ImageButton android:id="@+id/stop" style="@+style/LastFMButton.Stop" android:contentDescription="@string/action_stop"/>
+				<ImageButton android:id="@+id/skip" style="@+style/LastFMButton.Skip" android:contentDescription="@string/action_skip"/>
            </LinearLayout>
 </RelativeLayout>
