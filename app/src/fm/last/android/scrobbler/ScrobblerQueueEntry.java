@@ -31,11 +31,11 @@ import fm.last.api.RadioTrack;
  */
 public class ScrobblerQueueEntry implements Serializable {
 	private static final long serialVersionUID = 2L;
-	public String artist;
-	public String title;
-	public String album;
-	public Long startTime;
-	public Long duration;
+	public String artist = "";
+	public String title = "";
+	public String album = "";
+	public Long startTime = 0L;
+	public Long duration = 0L;
 	public String trackAuth = "";
 	public String rating = "";
 	public Boolean postedNowPlaying = false;

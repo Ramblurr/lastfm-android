@@ -44,6 +44,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -52,7 +53,6 @@ import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
-import fm.last.android.utils.UserTask;
 import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioTrack;
@@ -140,7 +140,7 @@ public class ScrobblerService extends Service {
 				FileInputStream fileStream = openFileInput("currentTrack.dat");
 				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
 				Object obj = objectStream.readObject();
-				if (obj instanceof ScrobblerQueueEntry) {
+				if (obj != null && obj instanceof ScrobblerQueueEntry) {
 					mCurrentTrack = (ScrobblerQueueEntry) obj;
 					if (mCurrentTrack.startTime > System.currentTimeMillis()) {
 						mCurrentTrack = null;
@@ -165,7 +165,7 @@ public class ScrobblerService extends Service {
 					Integer count = (Integer) obj;
 					for (int i = 0; i < count.intValue(); i++) {
 						obj = objectStream.readObject();
-						if (obj instanceof ScrobblerQueueEntry)
+						if (obj != null && obj instanceof ScrobblerQueueEntry)
 							mQueue.add((ScrobblerQueueEntry) obj);
 					}
 				}
@@ -544,7 +544,7 @@ public class ScrobblerService extends Service {
 		return null;
 	}
 
-	private class NowPlayingTask extends UserTask<AudioscrobblerService, Void, Boolean> {
+	private class NowPlayingTask extends AsyncTask<AudioscrobblerService, Void, Boolean> {
 		RadioTrack mTrack;
 
 		public NowPlayingTask(RadioTrack track) {
@@ -581,7 +581,7 @@ public class ScrobblerService extends Service {
 		}
 	}
 
-	private class SubmitTracksTask extends UserTask<AudioscrobblerService, Void, Boolean> {
+	private class SubmitTracksTask extends AsyncTask<AudioscrobblerService, Void, Boolean> {
 
 		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
@@ -591,7 +591,7 @@ public class ScrobblerService extends Service {
 				LastFmServer server = AndroidLastFmServerFactory.getServer();
 				while (mQueue.size() > 0) {
 					ScrobblerQueueEntry e = mQueue.peek();
-					if (e != null && e.title != null && e.artist != null) {
+					if (e != null && e.title != null && e.artist != null && e.toRadioTrack() != null) {
 						if (e.rating.equals("L")) {
 							server.loveTrack(e.artist, e.title, mSession.getKey());
 						}
@@ -603,6 +603,12 @@ public class ScrobblerService extends Service {
 					mQueue.take();
 				}
 				success = true;
+			} catch (NullPointerException e) { //Skip to the next track if we get an NPE
+				try {
+					mQueue.take();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
 			} catch (Exception e) {
 				logger.severe("Unable to submit track: " + e.toString());
 				e.printStackTrace();
