@@ -140,7 +140,7 @@ public class Profile_RadioTab extends ListActivity {
 			boolean success = false;
 			Session session = LastFMApplication.getInstance().session;
 			LastFMApplication.getInstance().fetchRecentStations();
-			SetupRecentStations();
+
 			// Check our subscriber status
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			try {
@@ -185,6 +185,8 @@ public class Profile_RadioTab extends ListActivity {
 		public void onPostExecute(Boolean result) {
 			Session session = LastFMApplication.getInstance().session;
 			if (session != null) {
+				SetupRecentStations();
+
 				if (!isAuthenticatedUser) {
 					mProfileBubble.setUser(Profile_RadioTab.this.mUser);
 					SetupCommonArtists(tasteometer);
@@ -293,7 +295,6 @@ public class Profile_RadioTab extends ListActivity {
 			}
 		}
 		mMyRecentAdapter.updateModel();
-
 	}
 
 	private void SetupMyStations() {
