@@ -237,7 +237,7 @@ public class RadioPlayerService extends Service {
 			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
 			if (ni.getState() == NetworkInfo.State.DISCONNECTED || ni.getState() == NetworkInfo.State.SUSPENDED) {
-				if (mState != STATE_STOPPED) {
+				if (mState != STATE_STOPPED && mState != STATE_ERROR) {
 					// Ignore disconnections that don't change our WiFi / cell
 					// state
 					if ((ni.getType() == ConnectivityManager.TYPE_WIFI) != mDoHasWiFi) {
@@ -272,7 +272,7 @@ public class RadioPlayerService extends Service {
 						mNextFullyBuffered = false;
 					}
 				}
-			} else if (ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED) {
+			} else if (ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED && mState != STATE_ERROR) {
 				if (mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
 					if (ni.getType() == ConnectivityManager.TYPE_WIFI) {
 						if (!mDoHasWiFi)
