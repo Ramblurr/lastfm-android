@@ -65,9 +65,9 @@ public class AudioscrobblerService extends Object {
 	private String mClientVersion;
 
 	// responses from handshake
-	private String mSessionId;
-	private URL mNpUrl;
-	private URL mSubsUrl;
+	public String sessionId;
+	public URL npUrl;
+	public URL subsUrl;
 
 	public AudioscrobblerService(Session session, String apiKey, String sharedSecret, String clientVersion) {
 		mUsername = session.getName();
@@ -81,8 +81,8 @@ public class AudioscrobblerService extends Object {
 		return new Long(System.currentTimeMillis() / 1000).toString();
 	}
 
-	private void handshake() throws IOException {
-		mSessionId = null;
+	public void handshake() throws IOException {
+		sessionId = null;
 
 		String timestamp = timestamp();
 
@@ -104,17 +104,17 @@ public class AudioscrobblerService extends Object {
 		if (lines.length < 4)
 			throw new IOException();
 
-		mSessionId = lines[1];
-		mNpUrl = new URL(lines[2]);
-		mSubsUrl = new URL(lines[3]);
+		sessionId = lines[1];
+		npUrl = new URL(lines[2]);
+		subsUrl = new URL(lines[3]);
 	}
 
-	public void nowPlaying(RadioTrack t) throws IOException {
-		if (mSessionId == null)
+	public String nowPlaying(RadioTrack t) throws IOException {
+		if (sessionId == null)
 			handshake();
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("s", mSessionId);
+		params.put("s", sessionId);
 		params.put("a", t.getCreator());
 		params.put("t", t.getTitle());
 		params.put("b", t.getAlbum());
@@ -123,28 +123,27 @@ public class AudioscrobblerService extends Object {
 		else
 			params.put("l", "");
 
-		String response = UrlUtil.doPost(mNpUrl, UrlUtil.buildQuery(params));
+		String response = UrlUtil.doPost(npUrl, UrlUtil.buildQuery(params));
 		Log.i("np query: " + UrlUtil.buildQuery(params));
 		Log.i("np response: " + response);
 
-		if (!response.trim().equals("OK"))
-			handshake();
+		return response.trim();
 	}
 
-	public void submit(RadioTrack t, long timestamp) throws IOException {
-		submit(t, timestamp, "");
+	public String submit(RadioTrack t, long timestamp) throws IOException {
+		return submit(t, timestamp, "");
 	}
 
 	/**
 	 * valid ratings are, L for love, B for banned and S for skip, you can only
 	 * specify one!
 	 */
-	public void submit(RadioTrack t, long timestamp, String ratingCharacter) throws IOException {
-		if (mSessionId == null)
+	public String submit(RadioTrack t, long timestamp, String ratingCharacter) throws IOException {
+		if (sessionId == null)
 			handshake();
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("s", mSessionId);
+		params.put("s", sessionId);
 		params.put("a[0]", t.getCreator());
 		params.put("t[0]", t.getTitle());
 		params.put("b[0]", t.getAlbum());
@@ -161,12 +160,10 @@ public class AudioscrobblerService extends Object {
 		params.put("m[0]", "");
 		params.put("n[0]", "");
 
-		String response = UrlUtil.doPost(mSubsUrl, UrlUtil.buildQuery(params));
+		String response = UrlUtil.doPost(subsUrl, UrlUtil.buildQuery(params));
 		Log.i("submit query: " + UrlUtil.buildQuery(params));
 
 		Log.i("submit response: " + response);
-
-		if (!response.trim().equals("OK"))
-			handshake();
+		return response.trim();
 	}
 }

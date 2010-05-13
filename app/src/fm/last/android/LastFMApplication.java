@@ -21,6 +21,8 @@
 package fm.last.android;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -50,6 +53,7 @@ import fm.last.android.activity.Player;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
+import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -62,6 +66,7 @@ public class LastFMApplication extends Application {
 	public fm.last.android.player.IRadioPlayer player = null;
 	private Context mCtx;
 	public GoogleAnalyticsTracker tracker;
+	public AudioscrobblerService scrobbler;
 
 	private static LastFMApplication instance = null;
 
@@ -75,6 +80,7 @@ public class LastFMApplication extends Application {
 
 	@Override
 	public void onCreate() {
+		super.onCreate();
 		instance = this;
 
 		String version;
@@ -95,6 +101,26 @@ public class LastFMApplication extends Application {
 		session = new Session(username, session_key, subscriber);
 		tracker = GoogleAnalyticsTracker.getInstance();
 		tracker.start(PrivateAPIKey.ANALYTICS_ID, this);
+		
+		version = "0.1";
+		try {
+			version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
+		} catch (NameNotFoundException e) {
+		}
+		scrobbler = AndroidLastFmServerFactory.getServer().createAudioscrobbler(session, version);
+		if(settings.getString("scrobbler_session", "").length() > 0) {
+			scrobbler.sessionId = settings.getString("scrobbler_session", "");
+			try {
+				scrobbler.npUrl = new URL(settings.getString("scrobbler_npurl", ""));
+			} catch (MalformedURLException e) {
+				scrobbler.npUrl = null;
+			}
+			try {
+				scrobbler.subsUrl = new URL(settings.getString("scrobbler_subsurl", ""));
+			} catch (MalformedURLException e) {
+				scrobbler.subsUrl = null;
+			}
+		}
 	}
 
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -344,6 +370,9 @@ public class LastFMApplication extends Application {
 		editor.remove("lastfm_pass");
 		editor.remove("lastfm_session_key");
 		editor.remove("lastfm_subscriber");
+		editor.remove("scrobbler_session");
+		editor.remove("scrobbler_subsurl");
+		editor.remove("scrobbler_npurl");
 		editor.commit();
 		session = null;
 		try {

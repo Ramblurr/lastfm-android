@@ -77,6 +77,8 @@ public class BugReport extends DialogPreference {
 				commandLine.add("-d");
 				commandLine.add("-v");
 				commandLine.add("time");
+				commandLine.add("*:I");
+				commandLine.add("PlayerDriver:W"); //Filter out SenseUI's over-sharing audio driver
 
 				Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]));
 				InputStream in = process.getInputStream();

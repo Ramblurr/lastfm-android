@@ -40,7 +40,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,6 +52,7 @@ import android.provider.MediaStore;
 import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
@@ -119,16 +120,10 @@ public class ScrobblerService extends Service {
 			e.printStackTrace();
 		}
 
-		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		mSession = LastFMApplication.getInstance().session;
 
 		if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
-			String version = "0.1";
-			try {
-				version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
-			} catch (NameNotFoundException e) {
-			}
-			mScrobbler = server.createAudioscrobbler(mSession, version);
+			mScrobbler = LastFMApplication.getInstance().scrobbler;
 		} else {
 			// User not authenticated, shutting down...
 			stopSelf();
@@ -189,6 +184,7 @@ public class ScrobblerService extends Service {
 			am.cancel(alarmIntent); // cancel any pending alarm intents
 			if (mQueue.size() > 0) {
 				// schedule an alarm to wake the device and try again in an hour
+				logger.info("Scrobbles are pending, will retry in an hour");
 				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
 			}
 			if (getFileStreamPath("currentTrack.dat").exists())
@@ -474,7 +470,7 @@ public class ScrobblerService extends Service {
 				NetworkInfo ni = cm.getActiveNetworkInfo();
 				if (ni != null) {
 					boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-					if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null) {
+					if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null && mNowPlayingTask == null) {
 						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
 						mNowPlayingTask.execute(mScrobbler);
 					}
@@ -516,7 +512,7 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.rating = "B";
 			Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || mQueue.size() > 0) {
+		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || (mQueue.size() > 0 && mSubmissionTask == null && mNowPlayingTask == null)) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
@@ -553,18 +549,28 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPreExecute() {
-			/* If we have any scrobbles in the queue, try to send them now */
-			if (mSubmissionTask == null && mQueue.size() > 0) {
-				mSubmissionTask = new SubmitTracksTask();
-				mSubmissionTask.execute(mScrobbler);
-			}
 		}
 
 		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			try {
-				scrobbler[0].nowPlaying(mTrack);
+				if(scrobbler[0].sessionId == null) {
+					scrobbler[0].handshake();
+					if(scrobbler[0].sessionId != null) {
+						SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+						SharedPreferences.Editor editor = settings.edit();
+						editor.putString("scrobbler_session", scrobbler[0].sessionId);
+						editor.putString("scrobbler_npurl", scrobbler[0].npUrl.toString());
+						editor.putString("scrobbler_subsurl", scrobbler[0].subsUrl.toString());
+						editor.commit();
+					}
+				}
+				String result = scrobbler[0].nowPlaying(mTrack);
+				if(result.equals("BADSESSION")) {
+					scrobbler[0].sessionId = null;
+					doInBackground(scrobbler[0]);
+				}
 				success = true;
 			} catch (Exception e) {
 				success = false;
@@ -577,6 +583,11 @@ public class ScrobblerService extends Service {
 			if (mCurrentTrack != null)
 				mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
+			/* If we have any scrobbles in the queue, try to send them now */
+			if (mSubmissionTask == null && mQueue.size() > 0) {
+				mSubmissionTask = new SubmitTracksTask();
+				mSubmissionTask.execute(mScrobbler);
+			}
 			stopIfReady();
 		}
 	}
@@ -586,10 +597,11 @@ public class ScrobblerService extends Service {
 		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
-			try {
-				logger.info("Going to submit " + mQueue.size() + " tracks");
-				LastFmServer server = AndroidLastFmServerFactory.getServer();
-				while (mQueue.size() > 0) {
+			logger.info("Going to submit " + mQueue.size() + " tracks");
+			LastFmServer server = AndroidLastFmServerFactory.getServer();
+			while (mQueue.size() > 0) {
+				try {
+					success = false;
 					ScrobblerQueueEntry e = mQueue.peek();
 					if (e != null && e.title != null && e.artist != null && e.toRadioTrack() != null) {
 						if (e.rating.equals("L")) {
@@ -598,21 +610,39 @@ public class ScrobblerService extends Service {
 						if (e.rating.equals("B")) {
 							server.banTrack(e.artist, e.title, mSession.getKey());
 						}
-						scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
+						String result = scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
+						if(result.equals("OK")) {
+							success = true;
+						} else if(result.equals("BADSESSION")) {
+							scrobbler[0].handshake();
+							if(scrobbler[0].sessionId != null) {
+								SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+								SharedPreferences.Editor editor = settings.edit();
+								editor.putString("scrobbler_session", scrobbler[0].sessionId);
+								editor.putString("scrobbler_npurl", scrobbler[0].npUrl.toString());
+								editor.putString("scrobbler_subsurl", scrobbler[0].subsUrl.toString());
+								editor.commit();
+								continue; //try again with our new session key
+							}
+						}
 					}
-					mQueue.take();
+				} catch (NullPointerException e) { //Skip to the next track if we get an NPE
+					success = true;
+				} catch (Exception e) {
+					logger.severe("Unable to submit track: " + e.toString());
+					e.printStackTrace();
+					success = false;
 				}
-				success = true;
-			} catch (NullPointerException e) { //Skip to the next track if we get an NPE
-				try {
-					mQueue.take();
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
+				if(success) {
+					try {
+						mQueue.take();
+					} catch (InterruptedException e1) {
+						e1.printStackTrace();
+					}
+				} else {
+					logger.severe("Scrobble submission aborted");
+					break;
 				}
-			} catch (Exception e) {
-				logger.severe("Unable to submit track: " + e.toString());
-				e.printStackTrace();
-				success = false;
 			}
 			return success;
 		}
