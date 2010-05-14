@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -45,7 +46,7 @@ public class BugReport extends DialogPreference {
 
 			try {
 				// Create the ZIP file
-				String outFilename = "/sdcard/lastfm-logs.zip";
+				String outFilename = Environment.getExternalStorageDirectory() + "/lastfm-logs.zip";
 				Log.i("Last.fm", "Creating " + outFilename);
 				ZipOutputStream out = new ZipOutputStream(new FileOutputStream(outFilename));
 
