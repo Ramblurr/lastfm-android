@@ -22,6 +22,7 @@ package fm.last.api;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Represents an event
@@ -45,9 +46,10 @@ public class Event implements Serializable {
 	private String tag;
 	private String url;
 	private String status;
+	private HashMap<String, String> ticketUrls;
 
 	public Event(int id, String title, String[] artists, String headliner, Venue venue, Date startDate, String description, ImageUrl[] images, int attendance,
-			int reviews, String tag, String url, String status) {
+			int reviews, String tag, String url, String status, HashMap<String, String>ticketUrls) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -62,6 +64,7 @@ public class Event implements Serializable {
 		this.tag = tag;
 		this.url = url;
 		this.status = status;
+		this.ticketUrls = ticketUrls;
 	}
 
 	public int getId() {
@@ -168,4 +171,11 @@ public class Event implements Serializable {
 		this.status = status;
 	}
 
+	public void addTicketUrl(String provider, String url) {
+		this.ticketUrls.put(provider, url);
+	}
+	
+	public HashMap<String, String> getTicketUrls() {
+		return this.ticketUrls;
+	}
 }

@@ -24,10 +24,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import org.w3c.dom.Node;
+
+import android.util.Log;
 
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
@@ -119,7 +122,17 @@ public class EventBuilder extends XMLBuilder<Event> {
 		// status
 		String status = this.getAttribute("status");
 
-		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status);
+		// ticket providers
+		Node ticketsNode = getChildNode("tickets");
+		List<Node> ticketNodes = XMLUtil.findNamedElementNodes(ticketsNode, "ticket");
+		HashMap<String, String> ticketUrls = new HashMap<String, String>();
+		for (Node ticket : ticketNodes) {
+			Log.i("LastFm", "Supplier: " + ticket.getAttributes().getNamedItem("supplier").getNodeValue());
+			Log.i("LastFm", "URL: " + ticket.getFirstChild().getNodeValue());
+			ticketUrls.put(ticket.getAttributes().getNamedItem("supplier").getNodeValue(),ticket.getFirstChild().getNodeValue());
+		}
+
+		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status, ticketUrls);
 	}
 
 }
