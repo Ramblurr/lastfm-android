@@ -34,7 +34,7 @@ public class ListEntry implements Serializable {
 	/**
 	 * Text that will appear in ListView's row
 	 */
-	String text;
+	public String text;
 
 	/**
 	 * The 2nd row of text that will appear in ListView's row

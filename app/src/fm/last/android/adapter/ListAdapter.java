@@ -288,6 +288,10 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 	public Object getItem(int position) {
 		return mList.get(position).value;
 	}
+	
+	public ListEntry getEntry(int position) {
+		return mList.get(position);
+	}
 
 	public long getItemId(int position) {
 		return position;

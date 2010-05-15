@@ -197,6 +197,7 @@
     <!-- Event activity -->
     <string name="event_label">Last.fm: Event</string>
 	<string name="event_showmap">Show Map</string>
+	<string name="event_buytickets">Buy Tickets</string>
 	<string name="event_attending">I\'m attending</string>
 	<string name="event_notattending">I\'m not attending</string>
 	<string name="event_maybe">I might attend</string>

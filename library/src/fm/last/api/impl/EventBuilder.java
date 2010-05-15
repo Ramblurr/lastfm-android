@@ -127,8 +127,6 @@ public class EventBuilder extends XMLBuilder<Event> {
 		List<Node> ticketNodes = XMLUtil.findNamedElementNodes(ticketsNode, "ticket");
 		HashMap<String, String> ticketUrls = new HashMap<String, String>();
 		for (Node ticket : ticketNodes) {
-			Log.i("LastFm", "Supplier: " + ticket.getAttributes().getNamedItem("supplier").getNodeValue());
-			Log.i("LastFm", "URL: " + ticket.getFirstChild().getNodeValue());
 			ticketUrls.put(ticket.getAttributes().getNamedItem("supplier").getNodeValue(),ticket.getFirstChild().getNodeValue());
 		}
 

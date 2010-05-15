@@ -171,10 +171,6 @@ public class Event implements Serializable {
 		this.status = status;
 	}
 
-	public void addTicketUrl(String provider, String url) {
-		this.ticketUrls.put(provider, url);
-	}
-	
 	public HashMap<String, String> getTicketUrls() {
 		return this.ticketUrls;
 	}
