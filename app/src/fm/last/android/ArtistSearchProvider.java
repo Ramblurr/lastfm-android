@@ -100,10 +100,14 @@ public class ArtistSearchProvider extends ContentProvider {
 
 	        for (int i = 0; i < ((artists.length < 6) ? artists.length : 6); i++) {
 				if (artists[i].getStreamable().equals("1")) {
+					String artistSample = "";
+					Artist[] similar = server.getSimilarArtists(artists[i].getName(), "3");
+					if (similar.length >= 3)
+						artistSample = LastFMApplication.getInstance().getString(R.string.newstation_artistsample, similar[0].getName(), similar[1].getName(), similar[2].getName());
 		            cursor.addRow(new Object[] {
 		                    id++,                  // _id
-		                    artists[i].getName(),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_similar),     // text2
+		                    LastFMApplication.getInstance().getString(R.string.newstation_artistradio,artists[i].getName()),           // text1
+		                    artistSample,     // text2
 		                    Uri.parse("lastfm://artist/"+artists[i].getName()+"/similarartists"),           // intent_data (included when clicking on item)
 		                    R.drawable.radio_icon
 		            });
