@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -136,10 +137,15 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
 
 		Intent intent = getIntent();
-		if (intent != null && intent.getData() != null
-				&& intent.getData().getScheme().equals("lastfm")) {
-			LastFMApplication.getInstance().playRadioStation(Player.this,
-					intent.getData().toString(), false);
+		if (intent != null && intent.getData() != null) {
+			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
+				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
+			} else {
+				Intent i = new Intent(this, Metadata.class);
+				i.putExtra("artist", Uri.decode(intent.getData().toString()));
+				startActivity(i);
+				finish();
+			}
 		}
 
 		if (icicle != null) {
