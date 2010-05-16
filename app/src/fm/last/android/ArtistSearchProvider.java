@@ -103,7 +103,7 @@ public class ArtistSearchProvider extends ContentProvider {
 		            cursor.addRow(new Object[] {
 		                    id++,                  // _id
 		                    artists[i].getName(),           // text1
-		                    "Listen to similar artists",     // text2
+		                    LastFMApplication.getInstance().getString(R.string.action_similar),     // text2
 		                    Uri.parse("lastfm://artist/"+artists[i].getName()+"/similarartists"),           // intent_data (included when clicking on item)
 		                    R.drawable.radio_icon
 		            });
