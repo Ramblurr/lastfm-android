@@ -107,14 +107,14 @@ public class ArtistSearchProvider extends ContentProvider {
 		                    Uri.parse("lastfm://artist/"+artists[i].getName()+"/similarartists"),           // intent_data (included when clicking on item)
 		                    R.drawable.radio_icon
 		            });
-		            cursor.addRow(new Object[] {
-		                    id++,                  // _id
-		                    artists[i].getName(),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-		                    artists[i].getName(),           // intent_data (included when clicking on item)
-		                    -1
-		            });
 				}
+	            cursor.addRow(new Object[] {
+	                    id++,                  // _id
+	                    artists[i].getName(),           // text1
+	                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
+	                    artists[i].getName(),           // intent_data (included when clicking on item)
+	                    -1
+	            });
 			}
 	        return cursor;
 		} catch (IOException e) {
