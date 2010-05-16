@@ -28,6 +28,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -90,7 +91,16 @@ public class LastFm extends Activity {
 		}
 		
 		if (!user.equals("") && !session_key.equals("")) {
-			if (getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
+			if(getIntent().getAction() != null && getIntent().getAction().equals(Intent.ACTION_SEARCH)) {
+				String query = "";
+				
+				if(getIntent().getStringExtra(SearchManager.QUERY) != null)
+					query = getIntent().getStringExtra(SearchManager.QUERY);
+				else
+					query = getIntent().getData().toString();
+				Log.i("LastFm", "Query: " + query);
+				LastFMApplication.getInstance().playRadioStation(this, query, true);
+			} else if (getIntent().getAction() != null && getIntent().getAction().equals("android.appwidget.action.APPWIDGET_CONFIGURE")) {
 				Intent intent = getIntent();
 				Bundle extras = intent.getExtras();
 				if (extras != null) {

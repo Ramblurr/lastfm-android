@@ -24,9 +24,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import android.app.ListActivity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -181,7 +183,6 @@ public class NewStation extends ListActivity implements Serializable {
 		super.onResume();
 
 		LastFMApplication.getInstance().tracker.trackPageView("/NewStation");
-
 	}
 
 	@Override
