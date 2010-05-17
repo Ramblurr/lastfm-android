@@ -470,7 +470,7 @@ public class ScrobblerService extends Service {
 				NetworkInfo ni = cm.getActiveNetworkInfo();
 				if (ni != null) {
 					boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-					if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null && mNowPlayingTask == null) {
+					if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null && mNowPlayingTask == null)) {
 						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
 						mNowPlayingTask.execute(mScrobbler);
 					}
@@ -516,7 +516,7 @@ public class ScrobblerService extends Service {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-			if (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI)) {
+			if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI))) {
 				if (mQueue.size() > 0 && mSubmissionTask == null) {
 					mSubmissionTask = new SubmitTracksTask();
 					mSubmissionTask.execute(mScrobbler);
