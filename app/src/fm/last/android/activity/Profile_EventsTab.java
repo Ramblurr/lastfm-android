@@ -26,6 +26,7 @@ import java.util.Stack;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -182,9 +183,19 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		case EVENTS_NEARME:
 			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Nearby");
 			LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-			mLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+			
+			Criteria criteria = new Criteria(); 
+			criteria.setPowerRequirement(Criteria.POWER_LOW); 
+			criteria.setAccuracy(Criteria.ACCURACY_COARSE); 
+			criteria.setAltitudeRequired(false); 
+			criteria.setBearingRequired(false); 
+			criteria.setSpeedRequired(false); 
+			criteria.setCostAllowed(false); 
+
+			String provider = lm.getBestProvider(criteria, true); 
+			mLocation = lm.getLastKnownLocation(provider);
 			new LoadNearbyEventsTask().execute((Void) null);
-			lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 30000L, 500.0f, this);
+			lm.requestLocationUpdates(provider, 30000L, 1000.0f, this);
 			break;
 		default:
 			break;
