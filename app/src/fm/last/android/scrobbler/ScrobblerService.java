@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
@@ -89,6 +91,7 @@ public class ScrobblerService extends Service {
 	public static final String LOVE = "fm.last.android.LOVE";
 	public static final String BAN = "fm.last.android.BAN";
 	AudioscrobblerService mScrobbler;
+	private Lock mScrobblerLock = new ReentrantLock();
 	SubmitTracksTask mSubmissionTask = null;
 	NowPlayingTask mNowPlayingTask = null;
 	ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
@@ -103,7 +106,7 @@ public class ScrobblerService extends Service {
 	public static final String UNKNOWN = "fm.last.android.unknown";
 
 	private Logger logger;
-
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -549,12 +552,18 @@ public class ScrobblerService extends Service {
 
 		@Override
 		public void onPreExecute() {
+			/* If we have any scrobbles in the queue, try to send them now */
+			if (mSubmissionTask == null && mQueue.size() > 0) {
+				mSubmissionTask = new SubmitTracksTask();
+				mSubmissionTask.execute(mScrobbler);
+			}
 		}
 
 		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			try {
+				mScrobblerLock.lock();
 				if(scrobbler[0].sessionId == null) {
 					scrobbler[0].handshake();
 					if(scrobbler[0].sessionId != null) {
@@ -574,6 +583,8 @@ public class ScrobblerService extends Service {
 				success = true;
 			} catch (Exception e) {
 				success = false;
+			} finally {
+				mScrobblerLock.unlock();
 			}
 			return success;
 		}
@@ -583,11 +594,6 @@ public class ScrobblerService extends Service {
 			if (mCurrentTrack != null)
 				mCurrentTrack.postedNowPlaying = result;
 			mNowPlayingTask = null;
-			/* If we have any scrobbles in the queue, try to send them now */
-			if (mSubmissionTask == null && mQueue.size() > 0) {
-				mSubmissionTask = new SubmitTracksTask();
-				mSubmissionTask.execute(mScrobbler);
-			}
 			stopIfReady();
 		}
 	}
@@ -597,6 +603,7 @@ public class ScrobblerService extends Service {
 		@Override
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
+			mScrobblerLock.lock();
 			logger.info("Going to submit " + mQueue.size() + " tracks");
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			while (mQueue.size() > 0) {
@@ -644,6 +651,7 @@ public class ScrobblerService extends Service {
 					break;
 				}
 			}
+			mScrobblerLock.unlock();
 			return success;
 		}
 
