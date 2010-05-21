@@ -81,7 +81,7 @@ public class AudioscrobblerService extends Object {
 		return new Long(System.currentTimeMillis() / 1000).toString();
 	}
 
-	public void handshake() throws IOException {
+	public synchronized void handshake() throws IOException {
 		sessionId = null;
 
 		String timestamp = timestamp();
@@ -109,7 +109,7 @@ public class AudioscrobblerService extends Object {
 		subsUrl = new URL(lines[3]);
 	}
 
-	public String nowPlaying(RadioTrack t) throws IOException {
+	public synchronized String nowPlaying(RadioTrack t) throws IOException {
 		if (sessionId == null)
 			handshake();
 
@@ -130,7 +130,7 @@ public class AudioscrobblerService extends Object {
 		return response.trim();
 	}
 
-	public String submit(RadioTrack t, long timestamp) throws IOException {
+	public synchronized String submit(RadioTrack t, long timestamp) throws IOException {
 		return submit(t, timestamp, "");
 	}
 
@@ -138,7 +138,7 @@ public class AudioscrobblerService extends Object {
 	 * valid ratings are, L for love, B for banned and S for skip, you can only
 	 * specify one!
 	 */
-	public String submit(RadioTrack t, long timestamp, String ratingCharacter) throws IOException {
+	public synchronized String submit(RadioTrack t, long timestamp, String ratingCharacter) throws IOException {
 		if (sessionId == null)
 			handshake();
 
