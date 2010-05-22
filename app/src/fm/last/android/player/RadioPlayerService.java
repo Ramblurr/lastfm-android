@@ -1304,8 +1304,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
         if (canDuck) {
             mp.setVolume(DUCK_VOLUME, DUCK_VOLUME);
-        } else {
+        } else if(isTransient) {
             pause();
+        } else {
+        	stop();
         }
 	}
 }

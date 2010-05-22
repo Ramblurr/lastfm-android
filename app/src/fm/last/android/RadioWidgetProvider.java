@@ -442,7 +442,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		AppWidgetManager appWidgetManager = null;
 		
 		if(views == null) {
-			AppWidgetManager.getInstance(context);
+			appWidgetManager = AppWidgetManager.getInstance(context);
 			views = new RemoteViews(context.getPackageName(), R.layout.widget);
 		}
 		PendingIntent pendingIntent;
