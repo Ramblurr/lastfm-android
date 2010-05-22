@@ -494,6 +494,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 					if (wifiLock.isHeld())
 						wifiLock.release();
+					
+			        if (mFocusHelper != null)
+			            mFocusHelper.abandonMusicFocus();
+			        
 					stopSelf();
 				} else {
 					if (mState == STATE_PLAYING || mState == STATE_PREPARING) {
@@ -543,6 +547,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 			
+	        if (mFocusHelper != null)
+	            mFocusHelper.requestMusicFocus();
+	        
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a
 			// call.
@@ -598,6 +605,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		currentQueue.clear();
 		if(currentStation != null)
 			RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
+		
+        if (mFocusHelper != null)
+            mFocusHelper.abandonMusicFocus();
+        
 		stopSelf();
 	}
 
