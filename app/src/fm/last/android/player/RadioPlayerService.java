@@ -162,65 +162,68 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
-		mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-		mTelephonyManager.listen(new PhoneStateListener() {
-			private FadeVolumeTask mFadeVolumeTask = null;
+		if(mFocusHelper == null) {
 
-			@Override
-			public void onCallStateChanged(int state, String incomingNumber) {
-				if (mState != STATE_STOPPED) {
-					if (mFadeVolumeTask != null)
-						mFadeVolumeTask.cancel();
-
-					if (state == TelephonyManager.CALL_STATE_IDLE) // fade music
-																	// in to
-																	// 100%
-					{
-						logger.info("Call ended, fading music back in");
-						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
-							@Override
-							public void onPreExecute() {
-								if (mState == STATE_PAUSED)
+			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+			mTelephonyManager.listen(new PhoneStateListener() {
+				private FadeVolumeTask mFadeVolumeTask = null;
+	
+				@Override
+				public void onCallStateChanged(int state, String incomingNumber) {
+					if (mState != STATE_STOPPED) {
+						if (mFadeVolumeTask != null)
+							mFadeVolumeTask.cancel();
+	
+						if (state == TelephonyManager.CALL_STATE_IDLE) // fade music
+																		// in to
+																		// 100%
+						{
+							logger.info("Call ended, fading music back in");
+							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
+								@Override
+								public void onPreExecute() {
+									if (mState == STATE_PAUSED)
+										RadioPlayerService.this.pause();
+								}
+	
+								@Override
+								public void onPostExecute() {
+									mFadeVolumeTask = null;
+								}
+							};
+						} else { // fade music out to silence
+							logger.info("Incoming call, fading music out");
+							if (mState == STATE_PAUSED) {
+								// this particular state of affairs should be
+								// impossible, seeing as we are the only
+								// component that dares the pause the radio. But we
+								// cater to it just in case
+								mp.setVolume(0.0f, 0.0f);
+								return;
+							}
+	
+							// fade out faster if making a call, this feels more
+							// natural
+							int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
+	
+							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration) {
+								@Override
+								public void onPreExecute() {
+								}
+	
+								@Override
+								public void onPostExecute() {
 									RadioPlayerService.this.pause();
-							}
-
-							@Override
-							public void onPostExecute() {
-								mFadeVolumeTask = null;
-							}
-						};
-					} else { // fade music out to silence
-						logger.info("Incoming call, fading music out");
-						if (mState == STATE_PAUSED) {
-							// this particular state of affairs should be
-							// impossible, seeing as we are the only
-							// component that dares the pause the radio. But we
-							// cater to it just in case
-							mp.setVolume(0.0f, 0.0f);
-							return;
+									mFadeVolumeTask = null;
+								}
+							};
 						}
-
-						// fade out faster if making a call, this feels more
-						// natural
-						int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
-
-						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration) {
-							@Override
-							public void onPreExecute() {
-							}
-
-							@Override
-							public void onPostExecute() {
-								RadioPlayerService.this.pause();
-								mFadeVolumeTask = null;
-							}
-						};
 					}
+					super.onCallStateChanged(state, incomingNumber);
 				}
-				super.onCallStateChanged(state, incomingNumber);
-			}
-		}, PhoneStateListener.LISTEN_CALL_STATE);
-
+			}, PhoneStateListener.LISTEN_CALL_STATE);
+		}
+		
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityListener, intentFilter);
