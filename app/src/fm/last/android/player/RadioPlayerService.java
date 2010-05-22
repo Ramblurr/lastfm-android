@@ -826,50 +826,53 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 		currentStationURL = url;
 
-		//Stop the standard media player
-		if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
-			bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-					try {
-						if (s.isPlaying()) {
-							s.pause();
-							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
-						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					unbindService(this);
-				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
-		}
+		if(mFocusHelper == null) {
+			
+			//Stop the standard media player
+			if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
+				bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
-		//Stop the HTC media player
-		if(RadioWidgetProvider.isHTCMusicInstalled(this)) {
-			bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-					try {
-						if (s.isPlaying()) {
-							s.pause();
-							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+						try {
+							if (s.isPlaying()) {
+								s.pause();
+								sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						unbindService(this);
 					}
-					unbindService(this);
-				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
+		
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+			}
+			
+			//Stop the HTC media player
+			if(RadioWidgetProvider.isHTCMusicInstalled(this)) {
+				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+		
+						try {
+							if (s.isPlaying()) {
+								s.pause();
+								sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						unbindService(this);
+					}
+		
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+			}
 		}
 		
 		tuningNotify();
