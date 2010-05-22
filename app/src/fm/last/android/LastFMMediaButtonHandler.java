@@ -24,7 +24,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 		try {
 			IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
 
-			if (player != null && player.isPlaying()) {
+			if (player != null && (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)) {
 				if (intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_FF")) {
 					player.skip();
 				}
@@ -57,8 +57,8 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 							return;
 						case KeyEvent.KEYCODE_HEADSETHOOK:
 						case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-							Log.i(TAG, "Pause-Button => Stopping '" + player.getTrackName() + "'");
-							player.stop();
+							Log.i(TAG, "Pause-Button => Pause/Resuming '" + player.getTrackName() + "'");
+							player.pause();
 							abortBroadcast();
 							return;
 						}
