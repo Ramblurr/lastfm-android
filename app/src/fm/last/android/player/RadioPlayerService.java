@@ -21,6 +21,7 @@
 package fm.last.android.player;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Timer;
@@ -41,8 +42,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -63,6 +62,9 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFMMediaButtonHandler;
+import fm.last.android.MusicFocusable;
+import fm.last.android.MusicPlayerFocusHelper;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.activity.Player;
@@ -76,7 +78,7 @@ import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.WSError;
 
-public class RadioPlayerService extends Service {
+public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private MediaPlayer mp = null;
 	private MediaPlayer next_mp = null;
@@ -124,9 +126,16 @@ public class RadioPlayerService extends Service {
 
 	private Logger logger;
 
+    private final float DUCK_VOLUME = 0.1f;
+    private MusicPlayerFocusHelper mFocusHelper;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		initializeStaticCompatMethods();
+        mFocusHelper = new MusicPlayerFocusHelper(this, this);
+	
 		logger = Logger.getLogger("fm.last.android.player");
 		try {
 			if (logger.getHandlers().length < 1) {
@@ -330,6 +339,10 @@ public class RadioPlayerService extends Service {
 		
 		if(wifiLock != null && wifiLock.isHeld())
 			wifiLock.release();
+		
+        unregisterMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
+        		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
+
 	}
 
 	public IBinder getBinder() {
@@ -871,6 +884,8 @@ public class RadioPlayerService extends Service {
 			currentStationURL = url;
 			notifyChange(STATION_CHANGED);
 			LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
+            registerMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
+            		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 		} else {
 			clearNotification();
 			currentStationURL = null;
@@ -1189,5 +1204,91 @@ public class RadioPlayerService extends Service {
 		 */
 		public abstract void onPostExecute();
 	}
+    // Backwards compatibility code (methods available as of SDK Level 8)
 
+    static {
+        initializeStaticCompatMethods();
+    }
+
+    static Method sMethodRegisterMediaButtonEventReceiver;
+    static Method sMethodUnregisterMediaButtonEventReceiver;
+
+    private static void initializeStaticCompatMethods() {
+        try {
+            sMethodRegisterMediaButtonEventReceiver = AudioManager.class.getMethod(
+                    "registerMediaButtonEventReceiver",
+                    new Class[] { ComponentName.class });
+            sMethodUnregisterMediaButtonEventReceiver = AudioManager.class.getMethod(
+                    "unregisterMediaButtonEventReceiver",
+                    new Class[] { ComponentName.class });
+        } catch (NoSuchMethodException e) {
+            // Silently fail when running on an OS before SDK level 8.
+        }
+    }
+
+    private static void registerMediaButtonEventReceiverCompat(AudioManager audioManager,
+            ComponentName receiver) {
+        if (sMethodRegisterMediaButtonEventReceiver == null)
+            return;
+
+        try {
+            sMethodRegisterMediaButtonEventReceiver.invoke(audioManager, receiver);
+        } catch (InvocationTargetException e) {
+            // Unpack original exception when possible
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+            } else {
+                // Unexpected checked exception; wrap and re-throw
+                throw new RuntimeException(e);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static void unregisterMediaButtonEventReceiverCompat(AudioManager audioManager,
+            ComponentName receiver) {
+        if (sMethodUnregisterMediaButtonEventReceiver == null)
+            return;
+
+        try {
+            sMethodUnregisterMediaButtonEventReceiver.invoke(audioManager, receiver);
+        } catch (InvocationTargetException e) {
+            // Unpack original exception when possible
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+            } else {
+                // Unexpected checked exception; wrap and re-throw
+                throw new RuntimeException(e);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+	public void focusGained() {
+		if(mState == STATE_PAUSED)
+			pause();
+
+		if(mp != null)
+			mp.setVolume(1.0f, 1.0f);
+	}
+
+	public void focusLost(boolean isTransient, boolean canDuck) {
+        if (mp == null)
+            return;
+
+        if (canDuck) {
+            mp.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+        } else {
+            pause();
+        }
+	}
 }
