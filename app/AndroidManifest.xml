@@ -44,6 +44,12 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<data android:mimeType="vnd.android.cursor.item/vnd.fm.last.android.profile" />
 			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/user/"/>
+			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
@@ -55,8 +61,8 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-        <provider android:name=".ArtistSearchProvider"
-                android:authorities="lastfm.artist"
+        <provider android:name=".SearchProvider"
+                android:authorities="lastfm"
                 android:syncable="false" />
 		<activity android:name=".activity.Player" android:label="@string/app_name"
 			android:configChanges="keyboardHidden" android:launchMode="singleTop">
@@ -114,6 +120,12 @@
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/music/"/>
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Preferences"

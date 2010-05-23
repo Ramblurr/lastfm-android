@@ -33,9 +33,9 @@
  -->
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
         android:label="@string/app_name"
-        android:searchSettingsDescription="@string/action_similar"
+        android:searchSettingsDescription="@string/action_search"
         android:includeInGlobalSearch="true"
-        android:searchSuggestAuthority="lastfm.artist"
+        android:searchSuggestAuthority="lastfm"
         android:queryAfterZeroResults="true"
         android:searchSuggestIntentAction="android.intent.action.VIEW">
 </searchable>

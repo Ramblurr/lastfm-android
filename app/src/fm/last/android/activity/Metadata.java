@@ -23,6 +23,7 @@ package fm.last.android.activity;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -30,6 +31,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -104,8 +106,15 @@ public class Metadata extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.metadata);
 
-		mArtistName = getIntent().getStringExtra("artist");
-		mTrackName = getIntent().getStringExtra("track");
+		if(getIntent().getData() != null) {
+			if(getIntent().getData().getScheme().equals("http")) {
+				List<String> segments = getIntent().getData().getPathSegments();
+				mArtistName = Uri.decode(segments.get(segments.size() - 1)).replace("+", " ");
+			}
+		} else {
+			mArtistName = getIntent().getStringExtra("artist");
+			mTrackName = getIntent().getStringExtra("track");
+		}
 
 		mTabHost = (TabHost)findViewById(R.id.TabBar);
 		mTabHost.setup();
@@ -292,7 +301,8 @@ public class Metadata extends Activity {
 						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
 						+ "<div style='margin-left:84px; margin-top:3px'>" + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
 						+ mArtistName + "</span><br/>" + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + listeners + " "
-						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span></div>"
+						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span>"
+						+ "<br/> <a href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>[Play " + artist.getName() + " Radio]</a></div>"
 						+ "<br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
 
 				success = true;

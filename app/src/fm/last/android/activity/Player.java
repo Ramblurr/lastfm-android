@@ -140,9 +140,9 @@ public class Player extends Activity {
 		if (intent != null && intent.getData() != null) {
 			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
 				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
-			} else {
-				Intent i = new Intent(this, Metadata.class);
-				i.putExtra("artist", Uri.decode(intent.getData().toString()));
+			} else {  //The search provider sent us an http:// URL, forward it along...
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(intent.getData());
 				startActivity(i);
 				finish();
 			}

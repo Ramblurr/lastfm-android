@@ -21,6 +21,7 @@
 package fm.last.android.activity;
 
 import java.io.File;
+import java.util.List;
 
 import android.app.ActivityGroup;
 import android.content.Context;
@@ -28,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -84,9 +86,14 @@ public class Profile extends ActivityGroup {
 		}
 		
 		if(getIntent().getData() != null) {
-			Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
-			if(cursor.moveToNext()) {
-				username = cursor.getString(cursor.getColumnIndex("DATA1"));
+			if(getIntent().getData().getScheme().equals("http")) {
+				List<String> segments = getIntent().getData().getPathSegments();
+				username = Uri.decode(segments.get(segments.size() - 1));
+			} else {
+				Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
+				if(cursor.moveToNext()) {
+					username = cursor.getString(cursor.getColumnIndex("DATA1"));
+				}
 			}
 		} else {
 			username = getIntent().getStringExtra("lastfm.profile.username");

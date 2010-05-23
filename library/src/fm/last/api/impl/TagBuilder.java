@@ -34,7 +34,7 @@ public class TagBuilder extends XMLBuilder<Tag> {
 	public Tag build(Node tagNode) {
 		node = tagNode;
 		String name = getText("name");
-		String tagcountStr = getText("tagcount");
+		String tagcountStr = getText("count");
 		int tagcount = -1;
 		try {
 			tagcount = Integer.parseInt(tagcountStr);
