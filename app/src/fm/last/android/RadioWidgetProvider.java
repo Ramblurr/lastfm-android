@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
@@ -504,6 +505,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			am.cancel(mAlarmIntent);
 			mAlarmIntent = null;
 		}
+		views.setImageViewResource(R.id.love, R.drawable.love);
 		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
@@ -549,17 +551,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 	
-					try {
-						if (s.isPlaying()) {
-							mediaPlayerPlaying = true;
-							updateAppWidget_playing(ctx, s.getTrackName(), s.getArtistName(), s.position(), s.duration(), false, false);
-						} else {
-							mediaPlayerPlaying = false;
-						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					new UpdateFromAndroidPlayerTask(ctx).execute(s);
+					
 					LastFMApplication.getInstance().unbindService(this);
 				}
 	
@@ -573,17 +566,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
 	
-					try {
-						if (s.isPlaying()) {
-							mediaPlayerPlaying = true;
-							updateAppWidget_playing(ctx, s.getTrackName(), s.getArtistName(), s.position(), s.duration(), false, false);
-						} else {
-							mediaPlayerPlaying = false;
-						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					new UpdateFromHTCPlayerTask(ctx).execute(s);
+
 					LastFMApplication.getInstance().unbindService(this);
 				}
 	
@@ -596,31 +580,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-					try {
-						if (player.isPlaying()) {
-							long duration = player.getDuration();
-							long pos = player.getPosition();
-							boolean buffering = true;
-							boolean loved = player.getLoved();
-							if ((pos >= 0) && (duration > 0) && (pos <= duration)) {
-								buffering = false;
-							}
-							if (player.getTrackName().equals(RadioPlayerService.UNKNOWN))
-								updateAppWidget_idle(ctx, player.getStationName(), true);
-							else
-								updateAppWidget_playing(ctx, player.getTrackName(), player.getArtistName(), pos, duration, buffering, loved);
-						} else if (!mediaPlayerPlaying) {
-							String stationName = player.getStationName();
-							if (stationName == null) {
-								Station station = LastFMApplication.getInstance().getLastStation();
-								if (station != null)
-									stationName = station.getName();
-							}
-							updateAppWidget_idle(ctx, stationName, player.getState() == RadioPlayerService.STATE_TUNING);
-						}
-					} catch (RemoteException ex) {
-					}
 	
+					new UpdateFromRadioPlayerTask(ctx).execute(player);
+
 					LastFMApplication.getInstance().unbindService(this);
 				}
 	
@@ -634,4 +596,139 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		return new Formatter().format("%02d:%02d", secs / 60, secs % 60).toString();
 	}
 
+	private static class UpdateFromAndroidPlayerTask extends AsyncTask<com.android.music.IMediaPlaybackService, Void, Boolean> {
+		Context ctx = null;
+		String trackName = "";
+		String artistName = "";
+		long position = 0L;
+		long duration = 0L;
+
+		UpdateFromAndroidPlayerTask(Context context) {
+			super();
+			ctx = context;
+		}
+		
+		@Override
+		public Boolean doInBackground(com.android.music.IMediaPlaybackService... s) {
+			try {
+				if (s[0].isPlaying()) {
+					mediaPlayerPlaying = true;
+					trackName = s[0].getTrackName();
+					artistName = s[0].getArtistName();
+					position = s[0].position();
+					duration = s[0].duration();
+				} else {
+					mediaPlayerPlaying = false;
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return mediaPlayerPlaying;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false);
+			}
+		}
+	}
+
+	private static class UpdateFromRadioPlayerTask extends AsyncTask<IRadioPlayer, Void, Boolean> {
+		Context ctx = null;
+		String trackName = "";
+		String artistName = "";
+		long position = 0L;
+		long duration = 0L;
+		boolean buffering = true;
+		boolean loved = false;
+		String stationName = "";
+		int state = 0;
+
+		UpdateFromRadioPlayerTask(Context context) {
+			super();
+			ctx = context;
+		}
+		
+		@Override
+		public Boolean doInBackground(IRadioPlayer... s) {
+			boolean playing = false;
+			try {
+				if (s[0].isPlaying()) {
+					trackName = s[0].getTrackName();
+					artistName = s[0].getArtistName();
+					position = s[0].getPosition();
+					duration = s[0].getDuration();
+					loved = s[0].getLoved();
+					if ((position >= 0) && (duration > 0) && (position <= duration)) {
+						buffering = false;
+					}
+					playing = true;
+				}
+				state = s[0].getState();
+				stationName = s[0].getStationName();
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return playing;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				if (trackName.equals(RadioPlayerService.UNKNOWN))
+					updateAppWidget_idle(ctx, stationName, true);
+				else
+					updateAppWidget_playing(ctx, trackName, artistName, position, duration, buffering, loved);
+			} else if (!mediaPlayerPlaying) {
+				if (stationName == null || stationName.length() < 1) {
+					Station station = LastFMApplication.getInstance().getLastStation();
+					if (station != null)
+						stationName = station.getName();
+				}
+				updateAppWidget_idle(ctx, stationName, state == RadioPlayerService.STATE_TUNING);
+			}
+		}
+	}
+
+	private static class UpdateFromHTCPlayerTask extends AsyncTask<com.htc.music.IMediaPlaybackService, Void, Boolean> {
+		Context ctx = null;
+		String trackName = "";
+		String artistName = "";
+		long position = 0L;
+		long duration = 0L;
+
+		UpdateFromHTCPlayerTask(Context context) {
+			super();
+			ctx = context;
+		}
+		
+		@Override
+		public Boolean doInBackground(com.htc.music.IMediaPlaybackService... s) {
+			try {
+				if (s[0].isPlaying()) {
+					mediaPlayerPlaying = true;
+					trackName = s[0].getTrackName();
+					artistName = s[0].getArtistName();
+					position = s[0].position();
+					duration = s[0].duration();
+				} else {
+					mediaPlayerPlaying = false;
+				}
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return mediaPlayerPlaying;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false);
+			}
+		}
+	}
 }
