@@ -187,7 +187,7 @@ public class Profile_RadioTab extends ListActivity {
 			if (session != null) {
 				SetupRecentStations();
 
-				if (!isAuthenticatedUser) {
+				if (!isAuthenticatedUser && Profile_RadioTab.this.mUser != null) {
 					mProfileBubble.setUser(Profile_RadioTab.this.mUser);
 					SetupCommonArtists(tasteometer);
 				}

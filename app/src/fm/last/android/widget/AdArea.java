@@ -16,12 +16,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageButton;
 import fm.last.android.LastFMApplication;
-import fm.last.android.utils.UserTask;
 import fm.last.api.Session;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
@@ -117,11 +117,8 @@ public class AdArea extends ImageButton {
 
 	public AdArea(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
-		if (!adsEnabled(context))
-			setVisibility(View.GONE);
-		else
-			setVisibility(View.VISIBLE);
-
+		
+		new AdsEnabledTask(context).execute((Void)null);
 		setOnClickListener(mClickListener);
 	}
 
@@ -145,7 +142,7 @@ public class AdArea extends ImageButton {
 		_cachedWidth = getWidth();
 	}
 
-	private class FetchAdTask extends UserTask<Void, Void, Boolean> {
+	private class FetchAdTask extends AsyncTask<Void, Void, Boolean> {
 		Bitmap mBitmap = null;
 
 		@Override
@@ -175,4 +172,35 @@ public class AdArea extends ImageButton {
 		}
 	}
 
+	private class AdsEnabledTask extends AsyncTask<Void, Void, Boolean> {
+		Context ctx = null;
+
+		AdsEnabledTask(Context context) {
+			super();
+			ctx = context;
+		}
+
+		@Override
+		public void onPreExecute() {
+			setVisibility(View.GONE);
+		}
+		
+		@Override
+		public Boolean doInBackground(Void... params) {
+			boolean success = false;
+			try {
+				success = adsEnabled(ctx);
+			} catch (Exception e) {
+			}
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if (!result)
+				setVisibility(View.GONE);
+			else
+				setVisibility(View.VISIBLE);
+		}
+	}
 }

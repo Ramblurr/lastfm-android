@@ -312,7 +312,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (intent.getAction().equals("fm.last.android.PLAY")) {
 			String stationURL = intent.getStringExtra("station");
 			Session session = intent.getParcelableExtra("session");
-			if (stationURL.length() > 0 && session != null) {
+			if (stationURL != null && stationURL.length() > 0 && session != null) {
 				new TuneRadioTask(stationURL, session).execute();
 			}
 		}
@@ -321,13 +321,17 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	@Override
 	public void onDestroy() {
 		logger.info("Player service shutting down");
-		if (mp != null) {
-			if (mp.isPlaying())
-				mp.stop();
-			mp.release();
-		}
-		if (next_mp != null) {
-			next_mp.release();
+		try {
+			if (mp != null) {
+				if (mp.isPlaying())
+					mp.stop();
+				mp.release();
+			}
+			if (next_mp != null) {
+				next_mp.release();
+			}
+		} catch (Exception e) {
+			
 		}
 		clearNotification();
 		unregisterReceiver(connectivityListener);
