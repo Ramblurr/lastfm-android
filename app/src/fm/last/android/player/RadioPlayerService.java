@@ -375,7 +375,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private void playingNotify() {
 
-		if (currentTrack == null)
+		if (currentTrack == null || currentTrack.getTitle() == null || currentTrack.getCreator() == null)
 			return;
 		Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.playerservice_streaming_ticker_text, currentTrack.getTitle(),
 				currentTrack.getCreator()), System.currentTimeMillis());
@@ -461,7 +461,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			if (p == mp) {
 				if (mState == STATE_PREPARING) {
 					p.start();
-					playingNotify();
+					try {
+						playingNotify();
+					} catch (NullPointerException e) {
+					}
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
 					logger.info("Ready to produce packets (Hi, Laurie!)");

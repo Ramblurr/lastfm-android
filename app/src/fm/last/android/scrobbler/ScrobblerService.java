@@ -152,7 +152,7 @@ public class ScrobblerService extends Service {
 			mCurrentTrack = null;
 		}
 
-		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
+		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(1000);
 
 		try {
 			if (getFileStreamPath("queue.dat").exists()) {
@@ -163,8 +163,13 @@ public class ScrobblerService extends Service {
 					Integer count = (Integer) obj;
 					for (int i = 0; i < count.intValue(); i++) {
 						obj = objectStream.readObject();
-						if (obj != null && obj instanceof ScrobblerQueueEntry)
-							mQueue.add((ScrobblerQueueEntry) obj);
+						if (obj != null && obj instanceof ScrobblerQueueEntry) {
+							try {
+								mQueue.add((ScrobblerQueueEntry) obj);
+							} catch (IllegalStateException e) {
+								break; //The queue is full!
+							}
+						}
 					}
 				}
 				objectStream.close();
@@ -248,7 +253,11 @@ public class ScrobblerService extends Service {
 			}
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
+				try {
 				mQueue.add(mCurrentTrack);
+				} catch (IllegalStateException e) {
+					logger.severe("Scrobble queue is full!  Have " + mQueue.size() + " scrobbles!");
+				}
 			}
 			mCurrentTrack = null;
 		}
@@ -515,12 +524,12 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.rating = "B";
 			Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || (mQueue.size() > 0 && mSubmissionTask == null && mNowPlayingTask == null)) {
+		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null && mNowPlayingTask == null)) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
 			if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI))) {
-				if (mQueue.size() > 0 && mSubmissionTask == null) {
+				if (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null) {
 					mSubmissionTask = new SubmitTracksTask();
 					mSubmissionTask.execute(mScrobbler);
 				}
