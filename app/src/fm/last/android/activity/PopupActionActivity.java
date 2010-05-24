@@ -10,6 +10,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteException;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -177,15 +178,23 @@ public class PopupActionActivity extends ListActivity {
 			break;
 		case R.drawable.shopping_cart_dark:
 			if(getIntent().getBooleanExtra("lastfm.nowplaying", false)) {
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"widget-buy", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"widget-buy", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 			} else {
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"charts-buy", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"charts-buy", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 			}
 			if(mTrackName != null)
 				Amazon.searchForTrack(this, mArtistName, mTrackName);

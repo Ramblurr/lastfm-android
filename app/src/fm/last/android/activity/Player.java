@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -192,10 +193,14 @@ public class Player extends Activity {
 	public boolean handleOptionItemSelected(Context c, MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.buy_menu_item:
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"player-buy", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"player-buy", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			Amazon.searchForTrack(this, mArtistName.getText().toString(),
 					mTrackName.getText().toString());
 			break;
@@ -340,10 +345,14 @@ public class Player extends Activity {
 			mLoveButton.setImageResource(R.drawable.loved);
 			loved = true;
 			
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"player-love", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"player-love", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 		}
 	};
 
@@ -352,10 +361,14 @@ public class Player extends Activity {
 		public void onClick(View v) {
 			Intent i = new Intent("fm.last.android.BAN");
 			sendBroadcast(i);
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"player-ban", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"player-ban", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			bindService(new Intent(Player.this,
 					fm.last.android.player.RadioPlayerService.class),
 					new ServiceConnection() {
@@ -382,10 +395,14 @@ public class Player extends Activity {
 	private View.OnClickListener mNextListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"player-skip", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"player-skip", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			bindService(new Intent(Player.this,
 					fm.last.android.player.RadioPlayerService.class),
 					new ServiceConnection() {
@@ -431,10 +448,14 @@ public class Player extends Activity {
 	private View.OnClickListener mOntourListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"on-tour-badge", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"on-tour-badge", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			showEventsMetadataIntent();
 		}
 
@@ -443,10 +464,14 @@ public class Player extends Activity {
 	private View.OnClickListener mStopListener = new View.OnClickListener() {
 
 		public void onClick(View v) {
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"player-stop", // Action
-					"", // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"player-stop", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 
 			bindService(new Intent(Player.this,
 					fm.last.android.player.RadioPlayerService.class),

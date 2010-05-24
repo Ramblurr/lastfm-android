@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Config;
@@ -88,10 +89,14 @@ public class ShareResolverActivity extends ListActivity {
 		Intent intent = mAdapter.intentForPosition(position);
 
 		if (intent != null) {
-			LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-					"share", // Action
-					intent.getComponent().getPackageName(), // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"share", // Action
+						intent.getComponent().getPackageName(), // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 
 			startActivity(intent);
 		}

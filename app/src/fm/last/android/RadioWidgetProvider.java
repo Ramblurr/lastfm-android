@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -158,10 +159,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							}, Context.BIND_AUTO_CREATE);
 				}
 			} else if (action.equals("fm.last.android.widget.SKIP")) {
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"widget-skip", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"widget-skip", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
@@ -238,10 +243,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							}, Context.BIND_AUTO_CREATE);
 				}
 			} else if (action.equals("fm.last.android.widget.STOP")) {
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"widget-stop", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"widget-stop", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 				
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
@@ -322,10 +331,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			} else if (action.equals("fm.last.android.widget.LOVE")) {
 				Intent i = new Intent("fm.last.android.LOVE");
 				context.sendBroadcast(i);
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"widget-love", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"widget-love", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 				LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
@@ -345,10 +358,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			} else if (action.equals("fm.last.android.widget.BAN")) {
 				Intent i = new Intent("fm.last.android.BAN");
 				context.sendBroadcast(i);
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"widget-ban", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"widget-ban", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 				
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
