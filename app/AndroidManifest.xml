@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="fm.last.android" android:versionCode="26" android:versionName="1.5.3">
+	package="fm.last.android" android:versionCode="27" android:versionName="1.5.4">
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,7 +18,7 @@
 	<supports-screens android:smallScreens="true"
 		android:normalScreens="true" android:largeScreens="true"
 		android:anyDensity="true" />
-	<uses-sdk android:minSdkVersion="3" />
+	<uses-sdk android:minSdkVersion="3"/>
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:name="LastFMApplication">
@@ -37,25 +37,43 @@
 				<action android:name="android.media.AUDIO_BECOMING_NOISY" />
 			</intent-filter>
 		</receiver>
-		<activity android:name=".activity.Profile" android:label="@string/profile_label"
+		<activity android:name=".activity.Profile"
 			android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<data android:mimeType="vnd.android.cursor.item/vnd.fm.last.android.profile" />
 			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.de" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.es" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.fr" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.it" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.jp" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.pl" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.br" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.ru" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.se" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.tr" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="cn.last.fm" android:pathPrefix="/user/"/>
+			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
 		<activity android:name=".activity.Profile_EventsTab"/>
-		<activity android:name=".activity.NewStation" android:label="@string/newstation_label"
+		<activity android:name=".activity.NewStation"
 			android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Player" android:label="@string/player_label"
+		<activity android:name=".activity.Player"
 			android:configChanges="keyboardHidden" android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
@@ -64,48 +82,65 @@
 				<data android:scheme="lastfm" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Event" android:label="@string/event_label"
+		<activity android:name=".activity.Event"
 			android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Share" android:label="@string/share_label"
+		<activity android:name=".activity.Share"
 			android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.AddToPlaylist"
-			android:label="@string/addtoplaylist_label" android:configChanges="keyboardHidden">
+		<activity android:name=".activity.AddToPlaylist" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Tag" android:label="@string/tag_label"
+		<activity android:name=".activity.Tag"
 			android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.SignUp" android:label="@string/signup_label">
+		<activity android:name=".activity.SignUp">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Metadata" android:label="@string/metadata_label">
+		<activity android:name=".activity.Metadata">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.de" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.es" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.fr" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.it" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.jp" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.pl" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.br" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.ru" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.se" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.tr" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="cn.last.fm" android:pathPrefix="/music/"/>
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Preferences"
-			android:configChanges="orientation|keyboardHidden" android:label="@string/prefs_label">
+			android:configChanges="orientation|keyboardHidden">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -125,7 +160,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".activity.Help" android:label="Last.fm: Help">
+		<activity android:name=".activity.Help">
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW"/>
 				<category android:name="android.intent.category.DEFAULT"/>
@@ -152,9 +187,7 @@
 			</intent-filter>
 		</activity>
 		<receiver android:name="RadioWidgetProvider"
-		            android:label="@string/app_name"
-		            android:icon="@drawable/icon"
-		            >
+		            android:icon="@drawable/icon">
 		    <intent-filter>
 		        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
     			<action android:name="fm.last.android.widget.SKIP"/>

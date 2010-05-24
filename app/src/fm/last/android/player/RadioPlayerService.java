@@ -21,6 +21,7 @@
 package fm.last.android.player;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Timer;
@@ -41,8 +42,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -63,6 +62,9 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFMMediaButtonHandler;
+import fm.last.android.MusicFocusable;
+import fm.last.android.MusicPlayerFocusHelper;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.activity.Player;
@@ -76,7 +78,7 @@ import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.WSError;
 
-public class RadioPlayerService extends Service {
+public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private MediaPlayer mp = null;
 	private MediaPlayer next_mp = null;
@@ -124,9 +126,16 @@ public class RadioPlayerService extends Service {
 
 	private Logger logger;
 
+    private final float DUCK_VOLUME = 0.1f;
+    private MusicPlayerFocusHelper mFocusHelper;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		initializeStaticCompatMethods();
+        mFocusHelper = new MusicPlayerFocusHelper(this, this);
+	
 		logger = Logger.getLogger("fm.last.android.player");
 		try {
 			if (logger.getHandlers().length < 1) {
@@ -153,65 +162,68 @@ public class RadioPlayerService extends Service {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
-		mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-		mTelephonyManager.listen(new PhoneStateListener() {
-			private FadeVolumeTask mFadeVolumeTask = null;
+		if(mFocusHelper == null) {
 
-			@Override
-			public void onCallStateChanged(int state, String incomingNumber) {
-				if (mState != STATE_STOPPED) {
-					if (mFadeVolumeTask != null)
-						mFadeVolumeTask.cancel();
-
-					if (state == TelephonyManager.CALL_STATE_IDLE) // fade music
-																	// in to
-																	// 100%
-					{
-						logger.info("Call ended, fading music back in");
-						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
-							@Override
-							public void onPreExecute() {
-								if (mState == STATE_PAUSED)
+			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+			mTelephonyManager.listen(new PhoneStateListener() {
+				private FadeVolumeTask mFadeVolumeTask = null;
+	
+				@Override
+				public void onCallStateChanged(int state, String incomingNumber) {
+					if (mState != STATE_STOPPED) {
+						if (mFadeVolumeTask != null)
+							mFadeVolumeTask.cancel();
+	
+						if (state == TelephonyManager.CALL_STATE_IDLE) // fade music
+																		// in to
+																		// 100%
+						{
+							logger.info("Call ended, fading music back in");
+							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
+								@Override
+								public void onPreExecute() {
+									if (mState == STATE_PAUSED)
+										RadioPlayerService.this.pause();
+								}
+	
+								@Override
+								public void onPostExecute() {
+									mFadeVolumeTask = null;
+								}
+							};
+						} else { // fade music out to silence
+							logger.info("Incoming call, fading music out");
+							if (mState == STATE_PAUSED) {
+								// this particular state of affairs should be
+								// impossible, seeing as we are the only
+								// component that dares the pause the radio. But we
+								// cater to it just in case
+								mp.setVolume(0.0f, 0.0f);
+								return;
+							}
+	
+							// fade out faster if making a call, this feels more
+							// natural
+							int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
+	
+							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration) {
+								@Override
+								public void onPreExecute() {
+								}
+	
+								@Override
+								public void onPostExecute() {
 									RadioPlayerService.this.pause();
-							}
-
-							@Override
-							public void onPostExecute() {
-								mFadeVolumeTask = null;
-							}
-						};
-					} else { // fade music out to silence
-						logger.info("Incoming call, fading music out");
-						if (mState == STATE_PAUSED) {
-							// this particular state of affairs should be
-							// impossible, seeing as we are the only
-							// component that dares the pause the radio. But we
-							// cater to it just in case
-							mp.setVolume(0.0f, 0.0f);
-							return;
+									mFadeVolumeTask = null;
+								}
+							};
 						}
-
-						// fade out faster if making a call, this feels more
-						// natural
-						int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
-
-						mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration) {
-							@Override
-							public void onPreExecute() {
-							}
-
-							@Override
-							public void onPostExecute() {
-								RadioPlayerService.this.pause();
-								mFadeVolumeTask = null;
-							}
-						};
 					}
+					super.onCallStateChanged(state, incomingNumber);
 				}
-				super.onCallStateChanged(state, incomingNumber);
-			}
-		}, PhoneStateListener.LISTEN_CALL_STATE);
-
+			}, PhoneStateListener.LISTEN_CALL_STATE);
+		}
+		
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityListener, intentFilter);
@@ -330,6 +342,10 @@ public class RadioPlayerService extends Service {
 		
 		if(wifiLock != null && wifiLock.isHeld())
 			wifiLock.release();
+		
+        unregisterMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
+        		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
+
 	}
 
 	public IBinder getBinder() {
@@ -481,6 +497,10 @@ public class RadioPlayerService extends Service {
 
 					if (wifiLock.isHeld())
 						wifiLock.release();
+					
+			        if (mFocusHelper != null)
+			            mFocusHelper.abandonMusicFocus();
+			        
 					stopSelf();
 				} else {
 					if (mState == STATE_PLAYING || mState == STATE_PREPARING) {
@@ -530,6 +550,9 @@ public class RadioPlayerService extends Service {
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 			
+	        if (mFocusHelper != null)
+	            mFocusHelper.requestMusicFocus();
+	        
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a
 			// call.
@@ -585,6 +608,10 @@ public class RadioPlayerService extends Service {
 		currentQueue.clear();
 		if(currentStation != null)
 			RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
+		
+        if (mFocusHelper != null)
+            mFocusHelper.abandonMusicFocus();
+        
 		stopSelf();
 	}
 
@@ -799,50 +826,53 @@ public class RadioPlayerService extends Service {
 
 		currentStationURL = url;
 
-		//Stop the standard media player
-		if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
-			bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-					try {
-						if (s.isPlaying()) {
-							s.pause();
-							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
-						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					unbindService(this);
-				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
-		}
+		if(mFocusHelper == null) {
+			
+			//Stop the standard media player
+			if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
+				bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
-		//Stop the HTC media player
-		if(RadioWidgetProvider.isHTCMusicInstalled(this)) {
-			bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-					try {
-						if (s.isPlaying()) {
-							s.pause();
-							sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+						try {
+							if (s.isPlaying()) {
+								s.pause();
+								sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						unbindService(this);
 					}
-					unbindService(this);
-				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
+		
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+			}
+			
+			//Stop the HTC media player
+			if(RadioWidgetProvider.isHTCMusicInstalled(this)) {
+				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
+		
+						try {
+							if (s.isPlaying()) {
+								s.pause();
+								sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						unbindService(this);
+					}
+		
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+			}
 		}
 		
 		tuningNotify();
@@ -871,6 +901,8 @@ public class RadioPlayerService extends Service {
 			currentStationURL = url;
 			notifyChange(STATION_CHANGED);
 			LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
+            registerMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
+            		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 		} else {
 			clearNotification();
 			currentStationURL = null;
@@ -1189,5 +1221,93 @@ public class RadioPlayerService extends Service {
 		 */
 		public abstract void onPostExecute();
 	}
+    // Backwards compatibility code (methods available as of SDK Level 8)
 
+    static {
+        initializeStaticCompatMethods();
+    }
+
+    static Method sMethodRegisterMediaButtonEventReceiver;
+    static Method sMethodUnregisterMediaButtonEventReceiver;
+
+    private static void initializeStaticCompatMethods() {
+        try {
+            sMethodRegisterMediaButtonEventReceiver = AudioManager.class.getMethod(
+                    "registerMediaButtonEventReceiver",
+                    new Class[] { ComponentName.class });
+            sMethodUnregisterMediaButtonEventReceiver = AudioManager.class.getMethod(
+                    "unregisterMediaButtonEventReceiver",
+                    new Class[] { ComponentName.class });
+        } catch (NoSuchMethodException e) {
+            // Silently fail when running on an OS before SDK level 8.
+        }
+    }
+
+    private static void registerMediaButtonEventReceiverCompat(AudioManager audioManager,
+            ComponentName receiver) {
+        if (sMethodRegisterMediaButtonEventReceiver == null)
+            return;
+
+        try {
+            sMethodRegisterMediaButtonEventReceiver.invoke(audioManager, receiver);
+        } catch (InvocationTargetException e) {
+            // Unpack original exception when possible
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+            } else {
+                // Unexpected checked exception; wrap and re-throw
+                throw new RuntimeException(e);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static void unregisterMediaButtonEventReceiverCompat(AudioManager audioManager,
+            ComponentName receiver) {
+        if (sMethodUnregisterMediaButtonEventReceiver == null)
+            return;
+
+        try {
+            sMethodUnregisterMediaButtonEventReceiver.invoke(audioManager, receiver);
+        } catch (InvocationTargetException e) {
+            // Unpack original exception when possible
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            } else if (cause instanceof Error) {
+                throw (Error) cause;
+            } else {
+                // Unexpected checked exception; wrap and re-throw
+                throw new RuntimeException(e);
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+	public void focusGained() {
+		if(mState == STATE_PAUSED)
+			pause();
+
+		if(mp != null)
+			mp.setVolume(1.0f, 1.0f);
+	}
+
+	public void focusLost(boolean isTransient, boolean canDuck) {
+        if (mp == null)
+            return;
+
+        if (canDuck) {
+            mp.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+        } else if(isTransient) {
+            pause();
+        } else {
+        	stop();
+        }
+	}
 }

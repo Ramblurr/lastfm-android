@@ -20,7 +20,6 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
-import java.io.IOException;
 import java.util.Formatter;
 
 import android.app.Activity;
@@ -136,10 +135,15 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
 
 		Intent intent = getIntent();
-		if (intent != null && intent.getData() != null
-				&& intent.getData().getScheme().equals("lastfm")) {
-			LastFMApplication.getInstance().playRadioStation(Player.this,
-					intent.getData().toString(), false);
+		if (intent != null && intent.getData() != null) {
+			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
+				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
+			} else {  //The search provider sent us an http:// URL, forward it along...
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(intent.getData());
+				startActivity(i);
+				finish();
+			}
 		}
 
 		if (icicle != null) {

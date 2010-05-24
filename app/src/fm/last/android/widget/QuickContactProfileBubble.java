@@ -73,6 +73,8 @@ public class QuickContactProfileBubble extends ProfileBubble {
 
 		if (c.moveToNext()) {
 			setQuickContactId(c.getLong(0));
+		} else if(mUser.getImages().length > 0) {
+			new FetchArtTask(mUser.getImages()[0].getUrl()).execute((Void) null);
 		}
 	}
 	
