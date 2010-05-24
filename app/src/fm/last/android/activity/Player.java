@@ -20,7 +20,6 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
-import java.io.IOException;
 import java.util.Formatter;
 
 import android.app.Activity;
@@ -32,7 +31,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;

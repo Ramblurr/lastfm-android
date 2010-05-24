@@ -49,6 +49,18 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.de" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.es" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.fr" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.it" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.jp" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.pl" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.br" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.ru" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.se" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.tr" android:pathPrefix="/user/"/>
+				<data android:scheme="http" android:host="cn.last.fm" android:pathPrefix="/user/"/>
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Profile_RadioTab"/>
@@ -126,6 +138,18 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="http" android:host="www.last.fm" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.de" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.es" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.fr" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.it" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.jp" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.pl" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.br" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.ru" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.se" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="www.lastfm.com.tr" android:pathPrefix="/music/"/>
+				<data android:scheme="http" android:host="cn.last.fm" android:pathPrefix="/music/"/>
 			</intent-filter>
 		</activity>
 		<activity android:name=".activity.Preferences"
