@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -54,10 +55,14 @@ public class SignUp extends Activity {
 
 				server.signUp(username, password, email);
 
-				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
-						"signup", // Action
-						"", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+							"signup", // Action
+							"", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 
 				setResult(RESULT_OK, new Intent().putExtra("username", username).putExtra("password", password));
 				finish();

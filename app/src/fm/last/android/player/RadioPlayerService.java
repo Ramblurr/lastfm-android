@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteException;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
@@ -312,7 +313,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (intent.getAction().equals("fm.last.android.PLAY")) {
 			String stationURL = intent.getStringExtra("station");
 			Session session = intent.getParcelableExtra("session");
-			if (stationURL.length() > 0 && session != null) {
+			if (stationURL != null && stationURL.length() > 0 && session != null) {
 				new TuneRadioTask(stationURL, session).execute();
 			}
 		}
@@ -321,13 +322,17 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	@Override
 	public void onDestroy() {
 		logger.info("Player service shutting down");
-		if (mp != null) {
-			if (mp.isPlaying())
-				mp.stop();
-			mp.release();
-		}
-		if (next_mp != null) {
-			next_mp.release();
+		try {
+			if (mp != null) {
+				if (mp.isPlaying())
+					mp.stop();
+				mp.release();
+			}
+			if (next_mp != null) {
+				next_mp.release();
+			}
+		} catch (Exception e) {
+			
 		}
 		clearNotification();
 		unregisterReceiver(connectivityListener);
@@ -365,17 +370,21 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		} catch (Exception e) {
 		}
 		if (currentStation != null && mStationStartTime > 0) {
-			LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
-					"Stream", // Action
-					currentStation.getType(), // Label
-					(int) ((System.currentTimeMillis() - mStationStartTime) / 1000)); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+						"Stream", // Action
+						currentStation.getType(), // Label
+						(int) ((System.currentTimeMillis() - mStationStartTime) / 1000)); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			mStationStartTime = 0;
 		}
 	}
 
 	private void playingNotify() {
 
-		if (currentTrack == null)
+		if (currentTrack == null || currentTrack.getTitle() == null || currentTrack.getCreator() == null)
 			return;
 		Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.playerservice_streaming_ticker_text, currentTrack.getTitle(),
 				currentTrack.getCreator()), System.currentTimeMillis());
@@ -461,7 +470,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			if (p == mp) {
 				if (mState == STATE_PREPARING) {
 					p.start();
-					playingNotify();
+					try {
+						playingNotify();
+					} catch (NullPointerException e) {
+					}
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
 					logger.info("Ready to produce packets (Hi, Laurie!)");
@@ -471,10 +483,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			} else {
 				mNextPrepared = true;
 			}
-			LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
-					"Buffering", // Action
-					currentStation.getType(), // Label
-					(int) ((System.currentTimeMillis() - mTrackStartTime) / 1000)); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+						"Buffering", // Action
+						currentStation.getType(), // Label
+						(int) ((System.currentTimeMillis() - mTrackStartTime) / 1000)); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 		}
 	};
 
@@ -763,10 +779,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			logger.info("Requesting bitrate: " + bitrate);
 			playlist = server.getRadioPlayList(bitrate, rtp, discovery, currentSession.getKey());
 			if (playlist == null || playlist.getTracks().length == 0) {
-				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
-						"Error", // Action
-						"NotEnoughContent", // Label
-						0); // Value
+				try {
+					LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+							"Error", // Action
+							"NotEnoughContent", // Label
+							0); // Value
+				} catch (SQLiteException e) {
+					//Google Analytics doesn't appear to be thread safe
+				}
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
 			}
 
@@ -792,10 +812,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				message = "NotEnoughContent";
 			else
 				message = e.getMessage();
-			LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
-					"Error", // Action
-					message, // Label
-					0); // Value
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+						"Error", // Action
+						message, // Label
+						0); // Value
+			} catch (SQLiteException e1) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			logger.severe("Web service error: " + e.getMessage());
 			mError = e;
 			throw e;

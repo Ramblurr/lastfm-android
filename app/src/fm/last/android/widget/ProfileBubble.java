@@ -66,6 +66,9 @@ public class ProfileBubble extends LinearLayout {
 	public void setUser(User user) {
 		mUser = user;
 
+		if(user == null)
+			return;
+		
 		if (user.getRealName() == null || user.getRealName().trim().length() == 0)
 			mFirst.setText(user.getName());
 		else

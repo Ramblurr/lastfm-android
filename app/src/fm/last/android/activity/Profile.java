@@ -67,11 +67,12 @@ public class Profile extends ActivityGroup {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.home);
 		Session session = LastFMApplication.getInstance().session;
-		if (session == null || (Integer.decode(Build.VERSION.SDK) >= 6 && !AccountAuthenticatorService.hasLastfmAccount(this))) {
+		if (session == null || session.getName() == null || (Integer.decode(Build.VERSION.SDK) >= 6 && !AccountAuthenticatorService.hasLastfmAccount(this))) {
 			LastFMApplication.getInstance().logout();
 			Intent intent = new Intent(Profile.this, LastFm.class);
 			startActivity(intent);
 			finish();
+			return;
 		}
 		
 		if(Integer.decode(Build.VERSION.SDK) >= 6 && !isHTCContactsInstalled(this)) {

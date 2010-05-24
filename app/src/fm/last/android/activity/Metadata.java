@@ -20,6 +20,7 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -294,15 +296,43 @@ public class Metadata extends Activity {
 				} catch (NumberFormatException e) {
 				}
 
+				String stationbuttonbg = "url(data:image/png;base64,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%3D%3D)";
+				
+				String stationbuttonmediumstyle = "color: white;"
+						+ "cursor: pointer;"
+						+ "display: block;"
+						+ "font-size: 11px;"
+						+ "font-weight: bold;"
+						+ "height: 25px;"
+						+ "line-height: 25px;"
+						+ "margin: 0px 10px 10px 0px;"
+						+ "max-width: 180px;"
+						+ "text-decoration: none;"
+						+ "overflow: hidden;"
+						+ "padding-left: 30px;"
+						+ "position: relative;"
+						+ "background: " + stationbuttonbg + " top left no-repeat";
+
+				String stationbuttonspanstyle = "position: relative;"
+					+ "display: block;"
+					+ "padding: 0 10px 0 2px;"
+					+ "background: " + stationbuttonbg + " right top no-repeat;"
+					+ "height: 25px;";
+				
 				mBio = "<html><body style='margin:0; padding:0; color:black; background: white; font-family: Helvetica; font-size: 11pt;'>"
 						+ "<div style='padding:17px; margin:0; top:0px; left:0px; position:absolute;'>" + "<img src='" + imageURL
 						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
 						+ "<div style='margin-left:84px; margin-top:3px'>" + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
 						+ mArtistName + "</span><br/>" + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + listeners + " "
 						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span>"
-						+ "<br/> <a href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>[Play " + artist.getName() + " Radio]</a></div>"
+						+ "<br/> <a style='"+ stationbuttonmediumstyle + "' href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>"
+						+ "<span style='" + stationbuttonspanstyle + "'>Play " + artist.getName() + " Radio</span></a></div>"
 						+ "<br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
 
+				FileOutputStream o = new FileOutputStream("/sdcard/bio.html");
+				o.write(mBio.getBytes(), 0, mBio.length());
+				o.close();
+				
 				success = true;
 			} catch (IOException e) {
 				e.printStackTrace();
