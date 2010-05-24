@@ -455,7 +455,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					long delay = (mp.getDuration() - mp.getCurrentPosition() - 30000);
 					if (delay < 1000)
 						delay = 1000;
-					am.set(AlarmManager.RTC, System.currentTimeMillis() + delay, mPreBufferIntent);
+					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, mPreBufferIntent);
 					logger.info("Prebuffering in " + delay / 1000 + " seconds");
 				}
 			}
@@ -559,6 +559,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
+			p.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 			p.setOnCompletionListener(mOnCompletionListener);
 			p.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
 			p.setOnPreparedListener(mOnPreparedListener);
