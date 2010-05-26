@@ -319,7 +319,8 @@ public class LastFm extends Activity {
 				d.show();
 			}
 
-			mDialog.dismiss();
+			if(mDialog.isShowing())
+				mDialog.dismiss();
 		}
 	}
 
