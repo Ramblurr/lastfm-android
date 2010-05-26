@@ -201,9 +201,11 @@ public class Profile_RadioTab extends ListActivity {
 	void SetupCommonArtists(Tasteometer ts) {
 		mMyRecentAdapter.resetList();
 
-		for (String name : ts.getResults()) {
-			String url = "lastfm://artist/" + Uri.encode(name) + "/similarartists";
-			mMyRecentAdapter.putStation(name, url);
+		if(ts != null) {
+			for (String name : ts.getResults()) {
+				String url = "lastfm://artist/" + Uri.encode(name) + "/similarartists";
+				mMyRecentAdapter.putStation(name, url);
+			}
 		}
 
 		mMyRecentAdapter.updateModel();

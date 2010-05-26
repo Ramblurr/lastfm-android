@@ -527,11 +527,13 @@ public class ScrobblerService extends Service {
 		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null && mNowPlayingTask == null)) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
-			boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
-			if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI))) {
-				if (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null) {
-					mSubmissionTask = new SubmitTracksTask();
-					mSubmissionTask.execute(mScrobbler);
+			if(ni != null) {
+				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
+				if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI))) {
+					if (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null) {
+						mSubmissionTask = new SubmitTracksTask();
+						mSubmissionTask.execute(mScrobbler);
+					}
 				}
 			}
 		}

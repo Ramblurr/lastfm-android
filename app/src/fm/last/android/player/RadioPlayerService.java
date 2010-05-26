@@ -163,7 +163,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
-		if(mFocusHelper == null) {
+		if(!mFocusHelper.isSupported()) {
 
 			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 			mTelephonyManager.listen(new PhoneStateListener() {
@@ -455,7 +455,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					long delay = (mp.getDuration() - mp.getCurrentPosition() - 30000);
 					if (delay < 1000)
 						delay = 1000;
-					am.set(AlarmManager.RTC, System.currentTimeMillis() + delay, mPreBufferIntent);
+					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, mPreBufferIntent);
 					logger.info("Prebuffering in " + delay / 1000 + " seconds");
 				}
 			}
@@ -514,7 +514,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					if (wifiLock.isHeld())
 						wifiLock.release();
 					
-			        if (mFocusHelper != null)
+			        if (mFocusHelper.isSupported())
 			            mFocusHelper.abandonMusicFocus();
 			        
 					stopSelf();
@@ -559,6 +559,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
+			p.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
 			p.setOnCompletionListener(mOnCompletionListener);
 			p.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
 			p.setOnPreparedListener(mOnPreparedListener);
@@ -566,7 +567,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 			
-	        if (mFocusHelper != null)
+	        if (mFocusHelper.isSupported())
 	            mFocusHelper.requestMusicFocus();
 	        
 			// We do this because there has been bugs in our phonecall fade code
@@ -625,7 +626,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if(currentStation != null)
 			RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
 		
-        if (mFocusHelper != null)
+        if (mFocusHelper.isSupported())
             mFocusHelper.abandonMusicFocus();
         
 		stopSelf();
@@ -850,7 +851,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 		currentStationURL = url;
 
-		if(mFocusHelper == null) {
+		if(!mFocusHelper.isSupported()) {
 			
 			//Stop the standard media player
 			if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
@@ -1315,11 +1316,12 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     }
 
 	public void focusGained() {
-		if(mState == STATE_PAUSED)
+		if(mState == STATE_PAUSED) {
 			pause();
 
-		if(mp != null)
-			mp.setVolume(1.0f, 1.0f);
+			if(mp != null && mp.isPlaying())
+				mp.setVolume(1.0f, 1.0f);
+		}
 	}
 
 	public void focusLost(boolean isTransient, boolean canDuck) {

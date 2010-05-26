@@ -146,8 +146,11 @@ public class LastFMApplication extends Application {
 	}
 
 	public void unbindPlayerService() {
+		try {
 		if(player != null && player.asBinder().isBinderAlive())
 			unbindService(mConnection);
+		} catch (Exception e) {
+		}
 		player = null;
 	}
 
