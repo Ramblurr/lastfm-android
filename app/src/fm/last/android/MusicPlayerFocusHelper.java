@@ -41,6 +41,10 @@ public class MusicPlayerFocusHelper {
         }
     }
 
+    public boolean isSupported() {
+    	return (sClassOnAudioFocusChangeListener != null);
+    }
+    
     public void requestMusicFocus() {
         requestAudioFocusCompat(mAM, mAudioFocusChangeListener,
                 AudioManager.STREAM_MUSIC, AUDIOFOCUS_GAIN);

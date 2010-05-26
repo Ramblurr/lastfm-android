@@ -163,7 +163,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
-		if(mFocusHelper == null) {
+		if(!mFocusHelper.isSupported()) {
 
 			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 			mTelephonyManager.listen(new PhoneStateListener() {
@@ -514,7 +514,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					if (wifiLock.isHeld())
 						wifiLock.release();
 					
-			        if (mFocusHelper != null)
+			        if (mFocusHelper.isSupported())
 			            mFocusHelper.abandonMusicFocus();
 			        
 					stopSelf();
@@ -567,7 +567,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 			
-	        if (mFocusHelper != null)
+	        if (mFocusHelper.isSupported())
 	            mFocusHelper.requestMusicFocus();
 	        
 			// We do this because there has been bugs in our phonecall fade code
@@ -626,7 +626,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if(currentStation != null)
 			RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
 		
-        if (mFocusHelper != null)
+        if (mFocusHelper.isSupported())
             mFocusHelper.abandonMusicFocus();
         
 		stopSelf();
@@ -851,7 +851,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 		currentStationURL = url;
 
-		if(mFocusHelper == null) {
+		if(!mFocusHelper.isSupported()) {
 			
 			//Stop the standard media player
 			if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
