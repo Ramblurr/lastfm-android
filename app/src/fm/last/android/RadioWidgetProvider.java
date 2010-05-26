@@ -4,6 +4,7 @@
 package fm.last.android;
 
 import java.util.Formatter;
+import java.util.concurrent.RejectedExecutionException;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -568,8 +569,16 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 	
-					new UpdateFromAndroidPlayerTask(ctx).execute(s);
-					
+					try {
+						new UpdateFromAndroidPlayerTask(ctx).execute(s);
+					} catch (RejectedExecutionException e) { //try again in 1 second
+						if (mAlarmIntent == null) {
+							Intent intent = new Intent("fm.last.android.widget.UPDATE");
+							mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+							AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+						}
+					}
 					LastFMApplication.getInstance().unbindService(this);
 				}
 	
@@ -583,7 +592,16 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
 	
-					new UpdateFromHTCPlayerTask(ctx).execute(s);
+					try {
+						new UpdateFromHTCPlayerTask(ctx).execute(s);
+					} catch (RejectedExecutionException e) { //try again in 1 second
+						if (mAlarmIntent == null) {
+							Intent intent = new Intent("fm.last.android.widget.UPDATE");
+							mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+							AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+						}
+					}
 
 					LastFMApplication.getInstance().unbindService(this);
 				}
@@ -598,7 +616,16 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
 	
-					new UpdateFromRadioPlayerTask(ctx).execute(player);
+					try {
+						new UpdateFromRadioPlayerTask(ctx).execute(player);
+					} catch (RejectedExecutionException e) { //try again in 1 second
+						if (mAlarmIntent == null) {
+							Intent intent = new Intent("fm.last.android.widget.UPDATE");
+							mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+							AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+						}
+					}
 
 					LastFMApplication.getInstance().unbindService(this);
 				}
