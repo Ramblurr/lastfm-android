@@ -160,7 +160,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 			Bitmap bmp = mImageCache.get(mList.get(position).url);
 			if (bmp != null) {
 				holder.image.setImageBitmap(bmp);
-			} else {
+			} else if (mList.get(position).icon_id >= 0) {
 				holder.image.setImageResource(mList.get(position).icon_id);
 			}
 		} else if (mList.get(position).icon_id >= 0) {
