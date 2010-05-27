@@ -1318,10 +1318,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	public void focusGained() {
 		if(mState == STATE_PAUSED) {
 			pause();
-
-			if(mp != null && mp.isPlaying())
-				mp.setVolume(1.0f, 1.0f);
 		}
+
+		if(mp != null && mp.isPlaying())
+			mp.setVolume(1.0f, 1.0f);
 	}
 
 	public void focusLost(boolean isTransient, boolean canDuck) {
