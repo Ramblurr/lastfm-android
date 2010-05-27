@@ -290,7 +290,11 @@ public class Player extends Activity {
 
 	@Override
 	protected void onPause() {
-		unregisterReceiver(mStatusListener);
+		try {
+			unregisterReceiver(mStatusListener);
+		} catch(IllegalArgumentException e) {
+			//The listener wasn't registered yet
+		}
 		mHandler.removeMessages(REFRESH);
 		if (LastFMApplication.getInstance().player != null)
 			LastFMApplication.getInstance().unbindPlayerService();
