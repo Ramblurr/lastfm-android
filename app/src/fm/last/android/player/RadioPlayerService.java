@@ -199,7 +199,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 								// impossible, seeing as we are the only
 								// component that dares the pause the radio. But we
 								// cater to it just in case
-								mp.setVolume(0.0f, 0.0f);
+								if(mp != null && mp.isPlaying())
+									mp.setVolume(0.0f, 0.0f);
 								return;
 							}
 	
