@@ -586,8 +586,8 @@ public class Player extends Activity {
 								mLoveButton.setImageResource(R.drawable.love);
 							}
 
-							if (!mArtistName.getText().equals(artistName)
-									|| !mTrackName.getText().equals(trackName)) {
+							if ((mArtistName != null && mArtistName.getText() != null && mTrackName != null && mTrackName.getText() != null) && (!mArtistName.getText().equals(artistName)
+									|| !mTrackName.getText().equals(trackName))) {
 								if (artistName
 										.equals(RadioPlayerService.UNKNOWN)) {
 									mArtistName.setText("");
