@@ -56,10 +56,20 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		return false;
 	}
 
+	public static String getAndroidMusicPackageName(Context ctx) {
+		try {
+			PackageManager pm = ctx.getPackageManager();
+			pm.getPackageInfo("com.google.android.music", 0);
+			return "com.google.android.music";
+		} catch (Exception e) {
+		}
+		return "com.android.music";
+	}
+
 	public static boolean isAndroidMusicInstalled(Context ctx) {
 		try {
 			PackageManager pm = ctx.getPackageManager();
-			pm.getPackageInfo("com.android.music", 0);
+			pm.getPackageInfo(getAndroidMusicPackageName(ctx), 0);
 			return true;
 		} catch (Exception e) {
 		}
@@ -75,7 +85,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			if (action.equals("fm.last.android.widget.ACTION")) {
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
@@ -171,7 +181,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
@@ -255,7 +265,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
@@ -370,7 +380,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
@@ -565,7 +575,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		bindButtonIntents(context, null);
 
 		if(isAndroidMusicInstalled(context)) {
-			LastFMApplication.getInstance().bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+			LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 	

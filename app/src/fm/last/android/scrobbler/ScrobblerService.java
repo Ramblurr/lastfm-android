@@ -56,6 +56,7 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.android.RadioWidgetProvider;
 import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioTrack;
@@ -286,7 +287,7 @@ public class ScrobblerService extends Service {
 		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
-				bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+				bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 

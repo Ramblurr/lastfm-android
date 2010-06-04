@@ -192,10 +192,12 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 			criteria.setSpeedRequired(false); 
 			criteria.setCostAllowed(false); 
 
-			String provider = lm.getBestProvider(criteria, true); 
-			mLocation = lm.getLastKnownLocation(provider);
+			String provider = lm.getBestProvider(criteria, true);
+			if(provider != null) {
+				mLocation = lm.getLastKnownLocation(provider);
+				lm.requestLocationUpdates(provider, 30000L, 1000.0f, this);
+			}
 			new LoadNearbyEventsTask().execute((Void) null);
-			lm.requestLocationUpdates(provider, 30000L, 1000.0f, this);
 			break;
 		default:
 			break;
