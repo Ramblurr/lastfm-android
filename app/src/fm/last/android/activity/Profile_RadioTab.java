@@ -70,10 +70,6 @@ public class Profile_RadioTab extends ListActivity {
 	private boolean isAuthenticatedUser;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
-	ProfileBubble mProfileBubble;
-	private Button mNewStationButton;
-	private EventActivityResult mOnEventActivityResult;
-
 	private IntentFilter mIntentFilter;
 
 	@Override
@@ -83,32 +79,6 @@ public class Profile_RadioTab extends ListActivity {
 		mUsername = getIntent().getStringExtra("user");
 		isAuthenticatedUser = getIntent().getBooleanExtra("authenticated", false);
 		
-		if (isAuthenticatedUser) {
-			Button b = mNewStationButton = new Button(this);
-			b.setBackgroundResource(R.drawable.start_a_new_station_button);
-			b.setTextColor(0xffffffff);
-			b.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-			b.setFocusable(false); // essential!
-			b.setClickable(false); // getListView() clicklistener handles this
-									// as the other routes had bugs
-			b.setGravity(3 | 16); // sorry not to use constants, I got lame and
-									// couldn't figure it out
-			b.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-			b.setText(R.string.profile_newstation);
-			b.setTag("header");
-			getListView().addHeaderView(b, null, true);
-			getListView().setItemsCanFocus(true);
-		} else {
-			try {
-				mProfileBubble = new QuickContactProfileBubble(this);
-			} catch (java.lang.VerifyError e) {
-				mProfileBubble = new ProfileBubble(this);
-			}
-			mProfileBubble.setTag("header");
-			mProfileBubble.setClickable(false);
-			getListView().addHeaderView(mProfileBubble, null, false);
-		}
-
 		getListView().setDivider(new ColorDrawable(0xffd9d7d7));
 		getListView().setSelector(new ColorDrawable(0x00000000));
 		getListView().requestFocus();
@@ -188,7 +158,6 @@ public class Profile_RadioTab extends ListActivity {
 				SetupRecentStations();
 
 				if (!isAuthenticatedUser && Profile_RadioTab.this.mUser != null) {
-					mProfileBubble.setUser(Profile_RadioTab.this.mUser);
 					SetupCommonArtists(tasteometer);
 				}
 				if (session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
@@ -236,16 +205,6 @@ public class Profile_RadioTab extends ListActivity {
 			mMyPlaylistsAdapter.updateNowPlaying();
 		setListAdapter(mMainAdapter);
 		mMainAdapter.notifyDataSetChanged();
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 0 && resultCode == RESULT_OK) {
-			int status = data.getExtras().getInt("status", -1);
-			if (mOnEventActivityResult != null && status != -1) {
-				mOnEventActivityResult.onEventStatus(status);
-			}
-		}
 	}
 
 	@Override
@@ -327,12 +286,6 @@ public class Profile_RadioTab extends ListActivity {
 
 		if (!mMainAdapter.isEnabled(position - 1))
 			return;
-
-		if (v == mNewStationButton && v != null) {
-			Intent intent = new Intent(Profile_RadioTab.this, NewStation.class);
-			startActivity(intent);
-			return;
-		}
 
 		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
 				new ServiceConnection() {

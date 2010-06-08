@@ -50,6 +50,8 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
+import fm.last.android.widget.ProfileBubble;
+import fm.last.android.widget.QuickContactProfileBubble;
 import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.ImageUrl;
@@ -89,9 +91,9 @@ public class Profile_ChartsTab extends ListActivity {
 
 	private ImageCache mImageCache = null;
 
-	private EventActivityResult mOnEventActivityResult;
-
 	private IntentFilter mIntentFilter;
+	
+	ProfileBubble mProfileBubble;
 
 	@Override
 	public void onCreate(Bundle icicle) {
@@ -100,6 +102,16 @@ public class Profile_ChartsTab extends ListActivity {
 		setContentView(R.layout.charts);
 
 		mUsername = getIntent().getStringExtra("user");
+		try {
+			mProfileBubble = new QuickContactProfileBubble(this);
+		} catch (java.lang.VerifyError e) {
+			mProfileBubble = new ProfileBubble(this);
+		}
+		mProfileBubble.setTag("header");
+		mProfileBubble.setClickable(false);
+		getListView().addHeaderView(mProfileBubble, null, false);
+
+		new LoadUserTask().execute((Void)null);
 
 		mViewHistory = new Stack<Integer>();
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
@@ -149,6 +161,28 @@ public class Profile_ChartsTab extends ListActivity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction("fm.last.android.ERROR");
+	}
+	
+	private class LoadUserTask extends AsyncTask<Void, Void, Boolean> {
+		User mUser = null;
+		
+		@Override
+		public Boolean doInBackground(Void... params) {
+			LastFmServer server = AndroidLastFmServerFactory.getServer();
+			try {
+				mUser = server.getUserInfo(mUsername, null);
+			} catch (Exception e) {
+				return false;
+			}
+			return true;
+		}
+		
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result) {
+				mProfileBubble.setUser(mUser);
+			}
+		}
 	}
 
 	@Override
@@ -201,16 +235,6 @@ public class Profile_ChartsTab extends ListActivity {
 				adapter.disableLoadBar();
 				adapter.refreshList();
 				mProfileLists[key].setAdapter(adapter);
-			}
-		}
-	}
-
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 0 && resultCode == RESULT_OK) {
-			int status = data.getExtras().getInt("status", -1);
-			if (mOnEventActivityResult != null && status != -1) {
-				mOnEventActivityResult.onEventStatus(status);
 			}
 		}
 	}

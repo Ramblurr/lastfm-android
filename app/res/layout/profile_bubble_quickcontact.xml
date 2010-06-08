@@ -2,6 +2,7 @@
 <LinearLayout 
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android" 
+	android:background="@drawable/tab_bar_rest"
 	android:layout_height="70dip" 
 	android:layout_width="fill_parent"
 	android:orientation="horizontal"
