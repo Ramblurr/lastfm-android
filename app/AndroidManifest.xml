@@ -66,6 +66,15 @@
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
 		<activity android:name=".activity.Profile_EventsTab"/>
+		<activity android:name=".activity.Profile_SearchTab">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data android:name="android.app.searchable"
+                    android:resource="@xml/searchable"/>
+		</activity>
 		<activity android:name=".activity.NewStation"
 			android:configChanges="keyboardHidden">
 			<intent-filter>
@@ -84,15 +93,6 @@
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="lastfm" />
 			</intent-filter>
-			            <!-- Receives the search request. -->
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <!-- Points to searchable meta data. -->
-            <meta-data android:name="android.app.searchable"
-                    android:resource="@xml/searchable"/>
 		</activity>
 		<activity android:name=".activity.Event"
 			android:configChanges="keyboardHidden">
