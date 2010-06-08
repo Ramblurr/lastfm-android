@@ -312,7 +312,11 @@ public class Player extends Activity {
 		long next = refreshNow();
 		queueNextRefresh(next);
 
-		LastFMApplication.getInstance().tracker.trackPageView("/Player");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/Player");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 		bindService(new Intent(Player.this,
 				fm.last.android.player.RadioPlayerService.class),
 				new ServiceConnection() {

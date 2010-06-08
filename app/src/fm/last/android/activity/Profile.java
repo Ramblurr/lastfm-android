@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -168,7 +169,11 @@ public class Profile extends ActivityGroup {
 			finish(); // We shouldn't really get here, but sometimes the window
 						// stack keeps us around
 		}
-		LastFMApplication.getInstance().tracker.trackPageView("/Profile");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/Profile");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 		super.onResume();
 	}
 

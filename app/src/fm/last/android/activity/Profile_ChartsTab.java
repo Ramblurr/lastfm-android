@@ -30,6 +30,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -311,27 +312,51 @@ public class Profile_ChartsTab extends ListActivity {
 		mProfileAdapter.enableLoadBar(position);
 		switch (position) {
 		case PROFILE_TOPARTISTS: // "Top Artists"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadTopArtistsTask().execute((Void) null);
 			break;
 		case PROFILE_TOPALBUMS: // "Top Albums"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadTopAlbumsTask().execute((Void) null);
 			break;
 		case PROFILE_TOPTRACKS: // "Top Tracks"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadTopTracksTask().execute((Void) null);
 			break;
 		case PROFILE_RECENTLYPLAYED: // "Recently Played"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadRecentTracksTask().execute((Void) null);
 			break;
 		case PROFILE_FRIENDS: // "Friends"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadFriendsTask().execute((Void) null);
 			break;
 		case PROFILE_TAGS: // "Tags"
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadTagsTask().execute((Void) null);
 			break;
 		default:

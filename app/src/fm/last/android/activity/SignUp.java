@@ -93,6 +93,10 @@ public class SignUp extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		LastFMApplication.getInstance().tracker.trackPageView("/SignUp");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/SignUp");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 }

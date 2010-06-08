@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -206,7 +207,11 @@ public class Tag extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		LastFMApplication.getInstance().tracker.trackPageView("/Tag");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/Tag");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 
 	/**

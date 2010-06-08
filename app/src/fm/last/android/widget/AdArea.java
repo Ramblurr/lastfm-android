@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -118,7 +119,11 @@ public class AdArea extends ImageButton {
 	public AdArea(Context context, AttributeSet attributeSet) {
 		super(context, attributeSet);
 		
-		new AdsEnabledTask(context).execute((Void)null);
+		try {
+			new AdsEnabledTask(context).execute((Void)null);
+		} catch (RejectedExecutionException e) {
+			setVisibility(View.GONE);
+		}
 		setOnClickListener(mClickListener);
 	}
 

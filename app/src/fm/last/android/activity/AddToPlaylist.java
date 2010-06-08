@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -117,7 +118,11 @@ public class AddToPlaylist extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		LastFMApplication.getInstance().tracker.trackPageView("/AddToPlaylist");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/AddToPlaylist");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 
 	private ImageCache getImageCache() {

@@ -32,6 +32,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -172,7 +173,11 @@ public class Metadata extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		LastFMApplication.getInstance().tracker.trackPageView("/Metadata");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/Metadata");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import java.util.Stack;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -173,15 +174,27 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 
 		switch (position) {
 		case EVENTS_MYEVENTS:
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadMyEventsTask().execute((Void) null);
 			break;
 		case EVENTS_RECOMMENDED:
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Recommended");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Recommended");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			new LoadRecommendedEventsTask().execute((Void) null);
 			break;
 		case EVENTS_NEARME:
-			LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Nearby");
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Nearby");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 			LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 			
 			Criteria criteria = new Criteria(); 

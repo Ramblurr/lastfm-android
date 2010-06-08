@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -88,6 +89,10 @@ public class Preferences extends PreferenceActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		LastFMApplication.getInstance().tracker.trackPageView("/Preferences");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/Preferences");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 }

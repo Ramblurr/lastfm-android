@@ -21,6 +21,7 @@
 package fm.last.android;
 
 import java.net.URL;
+import java.util.concurrent.RejectedExecutionException;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -48,7 +50,6 @@ import android.widget.EditText;
 import fm.last.android.activity.Profile;
 import fm.last.android.activity.SignUp;
 import fm.last.android.sync.AccountAuthenticatorService;
-import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.Session;
@@ -81,8 +82,12 @@ public class LastFm extends Activity {
 		String session_key = settings.getString("lastfm_session_key", "");
 		String pass;
 
-		new CheckUpdatesTask().execute((Void) null);
-
+		try {
+			new CheckUpdatesTask().execute((Void) null);
+		} catch (RejectedExecutionException e) {
+			
+		}
+		
 		if(Integer.decode(Build.VERSION.SDK) >= 6) {
 			if(!AccountAuthenticatorService.hasLastfmAccount(this)) {
 				session_key = "";
@@ -217,7 +222,7 @@ public class LastFm extends Activity {
 	 * In a task because it can take a while, and Android has a tendency to
 	 * panic and show the force quit/wait dialog quickly. And this blocks.
 	 */
-	private class LoginTask extends UserTask<String, Void, Session> {
+	private class LoginTask extends AsyncTask<String, Void, Session> {
 		Context context;
 		ProgressDialog mDialog;
 
@@ -336,7 +341,7 @@ public class LastFm extends Activity {
 
 	private LoginTask mLoginTask;
 
-	private class CheckUpdatesTask extends UserTask<Void, Void, Boolean> {
+	private class CheckUpdatesTask extends AsyncTask<Void, Void, Boolean> {
 		private String mUpdateURL = "";
 
 		@Override

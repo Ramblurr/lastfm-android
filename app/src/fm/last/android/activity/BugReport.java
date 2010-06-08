@@ -10,6 +10,7 @@ import java.util.zip.ZipOutputStream;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,7 +33,11 @@ public class BugReport extends DialogPreference {
 	protected void showDialog(Bundle state) {
 		super.showDialog(state);
 		mBug = (EditText) getDialog().findViewById(R.id.bug);
-		LastFMApplication.getInstance().tracker.trackPageView("/BugReport");
+		try {
+			LastFMApplication.getInstance().tracker.trackPageView("/BugReport");
+		} catch (SQLiteException e) {
+			//Google Analytics doesn't appear to be thread safe
+		}
 	}
 
 	@Override
