@@ -141,9 +141,6 @@ public class Profile extends ActivityGroup {
 	                .setContent(radioTabIntent));
 		}
 
-		if (getIntent().getBooleanExtra("lastfm.profile.new_user", false))
-			startActivity(new Intent(Profile.this, NewStation.class));
-
 		File f = new File(Environment.getExternalStorageDirectory() + "/lastfm-logs.zip");
 		if (f.exists()) {
 			Log.i("Last.fm", "Removing stale bug report archive");
