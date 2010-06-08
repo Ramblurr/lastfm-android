@@ -869,7 +869,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						unbindService(this);
+						try {
+							unbindService(this);
+						} catch (Exception e) {
+						}
 					}
 		
 					public void onServiceDisconnected(ComponentName comp) {
@@ -892,7 +895,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						unbindService(this);
+						try {
+							unbindService(this);
+						} catch (Exception e) {
+						}
 					}
 		
 					public void onServiceDisconnected(ComponentName comp) {
@@ -963,7 +969,12 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				clearNotification();
 				stopSelf();
 			} catch (Exception e) {
-				e.printStackTrace();
+				currentStationURL = null;
+				Intent i = new Intent("fm.last.android.ERROR");
+				sendBroadcast(i);
+				logger.severe("Tuning error: " + e.getMessage());
+				clearNotification();
+				stopSelf();
 			}
 			return null;
 		}

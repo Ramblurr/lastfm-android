@@ -41,6 +41,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -157,6 +159,15 @@ public class LastFMApplication extends Application {
 	public void playRadioStation(Context ctx, String url, boolean showPlayer) {
 		mCtx = ctx;
 		if (session != null && session.getKey().length() > 0) {
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if(ni == null || !ni.isAvailable() || !ni.isConnected()) {
+				presentError(mCtx, getString(R.string.ERROR_NONETWORK_TITLE), getString(R.string.ERROR_NONETWORK));
+				Intent i = new Intent("fm.last.android.ERROR");
+				sendBroadcast(i);
+				return;
+			}
+			
 			final Intent out = new Intent(this, RadioPlayerService.class);
 			out.setAction("fm.last.android.PLAY");
 			out.putExtra("station", url);
@@ -179,7 +190,9 @@ public class LastFMApplication extends Application {
 							startActivity(i);
 						} else if (action.equals("fm.last.android.ERROR")) {
 							WSError e = intent.getParcelableExtra("error");
-							Log.e("Last.fm", "Tuning error: " + e.getMessage());
+							if(e != null) {
+								Log.e("Last.fm", "Tuning error: " + e.getMessage());
+							}
 							presentError(mCtx, e);
 						}
 						unregisterReceiver(this);
@@ -293,61 +306,67 @@ public class LastFMApplication extends Application {
 		int title = 0;
 		int description = 0;
 
-		System.out.printf("Received a webservice error during method: %s: %s\n", error.getMethod(), error.getMessage());
-
-		if (error.getMethod().startsWith("radio.")) {
-			title = R.string.ERROR_STATION_TITLE;
-			switch (error.getCode()) {
-			case WSError.ERROR_NotEnoughContent:
-				title = R.string.ERROR_INSUFFICIENT_CONTENT_TITLE;
-				description = R.string.ERROR_INSUFFICIENT_CONTENT;
-				break;
-
-			case WSError.ERROR_NotEnoughFans:
-				description = R.string.ERROR_INSUFFICIENT_FANS;
-				break;
-
-			case WSError.ERROR_NotEnoughMembers:
-				description = R.string.ERROR_INSUFFICIENT_MEMBERS;
-				break;
-
-			case WSError.ERROR_NotEnoughNeighbours:
-				description = R.string.ERROR_INSUFFICIENT_NEIGHBOURS;
-				break;
+		if(error != null) {
+			System.out.printf("Received a webservice error during method: %s: %s\n", error.getMethod(), error.getMessage());
+	
+			if (error.getMethod().startsWith("radio.")) {
+				title = R.string.ERROR_STATION_TITLE;
+				switch (error.getCode()) {
+				case WSError.ERROR_NotEnoughContent:
+					title = R.string.ERROR_INSUFFICIENT_CONTENT_TITLE;
+					description = R.string.ERROR_INSUFFICIENT_CONTENT;
+					break;
+	
+				case WSError.ERROR_NotEnoughFans:
+					description = R.string.ERROR_INSUFFICIENT_FANS;
+					break;
+	
+				case WSError.ERROR_NotEnoughMembers:
+					description = R.string.ERROR_INSUFFICIENT_MEMBERS;
+					break;
+	
+				case WSError.ERROR_NotEnoughNeighbours:
+					description = R.string.ERROR_INSUFFICIENT_NEIGHBOURS;
+					break;
+				}
+			}
+	
+			if (error.getMethod().equals("user.signUp")) {
+				title = R.string.ERROR_SIGNUP_TITLE;
+				switch (error.getCode()) {
+				case WSError.ERROR_InvalidParameters:
+					presentError(ctx, getResources().getString(title), error.getMessage());
+					return;
+	
+				}
 			}
 		}
-
-		if (error.getMethod().equals("user.signUp")) {
-			title = R.string.ERROR_SIGNUP_TITLE;
-			switch (error.getCode()) {
-			case WSError.ERROR_InvalidParameters:
-				presentError(ctx, getResources().getString(title), error.getMessage());
-				return;
-
-			}
-		}
-
+		
 		if (title == 0)
 			title = R.string.ERROR_SERVER_UNAVAILABLE_TITLE;
 
 		if (description == 0) {
-			switch (error.getCode()) {
-			case WSError.ERROR_AuthenticationFailed:
-			case WSError.ERROR_InvalidSession:
-				title = R.string.ERROR_SESSION_TITLE;
-				description = R.string.ERROR_SESSION;
-				break;
-			case WSError.ERROR_InvalidAPIKey:
-				title = R.string.ERROR_UPGRADE_TITLE;
-				description = R.string.ERROR_UPGRADE;
-				break;
-			case WSError.ERROR_SubscribersOnly:
-				title = R.string.ERROR_SUBSCRIPTION_TITLE;
-				description = R.string.ERROR_SUBSCRIPTION;
-				break;
-			default:
+			if(error != null) {
+				switch (error.getCode()) {
+				case WSError.ERROR_AuthenticationFailed:
+				case WSError.ERROR_InvalidSession:
+					title = R.string.ERROR_SESSION_TITLE;
+					description = R.string.ERROR_SESSION;
+					break;
+				case WSError.ERROR_InvalidAPIKey:
+					title = R.string.ERROR_UPGRADE_TITLE;
+					description = R.string.ERROR_UPGRADE;
+					break;
+				case WSError.ERROR_SubscribersOnly:
+					title = R.string.ERROR_SUBSCRIPTION_TITLE;
+					description = R.string.ERROR_SUBSCRIPTION;
+					break;
+				default:
+					description = R.string.ERROR_SERVER_UNAVAILABLE;
+					break;
+				}
+			} else {
 				description = R.string.ERROR_SERVER_UNAVAILABLE;
-				break;
 			}
 		}
 
