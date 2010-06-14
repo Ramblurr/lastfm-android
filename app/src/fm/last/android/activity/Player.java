@@ -774,6 +774,7 @@ public class Player extends Activity {
 				success = true;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return success;
 		}
@@ -814,6 +815,7 @@ public class Player extends Activity {
 
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return result;
 		}
