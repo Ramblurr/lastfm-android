@@ -16,6 +16,7 @@ import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
 import fm.last.api.User;
+import fm.last.api.WSError;
 
 public class SearchProvider extends ContentProvider {
 
@@ -88,56 +89,67 @@ public class SearchProvider extends ContentProvider {
 
     private Cursor getSuggestions(String query, String[] projection) {
         String processedQuery = query == null ? "" : query.toLowerCase();
+        if(processedQuery.length() < 1)
+        	return null;
         
 		LastFmServer server = AndroidLastFmServerFactory.getServer();
 		try {
 	        MatrixCursor cursor = new MatrixCursor(COLUMNS);
 	        long id = 0;
 
-	        User u = server.getUserInfo(processedQuery, LastFMApplication.getInstance().session.getKey());
-	        if(u != null) {
-	            cursor.addRow(new Object[] {
-	                    id++,                  // _id
-	                    processedQuery,           // text1
-	                    LastFMApplication.getInstance().getString(R.string.action_viewprofile),     // text2
-	                    Uri.parse("http://www.last.fm/user/"+processedQuery),           // intent_data (included when clicking on item)
-	                    -1
-	            });
-	        }
-
-	        Artist a = server.getArtistInfo(processedQuery, "", "");
-	        if(a != null) {
-	            cursor.addRow(new Object[] {
-	                    id++,                  // _id
-	                    processedQuery,           // text1
-	                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-	                    Uri.parse("http://www.last.fm/music/"+processedQuery),           // intent_data (included when clicking on item)
-	                    -1
-	            });
-
-	            cursor.addRow(new Object[] {
-	                    id++,                  // _id
-	                    LastFMApplication.getInstance().getString(R.string.newstation_artistradio,a.getName()),           // text1
-	                    LastFMApplication.getInstance().getString(R.string.action_similar),     // text2
-	                    Uri.parse("lastfm://artist/"+a.getName()+"/similarartists"),           // intent_data (included when clicking on item)
-	                    R.drawable.radio_icon
-	            });
-	        }
-
-	        Tag[] tags;
-			tags = server.searchForTag(processedQuery);
-
-	        for (int i = 0; i < (tags.length < 6 ? tags.length : 6); i++) {
-				if (tags[i].getTagcount() > 100) {
+	        try {
+		        User u = server.getUserInfo(processedQuery, LastFMApplication.getInstance().session.getKey());
+		        if(u != null && u.getName().toLowerCase().equals(processedQuery)) {
 		            cursor.addRow(new Object[] {
 		                    id++,                  // _id
-		                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tags[i].getName()),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
-		                    Uri.parse("lastfm://globaltags/"+tags[i].getName()),           // intent_data (included when clicking on item)
+		                    processedQuery,           // text1
+		                    LastFMApplication.getInstance().getString(R.string.action_viewprofile),     // text2
+		                    Uri.parse("http://www.last.fm/user/"+processedQuery),           // intent_data (included when clicking on item)
+		                    -1
+		            });
+		        }
+	        } catch (WSError e) {
+	        }
+
+	        try {
+		        Artist a = server.getArtistInfo(processedQuery, "", "");
+		        if(a != null) {
+		            cursor.addRow(new Object[] {
+		                    id++,                  // _id
+		                    processedQuery,           // text1
+		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
+		                    Uri.parse("http://www.last.fm/music/"+processedQuery),           // intent_data (included when clicking on item)
+		                    -1
+		            });
+	
+		            cursor.addRow(new Object[] {
+		                    id++,                  // _id
+		                    LastFMApplication.getInstance().getString(R.string.newstation_artistradio,a.getName()),           // text1
+		                    LastFMApplication.getInstance().getString(R.string.action_similar),     // text2
+		                    Uri.parse("lastfm://artist/"+a.getName()+"/similarartists"),           // intent_data (included when clicking on item)
 		                    R.drawable.radio_icon
 		            });
+		        }
+	        } catch (WSError e) {
+	        }
+
+	        try {
+		        Tag[] tags;
+				tags = server.searchForTag(processedQuery);
+	
+		        for (int i = 0; i < (tags.length < 6 ? tags.length : 6); i++) {
+					if (tags[i].getTagcount() > 100) {
+			            cursor.addRow(new Object[] {
+			                    id++,                  // _id
+			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tags[i].getName()),           // text1
+			                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
+			                    Uri.parse("lastfm://globaltags/"+tags[i].getName()),           // intent_data (included when clicking on item)
+			                    R.drawable.radio_icon
+			            });
+					}
 				}
-			}
+	        } catch (WSError e) {
+	        }
 	        
 	        return cursor;
 		} catch (IOException e) {

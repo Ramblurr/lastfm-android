@@ -167,11 +167,16 @@ public class UrlUtil {
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
+			InputStream contentStream = null;
 			int rc = conn.getResponseCode();
-			if (rc != 200) {
+			if (rc == 400)
+				contentStream = conn.getErrorStream();
+			else if (rc != 200) {
 				throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
+			} else {
+				contentStream = conn.getInputStream();
 			}
-			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
 			return toString(reader);
 		} finally {
 			if (reader != null) {
