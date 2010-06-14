@@ -309,8 +309,8 @@ public class Profile_ChartsTab extends ListActivity {
 
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		setNextAnimation();
-		mProfileAdapter.enableLoadBar(position);
-		switch (position) {
+		mProfileAdapter.enableLoadBar(position-1);
+		switch (position-1) {
 		case PROFILE_TOPARTISTS: // "Top Artists"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
