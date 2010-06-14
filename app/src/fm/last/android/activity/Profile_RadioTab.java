@@ -280,11 +280,10 @@ public class Profile_RadioTab extends ListActivity {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int p, long id) {
-		// mMainAdapter seems to want position-1 :-/
 		final ListView list = l;
 		final int position = p;
 
-		if (!mMainAdapter.isEnabled(position - 1))
+		if (!mMainAdapter.isEnabled(position))
 			return;
 
 		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
@@ -292,14 +291,14 @@ public class Profile_RadioTab extends ListActivity {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
 						try {
-							String adapter_station = mMainAdapter.getStation(position - 1);
+							String adapter_station = mMainAdapter.getStation(position);
 							String current_station = player.getStationUrl();
 							if (player.isPlaying() && adapter_station.equals(current_station)) {
 								Intent intent = new Intent(Profile_RadioTab.this, Player.class);
 								startActivity(intent);
 							} else {
 								list.setEnabled(false);
-								mMainAdapter.enableLoadBar(position - 1);
+								mMainAdapter.enableLoadBar(position);
 								LastFMApplication.getInstance().playRadioStation(Profile_RadioTab.this, adapter_station, true);
 							}
 						} catch (Exception e) {
