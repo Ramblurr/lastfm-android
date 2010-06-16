@@ -66,6 +66,10 @@
 	<string name="prefs_scrobble_summary">Aktualisiere dein Last.fm Profil während du Musik hörst</string>
 	<string name="prefs_scrobble_music_player_title">Scrobbel Android Player</string>
 	<string name="prefs_scrobble_music_player_summary">Scrobbel den Android Musik-Player</string>
+	<string name="prefs_scrobble_sls_title">SLS-Unterstützung</string>
+    <string name="prefs_scrobble_sls_summary">Scrobble Anwendungen mit Simple Last.fm Scrobbler API</string>
+    <string name="prefs_scrobble_sdroid_title">ScrobbleDroid-Untersützung</string>
+    <string name="prefs_scrobble_sdroid_summary">Scrobble Anwendungen mit ScrobbleDroid API</string>
 	<string name="prefs_scrobble_realtime_title">Scrobbel in Echtzeit</string>
 	<string name="prefs_scrobble_realtime_summary">Sendet \'Hört gerade\' Informationen und scrobbelt sofort.</string>
 	<string name="prefs_scrobble_wifi_only_title">Scrobbel nur bei WLAN</string>
@@ -81,6 +85,18 @@
     <string name="prefs_noisy_summary">Stoppt die Musik, wenn das Headset entfernt wird.</string>
 	<string name="prefs_tos_title">Nutzungsbedingungen</string>
 	<string name="prefs_privacy_title">Datenschutz</string>
+	<string name="prefs_cat_sync_title">Synchronisation</string>
+    <string name="prefs_sync_names_title">Abgleich echter Namen</string>
+    <string name="prefs_sync_names_summary">Zeige echte Namen anstelle von Benutzernamen an</string>
+    <string name="prefs_sync_taste_title">Abgleich Taste-O-Meter</string>
+    <string name="prefs_sync_taste_summary">Zeige die musikalische Übereinstimmung mit deinen Kontakten an</string>
+    <string name="prefs_sync_icons_title">Abgleich Avatare</string>
+    <string name="prefs_sync_icons_summary">Zeige die Last.fm Avatare deiner Kontakte an</string>
+    <string name="prefs_sync_website_title">Abgleich Website</string>
+    <string name="prefs_sync_website_summary">Zeige die Last.fm-Profil URLs deiner Kontakte an</string>	
+	<string name="prefs_headset_controls_title">Headset-Steuerung</string>
+    <string name="prefs_headset_controls_summary">Aktiviere Steuerung der Wiedergabe durch Headset-Tasten</string>
+	
 	
 	<!-- bugreport -->
 	<string name="bugreport_description">Bitte beschreibe den Fehler:</string>
@@ -116,6 +132,9 @@
 	<string name="profile_recentlyplayed">Kürzlich gespielt</string>
 	<string name="profile_norecenttracks">Keine kürzlich gespielten Titel</string>
 	<string name="profile_events">Events</string>
+	<string name="profile_myevents">Meine Events</string>
+    <string name="profile_events_recommended">Empfohlen von Last.fm</string>
+    <string name="profile_events_nearby">Events in meiner Nähe</string>	
 	<string name="profile_noevents">Keine zukünftigen Events</string>
 	<string name="profile_friends">Freunde</string>
 	<string name="profile_nofriends">Keine Freunde geladen</string>
@@ -126,6 +145,7 @@
 	<string name="profile_loading">Lade Profil...</string>
 	<string name="profile_gender_male">männl.</string>
     <string name="profile_gender_female">weibl.</string>
+    <string name="profile_search">Suche</string>
 	
     <!-- Share activity -->
     <string name="share_label">Last.fm: An einen Freund empfehlen</string>

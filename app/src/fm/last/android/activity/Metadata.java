@@ -112,9 +112,13 @@ public class Metadata extends Activity {
 				List<String> segments = getIntent().getData().getPathSegments();
 				mArtistName = Uri.decode(segments.get(segments.size() - 1)).replace("+", " ");
 			}
-		} else if(getIntent().getAction().equals(MediaStore.INTENT_ACTION_MEDIA_SEARCH)) {
-			mArtistName = getIntent().getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
-		} else {
+		} 
+		else if(getIntent().getAction() != null) {
+			if (getIntent().getAction().equals(MediaStore.INTENT_ACTION_MEDIA_SEARCH)) {
+				mArtistName = getIntent().getStringExtra(MediaStore.EXTRA_MEDIA_ARTIST);
+			}
+		} 
+		else {
 			mArtistName = getIntent().getStringExtra("artist");
 			mTrackName = getIntent().getStringExtra("track");
 		}

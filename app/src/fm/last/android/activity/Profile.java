@@ -122,7 +122,7 @@ public class Profile extends ActivityGroup {
 		
 		if (isAuthenticatedUser) {
 			mTabHost.addTab(mTabHost.newTabSpec("search")
-	                .setIndicator("Search", getResources().getDrawable(R.drawable.ic_tab_profile))
+	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(R.drawable.ic_tab_profile))
 	                .setContent(new Intent(this, Profile_SearchTab.class)));
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.ic_tab_profile))
@@ -131,7 +131,7 @@ public class Profile extends ActivityGroup {
 	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.ic_tab_radio))
 	                .setContent(radioTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("events")
-	                .setIndicator("Events", getResources().getDrawable(R.drawable.ic_tab_events))
+	                .setIndicator(getString(R.string.profile_events), getResources().getDrawable(R.drawable.ic_tab_events))
 	                .setContent(eventsTabIntent));
 		} else {
 			mTabHost.addTab(mTabHost.newTabSpec("profile")

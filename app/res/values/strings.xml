@@ -103,9 +103,9 @@
 	<string name="prefs_sync_taste_title">Sync taste-o-meter</string>
 	<string name="prefs_sync_taste_summary">Display contacts\' music compatibility</string>
 	<string name="prefs_sync_icons_title">Sync avatars</string>
-	<string name="prefs_sync_icons_summary">Display contacts\' last.fm avatars</string>
+	<string name="prefs_sync_icons_summary">Display contacts\' Last.fm avatars</string>
 	<string name="prefs_sync_website_title">Sync website</string>
-	<string name="prefs_sync_website_summary">Display contacts\' last.fm profile URLs</string>
+	<string name="prefs_sync_website_summary">Display contacts\' Last.fm profile URLs</string>
 	<string name="prefs_headset_controls_title">Headset Controls</string>
 	<string name="prefs_headset_controls_summary">Respond to headset stop and skip buttons during playback</string>
 
@@ -143,6 +143,9 @@
 	<string name="profile_recentlyplayed">Recently Played</string>
 	<string name="profile_norecenttracks">No Recent Tracks</string>
 	<string name="profile_events">Events</string>
+	<string name="profile_myevents">My Events</string>
+	<string name="profile_events_recommended">Recommended by Last.fm</string>
+	<string name="profile_events_nearby">Events Near Me</string>
 	<string name="profile_noevents">No Upcoming Events</string>
 	<string name="profile_friends">Friends</string>
 	<string name="profile_nofriends">No Friends Retrieved</string>
@@ -153,6 +156,7 @@
 	<string name="profile_loading">Loading Profile...</string>
 	<string name="profile_gender_male">male</string>
 	<string name="profile_gender_female">female</string>
+	<string name="profile_search">Search</string>
 
 	<!-- Share activity -->
 	<string name="share_label">Last.fm: Share With A Friend</string>

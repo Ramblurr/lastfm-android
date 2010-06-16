@@ -95,7 +95,9 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 
 		getListView().requestFocus();
 		
-		String[] mStrings = new String[] { "My Events", "Recommended by Last.fm", "Events Near Me" }; // this
+		String[] mStrings = new String[] { getString(R.string.profile_myevents),
+				getString(R.string.profile_events_recommended),
+				getString(R.string.profile_events_nearby)}; 										// this
 																									// order
 																									// must
 																									// match
