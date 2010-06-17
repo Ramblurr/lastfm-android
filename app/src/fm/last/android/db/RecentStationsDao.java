@@ -7,6 +7,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import fm.last.api.Station;
 
+/**
+ * The DAO to access the table containing the recently played stations.
+ * @author twa
+ */
 public class RecentStationsDao extends AbstractDao<Station>
 {
 	
@@ -15,19 +19,30 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 */
 	public static final String DB_TABLE_RECENTSTATIONS = "t_recentstations";
 	
+	/*
+	 * (non-Javadoc)
+	 * @see fm.last.android.db.AbstractDao#getTableName()
+	 */
 	@Override
 	protected String getTableName() 
 	{	
 		return DB_TABLE_RECENTSTATIONS;
 	}
 	
-	
+	/**
+	 * The {@link RecentStationsDao} singleton instance.
+	 */
 	private static RecentStationsDao instance = null;
 
-	public static RecentStationsDao getInstance() {
+	/**
+	 * @return the {@link RecentStationsDao} singleton instance.
+	 */
+	public static RecentStationsDao getInstance() 
+	{
 		if(instance != null) {
 			return instance;
-		} else {
+		} 
+		else {
 			return new RecentStationsDao();
 		}
 	}

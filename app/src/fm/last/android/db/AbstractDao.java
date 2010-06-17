@@ -78,6 +78,10 @@ public abstract class AbstractDao<T>
 		}
 	}
 	
+	/**
+	 * Load all entries of the table.
+	 * @return a list with the entries.
+	 */
 	public List<T> loadAll()
 	{
 		return loadWithQualification(null);

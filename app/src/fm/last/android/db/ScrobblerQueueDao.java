@@ -8,19 +8,33 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import fm.last.android.scrobbler.ScrobblerQueueEntry;
 
+/**
+ * DAO for table containing scrobbler queue.
+ * This DAO can be used to access the queued items and the
+ * track currently played. 
+ * @author atwupack
+ */
 public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 {
 	/**
 	 * The table for the recent stations list.
 	 */
 	public static final String DB_TABLE_SCROBBLERQUEUE = "t_scrobblerqueue";
-		
+	
+	/**
+	 * Singleton instance of {@link ScrobblerQueueDao}.
+	 */
 	private static ScrobblerQueueDao instance = null;
 
-	public static ScrobblerQueueDao getInstance() {
+	/** 
+	 * @return the {@link ScrobblerQueueDao} singleton.
+	 */
+	public static ScrobblerQueueDao getInstance() 
+	{
 		if(instance != null) {
 			return instance;
-		} else {
+		} 
+		else {
 			return new ScrobblerQueueDao();
 		}
 	}
@@ -73,7 +87,6 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 			save(Collections.singleton(track));
 		}
 	}
-	
 	
 	/*
 	 * (non-Javadoc)
