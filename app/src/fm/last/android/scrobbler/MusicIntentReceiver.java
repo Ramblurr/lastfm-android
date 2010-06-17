@@ -22,6 +22,7 @@ package fm.last.android.scrobbler;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import android.content.BroadcastReceiver;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.db.ScrobblerQueueDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
@@ -65,20 +67,9 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
 
 				try {
-					if (context.getFileStreamPath("queue.dat").exists()) {
-						FileInputStream fileStream = context.openFileInput("queue.dat");
-						ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-						Object obj = objectStream.readObject();
-						if (obj instanceof Integer) {
-							Integer count = (Integer) obj;
-							for (int i = 0; i < count.intValue(); i++) {
-								obj = objectStream.readObject();
-								if (obj instanceof ScrobblerQueueEntry)
-									queue.add((ScrobblerQueueEntry) obj);
-							}
-						}
-						objectStream.close();
-						fileStream.close();
+					List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadAll();
+					if (entries!=null) {
+						queue.addAll(entries);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

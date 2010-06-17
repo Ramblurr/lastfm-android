@@ -353,7 +353,6 @@ public class LastFMApplication extends Application {
 			}, 0);
 			deleteDatabase(LastFmDbHelper.DB_NAME);
 			deleteFile("currentTrack.dat");
-			deleteFile("queue.dat");
 			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				AccountAuthenticatorService.removeLastfmAccount(this);
 			}

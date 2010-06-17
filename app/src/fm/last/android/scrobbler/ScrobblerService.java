@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -57,6 +58,7 @@ import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
+import fm.last.android.db.ScrobblerQueueDao;
 import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioTrack;
@@ -156,25 +158,9 @@ public class ScrobblerService extends Service {
 		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(1000);
 
 		try {
-			if (getFileStreamPath("queue.dat").exists()) {
-				FileInputStream fileStream = openFileInput("queue.dat");
-				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-				Object obj = objectStream.readObject();
-				if (obj instanceof Integer) {
-					Integer count = (Integer) obj;
-					for (int i = 0; i < count.intValue(); i++) {
-						obj = objectStream.readObject();
-						if (obj != null && obj instanceof ScrobblerQueueEntry) {
-							try {
-								mQueue.add((ScrobblerQueueEntry) obj);
-							} catch (IllegalStateException e) {
-								break; //The queue is full!
-							}
-						}
-					}
-				}
-				objectStream.close();
-				fileStream.close();
+			List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadAll();
+			if (entries!=null) {
+				mQueue.addAll(entries);
 				logger.info("Loaded " + mQueue.size() + " queued tracks");
 			}
 		} catch (Exception e) {
@@ -213,23 +199,13 @@ public class ScrobblerService extends Service {
 		}
 
 		try {
-			if (getFileStreamPath("queue.dat").exists())
-				deleteFile("queue.dat");
+			ScrobblerQueueDao.getInstance().clearTable();			
 			if (mQueue.size() > 0) {
 				logger.info("Writing " + mQueue.size() + " queued tracks");
-				FileOutputStream filestream = openFileOutput("queue.dat", 0);
-				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
-				objectstream.writeObject(new Integer(mQueue.size()));
-				while (mQueue.size() > 0) {
-					ScrobblerQueueEntry e = mQueue.take();
-					objectstream.writeObject(e);
-				}
-				objectstream.close();
-				filestream.close();
+				ScrobblerQueueDao.getInstance().save(mQueue);
 			}
-		} catch (Exception e) {
-			if (getFileStreamPath("queue.dat").exists())
-				deleteFile("queue.dat");
+		} 
+		catch (Exception e) {
 			logger.severe("Unable to save queue state");
 			e.printStackTrace();
 		}

@@ -1,7 +1,6 @@
 package fm.last.android.db;
 
 import fm.last.android.LastFMApplication;
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -16,7 +15,7 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 	 * The DB's version number.
 	 * This needs to be increased on schema changes.
 	 */
-	public static final int DB_VERSION = 2;
+	public static final int DB_VERSION = 3;
 	
 	public LastFmDbHelper() 
 	{
@@ -41,11 +40,11 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 				" Title VARCHAR NOT NULL," +
 				" Album VARCHAR NOT NULL," +
 				" TrackAuth VARCHAR NOT NULL," +
-				" Ratng VARCHAR NOT NULL," +
+				" Rating VARCHAR NOT NULL," +
 				" StartTime INTEGER NOT NULL," +
 				" Duration INTEGER NOT NULL," +
-				" postedNowPlaying INTEGER NOT NULL," +
-				" loved INTEGER NOT NULL)");
+				" PostedNowPlaying INTEGER NOT NULL," +
+				" Loved INTEGER NOT NULL)");
 
 	}
 

@@ -1,6 +1,7 @@
 package fm.last.android.db;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -77,11 +78,16 @@ public abstract class AbstractDao<T>
 		}
 	}
 	
+	public List<T> loadAll()
+	{
+		return loadWithQualification(null);
+	}
+	
 	/**
 	 * Inserts a list of objects as rows into the table.
 	 * @param objects the objects to be inserted.
 	 */
-	public void save(List<T> objects)
+	public void save(Collection<T> objects)
 	{
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();

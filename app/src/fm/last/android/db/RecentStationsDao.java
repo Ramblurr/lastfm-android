@@ -81,10 +81,8 @@ public class RecentStationsDao extends AbstractDao<Station>
 	@Override
 	protected Station buildObject(Cursor c) 
 	{
-		int urlColumn = c.getColumnIndex("Url");
-		int nameColumn = c.getColumnIndex("Name");
-		String name = c.getString(nameColumn);
-		String url = c.getString(urlColumn);
+		String name = c.getString(c.getColumnIndex("Name"));
+		String url = c.getString(c.getColumnIndex("Url"));
 		return new Station(name, "", url, "");
 	}
 	
