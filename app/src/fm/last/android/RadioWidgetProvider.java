@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 import fm.last.android.activity.PopupActionActivity;
 import fm.last.android.activity.Profile;
+import fm.last.android.db.RecentStationsDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
@@ -232,13 +233,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										if (player.isPlaying())
 											player.skip();
 										else {
-											if (LastFMApplication.getInstance().getLastStation() == null) {
+											Station lastStation = RecentStationsDao.getInstance().getLastStation();
+											if (lastStation == null) {
 												LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
 												updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
 											} else {
-												LastFMApplication.getInstance().playRadioStation(ctx, LastFMApplication.getInstance().getLastStation().getUrl(),
+												LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
 														false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), LastFMApplication.getInstance().getLastStation().getName(),
+												updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
 														true);
 											}
 										}
@@ -318,13 +320,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										if (player.isPlaying())
 											player.stop();
 										else {
-											if (LastFMApplication.getInstance().getLastStation() == null) {
+											Station lastStation = RecentStationsDao.getInstance().getLastStation();
+											if (lastStation == null) {
 												LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
 												updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
 											} else {
-												LastFMApplication.getInstance().playRadioStation(ctx, LastFMApplication.getInstance().getLastStation().getUrl(),
+												LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
 														false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), LastFMApplication.getInstance().getLastStation().getName(),
+												updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
 														true);
 											}
 										}
@@ -754,7 +757,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					updateAppWidget_playing(ctx, trackName, artistName, position, duration, buffering, loved);
 			} else if (!mediaPlayerPlaying) {
 				if (stationName == null || stationName.length() < 1) {
-					Station station = LastFMApplication.getInstance().getLastStation();
+					Station station = RecentStationsDao.getInstance().getLastStation();
 					if (station != null)
 						stationName = station.getName();
 				}

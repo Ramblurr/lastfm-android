@@ -58,8 +58,6 @@ import fm.last.util.UrlUtil;
 
 public class LastFm extends Activity {
 	public static final String PREFS = "LoginPrefs";
-	public static final String DB_NAME = "lastfm";
-	public static final String DB_TABLE_RECENTSTATIONS = "t_recentstations";
 	private boolean mLoginShown;
 	private EditText mPassField;
 	private EditText mUserField;

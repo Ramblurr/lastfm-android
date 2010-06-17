@@ -34,14 +34,14 @@ public class ScrobblerQueueEntry implements Serializable {
 	public String artist = "";
 	public String title = "";
 	public String album = "";
-	public Long startTime = 0L;
-	public Long duration = 0L;
+	public long startTime = 0L;
+	public long duration = 0L;
 	public String trackAuth = "";
 	public String rating = "";
-	public Boolean postedNowPlaying = false;
-	public Boolean loved = false;
+	public boolean postedNowPlaying = false;
+	public boolean loved = false;
 
 	public RadioTrack toRadioTrack() {
-		return new RadioTrack("", title, "", album, artist, duration.toString(), "", trackAuth, loved);
+		return new RadioTrack("", title, "", album, artist, String.valueOf(duration), "", trackAuth, loved);
 	}
 }

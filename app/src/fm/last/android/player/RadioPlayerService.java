@@ -70,6 +70,7 @@ import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
+import fm.last.android.db.RecentStationsDao;
 import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.UserTask;
 import fm.last.api.LastFmServer;
@@ -932,7 +933,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			refreshPlaylist();
 			currentStationURL = url;
 			notifyChange(STATION_CHANGED);
-			LastFMApplication.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
+			RecentStationsDao.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
             registerMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
             		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 		} else {

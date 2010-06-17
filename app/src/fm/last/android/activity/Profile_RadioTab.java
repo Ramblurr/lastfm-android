@@ -21,6 +21,7 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -47,6 +48,7 @@ import fm.last.android.R;
 import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.SeparatedListAdapter;
+import fm.last.android.db.RecentStationsDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.widget.ProfileBubble;
@@ -247,7 +249,7 @@ public class Profile_RadioTab extends ListActivity {
 		if (!isAuthenticatedUser)
 			return;
 		mMyRecentAdapter.resetList();
-		Station[] stations = LastFMApplication.getInstance().getRecentStations();
+		List<Station> stations = RecentStationsDao.getInstance().getRecentStations();
 		if (stations != null) {
 			for (Station station : stations) {
 				String name = station.getName();
