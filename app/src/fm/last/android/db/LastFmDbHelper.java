@@ -15,7 +15,7 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 	 * The DB's version number.
 	 * This needs to be increased on schema changes.
 	 */
-	public static final int DB_VERSION = 3;
+	public static final int DB_VERSION = 4;
 	
 	public LastFmDbHelper() 
 	{
@@ -44,7 +44,8 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 				" StartTime INTEGER NOT NULL," +
 				" Duration INTEGER NOT NULL," +
 				" PostedNowPlaying INTEGER NOT NULL," +
-				" Loved INTEGER NOT NULL)");
+				" Loved INTEGER NOT NULL," +
+				" CurrentTrack INTEGER NOT NULL)");
 
 	}
 

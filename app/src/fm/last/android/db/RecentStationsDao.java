@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import fm.last.api.Station;
 
 public class RecentStationsDao extends AbstractDao<Station>

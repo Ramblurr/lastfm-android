@@ -67,7 +67,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
 
 				try {
-					List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadAll();
+					List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadQueue();
 					if (entries!=null) {
 						queue.addAll(entries);
 					}

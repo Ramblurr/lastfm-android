@@ -40,6 +40,7 @@ public class ScrobblerQueueEntry implements Serializable {
 	public String rating = "";
 	public boolean postedNowPlaying = false;
 	public boolean loved = false;
+	public boolean currentTrack = false;
 
 	public RadioTrack toRadioTrack() {
 		return new RadioTrack("", title, "", album, artist, String.valueOf(duration), "", trackAuth, loved);

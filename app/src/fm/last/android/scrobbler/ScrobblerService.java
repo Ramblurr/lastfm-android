@@ -137,19 +137,14 @@ public class ScrobblerService extends Service {
 		}
 
 		try {
-			if (getFileStreamPath("currentTrack.dat").exists()) {
-				FileInputStream fileStream = openFileInput("currentTrack.dat");
-				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
-				Object obj = objectStream.readObject();
-				if (obj != null && obj instanceof ScrobblerQueueEntry) {
-					mCurrentTrack = (ScrobblerQueueEntry) obj;
-					if (mCurrentTrack.startTime > System.currentTimeMillis()) {
-						mCurrentTrack = null;
-						logger.info("Serialized start time is in the future! ignoring");
-					}
+			ScrobblerQueueEntry entry = ScrobblerQueueDao.getInstance().loadCurrentTrack();
+			if (entry != null) {
+				if (entry.startTime > System.currentTimeMillis()) {
+					logger.info("Serialized start time is in the future! ignoring");
 				}
-				objectStream.close();
-				fileStream.close();
+				else {
+					mCurrentTrack = entry;
+				}
 			}
 		} catch (Exception e) {
 			mCurrentTrack = null;
@@ -158,7 +153,7 @@ public class ScrobblerService extends Service {
 		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(1000);
 
 		try {
-			List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadAll();
+			List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadQueue();
 			if (entries!=null) {
 				mQueue.addAll(entries);
 				logger.info("Loaded " + mQueue.size() + " queued tracks");
@@ -182,28 +177,14 @@ public class ScrobblerService extends Service {
 				logger.info("Scrobbles are pending, will retry in an hour");
 				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
 			}
-			if (getFileStreamPath("currentTrack.dat").exists())
-				deleteFile("currentTrack.dat");
-			if (mCurrentTrack != null) {
-				FileOutputStream filestream = openFileOutput("currentTrack.dat", 0);
-				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
-				objectstream.writeObject(mCurrentTrack);
-				objectstream.close();
-				filestream.close();
-			}
+			ScrobblerQueueDao.getInstance().saveCurrentTrack(mCurrentTrack);
 		} catch (Exception e) {
-			if (getFileStreamPath("currentTrack.dat").exists())
-				deleteFile("currentTrack.dat");
 			logger.severe("Unable to save current track state");
 			e.printStackTrace();
 		}
 
 		try {
-			ScrobblerQueueDao.getInstance().clearTable();			
-			if (mQueue.size() > 0) {
-				logger.info("Writing " + mQueue.size() + " queued tracks");
-				ScrobblerQueueDao.getInstance().save(mQueue);
-			}
+			ScrobblerQueueDao.getInstance().saveQueue(mQueue);
 		} 
 		catch (Exception e) {
 			logger.severe("Unable to save queue state");
@@ -230,8 +211,8 @@ public class ScrobblerService extends Service {
 			}
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-				try {
-				mQueue.add(mCurrentTrack);
+				try {					
+					mQueue.add(mCurrentTrack);
 				} catch (IllegalStateException e) {
 					logger.severe("Scrobble queue is full!  Have " + mQueue.size() + " scrobbles!");
 				}
