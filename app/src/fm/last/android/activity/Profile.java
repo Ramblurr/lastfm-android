@@ -87,10 +87,21 @@ public class Profile extends ActivityGroup {
 			}
 		}
 		
-		if(getIntent().getData() != null) {
-			if(getIntent().getData().getScheme().equals("http")) {
-				List<String> segments = getIntent().getData().getPathSegments();
-				username = Uri.decode(segments.get(segments.size() - 1));
+		Intent intent = getIntent();
+		if (intent.getData() != null) {
+			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
+				LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), false);
+			} else if(getIntent().getData().getScheme().equals("http")) {  //The search provider sent us an http:// URL, forward it to the metadata screen
+				Intent i = null;
+				if(intent.getData().getPath().contains("/user/")) {
+					List<String> segments = getIntent().getData().getPathSegments();
+					username = Uri.decode(segments.get(segments.size() - 1));
+				} else {
+					i = new Intent(this, Metadata.class);
+					i.setData(intent.getData());
+					startActivity(i);
+					finish();
+				}
 			} else {
 				Cursor cursor = managedQuery(getIntent().getData(), null, null, null, null);
 				if(cursor.moveToNext()) {

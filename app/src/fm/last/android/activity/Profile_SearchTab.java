@@ -21,8 +21,6 @@
 package fm.last.android.activity;
 
 import android.app.Activity;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -31,7 +29,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.EditText;
-import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 
 public class Profile_SearchTab extends Activity implements OnClickListener, OnKeyListener {
@@ -42,23 +39,6 @@ public class Profile_SearchTab extends Activity implements OnClickListener, OnKe
 		super.onCreate(icicle);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.search);
-		
-		Intent intent = getIntent();
-		if (intent != null && intent.getData() != null) {
-			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
-				LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), false);
-			} else {  //The search provider sent us an http:// URL, forward it to the metadata screen
-				Intent i = null;
-				if(intent.getData().getPath().contains("/user/")) {
-					i = new Intent(this, Profile.class);
-				} else {
-					i = new Intent(this, Metadata.class);
-				}
-				i.setData(intent.getData());
-				startActivity(i);
-				finish();
-			}
-		}
 
 		mSearchText = (EditText)findViewById(R.id.station_editbox);
 		mSearchText.setOnClickListener(this);
@@ -88,7 +68,7 @@ public class Profile_SearchTab extends Activity implements OnClickListener, OnKe
 	
 	@Override
 	public boolean onSearchRequested() {
-	     startSearch(mSearchText.getText().toString(), false, null, false);
+	     getParent().startSearch(mSearchText.getText().toString(), false, null, false);
 	     mSearchText.setText("");
 	     return true;
 	 }
