@@ -21,7 +21,8 @@ import fm.last.api.WSError;
 public class SearchProvider extends ContentProvider {
 
     public static String AUTHORITY = "lastfm";
-
+    public static Uri SUGGESTIONS_URI = Uri.parse("content://lastfm/search_suggest_query/");
+    
     private static final int SEARCH_SUGGEST = 0;
     private static final int SHORTCUT_REFRESH = 1;
     private static final UriMatcher sURIMatcher = buildUriMatcher();
@@ -36,7 +37,8 @@ public class SearchProvider extends ContentProvider {
             SearchManager.SUGGEST_COLUMN_TEXT_1,
             SearchManager.SUGGEST_COLUMN_TEXT_2,
             SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-            SearchManager.SUGGEST_COLUMN_ICON_2
+            SearchManager.SUGGEST_COLUMN_ICON_2,
+            "_imageURL"
             };
 
 
@@ -105,31 +107,27 @@ public class SearchProvider extends ContentProvider {
 		                    processedQuery,           // text1
 		                    LastFMApplication.getInstance().getString(R.string.action_viewprofile),     // text2
 		                    Uri.parse("http://www.last.fm/user/"+processedQuery),           // intent_data (included when clicking on item)
-		                    -1
+		                    -1,
+		                    u.getImages().length == 0 ? "" : u.getImages()[0].getUrl()
 		            });
 		        }
 	        } catch (WSError e) {
 	        }
 
 	        try {
-		        Artist a = server.getArtistInfo(processedQuery, "", "");
-		        if(a != null) {
+		        Artist[] artists;
+		        artists = server.searchForArtist(processedQuery);
+	
+		        for (int i = 0; i < (artists.length < 6 ? artists.length : 6); i++) {
 		            cursor.addRow(new Object[] {
 		                    id++,                  // _id
-		                    processedQuery,           // text1
+		                    artists[i].getName(),           // text1
 		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
 		                    Uri.parse("http://www.last.fm/music/"+processedQuery),           // intent_data (included when clicking on item)
-		                    -1
+		                    -1,
+		                    artists[i].getImages().length == 0 ? "" : artists[i].getImages()[0].getUrl()
 		            });
-	
-		            cursor.addRow(new Object[] {
-		                    id++,                  // _id
-		                    LastFMApplication.getInstance().getString(R.string.newstation_artistradio,a.getName()),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_similar),     // text2
-		                    Uri.parse("lastfm://artist/"+a.getName()+"/similarartists"),           // intent_data (included when clicking on item)
-		                    R.drawable.radio_icon
-		            });
-		        }
+				}
 	        } catch (WSError e) {
 	        }
 
@@ -144,7 +142,8 @@ public class SearchProvider extends ContentProvider {
 			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tags[i].getName()),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
 			                    Uri.parse("lastfm://globaltags/"+tags[i].getName()),           // intent_data (included when clicking on item)
-			                    R.drawable.radio_icon
+			                    R.drawable.radio_icon,
+			                    -1
 			            });
 					}
 				}

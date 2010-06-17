@@ -68,6 +68,7 @@ import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
 import fm.last.api.User;
+import fm.last.api.WSError;
 
 /**
  * @author Jono Cole <jono@last.fm>
@@ -347,6 +348,7 @@ public class Metadata extends Activity {
 				success = true;
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return success;
 		}
@@ -408,6 +410,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -457,6 +460,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -503,6 +507,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -563,6 +568,7 @@ public class Metadata extends Activity {
 
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 
 			if (!result) {
