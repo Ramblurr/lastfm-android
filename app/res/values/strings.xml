@@ -183,7 +183,6 @@
 
 	<!-- NewStation activity -->
 	<string name="newstation_search">Search</string>
-	<string name="newstation_hint">Artist, Tag, or Username</string>
 	<string name="newstation_searching">Searching...</string>
 	<string name="newstation_noresults">No results found</string>
 	<string name="newstation_artistradio">%s Radio</string>
