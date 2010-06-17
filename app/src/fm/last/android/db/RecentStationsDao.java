@@ -47,22 +47,13 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * Read the last added station.
 	 * @return the last station that has been added to the list.
 	 */
-	public Station getLastStation() {
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Station result = null;
-		Cursor c = null;
-		try {
-			c = db.rawQuery("SELECT * FROM " + DB_TABLE_RECENTSTATIONS + " ORDER BY Timestamp DESC LIMIT 4", null);
-			if (c.getCount() > 0) {
-				c.moveToFirst();
-				result = buildObject(c);
-			}
+	public Station getLastStation() 
+	{
+		List<Station> stations = loadWithQualification("ORDER BY Timestamp DESC LIMIT 4");
+		if (stations!=null && stations.size()>0) {
+			return stations.get(0);
 		}
-		finally {
-			c.close();
-			db.close();
-		}
-		return result;
+		return null;
 	}
 	
 	/**
