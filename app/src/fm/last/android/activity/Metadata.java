@@ -111,7 +111,10 @@ public class Metadata extends Activity {
 		if(getIntent().getData() != null) {
 			if(getIntent().getData().getScheme().equals("http")) {
 				List<String> segments = getIntent().getData().getPathSegments();
-				mArtistName = Uri.decode(segments.get(segments.size() - 1)).replace("+", " ");
+				
+				mArtistName = Uri.decode(segments.get(1)).replace("+", " ");
+				if(segments.size() > 2)
+					mTrackName = Uri.decode(segments.get(3)).replace("+", " ");
 			}
 		} 
 		else if(getIntent().getAction() != null) {
