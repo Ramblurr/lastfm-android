@@ -20,11 +20,7 @@
  ***************************************************************************/
 package fm.last.android.scrobbler;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -97,7 +93,7 @@ public class ScrobblerService extends Service {
 	private Lock mScrobblerLock = new ReentrantLock();
 	SubmitTracksTask mSubmissionTask = null;
 	NowPlayingTask mNowPlayingTask = null;
-	ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
+	//ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
 	ScrobblerQueueEntry mCurrentTrack = null;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -149,18 +145,6 @@ public class ScrobblerService extends Service {
 		} catch (Exception e) {
 			mCurrentTrack = null;
 		}
-
-		mQueue = new ArrayBlockingQueue<ScrobblerQueueEntry>(1000);
-
-		try {
-			List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadQueue();
-			if (entries!=null) {
-				mQueue.addAll(entries);
-				logger.info("Loaded " + mQueue.size() + " queued tracks");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -172,7 +156,7 @@ public class ScrobblerService extends Service {
 			PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 			am.cancel(alarmIntent); // cancel any pending alarm intents
-			if (mQueue.size() > 0) {
+			if (ScrobblerQueueDao.getInstance().getQueueSize() > 0) {
 				// schedule an alarm to wake the device and try again in an hour
 				logger.info("Scrobbles are pending, will retry in an hour");
 				am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 3600000, alarmIntent);
@@ -180,14 +164,6 @@ public class ScrobblerService extends Service {
 			ScrobblerQueueDao.getInstance().saveCurrentTrack(mCurrentTrack);
 		} catch (Exception e) {
 			logger.severe("Unable to save current track state");
-			e.printStackTrace();
-		}
-
-		try {
-			ScrobblerQueueDao.getInstance().saveQueue(mQueue);
-		} 
-		catch (Exception e) {
-			logger.severe("Unable to save queue state");
 			e.printStackTrace();
 		}
 	}
@@ -211,11 +187,12 @@ public class ScrobblerService extends Service {
 			}
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-				try {					
-					mQueue.add(mCurrentTrack);
-				} catch (IllegalStateException e) {
-					logger.severe("Scrobble queue is full!  Have " + mQueue.size() + " scrobbles!");
-				}
+				ScrobblerQueueDao.getInstance().addToQueue(mCurrentTrack);
+//				try {					
+//					mQueue.add(mCurrentTrack);
+//				} catch (IllegalStateException e) {
+//					logger.severe("Scrobble queue is full!  Have " + mQueue.size() + " scrobbles!");
+//				}
 			}
 			mCurrentTrack = null;
 		}
@@ -482,13 +459,14 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.rating = "B";
 			Toast.makeText(this, getString(R.string.scrobbler_trackbanned), Toast.LENGTH_SHORT).show();
 		}
-		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null && mNowPlayingTask == null)) {
+		if (intent.getAction().equals("fm.last.android.scrobbler.FLUSH") || mNowPlayingTask == null) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			if(ni != null) {
 				boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
 				if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI))) {
-					if (mQueue != null && mQueue.size() > 0 && mSubmissionTask == null) {
+					int queueSize = ScrobblerQueueDao.getInstance().getQueueSize();
+					if (queueSize > 0 && mSubmissionTask == null) {
 						mSubmissionTask = new SubmitTracksTask();
 						mSubmissionTask.execute(mScrobbler);
 					}
@@ -522,7 +500,7 @@ public class ScrobblerService extends Service {
 		@Override
 		public void onPreExecute() {
 			/* If we have any scrobbles in the queue, try to send them now */
-			if (mSubmissionTask == null && mQueue.size() > 0) {
+			if (mSubmissionTask == null && ScrobblerQueueDao.getInstance().getQueueSize() > 0) {
 				mSubmissionTask = new SubmitTracksTask();
 				mSubmissionTask.execute(mScrobbler);
 			}
@@ -573,12 +551,13 @@ public class ScrobblerService extends Service {
 		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
 			boolean success = false;
 			mScrobblerLock.lock();
-			logger.info("Going to submit " + mQueue.size() + " tracks");
+			logger.info("Going to submit " + ScrobblerQueueDao.getInstance().getQueueSize() + " tracks");
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
-			while (mQueue.size() > 0) {
+			
+			ScrobblerQueueEntry e = null;
+			while ((e = ScrobblerQueueDao.getInstance().nextQueueEntry()) != null) {
 				try {
 					success = false;
-					ScrobblerQueueEntry e = mQueue.peek();
 					if (e != null && e.title != null && e.artist != null && e.toRadioTrack() != null) {
 						if (e.rating.equals("L")) {
 							server.loveTrack(e.artist, e.title, mSession.getKey());
@@ -602,20 +581,16 @@ public class ScrobblerService extends Service {
 							}
 						}
 					}
-				} catch (NullPointerException e) { //Skip to the next track if we get an NPE
-					success = true;
-				} catch (Exception e) {
-					logger.severe("Unable to submit track: " + e.toString());
-					e.printStackTrace();
+				} 
+				catch (Exception ex) {
+					logger.severe("Unable to submit track: " + ex.toString());
+					ex.printStackTrace();
 					success = false;
 				}
 				if(success) {
-					try {
-						mQueue.take();
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				} else {
+					ScrobblerQueueDao.getInstance().removeFromQueue(e);
+				} 
+				else {
 					logger.severe("Scrobble submission aborted");
 					break;
 				}

@@ -351,7 +351,7 @@ public class LastFMApplication extends Application {
 				public void onServiceDisconnected(ComponentName comp) {
 				}
 			}, 0);
-			deleteDatabase(LastFmDbHelper.DB_NAME);
+			LastFmDbHelper.getInstance().clearDatabase();
 			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				AccountAuthenticatorService.removeLastfmAccount(this);
 			}

@@ -39,6 +39,34 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 		}
 	}
 	
+	public int getQueueSize()
+	{
+		return countWithQualification("WHERE CurrentTrack=0");
+	}
+	
+	
+	public void addToQueue(ScrobblerQueueEntry entry)
+	{
+		if (entry==null) return;
+		entry.currentTrack = false;
+		save(Collections.singleton(entry));
+	}
+	
+	public void removeFromQueue(ScrobblerQueueEntry entry)
+	{
+		if (entry==null) return;
+		removeWithQualification("WHERE StartTime="+entry.startTime+" AND CurrentTrack=0");
+	}
+	
+	public ScrobblerQueueEntry nextQueueEntry()
+	{
+		List<ScrobblerQueueEntry> queue = loadWithQualification("WHERE CurrentTrack=0 LIMIT 1");
+		if (queue!=null && queue.size()>0) {
+			return queue.get(0);
+		}
+		return null;
+	}
+	
 	/**
 	 * Load the queued entries excluding the current track.
 	 * @return list of queue entries.
@@ -46,20 +74,6 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	public List<ScrobblerQueueEntry> loadQueue()
 	{
 		return loadWithQualification("WHERE CurrentTrack=0");
-	}
-	
-	/**
-	 * Replace all queue entries.
-	 * @param queue a {@link Collection} of queue entries.
-	 */
-	public void saveQueue(Collection<ScrobblerQueueEntry> queue)
-	{
-		removeWithQualification("WHERE CurrentTrack=0");
-		for (ScrobblerQueueEntry entry : queue) {
-			if (entry==null) continue;
-			entry.currentTrack = false;
-		}
-		save(queue);
 	}
 	
 	/**

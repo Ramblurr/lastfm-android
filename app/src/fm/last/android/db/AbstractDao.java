@@ -18,7 +18,7 @@ public abstract class AbstractDao<T>
 	
 	protected AbstractDao() 
 	{
-		dbHelper = new LastFmDbHelper();
+		dbHelper = LastFmDbHelper.getInstance();
 	}
 	
 	protected final LastFmDbHelper dbHelper;
@@ -52,16 +52,18 @@ public abstract class AbstractDao<T>
 	 * @param qual an optional qualification
 	 * @return a list with the found objects
 	 */
-	public List<T> loadWithQualification(String qual)
+	protected List<T> loadWithQualification(String qual)
 	{
-		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		String query = "SELECT * FROM " + getTableName();
 		if (qual!=null) {
 			query += " " + qual;
 		}
 		log(Log.DEBUG, query);
+		SQLiteDatabase db = null;
+		Cursor c = null;
 		try {
-			Cursor c = db.rawQuery(query , null);
+			db = dbHelper.getReadableDatabase();
+			c = db.rawQuery(query , null);
 			List<T> result = new ArrayList<T>(c.getCount());
 			if (c.getCount() > 0) {
 				c.moveToFirst();				
@@ -74,6 +76,16 @@ public abstract class AbstractDao<T>
 			return result;
 		}
 		finally {
+			close(c,db);
+		}
+	}
+	
+	protected void close(Cursor c, SQLiteDatabase db)
+	{
+		if (c!=null) {
+			c.close();
+		}
+		if (db!=null) {
 			db.close();
 		}
 	}
@@ -93,9 +105,10 @@ public abstract class AbstractDao<T>
 	 */
 	public void save(Collection<T> objects)
 	{
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		SQLiteDatabase db = null;
 		ContentValues values = new ContentValues();
 		try {
+			db =  dbHelper.getWritableDatabase();;
 			for (T newObject : objects) {
 				if (newObject==null) continue;
 				values.clear();
@@ -105,7 +118,7 @@ public abstract class AbstractDao<T>
 			}
 		}		
 		finally {
-			db.close();
+			close(null,db);
 		}
 	}
 	
@@ -113,20 +126,45 @@ public abstract class AbstractDao<T>
 	 * Removes rows from the table.
 	 * @param qual optional qualification
 	 */
-	public void removeWithQualification(String qual)
-	{
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
+	protected void removeWithQualification(String qual)
+	{		
 		String query = "DELETE FROM " + getTableName();
 		if (qual!=null) {
 			query += " " + qual;
 		}
 		log(Log.DEBUG, query);
+		SQLiteDatabase db = null;
 		try {
+			db = dbHelper.getWritableDatabase();
 			db.execSQL(query);
 		}
 		finally {
-			db.close();
+			close(null,db);
 		}
+	}
+	
+	protected int countWithQualification(String qual)
+	{		
+		String query = "SELECT count(*) FROM " + getTableName();
+		if (qual!=null) {
+			query += " " + qual;
+		}
+		log(Log.DEBUG, query);
+		SQLiteDatabase db = null;
+		Cursor c = null;
+		try {
+			db = dbHelper.getWritableDatabase();
+			c = db.rawQuery(query,null);
+			if (c.moveToFirst()) {
+				int count = c.getInt(0);
+				log(Log.DEBUG, "Found "+count+" entries");
+				return count;
+			}
+		}
+		finally {
+			close(c,db);
+		}
+		return 0;
 	}
 	
 	/**

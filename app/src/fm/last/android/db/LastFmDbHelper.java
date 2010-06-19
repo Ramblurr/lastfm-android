@@ -15,9 +15,34 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 	 * The DB's version number.
 	 * This needs to be increased on schema changes.
 	 */
-	public static final int DB_VERSION = 4;
+	public static final int DB_VERSION = 5;
 	
-	public LastFmDbHelper() 
+	/**
+	 * Singleton instance of {@link ScrobblerQueueDao}.
+	 */
+	private static LastFmDbHelper instance = null;
+
+	/** 
+	 * @return the {@link ScrobblerQueueDao} singleton.
+	 */
+	public static LastFmDbHelper getInstance() 
+	{
+		if(instance != null) {
+			return instance;
+		} 
+		else {
+			return new LastFmDbHelper();
+		}
+	}
+	
+	public void clearDatabase()
+	{
+		ScrobblerQueueDao.getInstance().clearTable();
+		RecentStationsDao.getInstance().clearTable();
+	}
+
+	
+	private LastFmDbHelper() 
 	{
 		super(LastFMApplication.getInstance().getApplicationContext(), DB_NAME, null, DB_VERSION);
 	}
@@ -35,13 +60,15 @@ public class LastFmDbHelper extends SQLiteOpenHelper
 				"Name VARCHAR NOT NULL, " +
 				"Timestamp INTEGER NOT NULL)");
 		
+		// create table for scrobbling queue
+		// the start time is used as PK because there can be only one track at a time
 		db.execSQL("CREATE TABLE IF NOT EXISTS " + ScrobblerQueueDao.DB_TABLE_SCROBBLERQUEUE +
 				" (Artist VARCHAR NOT NULL," +
 				" Title VARCHAR NOT NULL," +
 				" Album VARCHAR NOT NULL," +
 				" TrackAuth VARCHAR NOT NULL," +
 				" Rating VARCHAR NOT NULL," +
-				" StartTime INTEGER NOT NULL," +
+				" StartTime INTEGER NOT NULL PRIMARY KEY," +
 				" Duration INTEGER NOT NULL," +
 				" PostedNowPlaying INTEGER NOT NULL," +
 				" Loved INTEGER NOT NULL," +
