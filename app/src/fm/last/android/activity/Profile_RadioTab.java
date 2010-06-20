@@ -89,8 +89,6 @@ public class Profile_RadioTab extends ListActivity {
 
 		new LoadUserTask().execute((Void) null);
 		SetupMyStations();
-		SetupRecentStations();
-		RebuildMainMenu();
 
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
