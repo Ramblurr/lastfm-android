@@ -68,6 +68,7 @@ import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
 import fm.last.api.User;
+import fm.last.api.WSError;
 
 /**
  * @author Jono Cole <jono@last.fm>
@@ -110,7 +111,10 @@ public class Metadata extends Activity {
 		if(getIntent().getData() != null) {
 			if(getIntent().getData().getScheme().equals("http")) {
 				List<String> segments = getIntent().getData().getPathSegments();
-				mArtistName = Uri.decode(segments.get(segments.size() - 1)).replace("+", " ");
+				
+				mArtistName = Uri.decode(segments.get(1)).replace("+", " ");
+				if(segments.size() > 2)
+					mTrackName = Uri.decode(segments.get(3)).replace("+", " ");
 			}
 		} 
 		else if(getIntent().getAction() != null) {
@@ -347,6 +351,7 @@ public class Metadata extends Activity {
 				success = true;
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return success;
 		}
@@ -408,6 +413,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -457,6 +463,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -503,6 +510,7 @@ public class Metadata extends Activity {
 				return iconifiedEntries;
 			} catch (Exception e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 			return null;
 		}
@@ -563,6 +571,7 @@ public class Metadata extends Activity {
 
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (WSError e) {
 			}
 
 			if (!result) {

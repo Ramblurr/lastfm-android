@@ -11,6 +11,7 @@
 		android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:textSize="18sp"
+		android:hint="@string/action_search"
 		android:layout_alignParentLeft="true"  android:layout_alignLeft="@+id/station_search"
 		android:layout_weight="1" android:singleLine="true" 
 		android:layout_marginLeft="7dip"
@@ -37,16 +38,13 @@
 			android:src="@drawable/station_starter_logo"
 			android:layout_gravity="center"
 			android:layout_marginTop="80dip"/>
-		<TextView android:id="@+id/search_hint" 
-			android:layout_height="fill_parent" 
-			android:gravity="center"
-			android:text="@string/newstation_hint_artist" 
-			android:textSize="16sp" 
-			android:textStyle="bold" 
-			android:layout_width="fill_parent" 
-			android:layout_marginTop="32dip"
-			android:paddingLeft="12dip"
-			android:paddingRight="12dip"
-			android:textColor="#494848" />
 	</LinearLayout>
+	<ListView android:id="@android:id/list" android:layout_width="fill_parent"
+		android:layout_below="@+id/SearchBar"
+		android:divider="#d9d7d7"
+		android:listSelector="#00000000"
+		android:visibility="gone"
+		android:background="#fff"
+		android:layout_height="fill_parent">
+	</ListView>
 </RelativeLayout>

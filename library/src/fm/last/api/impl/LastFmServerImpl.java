@@ -123,6 +123,14 @@ final class LastFmServerImpl implements LastFmServer {
 		return TagFunctions.searchForTag(baseUrl, params);
 	}
 
+	public Track[] searchForTrack(String track) throws IOException, WSError {
+		Map<String, String> params = createParams("track.search");
+		if (track != null) {
+			params.put("track", track);
+		}
+		return TrackFunctions.searchForTrack(baseUrl, params);
+	}
+
 	public Friends getFriends(String user, String recenttracks, String limit) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getFriends");
 		if (user != null) {

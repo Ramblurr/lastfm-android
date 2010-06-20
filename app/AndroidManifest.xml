@@ -62,18 +62,17 @@
 				<data android:scheme="http" android:host="www.lastfm.com.tr" android:pathPrefix="/user/"/>
 				<data android:scheme="http" android:host="cn.last.fm" android:pathPrefix="/user/"/>
 			</intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                    android:resource="@xml/searchable"/>
 		</activity>
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
 		<activity android:name=".activity.Profile_EventsTab"/>
 		<activity android:name=".activity.Profile_SearchTab">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <meta-data android:name="android.app.searchable"
-                    android:resource="@xml/searchable"/>
 		</activity>
         <provider android:name=".SearchProvider"
                 android:authorities="lastfm"

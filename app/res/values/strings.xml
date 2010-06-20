@@ -182,25 +182,12 @@
 	<string name="metadata_listeners">listeners</string>
 
 	<!-- NewStation activity -->
-	<string name="newstation_label">Last.fm: Create a New Station</string>
 	<string name="newstation_search">Search</string>
-	<string name="newstation_artist">Artist</string>
-	<string name="newstation_artistsample">%s, %s, and %s</string>
-	<string name="newstation_artistradio">%s Radio</string>
-	<string name="newstation_tag">Tag</string>
-	<string name="newstation_tagradio">%s Tag Radio</string>
-	<string name="newstation_user">User</string>
-	<string name="newstation_edithint_artist">eg. Nirvana</string>
-	<string name="newstation_hint_artist">To start listening,\n type in an artist you like.</string>
-	<string name="newstation_edithint_tag">eg. Rock</string>
-	<string name="newstation_hint_tag">Type in a tag to get started.</string>
-	<string name="newstation_edithint_user">eg. Last.hq</string>
-	<string name="newstation_hint_user">Type in a username\n to get started.</string>
 	<string name="newstation_searching">Searching...</string>
-	<string name="newstation_noartist">No artists found</string>
-	<string name="newstation_nousers">No users found</string>
-	<string name="newstation_notags">No tags found</string>
-
+	<string name="newstation_noresults">No results found</string>
+	<string name="newstation_artistradio">%s Radio</string>
+	<string name="newstation_tagradio">%s Tag Radio</string>
+	
     <!-- Event activity -->
     <string name="event_label">Last.fm: Event</string>
 	<string name="event_showmap">Show Map</string>

@@ -39,6 +39,8 @@ public interface LastFmServer {
 
 	public Tag[] searchForTag(String Tag) throws IOException;
 
+	public Track[] searchForTrack(String track) throws IOException;
+
 	/**
 	 * See http://www.last.fm/api/show?service=263
 	 * 
