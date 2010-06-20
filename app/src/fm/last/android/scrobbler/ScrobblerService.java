@@ -21,8 +21,6 @@
 package fm.last.android.scrobbler;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.FileHandler;
@@ -93,7 +91,6 @@ public class ScrobblerService extends Service {
 	private Lock mScrobblerLock = new ReentrantLock();
 	SubmitTracksTask mSubmissionTask = null;
 	NowPlayingTask mNowPlayingTask = null;
-	//ArrayBlockingQueue<ScrobblerQueueEntry> mQueue;
 	ScrobblerQueueEntry mCurrentTrack = null;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -187,12 +184,10 @@ public class ScrobblerService extends Service {
 			}
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
-				ScrobblerQueueDao.getInstance().addToQueue(mCurrentTrack);
-//				try {					
-//					mQueue.add(mCurrentTrack);
-//				} catch (IllegalStateException e) {
-//					logger.severe("Scrobble queue is full!  Have " + mQueue.size() + " scrobbles!");
-//				}
+				boolean queued = ScrobblerQueueDao.getInstance().addToQueue(mCurrentTrack);
+				if (!queued) {			
+					logger.severe("Scrobble queue is full!  Have " + ScrobblerQueueDao.MAX_QUEUE_SIZE + " scrobbles!");
+				}
 			}
 			mCurrentTrack = null;
 		}

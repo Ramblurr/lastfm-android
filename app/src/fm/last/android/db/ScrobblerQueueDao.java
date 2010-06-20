@@ -21,6 +21,11 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	public static final String DB_TABLE_SCROBBLERQUEUE = "t_scrobblerqueue";
 	
 	/**
+	 * The maximum number of entries in the queue.
+	 */
+	public static final int MAX_QUEUE_SIZE = 1000;
+	
+	/**
 	 * Singleton instance of {@link ScrobblerQueueDao}.
 	 */
 	private static ScrobblerQueueDao instance = null;
@@ -38,25 +43,46 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 		}
 	}
 	
+	/**
+	 * @return the current number of queue entries.
+	 */
 	public int getQueueSize()
 	{
 		return countWithQualification("WHERE CurrentTrack=0");
 	}
 	
-	
-	public void addToQueue(ScrobblerQueueEntry entry)
+	/**
+	 * Add e new entry to the queue.
+	 * @param entry the {@link ScrobblerQueueEntry} to be added.
+	 * @return 	<code>true</code> if the entry has been added
+	 * 			<code>false</code> if the queue is full.
+	 */
+	public boolean addToQueue(ScrobblerQueueEntry entry)
 	{
-		if (entry==null) return;
+		if (entry==null) return true;
+		int currentSize = getQueueSize();
+		if (currentSize >= MAX_QUEUE_SIZE) {
+			return false;
+		}
 		entry.currentTrack = false;
 		save(Collections.singleton(entry));
+		return true;
 	}
 	
+	/**
+	 * Remove an entry from the queue.
+	 * @param entry the {@link ScrobblerQueueEntry} to be removed.
+	 */
 	public void removeFromQueue(ScrobblerQueueEntry entry)
 	{
 		if (entry==null) return;
 		removeWithQualification("WHERE StartTime="+entry.startTime+" AND CurrentTrack=0");
 	}
 	
+	/**
+	 * Get an entry from the queue.
+	 * @return a {@link ScrobblerQueueEntry} from the queue.
+	 */
 	public ScrobblerQueueEntry nextQueueEntry()
 	{
 		List<ScrobblerQueueEntry> queue = loadWithQualification("WHERE CurrentTrack=0 LIMIT 1");

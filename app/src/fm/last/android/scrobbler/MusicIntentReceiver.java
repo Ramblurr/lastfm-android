@@ -20,11 +20,6 @@
  ***************************************************************************/
 package fm.last.android.scrobbler;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -64,18 +59,9 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				return;
 			}
 			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-				ArrayBlockingQueue<ScrobblerQueueEntry> queue = new ArrayBlockingQueue<ScrobblerQueueEntry>(200);
-
-				try {
-					List<ScrobblerQueueEntry> entries = ScrobblerQueueDao.getInstance().loadQueue();
-					if (entries!=null) {
-						queue.addAll(entries);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				if (queue.size() < 1)
+				if (ScrobblerQueueDao.getInstance().getQueueSize()<1) {
 					return;
+				}
 			}
 			final Intent out = new Intent(context, ScrobblerService.class);
 			out.setAction(intent.getAction());
