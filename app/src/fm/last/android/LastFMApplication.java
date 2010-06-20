@@ -20,12 +20,8 @@
  ***************************************************************************/
 package fm.last.android;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import android.app.AlertDialog;
@@ -51,14 +47,11 @@ import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import fm.last.android.activity.Player;
 import fm.last.android.db.LastFmDbHelper;
-import fm.last.android.db.RecentStationsDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.api.AudioscrobblerService;
-import fm.last.api.LastFmServer;
 import fm.last.api.Session;
-import fm.last.api.Station;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
@@ -203,33 +196,6 @@ public class LastFMApplication extends Application {
 		}
 	}
 
-
-
-
-	public void fetchRecentStations() {
-		LastFmServer server = AndroidLastFmServerFactory.getServer();
-
-		// Is it worth it?
-		if (session != null) {
-			try {
-				// Let me work it
-				Station stations[] = server.getUserRecentStations(session.getName(), session.getKey());
-				if (stations != null && stations.length > 0) {
-					// I put my thing down, flip it, and reverse it
-					List<Station> list = Arrays.asList(stations);
-					Collections.reverse(list);
-					stations = (Station[]) list.toArray();
-					RecentStationsDao.getInstance().clearTable();
-					for (Station station : stations) {
-						RecentStationsDao.getInstance().appendRecentStation(station.getUrl(), station.getName());
-					}
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
 
 	@Override
 	public void onTerminate() {

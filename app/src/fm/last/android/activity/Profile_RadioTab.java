@@ -21,6 +21,8 @@
 package fm.last.android.activity;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -31,28 +33,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.TypedValue;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
-import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.db.RecentStationsDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
-import fm.last.android.widget.ProfileBubble;
-import fm.last.android.widget.QuickContactProfileBubble;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
@@ -95,6 +91,32 @@ public class Profile_RadioTab extends ListActivity {
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction("fm.last.android.ERROR");
 	}
+	
+	private void fetchRecentStations() {
+		LastFmServer server = AndroidLastFmServerFactory.getServer();
+
+		Session session = LastFMApplication.getInstance().session;
+		// Is it worth it?
+		if (session != null) {
+			try {
+				// Let me work it
+				Station stations[] = server.getUserRecentStations(session.getName(), session.getKey());
+				if (stations != null && stations.length > 0) {
+					// I put my thing down, flip it, and reverse it
+					List<Station> list = Arrays.asList(stations);
+					Collections.reverse(list);
+					stations = (Station[]) list.toArray();
+					RecentStationsDao.getInstance().clearTable();
+					for (Station station : stations) {
+						RecentStationsDao.getInstance().appendRecentStation(station.getUrl(), station.getName());
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private class LoadUserTask extends AsyncTask<Void, Void, Boolean> {
 		Tasteometer tasteometer;
@@ -109,7 +131,7 @@ public class Profile_RadioTab extends ListActivity {
 			RadioPlayList[] playlists;
 			boolean success = false;
 			Session session = LastFMApplication.getInstance().session;
-			LastFMApplication.getInstance().fetchRecentStations();
+			fetchRecentStations();
 
 			// Check our subscriber status
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
