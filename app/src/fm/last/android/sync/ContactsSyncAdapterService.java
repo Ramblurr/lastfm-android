@@ -409,7 +409,7 @@ public class ContactsSyncAdapterService extends Service {
 					e.printStackTrace();
 				}
 				try {
-					if (entry.taste_timestamp == null || System.currentTimeMillis() > (entry.taste_timestamp + 2628000000L)) {
+					if (!account.name.equals(username) && (entry.taste_timestamp == null || System.currentTimeMillis() > (entry.taste_timestamp + 2628000000L))) {
 						Tasteometer taste;
 						taste = server.tasteometerCompare(account.name, username, 3);
 						updateTasteometer(operationList, entry.raw_id, username, taste);
