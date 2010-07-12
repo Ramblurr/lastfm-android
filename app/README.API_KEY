@@ -9,4 +9,5 @@ package fm.last.android;
 public class PrivateAPIKey {
 	public static final String KEY = "put your API key here";
 	public static final String SECRET = "put your API secret here";
+	public static final String ANALYTICS_ID = ""; //leave this empty, or provide your own Google Analytics ID
 }
