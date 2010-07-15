@@ -41,6 +41,34 @@ public class RadioFunctions {
 	private RadioFunctions() {
 	}
 
+	public static Station searchForStation(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String query = UrlUtil.buildQuery(params);
+		String response = UrlUtil.doPost(new URL(baseUrl), query);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
+			Node stationsNode = XMLUtil.findNamedElementNode(lfmNode, "stations");
+			Node stationNode = XMLUtil.findNamedElementNode(stationsNode, "station");
+			StationBuilder sb = new StationBuilder();
+			return sb.build(stationNode);
+		}
+	}
+
 	public static Station tuneToStation(String baseUrl, Map<String, String> params) throws IOException, WSError {
 		String query = UrlUtil.buildQuery(params);
 		String response = UrlUtil.doPost(new URL(baseUrl), query);

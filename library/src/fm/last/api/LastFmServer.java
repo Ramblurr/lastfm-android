@@ -339,4 +339,6 @@ public interface LastFmServer {
 	public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException;
 
 	public Station[] getUserRecentStations(String user, String sk) throws IOException;
+	
+	public Station searchForStation(String query) throws IOException;
 }

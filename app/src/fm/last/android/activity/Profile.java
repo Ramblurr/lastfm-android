@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.List;
 
 import android.app.ActivityGroup;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -134,10 +135,11 @@ public class Profile extends ActivityGroup {
 		Intent eventsTabIntent = new Intent(this, Profile_EventsTab.class);
 		eventsTabIntent.putExtra("user", username);
 		
+		Intent searchTabIntent = new Intent(this, Profile_SearchTab.class);
+		if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null)
+			searchTabIntent.putExtra(SearchManager.QUERY, getIntent().getStringExtra(SearchManager.QUERY));
+
 		if (isAuthenticatedUser) {
-			mTabHost.addTab(mTabHost.newTabSpec("search")
-	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(R.drawable.ic_tab_profile))
-	                .setContent(new Intent(this, Profile_SearchTab.class)));
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.ic_tab_profile))
 	                .setContent(chartsTabIntent));
@@ -147,6 +149,12 @@ public class Profile extends ActivityGroup {
 			mTabHost.addTab(mTabHost.newTabSpec("events")
 	                .setIndicator(getString(R.string.profile_events), getResources().getDrawable(R.drawable.ic_tab_events))
 	                .setContent(eventsTabIntent));
+			mTabHost.addTab(mTabHost.newTabSpec("search")
+	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(android.R.drawable.ic_menu_search))
+	                .setContent(searchTabIntent));
+			if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null) {
+				mTabHost.setCurrentTabByTag("search");
+			}
 		} else {
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_userprofile, username), getResources().getDrawable(R.drawable.ic_tab_profile))

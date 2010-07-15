@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/station_layout"
+<RelativeLayout
 	android:layout_width="fill_parent" android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
 	<LinearLayout android:id="@+id/SearchBar" 
@@ -18,18 +18,16 @@
         android:layout_marginBottom="3dip"
         android:layout_marginTop="4dip"/>	
         
-	<Button android:id="@+id/search"
-		android:text="@string/newstation_search"
-		android:textColor="#fff" android:gravity="center"
+	<ImageButton 
+		android:id="@+id/search"
 		android:layout_height="fill_parent" android:layout_width="wrap_content"
 		android:layout_marginLeft="8dip"
 		android:layout_marginRight="8dip"
 		android:layout_marginBottom="9dip"
 		android:layout_marginTop="7dip"
-		android:paddingLeft="20dip"
-		android:paddingRight="20dip"
-		android:background="@drawable/black_button"/>
-	</LinearLayout>
+		android:background="@drawable/black_button"
+		android:src="@*android:drawable/ic_btn_speak_now"/>
+ 	</LinearLayout>
 	
 	<LinearLayout android:layout_below="@id/SearchBar" android:layout_height="fill_parent" android:layout_width="fill_parent" android:orientation="vertical" android:background="#ebebeb">
 		<ImageView 

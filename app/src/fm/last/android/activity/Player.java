@@ -20,10 +20,12 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
+import java.io.IOException;
 import java.util.Formatter;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -63,6 +65,7 @@ import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
 import fm.last.api.LastFmServer;
+import fm.last.api.Station;
 import fm.last.api.WSError;
 
 public class Player extends Activity {
@@ -90,6 +93,8 @@ public class Player extends Activity {
 
 	private static final int REFRESH = 1;
 
+	private boolean tuning = false;
+	
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
 	private IntentFilter mIntentFilter;
@@ -134,19 +139,32 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_STATE_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
+		mIntentFilter.addAction("fm.last.android.ERROR");
 
 		Intent intent = getIntent();
-		if (intent != null && intent.getData() != null) {
-			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
+		if (intent != null) {
+			if(intent.getAction() != null && intent.getAction().equals("android.media.action.MEDIA_PLAY_FROM_SEARCH")) {
+				String query = intent.getStringExtra(SearchManager.QUERY);
+				try {
+					Station s = mServer.searchForStation(query);
+					if(s != null) {
+						LastFMApplication.getInstance().playRadioStation(Player.this, s.getUrl(), false);
+						tuning = true;
+					}
+				} catch (NullPointerException e) {
+					Intent i = new Intent(this, Profile.class);
+					i.putExtra(SearchManager.QUERY, query);
+					startActivity(i);
+					finish();
+					return;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else if(intent.getData() != null && intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
 				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
-			} else {  //The search provider sent us an http:// URL, forward it along...
-				Intent i = new Intent(Intent.ACTION_VIEW);
-				i.setData(intent.getData());
-				startActivity(i);
-				finish();
+				tuning = true;
 			}
 		}
-
 		if (icicle != null) {
 			mCachedArtist = icicle.getString("artist");
 			mCachedTrack = icicle.getString("track");
@@ -317,30 +335,32 @@ public class Player extends Activity {
 		} catch (SQLiteException e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
-		bindService(new Intent(Player.this,
-				fm.last.android.player.RadioPlayerService.class),
-				new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp,
-							IBinder binder) {
-						IRadioPlayer player = IRadioPlayer.Stub
-								.asInterface(binder);
-						try {
-							if (!player.isPlaying()) {
-								Intent i = new Intent(Player.this, Profile.class);
-								startActivity(i);
-								finish();
+
+		if(!tuning) {
+			bindService(new Intent(Player.this,
+					fm.last.android.player.RadioPlayerService.class),
+					new ServiceConnection() {
+						public void onServiceConnected(ComponentName comp,
+								IBinder binder) {
+							IRadioPlayer player = IRadioPlayer.Stub
+									.asInterface(binder);
+							try {
+								if (!player.isPlaying()) {
+									Intent i = new Intent(Player.this, Profile.class);
+									startActivity(i);
+									finish();
+								}
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							unbindService(this);
 						}
-						unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, 0);
-
+	
+						public void onServiceDisconnected(ComponentName comp) {
+						}
+					}, 0);
+		}
 	}
 
 	@Override
@@ -546,7 +566,7 @@ public class Player extends Activity {
 				// FIXME: this *should* be handled by the metadata activity now
 				// if(mDetailFlipper.getDisplayedChild() == 1)
 				// mDetailFlipper.showPrevious();
-			} else if (action.equals(RadioPlayerService.PLAYBACK_ERROR)) {
+			} else if (action.equals(RadioPlayerService.PLAYBACK_ERROR) || action.equals("fm.last.android.ERROR")) {
 				// TODO add a skip counter and try to skip 3 times before
 				// display an error message
 				if (mTuningDialog != null) {

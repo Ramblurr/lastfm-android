@@ -518,6 +518,12 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserRecentStations(baseUrl, params);
 	}
 
+	public Station searchForStation(String station) throws IOException {
+		Map<String, String> params = createParams("radio.search");
+		params.put("name", station);
+		return RadioFunctions.searchForStation(baseUrl, params);
+	}
+	
 	public Artist[] topArtistsForTag(String tag) throws IOException {
 		Map<String, String> params = createParams("tag.getTopArtists");
 		params.put("tag", tag);

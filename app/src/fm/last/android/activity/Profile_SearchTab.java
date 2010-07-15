@@ -22,7 +22,6 @@ package fm.last.android.activity;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Intent;
@@ -30,13 +29,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import fm.last.android.R;
 import fm.last.android.SearchProvider;
@@ -46,7 +46,7 @@ import fm.last.android.utils.ImageCache;
 
 public class Profile_SearchTab extends ListActivity implements OnClickListener, OnKeyListener {
 	private EditText mSearchText;
-	private Button mSearchButton;
+	private ImageButton mSearchButton;
 	private ImageCache mImageCache;
 	
 	@Override
@@ -58,21 +58,42 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		mSearchText = (EditText)findViewById(R.id.station_editbox);
 		mSearchText.setOnKeyListener(this);
 		
-		mSearchButton = (Button)findViewById(R.id.search);
+		mSearchButton = (ImageButton)findViewById(R.id.search);
 		mSearchButton.setOnClickListener(this);
 		
 		mImageCache = new ImageCache();
+		
+		String query = getIntent().getStringExtra(SearchManager.QUERY);
+		if(query != null) {
+			mSearchText.setText(query);
+			new SearchTask().execute((Void)null);
+		}
 	}
 
 	public void onClick(View arg0) {
-		mSearchText.setEnabled(false);
-		mSearchButton.setEnabled(false);
-		new SearchTask().execute((Void)null);
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.action_search));
+        startActivityForResult(intent, 1234);
 	}
+	
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1234 && resultCode == RESULT_OK) {
+            // Fill the list view with the strings the recognizer thought it could have heard
+            ArrayList<String> matches = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            mSearchText.setText(matches.get(0));
+			new SearchTask().execute((Void)null);
+        }
 
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+    
 	public boolean onKey(View v, int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_ENTER) {
-			mSearchButton.performClick();
+			new SearchTask().execute((Void)null);
 			return true;
 		}
 		return false;
@@ -96,6 +117,21 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 	
 	private class SearchTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
 
+		@Override
+		public void onPreExecute() {
+			String[] strings = new String[] { "Searching" };
+			ListAdapter adapter = new ListAdapter(Profile_SearchTab.this, strings);
+
+			mSearchText.setEnabled(false);
+			mSearchButton.setEnabled(false);
+			
+			adapter.disableDisclosureIcons();
+			adapter.setDisabled();
+			adapter.enableLoadBar(0);
+			setListAdapter(adapter);
+			getListView().setVisibility(View.VISIBLE);
+		}
+		
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
