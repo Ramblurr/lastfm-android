@@ -305,6 +305,8 @@ public class LastFm extends Activity {
 				} else {
 					Intent intent = new Intent(LastFm.this, Profile.class);
 					intent.putExtra("lastfm.profile.new_user", mNewUser);
+					if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null)
+						intent.putExtra(SearchManager.QUERY, getIntent().getStringExtra(SearchManager.QUERY));
 					startActivity(intent);
 				}
 				finish();

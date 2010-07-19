@@ -73,6 +73,8 @@ public class Profile extends ActivityGroup {
 		if (session == null || session.getName() == null || (Integer.decode(Build.VERSION.SDK) >= 6 && !AccountAuthenticatorService.hasLastfmAccount(this))) {
 			LastFMApplication.getInstance().logout();
 			Intent intent = new Intent(Profile.this, LastFm.class);
+			if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null)
+				intent.putExtra(SearchManager.QUERY, getIntent().getStringExtra(SearchManager.QUERY));
 			startActivity(intent);
 			finish();
 			return;
