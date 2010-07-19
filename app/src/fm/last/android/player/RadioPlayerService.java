@@ -42,6 +42,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -135,9 +136,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	public static boolean radioAvailable(Context context) {
 		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		if (tm == null || tm.getNetworkCountryIso() == null|| tm.getNetworkCountryIso().length() == 0 || tm.getNetworkCountryIso().equals("us") || tm.getNetworkCountryIso().equals("uk") || tm.getNetworkCountryIso().equals("de")) {
+			context.getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
 			return true;
 		}
 		Log.i("Last.fm", "Radio is unavailable in this region: " + tm.getNetworkCountryIso());
+		context.getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 		return false;
 	}
     

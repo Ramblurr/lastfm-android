@@ -72,8 +72,7 @@
 		<activity android:name=".activity.Profile_RadioTab"/>
 		<activity android:name=".activity.Profile_ChartsTab"/>
 		<activity android:name=".activity.Profile_EventsTab"/>
-		<activity android:name=".activity.Profile_SearchTab">
-		</activity>
+		<activity android:name=".activity.Profile_SearchTab"/>
         <provider android:name=".SearchProvider"
                 android:authorities="lastfm"
                 android:syncable="false" />
@@ -205,6 +204,11 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
+		<receiver android:name="LocaleReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.LOCALE_CHANGED"/>
+			</intent-filter>
+		</receiver>
 		<receiver android:name="RadioWidgetProvider"
 		            android:icon="@drawable/icon">
 		    <intent-filter>
