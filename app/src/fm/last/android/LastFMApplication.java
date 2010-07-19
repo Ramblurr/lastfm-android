@@ -193,6 +193,10 @@ public class LastFMApplication extends Application {
 				};
 				registerReceiver(statusListener, intentFilter);
 			}
+		} else {
+			Intent i = new Intent(mCtx, LastFm.class);
+			i.putExtra("station", url);
+			mCtx.startActivity(i);
 		}
 	}
 
