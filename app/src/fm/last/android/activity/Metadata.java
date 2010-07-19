@@ -60,6 +60,7 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.player.IRadioPlayer;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
 import fm.last.api.Artist;
@@ -142,9 +143,13 @@ public class Metadata extends Activity {
 		mTabHost.addTab(mTabHost.newTabSpec("similar")
                 .setIndicator(getString(R.string.metadata_similar), getResources().getDrawable(R.drawable.ic_tab_similar_artists))
                 .setContent(R.id.similar_list_view));
-		mTabHost.addTab(mTabHost.newTabSpec("tags")
-                .setIndicator(getString(R.string.metadata_tags), getResources().getDrawable(R.drawable.ic_tab_tags))
-                .setContent(R.id.tags_list_view));
+		if(RadioPlayerService.radioAvailable(this)) {
+			mTabHost.addTab(mTabHost.newTabSpec("tags")
+	                .setIndicator(getString(R.string.metadata_tags), getResources().getDrawable(R.drawable.ic_tab_tags))
+	                .setContent(R.id.tags_list_view));
+		} else {
+			findViewById(R.id.tags_list_view).setVisibility(View.GONE);
+		}
 		mTabHost.addTab(mTabHost.newTabSpec("events")
                 .setIndicator(getString(R.string.metadata_events), getResources().getDrawable(R.drawable.ic_tab_events))
                 .setContent(R.id.events_list_view));
@@ -259,7 +264,8 @@ public class Metadata extends Activity {
 
 		new LoadSimilarTask().execute((Void) null);
 		new LoadListenersTask().execute((Void) null);
-		new LoadTagsTask().execute((Void) null);
+		if(RadioPlayerService.radioAvailable(this))
+			new LoadTagsTask().execute((Void) null);
 		new LoadEventsTask().execute((Void) null);
 
 		mTabHost.setCurrentTabByTag("bio");
@@ -339,10 +345,11 @@ public class Metadata extends Activity {
 						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
 						+ "<div style='margin-left:84px; margin-top:3px'>" + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
 						+ mArtistName + "</span><br/>" + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + listeners + " "
-						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span>"
-						+ "<br/> <a style='"+ stationbuttonmediumstyle + "' href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>"
-						+ "<span style='" + stationbuttonspanstyle + "'>Play " + artist.getName() + " Radio</span></a></div>"
-						+ "<br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
+						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span>";
+				if(RadioPlayerService.radioAvailable(Metadata.this))
+					mBio += "<br/> <a style='"+ stationbuttonmediumstyle + "' href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>"
+							+ "<span style='" + stationbuttonspanstyle + "'>Play " + artist.getName() + " Radio</span></a>";
+				mBio += "</div><br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
 
 				FileOutputStream o = new FileOutputStream("/sdcard/bio.html");
 				o.write(mBio.getBytes(), 0, mBio.length());
@@ -406,8 +413,7 @@ public class Metadata extends Activity {
 
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < ((similar.length < 10) ? similar.length : 10); i++) {
-					ListEntry entry = new ListEntry(similar[i], R.drawable.artist_icon, similar[i].getName(), similar[i].getImages()[0].getUrl(),
-							R.drawable.list_icon_station);
+					ListEntry entry = new ListEntry(similar[i], R.drawable.artist_icon, similar[i].getName(), similar[i].getImages()[0].getUrl());
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
@@ -428,9 +434,9 @@ public class Metadata extends Activity {
 
 					public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 						Artist artist = (Artist) mSimilarAdapter.getItem(position);
-						mSimilarAdapter.enableLoadBar(position);
-						LastFMApplication.getInstance().playRadioStation(Metadata.this, "lastfm://artist/" + Uri.encode(artist.getName()) + "/similarartists",
-								false);
+						Intent i = new Intent(Metadata.this, Metadata.class);
+						i.putExtra("artist", artist.getName());
+						startActivity(i);
 					}
 
 				});

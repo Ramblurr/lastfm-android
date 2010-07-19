@@ -231,6 +231,10 @@ public class LastFMApplication extends Application {
 				case WSError.ERROR_NotEnoughNeighbours:
 					description = R.string.ERROR_INSUFFICIENT_NEIGHBOURS;
 					break;
+					
+				case WSError.ERROR_RadioUnavailable:
+					description = R.string.ERROR_RADIO_UNAVAILABLE;
+					break;
 				}
 			}
 	

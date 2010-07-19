@@ -43,6 +43,7 @@ import android.widget.TabHost;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.api.Session;
 
@@ -143,15 +144,17 @@ public class Profile extends ActivityGroup {
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.ic_tab_profile))
 	                .setContent(chartsTabIntent));
-			mTabHost.addTab(mTabHost.newTabSpec("radio")
-	                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.ic_tab_radio))
-	                .setContent(radioTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("events")
 	                .setIndicator(getString(R.string.profile_events), getResources().getDrawable(R.drawable.ic_tab_events))
 	                .setContent(eventsTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("search")
 	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(android.R.drawable.ic_menu_search))
 	                .setContent(searchTabIntent));
+			if(RadioPlayerService.radioAvailable(this)) {
+				mTabHost.addTab(mTabHost.newTabSpec("radio")
+		                .setIndicator(getString(R.string.profile_myradio), getResources().getDrawable(R.drawable.ic_tab_radio))
+		                .setContent(radioTabIntent));
+			}
 			if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null) {
 				mTabHost.setCurrentTabByTag("search");
 			}

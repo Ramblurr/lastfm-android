@@ -369,9 +369,9 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Artist artist = (Artist) l.getAdapter().getItem(position);
-				ListAdapter la = (ListAdapter) l.getAdapter();
-				la.enableLoadBar(position);
-				LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://artist/" + Uri.encode(artist.getName()) + "/similarartists", true);
+				Intent i = new Intent(Profile_ChartsTab.this, Metadata.class);
+				i.putExtra("artist", artist.getName());
+				startActivity(i);
 			} catch (ClassCastException e) {
 				// fine.
 			}
@@ -465,7 +465,7 @@ public class Profile_ChartsTab extends ListActivity {
 					} catch (ArrayIndexOutOfBoundsException e) {
 					}
 
-					ListEntry entry = new ListEntry(topartists[i], R.drawable.artist_icon, topartists[i].getName(), url, R.drawable.list_icon_station);
+					ListEntry entry = new ListEntry(topartists[i], R.drawable.artist_icon, topartists[i].getName(), url);
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;

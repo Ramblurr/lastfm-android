@@ -46,6 +46,8 @@ public class WSError extends Error implements Parcelable {
 	public static final int ERROR_NotEnoughMembers = 21;
 	public static final int ERROR_NotEnoughFans = 22;
 	public static final int ERROR_NotEnoughNeighbours = 23;
+	
+	public static final int ERROR_RadioUnavailable = 99;
 
 	public WSError(String method, String message, Integer code) {
 		this.method = method;

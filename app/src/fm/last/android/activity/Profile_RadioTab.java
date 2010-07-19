@@ -302,7 +302,6 @@ public class Profile_RadioTab extends ListActivity {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int p, long id) {
-		final ListView list = l;
 		final int position = p;
 
 		if (!mMainAdapter.isEnabled(position))
@@ -319,7 +318,6 @@ public class Profile_RadioTab extends ListActivity {
 								Intent intent = new Intent(Profile_RadioTab.this, Player.class);
 								startActivity(intent);
 							} else {
-								list.setEnabled(false);
 								mMainAdapter.enableLoadBar(position);
 								LastFMApplication.getInstance().playRadioStation(Profile_RadioTab.this, adapter_station, true);
 							}
