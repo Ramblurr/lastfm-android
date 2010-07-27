@@ -96,6 +96,8 @@ public interface LastFmServer {
 	 */
 	public Tag[] getTrackTopTags(String artist, String track, String mbid) throws IOException;
 
+	public Tag[] getArtistTopTags(String artist, String mbid) throws IOException;
+
 	/**
 	 * See http://www.lastfm.pl/api/show?service=123
 	 * 

@@ -229,6 +229,17 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTopTags(baseUrl, params);
 	}
 
+	public Tag[] getArtistTopTags(String artist, String mbid) throws IOException, WSError {
+		Map<String, String> params = createParams("artist.getTopTags");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (mbid != null) {
+			params.put("mbid", mbid);
+		}
+		return TrackFunctions.getTrackTopTags(baseUrl, params);
+	}
+
 	public Tag[] getUserTopTags(String user, Integer limit) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getTopTags");
 		if (user != null) {
