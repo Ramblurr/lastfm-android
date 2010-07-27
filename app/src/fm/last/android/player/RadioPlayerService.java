@@ -730,7 +730,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	private void pause() {
-		if (mState == STATE_STOPPED || mState == STATE_NODATA || mState == STATE_ERROR)
+		if (mState == STATE_STOPPED || mState == STATE_NODATA || mState == STATE_ERROR || currentStation == null)
 			return;
 
 		// TODO: This should not be exposed in the UI, only used to pause
