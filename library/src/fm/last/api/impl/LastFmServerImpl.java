@@ -396,6 +396,16 @@ final class LastFmServerImpl implements LastFmServer {
 		return UserFunctions.getUserTopArtists(baseUrl, params);
 	}
 
+	public Artist[] getUserRecommendedArtists(String user, String sk) throws IOException {
+		Map<String, String> params = createParams("user.getRecommendedArtists");
+		if (user != null) {
+			params.put("user", user);
+		}
+		params.put("sk", sk);
+		signParams(params);
+		return UserFunctions.getUserRecommendedArtists(baseUrl, params);
+	}
+
 	public Album[] getUserTopAlbums(String user, String period) throws IOException {
 		Map<String, String> params = createParams("user.getTopAlbums");
 		if (user != null) {

@@ -119,6 +119,8 @@ public interface LastFmServer {
 	 */
 	public Artist[] getUserTopArtists(String user, String period) throws IOException;
 
+	public Artist[] getUserRecommendedArtists(String user, String period) throws IOException;
+
 	/**
 	 * See http://www.lastfm.pl/api/show?service=299
 	 * 

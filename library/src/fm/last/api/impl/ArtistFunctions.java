@@ -204,4 +204,37 @@ public class ArtistFunctions {
 		}
 	}
 
+	public static Artist[] getRecommendedArtists(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
+			Node topartistsNode = XMLUtil.findNamedElementNode(lfmNode, "recommendations");
+
+			Node[] elnodes = XMLUtil.getChildNodes(topartistsNode, Node.ELEMENT_NODE);
+			ArtistBuilder artistBuilder = new ArtistBuilder();
+			List<Artist> artists = new ArrayList<Artist>();
+			for (Node node : elnodes) {
+				Artist artistObject = artistBuilder.build(node);
+				artists.add(artistObject);
+			}
+			return artists.toArray(new Artist[artists.size()]);
+		}
+	}
+
 }

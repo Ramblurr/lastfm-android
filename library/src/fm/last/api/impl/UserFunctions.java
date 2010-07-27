@@ -78,6 +78,10 @@ public class UserFunctions {
 		return ArtistFunctions.getTopArtists(baseUrl, params);
 	}
 
+	public static Artist[] getUserRecommendedArtists(String baseUrl, Map<String, String> params) throws IOException {
+		return ArtistFunctions.getRecommendedArtists(baseUrl, params);
+	}
+
 	public static Album[] getUserTopAlbums(String baseUrl, Map<String, String> params) throws IOException {
 		return AlbumFunctions.getTopAlbums(baseUrl, params);
 	}

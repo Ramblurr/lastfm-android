@@ -65,12 +65,13 @@ import fm.last.api.User;
 public class Profile_ChartsTab extends ListActivity {
 	// Java doesn't let you treat enums as ints easily, so we have to have this
 	// mess
-	private static final int PROFILE_TOPARTISTS = 0;
-	private static final int PROFILE_TOPALBUMS = 1;
-	private static final int PROFILE_TOPTRACKS = 2;
-	private static final int PROFILE_RECENTLYPLAYED = 3;
-	private static final int PROFILE_FRIENDS = 4;
-	private static final int PROFILE_TAGS = 5;
+	private static final int PROFILE_RECOMMENDED = 0;
+	private static final int PROFILE_TOPARTISTS = 1;
+	private static final int PROFILE_TOPALBUMS = 2;
+	private static final int PROFILE_TOPTRACKS = 3;
+	private static final int PROFILE_RECENTLYPLAYED = 4;
+	private static final int PROFILE_FRIENDS = 5;
+	private static final int PROFILE_TAGS = 6;
 
 	private ListAdapter mProfileAdapter;
 	private String mUsername; // store this separate so we have access to it
@@ -88,7 +89,7 @@ public class Profile_ChartsTab extends ListActivity {
 	Animation mPushLeftIn;
 	Animation mPushLeftOut;
 
-	ListView[] mProfileLists = new ListView[6];
+	ListView[] mProfileLists = new ListView[7];
 
 	private ImageCache mImageCache = null;
 
@@ -121,7 +122,20 @@ public class Profile_ChartsTab extends ListActivity {
 
 		getListView().requestFocus();
 		
-		String[] mStrings = new String[] { this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
+		String[] mStrings;
+		
+		if(mUsername.equals(LastFMApplication.getInstance().session.getName()))
+			mStrings = new String[] { this.getString(R.string.profile_myrecs), this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
+				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed),
+				this.getString(R.string.profile_friends), this.getString(R.string.profile_tags) }; // this
+																									// order
+																									// must
+																									// match
+																									// the
+																									// ProfileActions
+																									// enum
+		else
+			mStrings = new String[] { this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
 				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed),
 				this.getString(R.string.profile_friends), this.getString(R.string.profile_tags) }; // this
 																									// order
@@ -134,6 +148,9 @@ public class Profile_ChartsTab extends ListActivity {
 		getListView().setAdapter(mProfileAdapter);
 
 		// TODO should be functions and not member variables, caching is evil
+		mProfileLists[PROFILE_RECOMMENDED] = (ListView) findViewById(R.id.recommended_list_view);
+		mProfileLists[PROFILE_RECOMMENDED].setOnItemClickListener(mArtistListItemClickListener);
+
 		mProfileLists[PROFILE_TOPARTISTS] = (ListView) findViewById(R.id.topartists_list_view);
 		mProfileLists[PROFILE_TOPARTISTS].setOnItemClickListener(mArtistListItemClickListener);
 
@@ -310,7 +327,17 @@ public class Profile_ChartsTab extends ListActivity {
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		setNextAnimation();
 		mProfileAdapter.enableLoadBar(position-1);
+		if(!mUsername.equals(LastFMApplication.getInstance().session.getName()))
+			position++;
 		switch (position-1) {
+		case PROFILE_RECOMMENDED: // "Top Artists"
+			try {
+				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/RecommendedArtists");
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
+			new LoadRecommendedArtistsTask().execute((Void) null);
+			break;
 		case PROFILE_TOPARTISTS: // "Top Artists"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
@@ -446,6 +473,55 @@ public class Profile_ChartsTab extends ListActivity {
 			}
 		}
 	};
+
+	private class LoadRecommendedArtistsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+
+		@Override
+		public ArrayList<ListEntry> doInBackground(Void... params) {
+
+			try {
+				Artist[] recartists = mServer.getUserRecommendedArtists(mUsername, LastFMApplication.getInstance().session.getKey());
+				if (recartists.length == 0)
+					return null;
+				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
+				for (int i = 0; i < ((recartists.length < 10) ? recartists.length : 10); i++) {
+					String url = null;
+					try {
+						ImageUrl[] urls = recartists[i].getImages();
+						url = urls[0].getUrl();
+					} catch (ArrayIndexOutOfBoundsException e) {
+					}
+
+					ListEntry entry = new ListEntry(recartists[i], R.drawable.artist_icon, recartists[i].getName(), url);
+					iconifiedEntries.add(entry);
+				}
+				return iconifiedEntries;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		public void onPostExecute(ArrayList<ListEntry> iconifiedEntries) {
+			if (iconifiedEntries != null) {
+				ListAdapter adapter = new ListAdapter(Profile_ChartsTab.this, getImageCache());
+				adapter.setSourceIconified(iconifiedEntries);
+				mProfileLists[PROFILE_RECOMMENDED].setAdapter(adapter);
+			} else {
+				String[] strings = new String[] { getString(R.string.profile_notopartists) };
+				ListAdapter adapter = new ListAdapter(Profile_ChartsTab.this, strings);
+				adapter.disableDisclosureIcons();
+				adapter.setDisabled();
+				mProfileLists[PROFILE_RECOMMENDED].setAdapter(adapter);
+			}
+			mViewHistory.push(mNestedViewFlipper.getDisplayedChild()); // Save
+																		// the
+																		// current
+																		// view
+			mNestedViewFlipper.setDisplayedChild(PROFILE_RECOMMENDED + 1);
+		}
+	}
 
 	private class LoadTopArtistsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
 
