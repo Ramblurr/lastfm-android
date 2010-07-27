@@ -61,7 +61,9 @@ public class ShareResolverActivity extends ListActivity {
 		i.setAction(Intent.ACTION_SEND);
 		String artist = i.getStringExtra(Share.INTENT_EXTRA_ARTIST);
 		String track = i.getStringExtra(Share.INTENT_EXTRA_TRACK);
-		String URL = "http://www.last.fm/music/" + Uri.encode(artist) + "/_/" + Uri.encode(track);
+		String URL = "http://www.last.fm/music/" + Uri.encode(artist);
+		if(track != null)
+			URL += "/_/" + Uri.encode(track);
 		i.putExtra(Intent.EXTRA_TEXT, URL);
 
 		onCreate(icicle, i, getString(R.string.share_selectapplication));

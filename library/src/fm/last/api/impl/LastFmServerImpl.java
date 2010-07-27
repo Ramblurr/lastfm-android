@@ -489,6 +489,15 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.shareTrack(baseUrl, params);
 	}
 
+	public void shareArtist(String artist, String recipient, String sk) throws IOException {
+		Map<String, String> params = createParams("artist.share");
+		params.put("artist", artist);
+		params.put("recipient", recipient);
+		params.put("sk", sk);
+		signParams(params);
+		TrackFunctions.shareTrack(baseUrl, params);
+	}
+
 	public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException {
 		Map<String, String> params = createParams("playlist.addTrack");
 		params.put("artist", artist);

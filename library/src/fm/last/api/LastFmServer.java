@@ -334,6 +334,8 @@ public interface LastFmServer {
 
 	public void shareTrack(String artist, String track, String recipient, String sk) throws IOException;
 
+	public void shareArtist(String artist, String recipient, String sk) throws IOException;
+
 	public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException;
 
 	public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException;

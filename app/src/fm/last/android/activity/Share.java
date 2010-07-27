@@ -93,13 +93,17 @@ public class Share extends Activity {
 		public Boolean doInBackground(Void... params) {
 			try {
 				Session session = LastFMApplication.getInstance().session;
-				mServer.shareTrack(mArtist, mTrack, mRecipient, session.getKey());
+				if(mTrack != null)
+					mServer.shareTrack(mArtist, mTrack, mRecipient, session.getKey());
+				else
+					mServer.shareArtist(mArtist, mRecipient, session.getKey());
 				return true;
 			} catch (WSError e) {
 				// can't presentError here. it's not a UI thread. the app
 				// crashes.
 				// leave it to the toasting in onPostExecute
 				// LastFMApplication.getInstance().presentError(Share.this, e);
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
