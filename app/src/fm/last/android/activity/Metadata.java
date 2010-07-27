@@ -348,7 +348,7 @@ public class Metadata extends Activity {
 						+ "<div style='margin-left:84px; margin-top:3px'>" + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
 						+ mArtistName + "</span><br/>" + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + listeners + " "
 						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays);
-				if(userplaycount.length() > 0)
+				if(userplaycount.length() > 0 && !userplaycount.equals("0"))
 					mBio += "<br/>" + userplaycount + " " + getString(R.string.metadata_userplays);
 
 				mBio += "</span>";
