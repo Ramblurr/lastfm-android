@@ -302,7 +302,7 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.removeTrackTag(baseUrl, params);
 	}
 
-	public Artist getArtistInfo(String artist, String mbid, String lang) throws IOException, WSError {
+	public Artist getArtistInfo(String artist, String mbid, String lang, String username) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getInfo");
 		if (artist != null) {
 			params.put("artist", artist);
@@ -312,6 +312,9 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		if (lang != null) {
 			params.put("lang", lang);
+		}
+		if (username != null) {
+			params.put("username", username);
 		}
 		return ArtistFunctions.getArtistInfo(baseUrl, params);
 	}

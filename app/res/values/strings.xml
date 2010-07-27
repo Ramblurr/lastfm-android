@@ -180,6 +180,7 @@
 	<string name="metadata_nofans">No Top Listeners</string>
 	<string name="metadata_plays">plays</string>
 	<string name="metadata_listeners">listeners</string>
+	<string name="metadata_userplays">plays in your library</string>
 
 	<!-- NewStation activity -->
 	<string name="newstation_search">Search</string>

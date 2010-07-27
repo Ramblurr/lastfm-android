@@ -55,7 +55,7 @@ public class TrackBuilder extends XMLBuilder<Track> {
 			artist = artistBuilder.build(artistNode);
 		} else {
 			String artistName = getText("artist");
-			artist = new Artist(artistName, "", "", "", null, "", "", "");
+			artist = new Artist(artistName, "", "", "", null, "", "", "", "");
 		}
 
 		List<Node> imageNodes = getChildNodes("image");

@@ -39,8 +39,9 @@ public class Artist implements Serializable {
 	private Bio bio;
 	private String playcount;
 	private String listeners;
+	private String userplaycount;
 
-	public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable, String playcount, String listeners) {
+	public Artist(String name, String mbid, String match, String url, ImageUrl[] images, String streamable, String playcount, String listeners, String userplaycount) {
 		this.name = name;
 		this.mbid = mbid;
 		this.match = match;
@@ -49,6 +50,7 @@ public class Artist implements Serializable {
 		this.streamable = streamable;
 		this.playcount = playcount;
 		this.listeners = listeners;
+		this.userplaycount = userplaycount;
 	}
 
 	public String getName() {
@@ -97,5 +99,9 @@ public class Artist implements Serializable {
 
 	public String getListeners() {
 		return listeners;
+	}
+	
+	public String getUserPlaycount() {
+		return userplaycount;
 	}
 }

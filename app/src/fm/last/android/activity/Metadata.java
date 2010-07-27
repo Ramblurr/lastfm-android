@@ -292,13 +292,13 @@ public class Metadata extends Activity {
 			try {
 				String lang = Locale.getDefault().getLanguage();
 				if (lang.equalsIgnoreCase("de")) {
-					artist = mServer.getArtistInfo(mArtistName, null, lang);
+					artist = mServer.getArtistInfo(mArtistName, null, lang, LastFMApplication.getInstance().session.getName());
 				} else {
-					artist = mServer.getArtistInfo(mArtistName, null, null);
+					artist = mServer.getArtistInfo(mArtistName, null, null, LastFMApplication.getInstance().session.getName());
 				}
 				if (artist.getBio().getContent() == null || artist.getBio().getContent().trim().length() == 0) {
 					// no bio in current locale -> get the English bio
-					artist = mServer.getArtistInfo(mArtistName, null, null);
+					artist = mServer.getArtistInfo(mArtistName, null, null, LastFMApplication.getInstance().session.getName());
 				}
 				String imageURL = "";
 				for (ImageUrl image : artist.getImages()) {
@@ -310,10 +310,12 @@ public class Metadata extends Activity {
 
 				String listeners = "";
 				String plays = "";
+				String userplaycount = "";
 				try {
 					NumberFormat nf = NumberFormat.getInstance();
 					listeners = nf.format(Integer.parseInt(artist.getListeners()));
 					plays = nf.format(Integer.parseInt(artist.getPlaycount()));
+					userplaycount = nf.format(Integer.parseInt(artist.getUserPlaycount()));
 				} catch (NumberFormatException e) {
 				}
 
@@ -345,7 +347,12 @@ public class Metadata extends Activity {
 						+ "' style='margin-top: 4px; float: left; margin-right: 0px; margin-bottom: 14px; width:64px; border:1px solid gray; padding: 1px;'/>"
 						+ "<div style='margin-left:84px; margin-top:3px'>" + "<span style='font-size: 15pt; font-weight:bold; padding:0px; margin:0px;'>"
 						+ mArtistName + "</span><br/>" + "<span style='color:gray; font-weight: normal; font-size: 10pt;'>" + listeners + " "
-						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays) + "</span>";
+						+ getString(R.string.metadata_listeners) + "<br/>" + plays + " " + getString(R.string.metadata_plays);
+				if(userplaycount.length() > 0)
+					mBio += "<br/>" + userplaycount + " " + getString(R.string.metadata_userplays);
+
+				mBio += "</span>";
+
 				if(RadioPlayerService.radioAvailable(Metadata.this))
 					mBio += "<br/> <a style='"+ stationbuttonmediumstyle + "' href='lastfm://artist/" + Uri.encode(artist.getName()) + "'>"
 							+ "<span style='" + stationbuttonspanstyle + "'>Play " + artist.getName() + " Radio</span></a>";

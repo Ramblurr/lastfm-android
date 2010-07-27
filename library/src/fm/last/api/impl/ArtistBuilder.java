@@ -46,10 +46,16 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
 		String streamable = getText("streamable");
 		String listeners = "0";
 		String playcount = "0";
+		String userplaycount = "0";
 		Node statsNode = getChildNode("stats");
 		if (statsNode != null) {
 			playcount = XMLUtil.findNamedElementNode(statsNode, "playcount").getFirstChild().getNodeValue();
 			listeners = XMLUtil.findNamedElementNode(statsNode, "listeners").getFirstChild().getNodeValue();
+			try {
+				userplaycount = XMLUtil.findNamedElementNode(statsNode, "userplaycount").getFirstChild().getNodeValue();
+			} catch (Exception e) {
+				//This node isn't always present
+			}
 		}
 
 		List<Node> imageNodes = getChildNodes("image");
@@ -60,7 +66,7 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
 		for (Node imageNode : imageNodes)
 			images[i++] = imageBuilder.build(imageNode);
 
-		Artist artist = new Artist(name, mbid, match, url, images, streamable, playcount, listeners);
+		Artist artist = new Artist(name, mbid, match, url, images, streamable, playcount, listeners, userplaycount);
 
 		Node bioNode = getChildNode("bio");
 		if (bioNode != null) {

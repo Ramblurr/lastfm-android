@@ -209,10 +209,12 @@ public interface LastFmServer {
 	 * @param lang
 	 *            (Optional) : The language to return the biography in,
 	 *            expressed as an ISO 639 alpha-2 code.
+	 * @param username (Optional) : The username for the context of the request. 
+	 * 				If supplied, the user's playcount for this artist is included in the response.
 	 * @return Artist instance
 	 * @throws IOException
 	 */
-	public Artist getArtistInfo(String artist, String mbid, String lang) throws IOException;
+	public Artist getArtistInfo(String artist, String mbid, String lang, String username) throws IOException;
 
 	/**
 	 * See http://www.lastfm.pl/api/show?service=312
