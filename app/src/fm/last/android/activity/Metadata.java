@@ -457,7 +457,12 @@ public class Metadata extends Activity {
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
-				User[] fans = mServer.getTrackTopFans(mTrackName, mArtistName, null);
+				User[] fans;
+				if(mTrackName != null)
+					fans = mServer.getTrackTopFans(mTrackName, mArtistName, null);
+				else
+					fans = mServer.getArtistTopFans(mArtistName, null);
+
 				if (fans.length == 0)
 					return null;
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();

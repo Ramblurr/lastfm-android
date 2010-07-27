@@ -228,6 +228,8 @@ public interface LastFmServer {
 	 */
 	public User[] getTrackTopFans(String track, String artist, String mbid) throws IOException;
 
+	public User[] getArtistTopFans(String artist, String mbid) throws IOException;
+
 	/**
 	 * See http://www.lastfm.pl/api/show?service=117
 	 * 

@@ -330,6 +330,17 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTopFans(baseUrl, params);
 	}
 
+	public User[] getArtistTopFans(String artist, String mbid) throws IOException, WSError {
+		Map<String, String> params = createParams("artist.getTopFans");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (mbid != null) {
+			params.put("mbid", mbid);
+		}
+		return TrackFunctions.getTrackTopFans(baseUrl, params);
+	}
+
 	public Event[] getArtistEvents(String artist) throws IOException, WSError {
 		Map<String, String> params = createParams("artist.getEvents");
 		if (artist != null) {
