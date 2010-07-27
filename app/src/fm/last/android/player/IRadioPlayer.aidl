@@ -49,4 +49,7 @@ interface IRadioPlayer {
 	String getStationUrl();
 	
 	WSError getError();
+	
+	boolean getPauseButtonPressed();
+	void pauseButtonPressed();
 } 

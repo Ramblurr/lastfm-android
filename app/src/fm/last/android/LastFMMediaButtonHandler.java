@@ -1,5 +1,7 @@
 package fm.last.android;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		IBinder service = peekService(context, new Intent(context, RadioPlayerService.class));
+		
 		if (service == null || !PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("headset_controls", true)) {
 			Log.i(TAG, "LastFM-Player not active, don't handling media keys.");
 			return;
@@ -57,8 +60,21 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 							return;
 						case KeyEvent.KEYCODE_HEADSETHOOK:
 						case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-							Log.i(TAG, "Pause-Button => Pause/Resuming '" + player.getTrackName() + "'");
-							player.pause();
+							if(player.getPauseButtonPressed()) {
+								Log.i(TAG, "Next-Button => Skipping '" + player.getTrackName() + "'");
+								intent = new Intent("fm.last.android.widget.STOP");
+								PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+								AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+								am.cancel(alarmIntent);
+								player.skip();
+							} else {
+								Log.i(TAG, "Pause-Button => Pause/Resuming '" + player.getTrackName() + "'");
+								player.pauseButtonPressed();
+								intent = new Intent("fm.last.android.widget.STOP");
+								PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+								AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+								am.set(AlarmManager.RTC, System.currentTimeMillis() + 2000, alarmIntent);
+							}
 							abortBroadcast();
 							return;
 						}

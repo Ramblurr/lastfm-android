@@ -113,6 +113,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private long mStationStartTime = 0;
 	private long mTrackStartTime = 0;
 	private PendingIntent mPreBufferIntent = null;
+	private boolean pauseButtonPressed = false;
 
 	private static final int NOTIFY_ID = 1337;
 
@@ -648,6 +649,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	private void nextSong() {
+		pauseButtonPressed = false;
+		
 		if (mState == STATE_SKIPPING || mState == STATE_STOPPED || mState == STATE_NODATA) {
 			logger.severe("nextSong() called in wrong state: " + mState);
 			return;
@@ -1052,6 +1055,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	private final IRadioPlayer.Stub mBinder = new IRadioPlayer.Stub() {
+		public boolean getPauseButtonPressed() throws DeadObjectException {
+			return pauseButtonPressed;
+		}
+		
+		public void pauseButtonPressed() throws DeadObjectException {
+			pauseButtonPressed = true;
+		}
+		
 		public int getState() throws DeadObjectException {
 			return mState;
 		}
@@ -1099,7 +1110,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			logger.info("Skip button pressed");
 			if (Looper.myLooper() == null)
 				Looper.prepare();
-
+			
 			new NextTrackTask().execute((Void) null);
 		}
 
