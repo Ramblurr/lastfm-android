@@ -25,8 +25,10 @@ import java.util.List;
 
 import android.app.ActivityGroup;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -35,6 +37,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +47,7 @@ import android.widget.TabHost;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
+import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.api.Session;
@@ -192,6 +197,25 @@ public class Profile extends ActivityGroup {
 
 	@Override
 	public void onResume() {
+		mIsPlaying = false;
+		
+		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
+				new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
+						try {
+							mIsPlaying = player.isPlaying();
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LastFMApplication.getInstance().unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+
 		if (LastFMApplication.getInstance().session == null) {
 			finish(); // We shouldn't really get here, but sometimes the window
 						// stack keeps us around

@@ -179,7 +179,7 @@ public class Metadata extends Activity {
 
 					public void onServiceDisconnected(ComponentName comp) {
 					}
-				}, Context.BIND_AUTO_CREATE);
+				}, 0);
 
 	}
 
