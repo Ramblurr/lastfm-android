@@ -558,6 +558,12 @@ public class ScrobblerService extends Service {
 							server.loveTrack(e.artist, e.title, mSession.getKey());
 						}
 						if (e.rating.equals("B")) {
+							if(e.trackAuth.length() == 0) {
+								//Local tracks can't be banned, so drop them
+								logger.info("Removing banned local track from queue");
+								ScrobblerQueueDao.getInstance().removeFromQueue(e);
+								continue;
+							}
 							server.banTrack(e.artist, e.title, mSession.getKey());
 						}
 						String result = scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
