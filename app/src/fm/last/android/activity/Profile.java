@@ -155,7 +155,7 @@ public class Profile extends ActivityGroup {
 	                .setIndicator(getString(R.string.profile_events), getResources().getDrawable(R.drawable.ic_tab_events))
 	                .setContent(eventsTabIntent));
 			mTabHost.addTab(mTabHost.newTabSpec("search")
-	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(android.R.drawable.ic_menu_search))
+	                .setIndicator(getString(R.string.profile_search), getResources().getDrawable(R.drawable.ic_tab_search))
 	                .setContent(searchTabIntent));
 			if(RadioPlayerService.radioAvailable(this)) {
 				mTabHost.addTab(mTabHost.newTabSpec("radio")
