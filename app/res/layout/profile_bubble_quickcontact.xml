@@ -7,7 +7,7 @@
 	android:layout_width="fill_parent"
 	android:orientation="horizontal"
 	android:gravity="top"
-	android:paddingTop="12dip"
+	android:paddingTop="6dip"
 	android:paddingBottom="6dip"
 	android:paddingRight="11dip">
 	<QuickContactBadge android:id="@+id/profile_avatar"
@@ -16,8 +16,7 @@
 		android:layout_marginLeft="12dip"
 		android:layout_marginRight="12dip"
 		android:gravity="center"
-		style="@*android:style/Widget.QuickContactBadge.WindowSmall"
-		android:paddingRight="10dip"/>
+		style="@*android:style/Widget.QuickContactBadge.WindowSmall"/>
 	<LinearLayout
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
