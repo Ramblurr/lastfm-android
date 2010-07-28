@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -38,6 +39,7 @@ import android.view.View.OnKeyListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.SearchProvider;
 import fm.last.android.adapter.ListAdapter;
@@ -71,11 +73,15 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 	}
 
 	public void onClick(View arg0) {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.action_search));
-        startActivityForResult(intent, 1234);
+		try {
+	        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+	        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+	                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+	        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.action_search));
+	        startActivityForResult(intent, 1234);
+		} catch (ActivityNotFoundException e) {
+			LastFMApplication.getInstance().presentError(this, getString(R.string.ERROR_VOICE_TITLE), getString(R.string.ERROR_VOICE));
+		}
 	}
 	
     @Override

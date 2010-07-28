@@ -263,6 +263,8 @@
 	<string name="ERROR_AMAZON">The Amazon MP3 store is not currently available on this device.</string>
 	<string name="ERROR_AMAZON_TITLE">Amazon Unavailable</string>
 	<string name="ERROR_RADIO_UNAVAILABLE">Last.fm Radio is not available in this region.</string>
+	<string name="ERROR_VOICE_TITLE">Voice Search Unavailable</string>
+	<string name="ERROR_VOICE">Google Voice Search is not installed on this device.</string>
 	
 	<!-- third party account access -->
 	<string name="account_access_title">Last.fm Account Access</string>
