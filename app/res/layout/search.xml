@@ -12,6 +12,7 @@
 		android:layout_width="fill_parent"
 		android:textSize="18sp"
 		android:hint="@string/action_search"
+		android:imeOptions="actionSearch"
 		android:layout_alignParentLeft="true"  android:layout_alignLeft="@+id/station_search"
 		android:layout_weight="1" android:singleLine="true" 
 		android:layout_marginLeft="7dip"
