@@ -16,6 +16,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
+import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
 
 /**
@@ -28,14 +29,16 @@ public class Preferences extends PreferenceActivity {
 	@Override
 	public void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
+		addPreferencesFromResource(R.xml.preferences_scrobbler);
+		if(RadioPlayerService.radioAvailable(this))
+			addPreferencesFromResource(R.xml.preferences_player);
 		if(Integer.decode(Build.VERSION.SDK) >= 6) {
-			addPreferencesFromResource(R.xml.preferences_2);
+			addPreferencesFromResource(R.xml.preferences_sync);
 			findPreference("sync_icons").setOnPreferenceChangeListener(syncToggle);
 			findPreference("sync_names").setOnPreferenceChangeListener(syncToggle);
 			findPreference("sync_taste").setOnPreferenceChangeListener(syncToggle);
-		} else {
-			addPreferencesFromResource(R.xml.preferences);
 		}
+		addPreferencesFromResource(R.xml.preferences_about);
 		findPreference("scrobble").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("scrobble_music_player").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("tos").setOnPreferenceClickListener(urlClick);

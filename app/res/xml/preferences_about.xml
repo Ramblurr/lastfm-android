@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<PreferenceCategory android:title="@string/prefs_cat_about_title">
+		<fm.last.android.activity.BugReport
+			android:title="@string/prefs_bugreport_title"
+			android:summary="@string/prefs_bugreport_summary"
+			android:dialogLayout="@layout/bugreport"
+			android:negativeButtonText="@string/common_cancel" android:positiveButtonText="@string/prefs_bugreport_send"/>
+		<Preference
+			android:title="@string/prefs_tos_title"
+			android:key="tos"
+			/>
+		<Preference
+			android:title="@string/prefs_privacy_title"
+			android:key="privacy"
+			/>
+		<Preference
+			android:title="@string/prefs_version_title"
+			android:key="version"
+			/>
+	</PreferenceCategory>
+</PreferenceScreen>
