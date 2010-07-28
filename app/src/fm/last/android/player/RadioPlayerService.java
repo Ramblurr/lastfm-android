@@ -464,7 +464,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		public void onBufferingUpdate(MediaPlayer p, int percent) {
 			if (p == mp) {
 				bufferPercent = percent;
-				if (mPreBufferIntent == null && percent == 100) {
+				if (mPreBufferIntent == null && percent == 100 && PreferenceManager.getDefaultSharedPreferences(RadioPlayerService.this).getBoolean("prebuffer", true)) {
 					Intent intent = new Intent("fm.last.android.player.PREBUFFER");
 					mPreBufferIntent = PendingIntent.getBroadcast(RadioPlayerService.this, 0, intent, 0);
 					AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

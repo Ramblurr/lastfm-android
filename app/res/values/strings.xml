@@ -108,6 +108,8 @@
 	<string name="prefs_sync_website_summary">Display contacts\' Last.fm profile URLs</string>
 	<string name="prefs_headset_controls_title">Headset Controls</string>
 	<string name="prefs_headset_controls_summary">Respond to headset stop and skip buttons during playback</string>
+	<string name="prefs_prebuffer_title">Pre-load next track</string>
+	<string name="prefs_prebuffer_summary">Start caching the next track while the current song is playing</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
