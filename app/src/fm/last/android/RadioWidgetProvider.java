@@ -180,16 +180,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					//Google Analytics doesn't appear to be thread safe
 				}
 
-				if(mediaPlayerPlaying) {
+				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					if(isAndroidMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
 								try {
-									if (s.isPlaying()) {
-										s.next();
-									}
+									s.next();
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -207,9 +205,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
 				
 								try {
-									if (s.isPlaying()) {
-										s.next();
-									}
+									s.next();
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -265,7 +261,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					//Google Analytics doesn't appear to be thread safe
 				}
 				
-				if(mediaPlayerPlaying) {
+				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					if(isAndroidMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
 							public void onServiceConnected(ComponentName comp, IBinder binder) {
@@ -275,6 +271,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									if (s.isPlaying()) {
 										s.pause();
 										mediaPlayerPlaying = false;
+									} else {
+										s.play();
+										mediaPlayerPlaying = true;
 									}
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
@@ -296,6 +295,9 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									if (s.isPlaying()) {
 										s.pause();
 										mediaPlayerPlaying = false;
+									} else {
+										s.play();
+										mediaPlayerPlaying = true;
 									}
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
@@ -370,7 +372,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					}
 				}, 0);
 			} else if (action.equals("fm.last.android.widget.BAN")) {
-				if(mediaPlayerPlaying) {
+				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					try {
 						LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
 								"widget-prev", // Action
@@ -386,9 +388,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
 		
 								try {
-									if (s.isPlaying()) {
-										s.prev();
-									}
+									s.prev();
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -406,9 +406,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								com.htc.music.IMediaPlaybackService s = com.htc.music.IMediaPlaybackService.Stub.asInterface(binder);
 				
 								try {
-									if (s.isPlaying()) {
-										s.prev();
-									}
+									s.prev();
 								} catch (RemoteException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -546,7 +544,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			mAlarmIntent = null;
 		}
 		views.setImageViewResource(R.id.love, R.drawable.love);
-		views.setImageViewResource(R.id.ban, R.drawable.ban);
+		if(RadioPlayerService.radioAvailable(context))
+			views.setImageViewResource(R.id.ban, R.drawable.ban);
+		else
+			views.setImageViewResource(R.id.ban, R.drawable.prev);
 		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
@@ -640,7 +641,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			}, 0);
 		}
 
-		if(!mediaPlayerPlaying) {
+		if(!mediaPlayerPlaying && RadioPlayerService.radioAvailable(context)) {
 			LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
 				public void onServiceConnected(ComponentName comp, IBinder binder) {
 					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
@@ -684,15 +685,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		@Override
 		public Boolean doInBackground(com.android.music.IMediaPlaybackService... s) {
 			try {
-				if (s[0].isPlaying()) {
-					mediaPlayerPlaying = true;
-					trackName = s[0].getTrackName();
-					artistName = s[0].getArtistName();
-					position = s[0].position();
-					duration = s[0].duration();
-				} else {
-					mediaPlayerPlaying = false;
-				}
+				mediaPlayerPlaying = s[0].isPlaying();
+				trackName = s[0].getTrackName();
+				artistName = s[0].getArtistName();
+				position = s[0].position();
+				duration = s[0].duration();
 			} catch (RemoteException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -704,6 +701,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		public void onPostExecute(Boolean result) {
 			if(result) {
 				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false);
+			} else if(trackName != null && !RadioPlayerService.radioAvailable(ctx)) {
+				updateAppWidget_idle(ctx, artistName + " - " + trackName, false);
+			} else if(!RadioPlayerService.radioAvailable(ctx)) {
+				updateAppWidget_idle(ctx, "", false);
 			}
 		}
 	}
