@@ -358,10 +358,6 @@ public class Metadata extends Activity {
 							+ "<span style='" + stationbuttonspanstyle + "'>Play " + artist.getName() + " Radio</span></a>";
 				mBio += "</div><br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
 
-				FileOutputStream o = new FileOutputStream("/sdcard/bio.html");
-				o.write(mBio.getBytes(), 0, mBio.length());
-				o.close();
-				
 				success = true;
 			} catch (IOException e) {
 				e.printStackTrace();
