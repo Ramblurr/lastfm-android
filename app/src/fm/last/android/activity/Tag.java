@@ -25,12 +25,14 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
@@ -154,6 +156,13 @@ public class Tag extends Activity {
 
 		});
 
+		mTagEditText.setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				mTagEditText.requestFocusFromTouch();
+				return false;
+			}
+		});
+		
 		mTagButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
@@ -202,7 +211,11 @@ public class Tag extends Activity {
 		});
 		
 		mTabHost.setCurrentTabByTag("suggested");
-		mTagList.requestFocus();
+		
+		if(getResources().getConfiguration().hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO)
+			mTabHost.requestFocus();
+		else
+			mTagList.requestFocus();
 	}
 
 	@Override
