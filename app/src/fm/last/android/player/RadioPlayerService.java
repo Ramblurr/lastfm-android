@@ -136,7 +136,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	public static boolean radioAvailable(Context context) {
 		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		if (tm == null || tm.getNetworkCountryIso() == null|| tm.getNetworkCountryIso().length() == 0 || tm.getNetworkCountryIso().equals("us") || tm.getNetworkCountryIso().equals("gb") || tm.getNetworkCountryIso().equals("de")) {
+		if (tm == null || tm.getNetworkCountryIso() == null|| tm.getNetworkCountryIso().length() == 0 
+				|| tm.getNetworkCountryIso().equals("us") || tm.getNetworkCountryIso().equals("310") || tm.getNetworkCountryIso().equals("311") || tm.getNetworkCountryIso().equals("312") || tm.getNetworkCountryIso().equals("313") || tm.getNetworkCountryIso().equals("314") || tm.getNetworkCountryIso().equals("315")
+				|| tm.getNetworkCountryIso().equals("gb") || tm.getNetworkCountryIso().equals("234") || tm.getNetworkCountryIso().equals("235")
+				|| tm.getNetworkCountryIso().equals("de") || tm.getNetworkCountryIso().equals("262")) {
 			context.getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
 			return true;
 		}
