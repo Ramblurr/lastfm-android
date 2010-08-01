@@ -147,6 +147,13 @@ public class Profile extends ActivityGroup {
 		if(getIntent() != null && getIntent().getStringExtra(SearchManager.QUERY) != null)
 			searchTabIntent.putExtra(SearchManager.QUERY, getIntent().getStringExtra(SearchManager.QUERY));
 
+		if(RadioPlayerService.radioAvailable(this)) {
+			getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+		} else {
+			getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+		}
+
+		
 		if (isAuthenticatedUser) {
 			mTabHost.addTab(mTabHost.newTabSpec("profile")
 	                .setIndicator(getString(R.string.profile_myprofile), getResources().getDrawable(R.drawable.ic_tab_profile))
