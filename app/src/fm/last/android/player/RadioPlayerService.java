@@ -330,6 +330,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (intent.getAction().equals("fm.last.android.PLAY")) {
 			String stationURL = intent.getStringExtra("station");
 			Session session = intent.getParcelableExtra("session");
+			if(mState != STATE_STOPPED && currentStationURL.equals(stationURL))
+				return;
 			if (stationURL != null && stationURL.length() > 0 && session != null) {
 				new TuneRadioTask(stationURL, session).execute();
 			}
