@@ -612,13 +612,13 @@ public class Player extends Activity {
 
 							if ((mArtistName != null && mArtistName.getText() != null && mTrackName != null && mTrackName.getText() != null) && (!mArtistName.getText().equals(artistName)
 									|| !mTrackName.getText().equals(trackName))) {
-								if (artistName
+								if (artistName == null || artistName
 										.equals(RadioPlayerService.UNKNOWN)) {
 									mArtistName.setText("");
 								} else {
 									mArtistName.setText(artistName);
 								}
-								if (trackName
+								if (trackName == null || trackName
 										.equals(RadioPlayerService.UNKNOWN)) {
 									mTrackName.setText("");
 								} else {
