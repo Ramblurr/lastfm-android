@@ -20,7 +20,9 @@
  ***************************************************************************/
 package fm.last.android.scrobbler;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.FileHandler;
@@ -141,6 +143,34 @@ public class ScrobblerService extends Service {
 			}
 		} catch (Exception e) {
 			mCurrentTrack = null;
+		}
+		
+		try {
+			if (getFileStreamPath("queue.dat").exists()) {
+				logger.info("Migrating old scrobble queue");
+				FileInputStream fileStream = openFileInput("queue.dat");
+				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+				Object obj = objectStream.readObject();
+				if (obj instanceof Integer) {
+					Integer count = (Integer) obj;
+					for (int i = 0; i < count.intValue(); i++) {
+						obj = objectStream.readObject();
+						if (obj != null && obj instanceof ScrobblerQueueEntry) {
+							try {
+								ScrobblerQueueDao.getInstance().addToQueue((ScrobblerQueueEntry) obj);
+							} catch (IllegalStateException e) {
+								break; //The queue is full!
+							}
+						}
+					}
+					logger.info("Imported " + count + " tracks");
+				}
+				objectStream.close();
+				fileStream.close();
+				deleteFile("queue.dat");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
