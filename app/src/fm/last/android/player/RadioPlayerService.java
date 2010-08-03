@@ -142,7 +142,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				|| tm.getNetworkCountryIso().equals("de") || tm.getNetworkCountryIso().equals("262")) {
 			return true;
 		}
-		context.getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.activity.Player"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 		return false;
 	}
     
