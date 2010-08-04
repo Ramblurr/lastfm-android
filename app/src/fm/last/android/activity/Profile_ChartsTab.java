@@ -107,6 +107,8 @@ public class Profile_ChartsTab extends ListActivity {
 		
 		try {
 			mProfileBubble = new QuickContactProfileBubble(this);
+		} catch (java.lang.VerifyError e) {
+			mProfileBubble = new ProfileBubble(this);
 		} catch (Exception e) {
 			mProfileBubble = new ProfileBubble(this);
 		}
