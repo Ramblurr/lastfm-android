@@ -228,6 +228,15 @@ public class Tag extends Activity {
 		}
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			new SaveTagTask().execute((Object) null);
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Restores already added tags when orientation is changed
 	 */
