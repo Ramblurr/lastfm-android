@@ -266,6 +266,18 @@ final class LastFmServerImpl implements LastFmServer {
 		return TrackFunctions.getTrackTags(baseUrl, params);
 	}
 
+	public Tag[] getArtistTags(String artist, String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("artist.getTags");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+		}
+		signParams(params);
+		return TrackFunctions.getTrackTags(baseUrl, params);
+	}
+
 	public void addTrackTags(String artist, String track, String[] tag, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("track.addTags");
 		if (artist != null) {
@@ -291,6 +303,36 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		if (track != null) {
 			params.put("track", track);
+		}
+		if (tag != null) {
+			params.put("tag", tag);
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+		}
+		signParams(params);
+		TrackFunctions.removeTrackTag(baseUrl, params);
+	}
+
+	public void addArtistTags(String artist, String[] tag, String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("artist.addTags");
+		if (artist != null) {
+			params.put("artist", artist);
+		}
+		if (tag != null) {
+			params.put("tags", TagFunctions.buildTags(tag));
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+		}
+		signParams(params);
+		TrackFunctions.addTrackTags(baseUrl, params);
+	}
+
+	public void removeArtistTag(String artist, String tag, String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("artist.removeTag");
+		if (artist != null) {
+			params.put("artist", artist);
 		}
 		if (tag != null) {
 			params.put("tag", tag);

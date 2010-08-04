@@ -267,9 +267,14 @@ public class Tag extends Activity {
 		fm.last.api.Tag userTags[] = null;
 		fm.last.api.Tag oldTags[] = null;
 		try {
-			topTags = mServer.getTrackTopTags(mArtist, mTrack, null);
 			userTags = mServer.getUserTopTags(mSession.getName(), 50);
-			oldTags = mServer.getTrackTags(mArtist, mTrack, mSession.getKey());
+			if(mTrack != null) {
+				topTags = mServer.getTrackTopTags(mArtist, mTrack, null);
+				oldTags = mServer.getTrackTags(mArtist, mTrack, mSession.getKey());
+			} else {
+				topTags = mServer.getArtistTopTags(mArtist, null);
+				oldTags = mServer.getArtistTags(mArtist, mSession.getKey());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -364,14 +369,20 @@ public class Tag extends Activity {
 		String[] tag = new String[addTags.size()];
 		addTags.toArray(tag);
 		try {
-			mServer.addTrackTags(mArtist, mTrack, tag, mSession.getKey());
+			if(mTrack != null)
+				mServer.addTrackTags(mArtist, mTrack, tag, mSession.getKey());
+			else
+				mServer.addArtistTags(mArtist, tag, mSession.getKey());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		for (int i = 0; i < removeTags.size(); i++) {
 			try {
-				mServer.removeTrackTag(mArtist, mTrack, removeTags.get(i), mSession.getKey());
+				if(mTrack != null)
+					mServer.removeTrackTag(mArtist, mTrack, removeTags.get(i), mSession.getKey());
+				else
+					mServer.removeArtistTag(mArtist, removeTags.get(i), mSession.getKey());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

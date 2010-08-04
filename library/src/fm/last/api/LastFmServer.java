@@ -169,6 +169,8 @@ public interface LastFmServer {
 	 */
 	public Tag[] getTrackTags(String artist, String track, String sk) throws IOException;
 
+	public Tag[] getArtistTags(String artist, String sk) throws IOException;
+
 	/**
 	 * See http://www.lastfm.pl/api/show?service=304
 	 * 
@@ -185,6 +187,8 @@ public interface LastFmServer {
 	 */
 	public void addTrackTags(String artist, String track, String[] tag, String sk) throws IOException;
 
+	public void addArtistTags(String artist, String[] tag, String sk) throws IOException;
+
 	/**
 	 * See http://www.lastfm.pl/api/show?service=316
 	 * 
@@ -200,6 +204,8 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public void removeTrackTag(String artist, String track, String tag, String sk) throws IOException;
+
+	public void removeArtistTag(String artist, String tag, String sk) throws IOException;
 
 	/**
 	 * See http://www.last.fm/api/show?service=267
