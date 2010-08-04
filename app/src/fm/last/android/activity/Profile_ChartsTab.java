@@ -104,9 +104,10 @@ public class Profile_ChartsTab extends ListActivity {
 		setContentView(R.layout.charts);
 
 		mUsername = getIntent().getStringExtra("user");
+		
 		try {
 			mProfileBubble = new QuickContactProfileBubble(this);
-		} catch (java.lang.VerifyError e) {
+		} catch (Exception e) {
 			mProfileBubble = new ProfileBubble(this);
 		}
 		mProfileBubble.setTag("header");
