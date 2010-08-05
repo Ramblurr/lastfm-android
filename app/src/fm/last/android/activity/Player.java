@@ -34,6 +34,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -58,7 +59,6 @@ import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
-import fm.last.android.utils.UserTask;
 import fm.last.android.widget.AdArea;
 import fm.last.android.widget.AlbumArt;
 import fm.last.api.Album;
@@ -144,22 +144,8 @@ public class Player extends Activity {
 		Intent intent = getIntent();
 		if (intent != null) {
 			if(intent.getAction() != null && intent.getAction().equals("android.media.action.MEDIA_PLAY_FROM_SEARCH")) {
-				String query = intent.getStringExtra(SearchManager.QUERY);
-				try {
-					Station s = mServer.searchForStation(query);
-					if(s != null) {
-						LastFMApplication.getInstance().playRadioStation(Player.this, s.getUrl(), false);
-						tuning = true;
-					}
-				} catch (NullPointerException e) {
-					Intent i = new Intent(this, Profile.class);
-					i.putExtra(SearchManager.QUERY, query);
-					startActivity(i);
-					finish();
-					return;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				new SearchStationTask().execute((Void)null);
+				tuning = true;
 			} else if(intent.getData() != null && intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
 				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
 				tuning = true;
@@ -761,7 +747,36 @@ public class Player extends Activity {
 				.toString();
 	}
 
-	private class LoadAlbumArtTask extends UserTask<String, Void, Boolean> {
+	private class SearchStationTask extends AsyncTask<Void, Void, Station> {
+
+		@Override
+		protected Station doInBackground(Void... arg0) {
+			String query = Player.this.getIntent().getStringExtra(SearchManager.QUERY);
+			try {
+				Station s = mServer.searchForStation(query);
+				return s;
+			} catch (NullPointerException e) {
+			} catch (IOException e) {
+			}
+			return null;
+		}
+		
+		@Override
+		public void onPostExecute(Station result) {
+			String query = Player.this.getIntent().getStringExtra(SearchManager.QUERY);
+
+			if(result != null) {
+				LastFMApplication.getInstance().playRadioStation(Player.this, result.getUrl(), false);
+			} else {
+				Intent i = new Intent(Player.this, Profile.class);
+				i.putExtra(SearchManager.QUERY, query);
+				startActivity(i);
+				finish();
+			}
+		}
+	}
+	
+	private class LoadAlbumArtTask extends AsyncTask<String, Void, Boolean> {
 		String artUrl;
 
 		@Override
@@ -809,7 +824,7 @@ public class Player extends Activity {
 		}
 	}
 
-	private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
+	private class LoadEventsTask extends AsyncTask<Void, Void, Boolean> {
 		String mArtist = null;
 
 		@Override
