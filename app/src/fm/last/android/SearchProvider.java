@@ -109,7 +109,7 @@ public class SearchProvider extends ContentProvider {
 		                    id++,                  // _id
 		                    artists[i].getName(),           // text1
 		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-		                    Uri.parse("http://www.last.fm/music/"+processedQuery),           // intent_data (included when clicking on item)
+		                    Uri.parse("http://www.last.fm/music/"+artists[i].getName()),           // intent_data (included when clicking on item)
 		                    -1,
 		                    artists[i].getImages().length == 0 ? "" : artists[i].getImages()[0].getUrl()
 		            });
@@ -126,7 +126,7 @@ public class SearchProvider extends ContentProvider {
 		                    id++,                  // _id
 		                    tracks[i].getArtist().getName() + " - " + tracks[i].getName(),           // text1
 		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-		                    Uri.parse("http://www.last.fm/music/"+Uri.encode(tracks[i].getArtist().getName())+"/_/"+processedQuery),           // intent_data (included when clicking on item)
+		                    Uri.parse("http://www.last.fm/music/"+Uri.encode(tracks[i].getArtist().getName())+"/_/"+tracks[i].getName()),           // intent_data (included when clicking on item)
 		                    -1,
 		                    tracks[i].getImages().length == 0 ? "" : tracks[i].getImages()[0].getUrl()
 		            });
