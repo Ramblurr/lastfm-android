@@ -12,7 +12,7 @@
 		android:layout_width="fill_parent"
 		android:textSize="18sp"
 		android:hint="@string/action_search"
-		android:imeOptions="actionSearch"
+		android:imeOptions="actionGo"
 		android:layout_alignParentLeft="true"  android:layout_alignLeft="@+id/station_search"
 		android:layout_weight="1" android:singleLine="true" 
 		android:layout_marginLeft="7dip"
@@ -21,6 +21,15 @@
         
 	<ImageButton 
 		android:id="@+id/search"
+		android:layout_height="fill_parent" android:layout_width="wrap_content"
+		android:layout_marginLeft="8dip"
+		android:layout_marginBottom="9dip"
+		android:layout_marginTop="7dip"
+		android:background="@drawable/black_button"
+		android:src="@drawable/ic_tab_search"/>
+
+	<ImageButton 
+		android:id="@+id/voice"
 		android:layout_height="fill_parent" android:layout_width="wrap_content"
 		android:layout_marginLeft="8dip"
 		android:layout_marginRight="8dip"

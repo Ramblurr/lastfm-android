@@ -22,7 +22,7 @@
 	<string name="action_skip">Skip Track</string>
 	<string name="action_ontour">On Tour</string>
 	<string name="action_menu">Menu</string>
-	<string name="action_search">Artists, Tags, and Users</string>
+	<string name="action_search">Artists, Tags, Users</string>
 	<string name="action_tagradio">Listen to music with this tag</string>
 	<string name="action_viewprofile">View Profile</string>
 

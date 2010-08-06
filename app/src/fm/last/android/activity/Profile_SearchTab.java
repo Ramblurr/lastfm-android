@@ -49,6 +49,7 @@ import fm.last.android.utils.ImageCache;
 public class Profile_SearchTab extends ListActivity implements OnClickListener, OnKeyListener {
 	private EditText mSearchText;
 	private ImageButton mSearchButton;
+	private ImageButton mVoiceButton;
 	private ImageCache mImageCache;
 	
 	@Override
@@ -63,6 +64,9 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		mSearchButton = (ImageButton)findViewById(R.id.search);
 		mSearchButton.setOnClickListener(this);
 		
+		mVoiceButton = (ImageButton)findViewById(R.id.voice);
+		mVoiceButton.setOnClickListener(this);
+		
 		mImageCache = new ImageCache();
 		
 		String query = getIntent().getStringExtra(SearchManager.QUERY);
@@ -72,15 +76,19 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		}
 	}
 
-	public void onClick(View arg0) {
-		try {
-	        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-	        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-	                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-	        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.action_search));
-	        startActivityForResult(intent, 1234);
-		} catch (ActivityNotFoundException e) {
-			LastFMApplication.getInstance().presentError(this, getString(R.string.ERROR_VOICE_TITLE), getString(R.string.ERROR_VOICE));
+	public void onClick(View v) {
+		if(v.getId() == R.id.voice) {
+			try {
+		        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+		                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+		        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.action_search));
+		        startActivityForResult(intent, 1234);
+			} catch (ActivityNotFoundException e) {
+				LastFMApplication.getInstance().presentError(this, getString(R.string.ERROR_VOICE_TITLE), getString(R.string.ERROR_VOICE));
+			}
+		} else {
+			new SearchTask().execute((Void)null);
 		}
 	}
 	
@@ -130,6 +138,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 
 			mSearchText.setEnabled(false);
 			mSearchButton.setEnabled(false);
+			mVoiceButton.setEnabled(false);
 			
 			adapter.disableDisclosureIcons();
 			adapter.setDisabled();
@@ -180,6 +189,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 			getListView().setVisibility(View.VISIBLE);
 			mSearchText.setEnabled(true);
 			mSearchButton.setEnabled(true);
+			mVoiceButton.setEnabled(true);
 		}
 	}
 
