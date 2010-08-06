@@ -21,8 +21,10 @@
 package fm.last.android.player;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -114,7 +116,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private long mTrackStartTime = 0;
 	private PendingIntent mPreBufferIntent = null;
 	private boolean pauseButtonPressed = false;
-
+	private boolean disabledStagefright = false;
+	
 	private static final int NOTIFY_ID = 1337;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -279,7 +282,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 					logger.info("Data connection lost! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo()
 							+ " Reason: " + ni.getReason());
-					if (mp != null && bufferPercent < 100) {
+					if (mp != null && bufferPercent < 99) {
 						try {
 							mp.stop();
 						} catch (Exception e) {
@@ -369,6 +372,17 @@ public class RadioPlayerService extends Service implements MusicFocusable {
         unregisterMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
         		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 
+        if(disabledStagefright) {
+        	//Re-enable StageFright if we disabled it
+			logger.info("Enabling StageFright");
+			String[] setprop = {"setprop", "media.stagefright.enable-player", "true"};
+			try {
+				Runtime.getRuntime().exec(setprop);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
 	}
 
 	public IBinder getBinder() {
@@ -958,6 +972,37 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			RecentStationsDao.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
             registerMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
             		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
+
+            //Disable the new StageFright API since it doesn't handle our streams properly
+			String[] getprop = {"getprop", "media.stagefright.enable-player"};
+
+			Process process = Runtime.getRuntime().exec(getprop);
+			InputStream in = process.getInputStream();
+			byte[] buf = new byte[128];
+			int len = in.read(buf, 0, 128);
+			in.close();
+			
+			String value = new String(buf, 0, len);
+			logger.info("media.stagefright.enable-player: " + value);
+			
+			if(value.equals("true\n")) {
+				logger.info("Attempting to disable StageFright");
+	            //Disable the new StageFright API since it doesn't handle our streams properly
+				String[] setprop = {"setprop", "media.stagefright.enable-player", "false"};
+				Runtime.getRuntime().exec(setprop);
+
+				process = Runtime.getRuntime().exec(getprop);
+				in = process.getInputStream();
+				len = in.read(buf, 0, 128);
+				in.close();
+				
+				value = new String(buf, 0, len);
+				logger.info("media.stagefright.enable-player: " + value);
+				if(value.equals("false\n")) {
+					logger.info("StageFright disabled!");
+					disabledStagefright = true;
+				}
+			}
 		} else {
 			clearNotification();
 			currentStationURL = null;
