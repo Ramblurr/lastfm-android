@@ -61,6 +61,9 @@ public class ProfileBubble extends LinearLayout {
 		mSecond.setText(getContext().getText(R.string.profile_loading));
 		mAvatar = (AlbumArt) findViewById(R.id.profile_avatar);
 		mAvatar.setDefaultImageResource(R.drawable.profile_unknown);
+		
+		mFirst.setShadowLayer(2, 2, 2, 0xFF000000);
+		mFirst.setTextColor(0xFFFFFFFF);
 	}
 
 	public void setUser(User user) {

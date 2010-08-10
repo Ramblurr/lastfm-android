@@ -31,9 +31,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -41,6 +43,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.AndroidLastFmServerFactory;
@@ -128,49 +131,120 @@ public class Profile_ChartsTab extends ListActivity {
 		String[] mStrings;
 		
 		if(mUsername.equals(LastFMApplication.getInstance().session.getName()))
-			mStrings = new String[] { this.getString(R.string.profile_myrecs), this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
-				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed),
-				this.getString(R.string.profile_friends), this.getString(R.string.profile_tags) }; // this
-																									// order
-																									// must
-																									// match
-																									// the
-																									// ProfileActions
-																									// enum
+			mStrings = new String[] { getString(R.string.profile_myrecs), getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+				getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+				getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
+																						// order
+																						// must
+																						// match
+																						// the
+																						// ProfileActions
+																						// enum
 		else
-			mStrings = new String[] { this.getString(R.string.profile_topartists), this.getString(R.string.profile_topalbums),
-				this.getString(R.string.profile_toptracks), this.getString(R.string.profile_recentlyplayed),
-				this.getString(R.string.profile_friends), this.getString(R.string.profile_tags) }; // this
-																									// order
-																									// must
-																									// match
-																									// the
-																									// ProfileActions
-																									// enum
+			mStrings = new String[] { getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+				getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+				getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
+																						// order
+																						// must
+																						// match
+																						// the
+																						// ProfileActions
+																						// enum
 		mProfileAdapter = new ListAdapter(Profile_ChartsTab.this, mStrings);
 		getListView().setAdapter(mProfileAdapter);
 
 		// TODO should be functions and not member variables, caching is evil
 		mProfileLists[PROFILE_RECOMMENDED] = (ListView) findViewById(R.id.recommended_list_view);
 		mProfileLists[PROFILE_RECOMMENDED].setOnItemClickListener(mArtistListItemClickListener);
-
+		TextView title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_myrecs));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_RECOMMENDED].addHeaderView(title);
+		
+		
 		mProfileLists[PROFILE_TOPARTISTS] = (ListView) findViewById(R.id.topartists_list_view);
 		mProfileLists[PROFILE_TOPARTISTS].setOnItemClickListener(mArtistListItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_topartists));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_TOPARTISTS].addHeaderView(title);
 
 		mProfileLists[PROFILE_TOPALBUMS] = (ListView) findViewById(R.id.topalbums_list_view);
 		mProfileLists[PROFILE_TOPALBUMS].setOnItemClickListener(mAlbumListItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_topalbums));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_TOPALBUMS].addHeaderView(title);
 
 		mProfileLists[PROFILE_TOPTRACKS] = (ListView) findViewById(R.id.toptracks_list_view);
 		mProfileLists[PROFILE_TOPTRACKS].setOnItemClickListener(mTrackListItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_toptracks));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_TOPTRACKS].addHeaderView(title);
 
 		mProfileLists[PROFILE_RECENTLYPLAYED] = (ListView) findViewById(R.id.recenttracks_list_view);
 		mProfileLists[PROFILE_RECENTLYPLAYED].setOnItemClickListener(mTrackListItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_recentlyplayed));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_RECENTLYPLAYED].addHeaderView(title);
 
 		mProfileLists[PROFILE_FRIENDS] = (ListView) findViewById(R.id.profilefriends_list_view);
 		mProfileLists[PROFILE_FRIENDS].setOnItemClickListener(mUserItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_friends));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_FRIENDS].addHeaderView(title);
 
 		mProfileLists[PROFILE_TAGS] = (ListView) findViewById(R.id.profiletags_list_view);
 		mProfileLists[PROFILE_TAGS].setOnItemClickListener(mTagListItemClickListener);
+		title = new TextView(this);
+		title.setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_bar_rest));
+		title.setText(getString(R.string.profile_tags));
+		title.setPadding(6, 6, 6, 6);
+		title.setTextSize(16);
+		title.setTextColor(0xFFFFFFFF);
+		title.setGravity(Gravity.CENTER);
+		title.setTypeface(Typeface.DEFAULT_BOLD);
+		title.setShadowLayer(4, 4, 4, 0xFF000000);
+		mProfileLists[PROFILE_TAGS].addHeaderView(title);
 
 		// Loading animations
 		mPushLeftIn = AnimationUtils.loadAnimation(this, R.anim.push_left_in);

@@ -50,6 +50,9 @@ public class QuickContactProfileBubble extends ProfileBubble {
 		mSecond.setText(getContext().getText(R.string.profile_loading));
 		mAvatar = null;
 		mBadge = (QuickContactBadge)findViewById(R.id.profile_avatar);
+		
+		mFirst.setShadowLayer(2, 2, 2, 0xFF000000);
+		mFirst.setTextColor(0xFFFFFFFF);
 	}
 
 	private void setQuickContactId(long id) {
