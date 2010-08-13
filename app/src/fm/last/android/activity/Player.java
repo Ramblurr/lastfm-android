@@ -34,6 +34,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -752,9 +753,21 @@ public class Player extends Activity {
 		@Override
 		protected Station doInBackground(Void... arg0) {
 			String query = Player.this.getIntent().getStringExtra(SearchManager.QUERY);
+			String username = LastFMApplication.getInstance().session.getName();
+			
 			try {
-				Station s = mServer.searchForStation(query);
-				return s;
+				if(query.equals("my library")) {
+					return new Station("", "", "lastfm://user/" + Uri.encode(username) + "/personal", "");
+				} else if(query.equals("my recommendations")) {
+					return new Station("", "", "lastfm://user/" + Uri.encode(username) + "/recommended", "");
+				} else if(query.equals("my loved tracks")) {
+					return new Station("", "", "lastfm://user/" + Uri.encode(username) + "/loved", "");
+				} else if(query.equals("my neighborhood") || query.equals("my neighbourhood")) {
+					return new Station("", "", "lastfm://user/" + Uri.encode(username) + "/neighbours", "");
+				} else {
+					Station s = mServer.searchForStation(query);
+					return s;
+				}
 			} catch (NullPointerException e) {
 			} catch (IOException e) {
 			}
