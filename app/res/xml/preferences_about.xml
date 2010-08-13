@@ -17,6 +17,10 @@
 			android:key="privacy"
 			/>
 		<Preference
+			android:title="@string/prefs_changes_title"
+			android:key="changes"
+			/>
+		<Preference
 			android:title="@string/prefs_version_title"
 			android:key="version"
 			/>
