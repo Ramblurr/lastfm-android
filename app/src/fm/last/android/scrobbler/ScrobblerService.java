@@ -406,6 +406,7 @@ public class ScrobblerService extends Service {
 
 			String title = intent.getStringExtra("track");
 			String artist = intent.getStringExtra("artist");
+			mScrobbler.player = intent.getStringExtra("player");
 
 			if (mCurrentTrack != null) {
 				int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);

@@ -68,6 +68,7 @@ public class AudioscrobblerService extends Object {
 	public String sessionId;
 	public URL npUrl;
 	public URL subsUrl;
+	public String player = "";
 
 	public AudioscrobblerService(Session session, String apiKey, String sharedSecret, String clientVersion) {
 		mUsername = session.getName();
@@ -113,11 +114,15 @@ public class AudioscrobblerService extends Object {
 		if (sessionId == null)
 			handshake();
 
+		if(player.length() > 0)
+			return "OK";
+
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("s", sessionId);
 		params.put("a", t.getCreator());
 		params.put("t", t.getTitle());
 		params.put("b", t.getAlbum());
+		
 		if(t.getDuration() > 0)
 			params.put("l", new Integer(t.getDuration() / 1000).toString());
 		else
@@ -155,7 +160,7 @@ public class AudioscrobblerService extends Object {
 		if (t.getTrackAuth().length() > 0)
 			params.put("o[0]", "L" + t.getTrackAuth());
 		else
-			params.put("o[0]", "P");
+			params.put("o[0]", "P" + player);
 		params.put("r[0]", ratingCharacter);
 		params.put("m[0]", "");
 		params.put("n[0]", "");
