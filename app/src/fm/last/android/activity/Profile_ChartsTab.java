@@ -35,6 +35,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -473,9 +474,11 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Artist artist = (Artist) l.getAdapter().getItem(position);
-				Intent i = new Intent(Profile_ChartsTab.this, Metadata.class);
-				i.putExtra("artist", artist.getName());
-				startActivity(i);
+				if(artist != null) {
+					Intent i = new Intent(Profile_ChartsTab.this, Metadata.class);
+					i.putExtra("artist", artist.getName());
+					startActivity(i);
+				}
 			} catch (ClassCastException e) {
 				// fine.
 			}
@@ -487,10 +490,12 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Album album = (Album) l.getAdapter().getItem(position);
-				Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
-				i.putExtra("lastfm.artist", album.getArtist());
-				i.putExtra("lastfm.album", album.getTitle());
-				startActivity(i);
+				if(album != null) {
+					Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
+					i.putExtra("lastfm.artist", album.getArtist());
+					i.putExtra("lastfm.album", album.getTitle());
+					startActivity(i);
+				}
 			} catch (ClassCastException e) {
 				// (Album) cast can fail, like when the list contains a string
 				// saying: "no items"
@@ -503,10 +508,12 @@ public class Profile_ChartsTab extends ListActivity {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
 				Track track = (Track) l.getAdapter().getItem(position);
-				Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
-				i.putExtra("lastfm.artist", track.getArtist().getName());
-				i.putExtra("lastfm.track", track.getName());
-				startActivity(i);
+				if(track != null) {
+					Intent i = new Intent(Profile_ChartsTab.this, PopupActionActivity.class);
+					i.putExtra("lastfm.artist", track.getArtist().getName());
+					i.putExtra("lastfm.track", track.getName());
+					startActivity(i);
+				}
 			} catch (ClassCastException e) {
 				// (Track) cast can fail, like when the list contains a string
 				// saying: "no items"
@@ -520,14 +527,12 @@ public class Profile_ChartsTab extends ListActivity {
 			try {
 				Session session = LastFMApplication.getInstance().session;
 				Tag tag = (Tag) l.getAdapter().getItem(position);
-
-				ListAdapter la = (ListAdapter) l.getAdapter();
-				la.enableLoadBar(position);
-
-				if (session.getSubscriber().equals("1"))
-					LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://usertags/" + mUsername + "/" + Uri.encode(tag.getName()), true);
-				else
-					LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://globaltags/" + Uri.encode(tag.getName()), true);
+				if(tag != null) {
+					if (session.getSubscriber().equals("1"))
+						LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://usertags/" + mUsername + "/" + Uri.encode(tag.getName()), true);
+					else
+						LastFMApplication.getInstance().playRadioStation(Profile_ChartsTab.this, "lastfm://globaltags/" + Uri.encode(tag.getName()), true);
+				}
 			} catch (ClassCastException e) {
 				// when the list item is not a tag
 			}
@@ -538,13 +543,12 @@ public class Profile_ChartsTab extends ListActivity {
 	private OnItemClickListener mUserItemClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> l, View v, int position, long id) {
 			try {
-				ListAdapter la = (ListAdapter) l.getAdapter();
-				la.enableLoadBar(position);
-
-				User user = (User) la.getItem(position);
-				Intent profileIntent = new Intent(Profile_ChartsTab.this, fm.last.android.activity.Profile.class);
-				profileIntent.putExtra("lastfm.profile.username", user.getName());
-				startActivity(profileIntent);
+				User user = (User) l.getAdapter().getItem(position);
+				if(user != null) {
+					Intent profileIntent = new Intent(Profile_ChartsTab.this, fm.last.android.activity.Profile.class);
+					profileIntent.putExtra("lastfm.profile.username", user.getName());
+					startActivity(profileIntent);
+				}
 			} catch (ClassCastException e) {
 				// when the list item is not a User
 			}
