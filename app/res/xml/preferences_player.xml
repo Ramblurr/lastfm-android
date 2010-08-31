@@ -19,10 +19,6 @@
 			android:key="discovery"
 			android:defaultValue="false"
 			android:summary="@string/prefs_discovery_summary" android:title="@string/prefs_discovery_title"/> -->
-		<CheckBoxPreference
-			android:key="prebuffer"
-			android:defaultValue="true"
-			android:summary="@string/prefs_prebuffer_summary" android:title="@string/prefs_prebuffer_title"/>
 	</PreferenceCategory>
 
 </PreferenceScreen>

@@ -196,7 +196,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (bitrate == null)
 			bitrate = "128";
 		params.put("bitrate", bitrate);
-		params.put("speed_multiplier", "2");
+		params.put("speed_multiplier", "1");
 		params.put("rtp", rtp);
 		params.put("discovery", discovery);
 		signParams(params);
