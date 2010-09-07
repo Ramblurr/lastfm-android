@@ -114,8 +114,10 @@ public class AudioscrobblerService extends Object {
 		if (sessionId == null)
 			handshake();
 
-		if(player.length() > 0)
+		if(player.length() > 1) {
+			Log.i("Player: " + player);
 			return "OK";
+		}
 
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("s", sessionId);
