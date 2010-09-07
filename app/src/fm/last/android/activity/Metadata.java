@@ -59,7 +59,6 @@ import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
 import fm.last.android.utils.UserTask;
@@ -164,23 +163,7 @@ public class Metadata extends Activity {
 
 		mIsPlaying = false;
 
-		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-				new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-						try {
-							mIsPlaying = player.isPlaying();
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						LastFMApplication.getInstance().unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, 0);
-
+		mIsPlaying = LastFMApplication.getInstance().player.isPlaying();
 	}
 
 	@Override

@@ -31,7 +31,6 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.db.ScrobblerQueueDao;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
@@ -73,7 +72,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				return;
 			}
 			try {
-				IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
+				RadioPlayerService player = LastFMApplication.getInstance().player;
 				if (player != null && player.isPlaying()) {
 					String track = player.getTrackName();
 					String artist = player.getArtistName();
@@ -93,7 +92,7 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 				return;
 			}
 			try {
-				IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
+				RadioPlayerService player = LastFMApplication.getInstance().player;
 				if (player != null && player.isPlaying()) {
 					String track = player.getTrackName();
 					String artist = player.getArtistName();

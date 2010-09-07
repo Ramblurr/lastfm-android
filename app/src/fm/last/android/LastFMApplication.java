@@ -27,27 +27,21 @@ import java.util.Locale;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.os.IBinder;
-import android.os.Parcelable;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 
 import fm.last.android.activity.Player;
 import fm.last.android.db.LastFmDbHelper;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
 import fm.last.api.AudioscrobblerService;
@@ -58,7 +52,7 @@ import fm.last.util.UrlUtil;
 public class LastFMApplication extends Application {
 
 	public Session session;
-	public fm.last.android.player.IRadioPlayer player = null;
+	public RadioPlayerService player = null;
 	private Context mCtx;
 	public GoogleAnalyticsTracker tracker;
 	public AudioscrobblerService scrobbler;
@@ -116,9 +110,10 @@ public class LastFMApplication extends Application {
 				scrobbler.subsUrl = null;
 			}
 		}
+		player = new RadioPlayerService(this);
 	}
 
-	private ServiceConnection mConnection = new ServiceConnection() {
+	/*private ServiceConnection mConnection = new ServiceConnection() {
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
@@ -127,26 +122,12 @@ public class LastFMApplication extends Application {
 		public void onServiceDisconnected(ComponentName className) {
 			player = null;
 		}
-	};
+	};*/
 
 	public void bindPlayerService() {
-		// start our media player service
-		Intent mpIntent = new Intent(this, fm.last.android.player.RadioPlayerService.class);
-		boolean b = bindService(mpIntent, mConnection, BIND_AUTO_CREATE);
-		if (!b) {
-			// something went wrong
-			// mHandler.sendEmptyMessage(QUIT);
-			System.out.println("Binding to service failed " + mConnection);
-		}
 	}
 
 	public void unbindPlayerService() {
-		try {
-		if(player != null && player.asBinder().isBinderAlive())
-			unbindService(mConnection);
-		} catch (Exception e) {
-		}
-		player = null;
 	}
 
 	public void playRadioStation(Context ctx, String url, boolean showPlayer) {
@@ -154,18 +135,15 @@ public class LastFMApplication extends Application {
 		if (session != null && session.getKey().length() > 0) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
-			if(ni == null || !ni.isAvailable() || !ni.isConnected()) {
+			if(ni != null && (!ni.isAvailable() || !ni.isConnected())) {
 				presentError(mCtx, getString(R.string.ERROR_NONETWORK_TITLE), getString(R.string.ERROR_NONETWORK));
 				Intent i = new Intent("fm.last.android.ERROR");
 				sendBroadcast(i);
 				return;
 			}
 			
-			final Intent out = new Intent(this, RadioPlayerService.class);
-			out.setAction("fm.last.android.PLAY");
-			out.putExtra("station", url);
-			out.putExtra("session", (Parcelable) session);
-			startService(out);
+			player.startRadioStation(url, session);
+			
 			if (showPlayer) {
 				IntentFilter intentFilter = new IntentFilter();
 				intentFilter.addAction(RadioPlayerService.STATION_CHANGED);
@@ -206,6 +184,7 @@ public class LastFMApplication extends Application {
 		session = null;
 		instance = null;
 		tracker.stop();
+		player.onDestroy();
 		super.onTerminate();
 	}
 
@@ -309,22 +288,8 @@ public class LastFMApplication extends Application {
 		editor.commit();
 		session = null;
 		try {
-			LastFMApplication.getInstance().bindService(new Intent(this, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-					try {
-						if (player.isPlaying())
-							player.stop();
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					LastFMApplication.getInstance().unbindService(this);
-				}
-
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
+			if (player.isPlaying())
+				player.stop();
 			LastFmDbHelper.getInstance().clearDatabase();
 			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				AccountAuthenticatorService.removeLastfmAccount(this);

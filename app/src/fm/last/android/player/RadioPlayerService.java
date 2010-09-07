@@ -21,10 +21,8 @@
 package fm.last.android.player;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,14 +35,13 @@ import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -55,7 +52,6 @@ import android.media.MediaPlayer.OnPreparedListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Parcelable;
@@ -64,7 +60,6 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFMMediaButtonHandler;
@@ -84,9 +79,12 @@ import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.WSError;
 
-public class RadioPlayerService extends Service implements MusicFocusable {
+public class RadioPlayerService extends ContextWrapper implements MusicFocusable {
 
 	private MediaPlayer mp = null;
+	private MediaPlayer next_mp = null;
+	private boolean mNextPrepared = false;
+	private boolean mNextFullyBuffered = false;
 	private Station currentStation;
 	private Session currentSession;
 	private RadioTrack currentTrack;
@@ -111,7 +109,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private boolean mDoHasWiFi = false;
 	private long mStationStartTime = 0;
 	private long mTrackStartTime = 0;
+	private PendingIntent mPreBufferIntent = null;
 	private boolean pauseButtonPressed = false;
+	
 	private static final int NOTIFY_ID = 1337;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -142,9 +142,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		return false;
 	}
     
-	@Override
-	public void onCreate() {
-		super.onCreate();
+	public RadioPlayerService(Context base) {
+		super(base);
 		
 		initializeStaticCompatMethods();
         mFocusHelper = new MusicPlayerFocusHelper(this, this);
@@ -241,7 +240,20 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityListener, intentFilter);
+
+		intentFilter = new IntentFilter();
+		intentFilter.addAction("fm.last.android.player.PREBUFFER");
+		registerReceiver(prebufferListener, intentFilter);
 	}
+
+	BroadcastReceiver prebufferListener = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			mPreBufferIntent = null;
+			if(mState == STATE_PLAYING)
+				new PreBufferTask().execute();
+		}
+	};
 
 	BroadcastReceiver connectivityListener = new BroadcastReceiver() {
 
@@ -273,6 +285,17 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						mState = STATE_NODATA;
 						currentQueue.clear();
 					}
+					if (next_mp != null && !mNextFullyBuffered) {
+						try {
+							next_mp.stop();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+						next_mp.release();
+						next_mp = null;
+						mNextPrepared = false;
+						mNextFullyBuffered = false;
+					}
 				}
 			} else if (ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED && mState != STATE_ERROR) {
 				if (mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
@@ -291,26 +314,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 	};
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		onStart(intent, startId);
-		return START_NOT_STICKY;
-	}
-
-	@Override
-	public void onStart(Intent intent, int startId) {
-		if (intent.getAction().equals("fm.last.android.PLAY")) {
-			String stationURL = intent.getStringExtra("station");
-			Session session = intent.getParcelableExtra("session");
-			if(mState != STATE_STOPPED && currentStationURL.equals(stationURL))
-				return;
-			if (stationURL != null && stationURL.length() > 0 && session != null) {
-				new TuneRadioTask(stationURL, session).execute();
-			}
+	public void startRadioStation(String stationURL, Session session) {
+		if(mState != STATE_STOPPED && currentStationURL.equals(stationURL))
+			return;
+		if (stationURL != null && stationURL.length() > 0 && session != null) {
+			new TuneRadioTask(stationURL, session).execute();
 		}
 	}
 
-	@Override
 	public void onDestroy() {
 		logger.info("Player service shutting down");
 		try {
@@ -319,11 +330,20 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					mp.stop();
 				mp.release();
 			}
+			if (next_mp != null) {
+				next_mp.release();
+			}
 		} catch (Exception e) {
 			
 		}
 		clearNotification();
 		unregisterReceiver(connectivityListener);
+		unregisterReceiver(prebufferListener);
+		if (mPreBufferIntent != null) {
+			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			am.cancel(mPreBufferIntent);
+			mPreBufferIntent = null;
+		}
 		if(wakeLock != null && wakeLock.isHeld())
 			wakeLock.release();
 		
@@ -334,22 +354,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
         		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 	}
 
-	public IBinder getBinder() {
-
-		return mBinder;
-	}
-
 	private void clearNotification() {
-		try {
-			Class types[] = { boolean.class };
-			Object args[] = { true };
-			Method method = Service.class.getMethod("stopForeground", types);
-			method.invoke(this, args);
-		} catch (NoSuchMethodException e) {
-			nm.cancel(NOTIFY_ID);
-			setForeground(false);
-		} catch (Exception e) {
-		}
 		if (currentStation != null && mStationStartTime > 0) {
 			try {
 				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
@@ -360,6 +365,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			mStationStartTime = 0;
+			nm.cancel(NOTIFY_ID);
 		}
 	}
 
@@ -373,17 +379,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		String info = currentTrack.getTitle() + " - " + currentTrack.getCreator();
 		notification.setLatestEventInfo(this, currentStation.getName(), info, contentIntent);
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		nm.notify(NOTIFY_ID, notification);
 		RadioWidgetProvider.updateAppWidget(this);
-		try {
-			Class types[] = { int.class, Notification.class };
-			Object args[] = { NOTIFY_ID, notification };
-			Method method = Service.class.getMethod("startForeground", types);
-			method.invoke(this, args);
-		} catch (NoSuchMethodException e) {
-			nm.notify(NOTIFY_ID, notification);
-			setForeground(true);
-		} catch (Exception e) {
-		}
 
 		// Send the now playing info to an OpenWatch-enabled watch
 		Intent i = new Intent("com.smartmadsoft.openwatch.action.TEXT");
@@ -402,17 +399,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
 		notification.setLatestEventInfo(this, info, "", contentIntent);
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		nm.notify(NOTIFY_ID, notification);
 		RadioWidgetProvider.updateAppWidget(this);
-		try {
-			Class types[] = { int.class, Notification.class };
-			Object args[] = { NOTIFY_ID, notification };
-			Method method = Service.class.getMethod("startForeground", types);
-			method.invoke(this, args);
-		} catch (NoSuchMethodException e) {
-			nm.notify(NOTIFY_ID, notification);
-			setForeground(true);
-		} catch (Exception e) {
-		}
 		mStationStartTime = System.currentTimeMillis();
 	}
 
@@ -429,6 +417,19 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		public void onBufferingUpdate(MediaPlayer p, int percent) {
 			if (p == mp) {
 				bufferPercent = percent;
+				if (mPreBufferIntent == null && percent == 100 && PreferenceManager.getDefaultSharedPreferences(RadioPlayerService.this).getBoolean("prebuffer", true)) {
+					Intent intent = new Intent("fm.last.android.player.PREBUFFER");
+					mPreBufferIntent = PendingIntent.getBroadcast(RadioPlayerService.this, 0, intent, 0);
+					AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+					long delay = (mp.getDuration() - mp.getCurrentPosition() - 30000);
+					if (delay < 1000)
+						delay = 1000;
+					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay, mPreBufferIntent);
+					logger.info("Prebuffering in " + delay / 1000 + " seconds");
+				}
+			}
+			if (p == next_mp && percent == 100) {
+				mNextFullyBuffered = true;
 			}
 		}
 	};
@@ -448,6 +449,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				} else {
 					p.stop();
 				}
+			} else {
+				mNextPrepared = true;
 			}
 			try {
 				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
@@ -482,8 +485,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					
 			        if (mFocusHelper.isSupported())
 			            mFocusHelper.abandonMusicFocus();
-			        
-					stopSelf();
 				} else {
 					if (mState == STATE_PLAYING || mState == STATE_PREPARING) {
 						logger.severe("Playback error: " + what + ", " + extra);
@@ -500,6 +501,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						mState = STATE_NODATA;
 					}
 				}
+			} else {
+				logger.info("Encountered an error during pre-buffer");
+				if(next_mp != null)
+					next_mp.release();
+				next_mp = null;
+				mNextPrepared = false;
+				mNextFullyBuffered = false;
 			}
 			return true;
 		}
@@ -546,7 +554,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 	}
 
-	private void stop() {
+	public void stop() {
 		mState = STATE_STOPPED;
 		if (mp != null) {
 			try {
@@ -556,6 +564,22 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+		if (next_mp != null) {
+			try {
+				next_mp.stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			next_mp.release();
+		}
+		next_mp = null;
+		mNextPrepared = false;
+		mNextFullyBuffered = false;
+		if (mPreBufferIntent != null) {
+			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			am.cancel(mPreBufferIntent);
+			mPreBufferIntent = null;
 		}
 		clearNotification();
 		notifyChange(PLAYBACK_FINISHED);
@@ -571,8 +595,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		
         if (mFocusHelper.isSupported())
             mFocusHelper.abandonMusicFocus();
-        
-		stopSelf();
 	}
 
 	private void nextSong() {
@@ -587,7 +609,15 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			currentTrack = null;
 			if (mp.isPlaying()) {
 				mp.stop();
+				mp.release();
+				mp = null;
 			}
+		}
+
+		if (mPreBufferIntent != null) {
+			AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+			am.cancel(mPreBufferIntent);
+			mPreBufferIntent = null;
 		}
 
 		mState = STATE_SKIPPING;
@@ -601,6 +631,26 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+
+		if (next_mp != null) {
+			logger.info("Skipping to pre-buffered track");
+			if(mp != null)
+				mp.release();
+			mp = next_mp;
+			next_mp = null;
+			mState = STATE_PREPARING;
+			currentTrack = currentQueue.poll();
+			if (mNextPrepared) {
+				mOnPreparedListener.onPrepared(mp);
+			}
+			if (mNextFullyBuffered) {
+				mOnBufferingUpdateListener.onBufferingUpdate(mp, 100);
+			}
+			mNextPrepared = false;
+			mNextFullyBuffered = false;
+			notifyChange(META_CHANGED);
+			return;
 		}
 
 		// Check again, if size still == 0 then the playlist is empty.
@@ -624,7 +674,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			notification.setLatestEventInfo(this, getString(R.string.ERROR_INSUFFICIENT_CONTENT_TITLE), getString(R.string.ERROR_INSUFFICIENT_CONTENT),
 					contentIntent);
 			nm.notify(NOTIFY_ID, notification);
-			stopSelf();
 		}
 	}
 
@@ -654,6 +703,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			notifyChange(PLAYBACK_STATE_CHANGED);
 			mp.pause();
 			mState = STATE_PAUSED;
+			if (mPreBufferIntent != null) {
+				AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+				am.cancel(mPreBufferIntent);
+				mPreBufferIntent = null;
+			}
 		} else {
 			playingNotify();
 			mp.start();
@@ -855,7 +909,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			currentStationURL = null;
 			wakeLock.release();
 			wifiLock.release();
-			stopSelf();
 		}
 	}
 	
@@ -882,19 +935,42 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
 				clearNotification();
-				stopSelf();
 			} catch (Exception e) {
 				currentStationURL = null;
 				Intent i = new Intent("fm.last.android.ERROR");
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
 				clearNotification();
-				stopSelf();
 			}
 			return null;
 		}
 	}
 	
+	private class PreBufferTask extends UserTask<Void, Void, Void> {
+
+		@Override
+		public Void doInBackground(Void... input) {
+			// Check if we're running low on tracks
+			if (currentQueue.size() < 2) {
+				mPlaylistRetryCount = 0;
+				try {
+					// Please to be working?
+					refreshPlaylist();
+				} catch (WSError e) {
+					logger.info("Got a webservice error during soft-skip, ignoring: " + e.getMessage());
+				} catch (Exception e) {
+				}
+			}
+			if (currentQueue.size() > 1) {
+				mNextPrepared = false;
+				mNextFullyBuffered = false;
+				next_mp = new MediaPlayer();
+				playTrack((currentQueue.peek()), next_mp);
+			}
+			return null;
+		}
+	}
+
 	private class NextTrackTask extends UserTask<Void, Void, Boolean> {
 
 		@Override
@@ -921,164 +997,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				mState = STATE_ERROR;
 			}
 		}
-	}
-
-	private final IRadioPlayer.Stub mBinder = new IRadioPlayer.Stub() {
-		public boolean getPauseButtonPressed() throws DeadObjectException {
-			return pauseButtonPressed;
-		}
-		
-		public void pauseButtonPressed() throws DeadObjectException {
-			pauseButtonPressed = true;
-		}
-		
-		public int getState() throws DeadObjectException {
-			return mState;
-		}
-
-		public void pause() throws DeadObjectException {
-			RadioPlayerService.this.pause();
-		}
-
-		public void stop() throws DeadObjectException {
-			logger.info("Stop button pressed");
-			RadioPlayerService.this.stop();
-		}
-
-		public boolean tune(String url, Session session) throws DeadObjectException, WSError {
-			mError = null;
-
-			try {
-				RadioPlayerService.this.tune(url, session);
-				return true;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (WSError e) {
-				mError = e;
-			}
-			notifyChange(PLAYBACK_ERROR);
-			mState = STATE_ERROR;
-			return false;
-		}
-
-		public void startRadio() throws RemoteException {
-			if (Looper.myLooper() == null)
-				Looper.prepare();
-			// Enter a TUNING state if the user presses the skip button when the
-			// player is in a
-			// STOPPED state
-			if (mState == STATE_STOPPED)
-				mState = STATE_TUNING;
-			currentTrack = null;
-			RadioWidgetProvider.updateAppWidget(RadioPlayerService.this);
-			new NextTrackTask().execute((Void) null);
-		}
-
-		public void skip() throws RemoteException {
-			logger.info("Skip button pressed");
-			if (Looper.myLooper() == null)
-				Looper.prepare();
-			
-			new NextTrackTask().execute((Void) null);
-		}
-
-		public String getAlbumName() throws RemoteException {
-
-			if (currentTrack != null)
-				return currentTrack.getAlbum();
-			else
-				return UNKNOWN;
-		}
-
-		public boolean getLoved() throws RemoteException {
-			return currentTrack != null ? currentTrack.getLoved() : false;
-		}
-		
-		public void setLoved(boolean loved) throws RemoteException {
-			if(currentTrack != null)
-				currentTrack.setLoved(loved);
-		}
-		
-		public String getArtistName() throws RemoteException {
-
-			if (currentTrack != null)
-				return currentTrack.getCreator();
-			else
-				return UNKNOWN;
-		}
-
-		public long getDuration() throws RemoteException {
-			try {
-				if (mp != null && mp.isPlaying())
-					return mp.getDuration();
-			} catch (Exception e) {
-			}
-			return 0;
-		}
-
-		public String getTrackName() throws RemoteException {
-
-			if (currentTrack != null)
-				return currentTrack.getTitle();
-			else
-				return UNKNOWN;
-		}
-
-		public boolean isPlaying() throws RemoteException {
-
-			return mState != STATE_STOPPED && mState != STATE_ERROR;
-		}
-
-		public long getPosition() throws RemoteException {
-			try {
-				if (mp != null && mp.isPlaying())
-					return mp.getCurrentPosition();
-			} catch (Exception e) {
-			}
-			return 0;
-		}
-
-		public String getArtUrl() throws RemoteException {
-			if (currentTrack != null) {
-				return currentTrack.getImageUrl();
-			} else
-				return UNKNOWN;
-		}
-
-		public String getStationName() throws RemoteException {
-			if (currentStation != null)
-				return currentStation.getName();
-			return null;
-		}
-
-		public void setSession(Session session) throws RemoteException {
-
-			currentSession = session;
-		}
-
-		public int getBufferPercent() throws RemoteException {
-
-			return bufferPercent;
-		}
-
-		public String getStationUrl() throws RemoteException {
-
-			if (currentStation != null)
-				return currentStationURL;
-			return null;
-		}
-
-		public WSError getError() throws RemoteException {
-			WSError error = mError;
-			mError = null;
-			return error;
-		}
-	};
-
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mBinder;
 	}
 
 	/**
@@ -1245,5 +1163,111 @@ public class RadioPlayerService extends Service implements MusicFocusable {
         } else {
         	stop();
         }
+	}
+	
+	public String getAlbumName() {
+
+		if (currentTrack != null)
+			return currentTrack.getAlbum();
+		else
+			return UNKNOWN;
+	}
+
+	public boolean getLoved() {
+		return currentTrack != null ? currentTrack.getLoved() : false;
+	}
+	
+	public void setLoved(boolean loved) {
+		if(currentTrack != null)
+			currentTrack.setLoved(loved);
+	}
+	
+	public String getArtistName() {
+
+		if (currentTrack != null)
+			return currentTrack.getCreator();
+		else
+			return UNKNOWN;
+	}
+
+	public long getDuration() {
+		try {
+			if (mp != null && mp.isPlaying())
+				return mp.getDuration();
+		} catch (Exception e) {
+		}
+		return 0;
+	}
+
+	public String getTrackName() {
+
+		if (currentTrack != null)
+			return currentTrack.getTitle();
+		else
+			return UNKNOWN;
+	}
+
+	public boolean isPlaying() {
+
+		return mState != STATE_STOPPED && mState != STATE_ERROR;
+	}
+
+	public long getPosition() {
+		try {
+			if (mp != null && mp.isPlaying())
+				return mp.getCurrentPosition();
+		} catch (Exception e) {
+		}
+		return 0;
+	}
+
+	public String getArtUrl() {
+		if (currentTrack != null) {
+			return currentTrack.getImageUrl();
+		} else
+			return UNKNOWN;
+	}
+
+	public String getStationName() {
+		if (currentStation != null)
+			return currentStation.getName();
+		return null;
+	}
+
+	public void setSession(Session session) {
+
+		currentSession = session;
+	}
+
+	public int getBufferPercent() {
+
+		return bufferPercent;
+	}
+
+	public String getStationUrl() {
+
+		if (currentStation != null)
+			return currentStationURL;
+		return null;
+	}
+
+	public void skip() {
+		logger.info("Skip button pressed");
+		if (Looper.myLooper() == null)
+			Looper.prepare();
+		
+		new NextTrackTask().execute((Void) null);
+	}
+
+	public int getState() {
+		return mState;
+	}
+	
+	public boolean getPauseButtonPressed() {
+		return pauseButtonPressed;
+	}
+	
+	public void pauseButtonPressed() {
+		pauseButtonPressed = true;
 	}
 }

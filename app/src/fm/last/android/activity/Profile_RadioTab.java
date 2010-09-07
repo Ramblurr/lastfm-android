@@ -47,7 +47,6 @@ import fm.last.android.R;
 import fm.last.android.adapter.LastFMStreamAdapter;
 import fm.last.android.adapter.SeparatedListAdapter;
 import fm.last.android.db.RecentStationsDao;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
@@ -307,29 +306,20 @@ public class Profile_RadioTab extends ListActivity {
 		if (!mMainAdapter.isEnabled(position))
 			return;
 
-		LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-				new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-						try {
-							String adapter_station = mMainAdapter.getStation(position);
-							String current_station = player.getStationUrl();
-							if (player.isPlaying() && adapter_station.equals(current_station)) {
-								Intent intent = new Intent(Profile_RadioTab.this, Player.class);
-								startActivity(intent);
-							} else {
-								mMainAdapter.enableLoadBar(position);
-								LastFMApplication.getInstance().playRadioStation(Profile_RadioTab.this, adapter_station, true);
-							}
-						} catch (Exception e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						LastFMApplication.getInstance().unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, Context.BIND_AUTO_CREATE);
+		RadioPlayerService player = LastFMApplication.getInstance().player;
+		try {
+			String adapter_station = mMainAdapter.getStation(position);
+			String current_station = player.getStationUrl();
+			if (player.isPlaying() && adapter_station.equals(current_station)) {
+				Intent intent = new Intent(Profile_RadioTab.this, Player.class);
+				startActivity(intent);
+			} else {
+				mMainAdapter.enableLoadBar(position);
+				LastFMApplication.getInstance().playRadioStation(Profile_RadioTab.this, adapter_station, true);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

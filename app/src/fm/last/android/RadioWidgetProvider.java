@@ -24,7 +24,6 @@ import android.widget.RemoteViews;
 import fm.last.android.activity.PopupActionActivity;
 import fm.last.android.activity.Profile;
 import fm.last.android.db.RecentStationsDao;
-import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.Session;
 import fm.last.api.Station;
@@ -39,7 +38,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	private static RadioWidgetProvider sInstance;
 	private static PendingIntent mAlarmIntent = null;
 	private static boolean mediaPlayerPlaying = false;
-
+	
 	public static synchronized RadioWidgetProvider getInstance() {
 		if (sInstance == null) {
 			sInstance = new RadioWidgetProvider();
@@ -82,6 +81,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		final Context ctx = context;
 		final String action = intent.getAction();
 		final Session session = LastFMApplication.getInstance().session;
+		final RadioPlayerService player = LastFMApplication.getInstance().player;
+		
 		if (session != null) {
 			if (action.equals("fm.last.android.widget.ACTION")) {
 				if(mediaPlayerPlaying) {
@@ -140,35 +141,20 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						}, 0);
 					}
 				} else {
-					LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-							new ServiceConnection() {
-								public void onServiceConnected(ComponentName comp, IBinder binder) {
-									IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-									try {
-										String track = player.getTrackName();
-										String artist = player.getArtistName();
-										if (!track.equals(RadioPlayerService.UNKNOWN)) {
-											Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
-											i.putExtra("lastfm.artist", artist);
-											i.putExtra("lastfm.track", track);
-											i.putExtra("lastfm.nowplaying", true);
-											i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-											LastFMApplication.getInstance().startActivity(i);
-										} else {
-											Intent i = new Intent(LastFMApplication.getInstance(), Profile.class);
-											i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-											LastFMApplication.getInstance().startActivity(i);
-										}
-									} catch (RemoteException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									LastFMApplication.getInstance().unbindService(this);
-								}
-	
-								public void onServiceDisconnected(ComponentName comp) {
-								}
-							}, Context.BIND_AUTO_CREATE);
+					String track = player.getTrackName();
+					String artist = player.getArtistName();
+					if (!track.equals(RadioPlayerService.UNKNOWN)) {
+						Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
+						i.putExtra("lastfm.artist", artist);
+						i.putExtra("lastfm.track", track);
+						i.putExtra("lastfm.nowplaying", true);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						LastFMApplication.getInstance().startActivity(i);
+					} else {
+						Intent i = new Intent(LastFMApplication.getInstance(), Profile.class);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						LastFMApplication.getInstance().startActivity(i);
+					}
 				}
 			} else if (action.equals("fm.last.android.widget.SKIP")) {
 				try {
@@ -218,38 +204,23 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						}, 0);
 					}
 				} else {
-					LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-							new ServiceConnection() {
-								public void onServiceConnected(ComponentName comp, IBinder binder) {
-									IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-									try {
-										// If the player is in a stopped state, call
-										// startRadio instead
-										// of skip
-										if (player.isPlaying())
-											player.skip();
-										else {
-											Station lastStation = RecentStationsDao.getInstance().getLastStation();
-											if (lastStation == null) {
-												LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
-											} else {
-												LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
-														false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
-														true);
-											}
-										}
-									} catch (RemoteException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									LastFMApplication.getInstance().unbindService(this);
-								}
-	
-								public void onServiceDisconnected(ComponentName comp) {
-								}
-							}, Context.BIND_AUTO_CREATE);
+					// If the player is in a stopped state, call
+					// startRadio instead
+					// of skip
+					if (player.isPlaying())
+						player.skip();
+					else {
+						Station lastStation = RecentStationsDao.getInstance().getLastStation();
+						if (lastStation == null) {
+							LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
+							updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
+						} else {
+							LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
+									false);
+							updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
+									true);
+						}
+					}
 				}
 			} else if (action.equals("fm.last.android.widget.STOP")) {
 				try {
@@ -311,38 +282,23 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						}, 0);
 					}
 				} else {
-					LastFMApplication.getInstance().bindService(new Intent(LastFMApplication.getInstance(), fm.last.android.player.RadioPlayerService.class),
-							new ServiceConnection() {
-								public void onServiceConnected(ComponentName comp, IBinder binder) {
-									IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-									try {
-										// If the player is in a stopped state, call
-										// startRadio instead
-										// of stop
-										if (player.isPlaying())
-											player.stop();
-										else {
-											Station lastStation = RecentStationsDao.getInstance().getLastStation();
-											if (lastStation == null) {
-												LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
-											} else {
-												LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
-														false);
-												updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
-														true);
-											}
-										}
-									} catch (RemoteException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-									LastFMApplication.getInstance().unbindService(this);
-								}
-	
-								public void onServiceDisconnected(ComponentName comp) {
-								}
-							}, Context.BIND_AUTO_CREATE);
+					// If the player is in a stopped state, call
+					// startRadio instead
+					// of stop
+					if (player.isPlaying())
+						player.stop();
+					else {
+						Station lastStation = RecentStationsDao.getInstance().getLastStation();
+						if (lastStation == null) {
+							LastFMApplication.getInstance().playRadioStation(ctx, "lastfm://user/" + session.getName() + "/personal", false);
+							updateAppWidget_idle(LastFMApplication.getInstance(), null, true);
+						} else {
+							LastFMApplication.getInstance().playRadioStation(ctx, lastStation.getUrl(),
+									false);
+							updateAppWidget_idle(LastFMApplication.getInstance(), lastStation.getName(),
+									true);
+						}
+					}
 				}
 			} else if (action.equals("fm.last.android.widget.LOVE")) {
 				Intent i = new Intent("fm.last.android.LOVE");
@@ -355,22 +311,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				} catch (SQLiteException e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
-				LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-						try {
-							if (player.isPlaying())
-								player.setLoved(true);
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						LastFMApplication.getInstance().unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName arg0) {
-					}
-				}, 0);
+				if (player.isPlaying())
+					player.setLoved(true);
 			} else if (action.equals("fm.last.android.widget.BAN")) {
 				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					try {
@@ -430,22 +372,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 						//Google Analytics doesn't appear to be thread safe
 					}
 
-					LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
-						public void onServiceConnected(ComponentName comp, IBinder binder) {
-							IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-							try {
-								if (player.isPlaying())
-									player.skip();
-							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							LastFMApplication.getInstance().unbindService(this);
-						}
-	
-						public void onServiceDisconnected(ComponentName comp) {
-						}
-					}, 0);
+					if (player.isPlaying())
+						player.skip();
 				}
 			} else if (action.equals("fm.last.android.widget.UPDATE") || action.startsWith("com.")) {
 				updateAppWidget(context);
@@ -642,27 +570,16 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 
 		if(!mediaPlayerPlaying && RadioPlayerService.radioAvailable(context)) {
-			LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
-	
-					try {
-						new UpdateFromRadioPlayerTask(ctx).execute(player);
-					} catch (RejectedExecutionException e) { //try again in 1 second
-						if (mAlarmIntent == null) {
-							Intent intent = new Intent("fm.last.android.widget.UPDATE");
-							mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
-							AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
-						}
-					}
-
-					LastFMApplication.getInstance().unbindService(this);
+			try {
+				new UpdateFromRadioPlayerTask(ctx).execute();
+			} catch (RejectedExecutionException e) { //try again in 1 second
+				if (mAlarmIntent == null) {
+					Intent intent = new Intent("fm.last.android.widget.UPDATE");
+					mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+					AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+					am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
 				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, Context.BIND_AUTO_CREATE);
+			}
 		}
 	}
 
@@ -709,7 +626,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 	}
 
-	private static class UpdateFromRadioPlayerTask extends AsyncTask<IRadioPlayer, Void, Boolean> {
+	private static class UpdateFromRadioPlayerTask extends AsyncTask<Void, Void, Boolean> {
 		Context ctx = null;
 		String trackName = "";
 		String artistName = "";
@@ -726,26 +643,22 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 		
 		@Override
-		public Boolean doInBackground(IRadioPlayer... s) {
+		public Boolean doInBackground(Void... s) {
+			RadioPlayerService player = LastFMApplication.getInstance().player;
 			boolean playing = false;
-			try {
-				if (s[0].isPlaying()) {
-					trackName = s[0].getTrackName();
-					artistName = s[0].getArtistName();
-					position = s[0].getPosition();
-					duration = s[0].getDuration();
-					loved = s[0].getLoved();
-					if ((position >= 0) && (duration > 0) && (position <= duration)) {
-						buffering = false;
-					}
-					playing = true;
+			if (player.isPlaying()) {
+				trackName = player.getTrackName();
+				artistName = player.getArtistName();
+				position = player.getPosition();
+				duration = player.getDuration();
+				loved = player.getLoved();
+				if ((position >= 0) && (duration > 0) && (position <= duration)) {
+					buffering = false;
 				}
-				state = s[0].getState();
-				stationName = s[0].getStationName();
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				playing = true;
 			}
+			state = player.getState();
+			stationName = player.getStationName();
 			return playing;
 		}
 
