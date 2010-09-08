@@ -114,7 +114,7 @@ public class AudioscrobblerService extends Object {
 		if (sessionId == null)
 			handshake();
 
-		if(player.length() > 1) {
+		if(player != null && player.length() > 0) {
 			Log.i("Player: " + player);
 			return "OK";
 		}

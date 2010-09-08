@@ -406,7 +406,9 @@ public class ScrobblerService extends Service {
 
 			String title = intent.getStringExtra("track");
 			String artist = intent.getStringExtra("artist");
-			mScrobbler.player = intent.getStringExtra("player");
+			String player = intent.getStringExtra("player");
+			if(player != null)
+				mScrobbler.player = player;
 
 			if (mCurrentTrack != null) {
 				int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
@@ -555,6 +557,7 @@ public class ScrobblerService extends Service {
 				}
 				success = true;
 			} catch (Exception e) {
+				e.printStackTrace();
 				success = false;
 			} finally {
 				mScrobblerLock.unlock();
