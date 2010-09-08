@@ -231,6 +231,8 @@
 		                android:resource="@xml/radiowidget_info"
 		                />
 		</receiver>
+		<service android:name=".player.RadioPlayerService"
+			android:process=":player" android:label="@string/playerservice_label" />
 		<receiver android:name=".scrobbler.MusicIntentReceiver">
 			<intent-filter>
 				<action android:name="com.android.music.playstatechanged" />
