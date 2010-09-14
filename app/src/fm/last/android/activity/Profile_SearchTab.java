@@ -25,17 +25,20 @@ import java.util.ArrayList;
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -76,6 +79,13 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		}
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		mgr.hideSoftInputFromWindow(mSearchText.getWindowToken(), 0);
+	}
+	
 	public void onClick(View v) {
 		if(v.getId() == R.id.voice) {
 			try {
