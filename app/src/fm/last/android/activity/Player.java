@@ -40,7 +40,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,6 +97,8 @@ public class Player extends Activity {
 	private static final int REFRESH = 1;
 
 	private boolean tuning = false;
+	
+	private PowerManager.WakeLock wakelock = null;
 	
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
@@ -164,6 +168,12 @@ public class Player extends Activity {
 			} else {
 				mLoveButton.setImageResource(R.drawable.love);
 			}
+		}
+		
+		if(PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("screen_wakelock", false)) {
+			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Last.fm");
+			wakelock.acquire();
 		}
 	}
 
@@ -303,6 +313,8 @@ public class Player extends Activity {
 		mHandler.removeMessages(REFRESH);
 		if (LastFMApplication.getInstance().player != null)
 			LastFMApplication.getInstance().unbindPlayerService();
+		if(wakelock != null)
+			wakelock.release();
 		super.onPause();
 	}
 

@@ -15,6 +15,10 @@
 			android:key="headset_controls"
 			android:defaultValue="true"
 			android:summary="@string/prefs_headset_controls_summary" android:title="@string/prefs_headset_controls_title"/>
+		<CheckBoxPreference
+			android:key="screen_wakelock"
+			android:defaultValue="false"
+			android:summary="@string/prefs_screen_wakelock_summary" android:title="@string/prefs_screen_wakelock_title"/>
 		<!--  <CheckBoxPreference
 			android:key="discovery"
 			android:defaultValue="false"

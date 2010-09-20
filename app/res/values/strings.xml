@@ -111,6 +111,8 @@
 	<string name="prefs_prebuffer_title">Pre-load next track</string>
 	<string name="prefs_prebuffer_summary">Start caching the next track while the current song is playing</string>
 	<string name="prefs_changes_title">ChangeLog</string>
+	<string name="prefs_screen_wakelock_title">Disable Auto-Lock</string>
+	<string name="prefs_screen_wakelock_summary">Keep the screen on during playback</string>
 
 	<!-- bugreport -->
 	<string name="bugreport_description">Please describe the bug:</string>
