@@ -169,12 +169,6 @@ public class Player extends Activity {
 				mLoveButton.setImageResource(R.drawable.love);
 			}
 		}
-		
-		if(PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("screen_wakelock", false)) {
-			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Last.fm");
-			wakelock.acquire();
-		}
 	}
 
 	@Override
@@ -321,6 +315,12 @@ public class Player extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
+
+		if(PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("screen_wakelock", false)) {
+			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Last.fm");
+			wakelock.acquire();
+		}
 
 		registerReceiver(mStatusListener, mIntentFilter);
 		if (LastFMApplication.getInstance().player == null)
