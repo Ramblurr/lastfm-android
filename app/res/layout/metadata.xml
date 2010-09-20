@@ -19,9 +19,19 @@
 		    android:layout_height="fill_parent">
 
                 <!-- Bio tab -->
-		<WebView android:id="@+id/webview" android:layout_width="fill_parent"
-			android:layout_height="fill_parent" android:fadingEdge="none">
-		</WebView>
+		<RelativeLayout android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			xmlns:lfm="http://schemas.android.com/apk/res/fm.last.android">
+			<WebView android:id="@+id/webview" android:layout_width="fill_parent"
+				android:layout_height="fill_parent" android:fadingEdge="none">
+			</WebView>
+			<ImageButton android:id="@+id/ontour" android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_alignParentRight="true" android:visibility="gone" 
+				android:src="@drawable/on_tour" android:background="@null"
+				android:contentDescription="@string/action_ontour"
+				android:layout_alignParentTop="true"/>
+		</RelativeLayout>
 
                 <!-- Similar tab -->
 		<ListView android:id="@+id/similar_list_view"

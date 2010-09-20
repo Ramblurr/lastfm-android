@@ -20,7 +20,6 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,7 +28,6 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteException;
@@ -46,6 +44,7 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -97,6 +96,7 @@ public class Metadata extends Activity {
 	ListView mTagList;
 	ListView mFanList;
 	ListView mEventList;
+	ImageButton mOntourButton;
 	LastFmServer mServer = AndroidLastFmServerFactory.getServer();
 
 	public Metadata() {
@@ -136,6 +136,8 @@ public class Metadata extends Activity {
 		mTagList = (ListView) findViewById(R.id.tags_list_view);
 		mFanList = (ListView) findViewById(R.id.listeners_list_view);
 		mEventList = (ListView) findViewById(R.id.events_list_view);
+		mOntourButton = (ImageButton) findViewById(R.id.ontour);
+		mOntourButton.setOnClickListener(mOntourListener);
 
 		mTabHost.addTab(mTabHost.newTabSpec("bio")
                 .setIndicator(getString(R.string.metadata_bio), getResources().getDrawable(R.drawable.ic_tab_bio))
@@ -212,6 +214,22 @@ public class Metadata extends Activity {
 		return super.onPrepareOptionsMenu(menu);
 	}
 
+	private View.OnClickListener mOntourListener = new View.OnClickListener() {
+
+		public void onClick(View v) {
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Clicks", // Category
+						"on-tour-badge", // Action
+						"", // Label
+						0); // Value
+			} catch (SQLiteException e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
+			mTabHost.setCurrentTabByTag("events");		
+		}
+
+	};
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
@@ -575,6 +593,8 @@ public class Metadata extends Activity {
 		public void onPreExecute() {
 			mEventList.setOnItemClickListener(null);
 			mEventList.setAdapter(new NotificationAdapter(Metadata.this, NotificationAdapter.LOAD_MODE, getString(R.string.common_loading)));
+			mOntourButton.setVisibility(View.GONE);
+			mOntourButton.invalidate();
 		}
 
 		@Override
@@ -608,6 +628,7 @@ public class Metadata extends Activity {
 			mEventList.setAdapter(mEventAdapter);
 			if (result) {
 				mEventList.setOnItemClickListener(mEventOnItemClickListener);
+				mOntourButton.setVisibility(View.VISIBLE);
 			}
 		}
 	}
