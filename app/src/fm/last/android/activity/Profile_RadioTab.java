@@ -146,7 +146,7 @@ public class Profile_RadioTab extends ListActivity {
 					session = new Session(session.getName(), session.getKey(), subscriber);
 					LastFMApplication.getInstance().session = session;
 				}
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -167,7 +167,7 @@ public class Profile_RadioTab extends ListActivity {
 					}
 				}
 				success = true;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return success;
