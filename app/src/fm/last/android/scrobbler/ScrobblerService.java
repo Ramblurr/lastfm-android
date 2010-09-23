@@ -475,7 +475,7 @@ public class ScrobblerService extends Service {
 			nm.cancel(1338);
 		}
 		if (intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
-			if(intent.getLongExtra("position", 0) > 0) { //Work-around for buggy DoubleTwist player
+			if(intent.getLongExtra("position", 0) > 0 || !intent.hasExtra("position")) { //Work-around for buggy DoubleTwist player
 				mCurrentTrack = null;
 				NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 				nm.cancel(1338);
