@@ -475,9 +475,11 @@ public class ScrobblerService extends Service {
 			nm.cancel(1338);
 		}
 		if (intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
-			mCurrentTrack = null;
-			NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-			nm.cancel(1338);
+			if(intent.getLongExtra("position", 0) > 0) { //Work-around for buggy DoubleTwist player
+				mCurrentTrack = null;
+				NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				nm.cancel(1338);
+			}
 		}
 		if (intent.getAction().equals(LOVE) && mCurrentTrack != null) {
 			mCurrentTrack.rating = "L";
