@@ -235,6 +235,21 @@
 			android:process=":player" android:label="@string/playerservice_label" />
 		<receiver android:name=".scrobbler.MusicIntentReceiver">
 			<intent-filter>
+				<action android:name="fm.last.android.metachanged" />
+				<action android:name="fm.last.android.playstatechanged" />
+				<action android:name="fm.last.android.playbackcomplete" />
+				<action android:name="fm.last.android.playbackpaused" />
+				<action android:name="fm.last.android.scrobbler.FLUSH" />
+			</intent-filter>
+		</receiver>
+		<receiver android:name=".scrobbler.RatingIntentReceiver">
+			<intent-filter>
+				<action android:name="fm.last.android.LOVE" />
+				<action android:name="fm.last.android.BAN" />
+			</intent-filter>
+		</receiver>
+		<receiver android:name=".scrobbler.AndroidMusicIntentReceiver">
+			<intent-filter>
 				<action android:name="com.android.music.playstatechanged" />
 				<action android:name="com.android.music.playbackcomplete" />
 				<action android:name="com.android.music.metachanged" />
@@ -242,15 +257,16 @@
 				<action android:name="com.htc.music.metachanged" />
 				<action android:name="com.htc.music.playbackcomplete" />
 				<action android:name="com.htc.music.playstatechanged" />
-				<action android:name="fm.last.android.metachanged" />
-				<action android:name="fm.last.android.playstatechanged" />
-				<action android:name="fm.last.android.playbackcomplete" />
-				<action android:name="fm.last.android.playbackpaused" />
-				<action android:name="fm.last.android.LOVE" />
-				<action android:name="fm.last.android.BAN" />
-				<action android:name="fm.last.android.scrobbler.FLUSH" />
-				<action android:name="com.adam.aslfms.notify.playstatechanged" />
+			</intent-filter>
+		</receiver>
+		<receiver android:name=".scrobbler.ScrobbleDroidIntentReceiver">
+			<intent-filter>
 				<action android:name="net.jjc1138.android.scrobbler.action.MUSIC_STATUS" />
+			</intent-filter>
+		</receiver>
+		<receiver android:name=".scrobbler.SLSIntentReceiver">
+			<intent-filter>
+				<action android:name="com.adam.aslfms.notify.playstatechanged" />
 			</intent-filter>
 		</receiver>
 		<service android:name=".scrobbler.ScrobblerService"

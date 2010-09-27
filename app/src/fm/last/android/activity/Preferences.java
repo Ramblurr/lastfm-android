@@ -4,8 +4,9 @@
 package fm.last.android.activity;
 
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
@@ -13,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.player.RadioPlayerService;
@@ -41,6 +41,8 @@ public class Preferences extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.preferences_about);
 		findPreference("scrobble").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("scrobble_music_player").setOnPreferenceChangeListener(scrobbletoggle);
+		findPreference("scrobble_sdroid").setOnPreferenceChangeListener(scrobbletoggle);
+		findPreference("scrobble_sls").setOnPreferenceChangeListener(scrobbletoggle);
 		findPreference("tos").setOnPreferenceClickListener(urlClick);
 		findPreference("privacy").setOnPreferenceClickListener(urlClick);
 		findPreference("changes").setOnPreferenceClickListener(urlClick);
@@ -86,6 +88,51 @@ public class Preferences extends PreferenceActivity {
 
 	Preference.OnPreferenceChangeListener scrobbletoggle = new Preference.OnPreferenceChangeListener() {
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			if(preference.getKey().equals("scrobble")) {
+				if((Boolean)newValue) {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.MusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+
+					//Re-enable the rest of the recievers to match the current preference state
+					if(preference.getSharedPreferences().getBoolean("scrobble_music_player", true))
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.AndroidMusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+					else
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.AndroidMusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+
+					if(preference.getSharedPreferences().getBoolean("scrobble_sdroid", true))
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.ScrobbleDroidIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+					else
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.ScrobbleDroidIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+					
+					if(preference.getSharedPreferences().getBoolean("scrobble_sls", true))
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.SLSIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+					else
+						getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.SLSIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+				} else {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.MusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.AndroidMusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.ScrobbleDroidIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.SLSIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+				}
+			} else if(preference.getKey().equals("scrobble_music_player")) {
+				if((Boolean)newValue) {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.AndroidMusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+				} else {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.AndroidMusicIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+				}
+			} else if(preference.getKey().equals("scrobble_sdroid")) {
+				if((Boolean)newValue) {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.ScrobbleDroidIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+				} else {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.ScrobbleDroidIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+				}
+			} else if(preference.getKey().equals("scrobble_sls")) {
+				if((Boolean)newValue) {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.SLSIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+				} else {
+					getPackageManager().setComponentEnabledSetting(new ComponentName("fm.last.android", "fm.last.android.scrobbler.SLSIntentReceiver"), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+				}
+			}
+			
 			NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			nm.cancel(1338);
 			return true;

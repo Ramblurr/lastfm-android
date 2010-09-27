@@ -46,18 +46,6 @@ public class MusicIntentReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Session s = LastFMApplication.getInstance().session;
 		if (s != null && s.getKey().length() > 0 && PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble", true)) {
-			if (!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_music_player", true)
-					&& (intent.getAction().startsWith("com.android") || intent.getAction().startsWith("com.htc"))) {
-				return;
-			}
-			if (!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_sls", true)
-					&& intent.getAction().startsWith("com.adam.")) {
-				return;
-			}
-			if (!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("scrobble_sdroid", true)
-					&& intent.getAction().startsWith("net.jjc1138.")) {
-				return;
-			}
 			if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 				if (ScrobblerQueueDao.getInstance().getQueueSize()<1) {
 					return;

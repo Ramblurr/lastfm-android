@@ -11,6 +11,7 @@
 
 		<fm.last.android.activity.SeekBarPreference
 			android:key="scrobble_percentage"
+			android:dependency="scrobble"
 			android:max="100"
 			android:defaultValue="50"
 			android:summary="@string/prefs_scrobble_percentage"
@@ -37,13 +38,13 @@
 		<CheckBoxPreference
 			android:key="scrobble_realtime"
 			android:defaultValue="true"
-			android:dependency="scrobble_music_player"
+			android:dependency="scrobble"
 			android:summary="@string/prefs_scrobble_realtime_summary" android:title="@string/prefs_scrobble_realtime_title"/>
 
 		<CheckBoxPreference
 			android:key="scrobble_wifi_only"
 			android:defaultValue="false"
-			android:dependency="scrobble_music_player"
+			android:dependency="scrobble"
 			android:summary="@string/prefs_scrobble_wifi_only_summary" android:title="@string/prefs_scrobble_wifi_only_title"/>
 
 	</PreferenceCategory>
