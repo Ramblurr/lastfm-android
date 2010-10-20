@@ -268,6 +268,10 @@
 	<string name="ERROR_RADIO_UNAVAILABLE">Last.fm Radio is not available in this region.</string>
 	<string name="ERROR_VOICE_TITLE">Voice Search Unavailable</string>
 	<string name="ERROR_VOICE">Google Voice Search is not installed on this device.</string>
+	<string name="ERROR_DEPRECATED_TITLE">Station No Longer Available</string>
+	<string name="ERROR_DEPRECATED_LOVED">Due to recent station changes, \'loved tracks\' radio is no longer available.\n\n(Don\'t worry, your list of loved tracks hasn\'t changed).</string>
+	<string name="ERROR_DEPRECATED_TAGS">Due to recent station changes, \'personal tag\' radio is no longer available.\n\n(Don\'t worry, your tags haven\'t changed).</string>
+	<string name="ERROR_DEPRECATED_PLAYLISTS">Due to recent station changes, playlists are no longer available.\n\n(Don\'t worry, the list of tracks in your playlists haven\'t changed).</string>
 	
 	<!-- third party account access -->
 	<string name="account_access_title">Last.fm Account Access</string>

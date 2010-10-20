@@ -367,7 +367,7 @@ public class Profile_ChartsTab extends ListActivity {
 			String action = intent.getAction();
 			if (action.equals(RadioPlayerService.PLAYBACK_ERROR) || action.equals("fm.last.android.ERROR")) {
 				for (ListView list : mProfileLists) {
-					if (list.getAdapter() != null)
+					if (list.getAdapter() != null && list.getAdapter().getClass().equals(ListAdapter.class))
 						((ListAdapter) list.getAdapter()).disableLoadBar();
 				}
 			}

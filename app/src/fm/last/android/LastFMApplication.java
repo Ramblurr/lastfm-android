@@ -63,6 +63,8 @@ public class LastFMApplication extends Application {
 	public GoogleAnalyticsTracker tracker;
 	public AudioscrobblerService scrobbler;
 
+	private String mRequestedURL;
+	
 	private static LastFMApplication instance = null;
 
 	public static LastFMApplication getInstance() {
@@ -151,6 +153,8 @@ public class LastFMApplication extends Application {
 
 	public void playRadioStation(Context ctx, String url, boolean showPlayer) {
 		mCtx = ctx;
+		mRequestedURL = url;
+		
 		if (session != null && session.getKey().length() > 0) {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -238,6 +242,16 @@ public class LastFMApplication extends Application {
 					
 				case WSError.ERROR_RadioUnavailable:
 					description = R.string.ERROR_RADIO_UNAVAILABLE;
+					break;
+					
+				case WSError.ERROR_Deprecated:
+					title = R.string.ERROR_DEPRECATED_TITLE;
+					if(mRequestedURL.startsWith("lastfm://playlist/"))
+						description = R.string.ERROR_DEPRECATED_PLAYLISTS;
+					if(mRequestedURL.startsWith("lastfm://usertags/"))
+						description = R.string.ERROR_DEPRECATED_PLAYLISTS;
+					if(mRequestedURL.endsWith("/loved"))
+						description = R.string.ERROR_DEPRECATED_LOVED;
 					break;
 				}
 			}

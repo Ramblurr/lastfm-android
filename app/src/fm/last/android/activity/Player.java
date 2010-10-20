@@ -53,6 +53,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Animation.AnimationListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -138,6 +139,51 @@ public class Player extends Activity {
 		mOntourButton = (ImageButton) findViewById(R.id.ontour);
 		mOntourButton.setOnClickListener(mOntourListener);
 
+		LastFMApplication.getInstance().bindService(
+				new Intent(LastFMApplication.getInstance(),
+						fm.last.android.player.RadioPlayerService.class),
+				new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp,
+							IBinder binder) {
+						IRadioPlayer player = IRadioPlayer.Stub
+								.asInterface(binder);
+						try {
+							String url = player.getStationUrl();
+							
+							if(url.startsWith("lastfm://playlist/") || url.startsWith("lastfm://usertags/") || url.endsWith("/loved")) {
+								findViewById(R.id.noticeContainer).setVisibility(View.VISIBLE);
+								TextView notice = (TextView) findViewById(R.id.notice);
+								notice.setSelected(true);
+								notice.setOnClickListener(new View.OnClickListener() {
+	
+									public void onClick(View v) {
+										Intent i = new Intent(Intent.ACTION_VIEW);
+										i.setData(Uri.parse("http://www.last.fm"));
+										startActivity(i);
+									}
+									
+								});
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LastFMApplication.getInstance().unbindService(this);
+					}
+
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, Context.BIND_AUTO_CREATE);
+		
+		Button dismiss = (Button) findViewById(R.id.dismiss);
+		dismiss.setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				findViewById(R.id.noticeContainer).setVisibility(View.GONE);
+			}
+			
+		});
+		
 		mIntentFilter = new IntentFilter();
 		mIntentFilter.addAction(RadioPlayerService.META_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_FINISHED);
