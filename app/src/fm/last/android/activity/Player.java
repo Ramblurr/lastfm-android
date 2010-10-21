@@ -158,7 +158,7 @@ public class Player extends Activity {
 	
 									public void onClick(View v) {
 										Intent i = new Intent(Intent.ACTION_VIEW);
-										i.setData(Uri.parse("http://www.last.fm"));
+										i.setData(Uri.parse("http://www.last.fm/stationchanges2010"));
 										startActivity(i);
 									}
 									
@@ -175,7 +175,7 @@ public class Player extends Activity {
 					}
 				}, Context.BIND_AUTO_CREATE);
 		
-		Button dismiss = (Button) findViewById(R.id.dismiss);
+		ImageButton dismiss = (ImageButton) findViewById(R.id.dismiss);
 		dismiss.setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {

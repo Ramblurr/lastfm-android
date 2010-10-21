@@ -38,23 +38,24 @@
 				android:layout_below="@id/AdArea"/>
 
 			<LinearLayout android:layout_width="fill_parent" android:visibility="gone"
-				android:layout_height="wrap_content"
-				android:background="#88ffff44" android:paddingTop="2dip" android:paddingBottom="2dip"
+				android:layout_height="38dip"
+				android:background="@drawable/stripe" android:paddingTop="6dip" android:paddingBottom="2dip"
 				android:id="@+id/noticeContainer">
 
 			<TextView
 				android:id="@+id/notice"
 				android:text="Changes are coming to Last.fm that affect this station.  Tap for more information."
 				android:ellipsize="marquee" android:marqueeRepeatLimit="-1"
-				android:textColor="#000" android:textColorHighlight="#000" android:textSize="8pt"
-				android:layout_width="280dip"
+				android:textColor="#6b670e" android:textColorHighlight="#6b670e" android:textSize="8pt"
+				android:layout_width="284dip"
+				android:paddingRight="6dip"
 				android:layout_height="wrap_content"
 				android:singleLine="true"
 				/>
 
-			<Button
+			<ImageButton
 				android:id="@+id/dismiss"
-				android:text="X"
+				android:src="@drawable/close" android:background="@null"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				/>

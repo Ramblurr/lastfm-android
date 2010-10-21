@@ -299,7 +299,7 @@ public class Profile_RadioTab extends ListActivity {
 		mMyStationsAdapter = new LastFMStreamAdapter(this);
 		if (isAuthenticatedUser) {
 			mMyStationsAdapter.putStation(getString(R.string.profile_mylibrary), "lastfm://user/" + Uri.encode(mUsername) + "/personal");
-			if (!settings.getBoolean("remove_loved", false) && session.getSubscriber().equals("1"))
+			if (/*!settings.getBoolean("remove_loved", false) &&*/ session.getSubscriber().equals("1"))
 				mMyStationsAdapter.putStation(getString(R.string.profile_myloved), "lastfm://user/" + Uri.encode(mUsername) + "/loved");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myrecs), "lastfm://user/" + Uri.encode(mUsername) + "/recommended");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myneighborhood), "lastfm://user/" + Uri.encode(mUsername) + "/neighbours");
