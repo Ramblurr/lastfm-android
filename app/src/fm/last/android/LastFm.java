@@ -280,6 +280,9 @@ public class LastFm extends Activity {
 				editor.putString("lastfm_user", session.getName());
 				editor.putString("lastfm_session_key", session.getKey());
 				editor.putString("lastfm_subscriber", session.getSubscriber());
+				editor.putBoolean("remove_playlists", true);
+				editor.putBoolean("remove_tags", true);
+				editor.putBoolean("remove_loved", true);
 				editor.commit();
 
 				LastFMApplication.getInstance().session = session;

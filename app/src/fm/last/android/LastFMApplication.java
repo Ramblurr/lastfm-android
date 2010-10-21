@@ -179,6 +179,7 @@ public class LastFMApplication extends Application {
 
 					@Override
 					public void onReceive(Context context, Intent intent) {
+						unregisterReceiver(this);
 
 						String action = intent.getAction();
 						if (action.equals(RadioPlayerService.STATION_CHANGED)) {
@@ -192,7 +193,6 @@ public class LastFMApplication extends Application {
 							}
 							presentError(mCtx, e);
 						}
-						unregisterReceiver(this);
 					}
 				};
 				registerReceiver(statusListener, intentFilter);
@@ -246,12 +246,23 @@ public class LastFMApplication extends Application {
 					
 				case WSError.ERROR_Deprecated:
 					title = R.string.ERROR_DEPRECATED_TITLE;
-					if(mRequestedURL.startsWith("lastfm://playlist/"))
+					SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+					SharedPreferences.Editor editor = settings.edit();
+					if(mRequestedURL.startsWith("lastfm://playlist/")) {
 						description = R.string.ERROR_DEPRECATED_PLAYLISTS;
-					if(mRequestedURL.startsWith("lastfm://usertags/"))
-						description = R.string.ERROR_DEPRECATED_PLAYLISTS;
-					if(mRequestedURL.endsWith("/loved"))
+						editor.putBoolean("remove_playlists", true);
+					}
+					if(mRequestedURL.startsWith("lastfm://usertags/")) {
+						description = R.string.ERROR_DEPRECATED_TAGS;
+						editor.putBoolean("remove_tags", true);
+					}
+					if(mRequestedURL.endsWith("/loved")) {
 						description = R.string.ERROR_DEPRECATED_LOVED;
+						editor.putBoolean("remove_loved", true);
+					}
+					editor.commit();
+					Intent i = new Intent(RadioPlayerService.STATION_CHANGED);
+					sendBroadcast(i);
 					break;
 				}
 			}

@@ -203,13 +203,17 @@ public class Profile_RadioTab extends ListActivity {
 	}
 
 	private void RebuildMainMenu() {
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+
+		SetupMyStations();
+		
 		Session session = LastFMApplication.getInstance().session;
 		mMainAdapter = new SeparatedListAdapter(this);
 		if (isAuthenticatedUser) {
 			mMainAdapter.addSection(getString(R.string.profile_mystations), mMyStationsAdapter);
 			if (mMyRecentAdapter.getCount() > 0)
 				mMainAdapter.addSection(getString(R.string.profile_recentstations), mMyRecentAdapter);
-			if (session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
+			if (!settings.getBoolean("remove_playlists", false) && session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
 				mMainAdapter.addSection(getString(R.string.profile_myplaylists), mMyPlaylistsAdapter);
 			}
 		} else {
@@ -268,12 +272,20 @@ public class Profile_RadioTab extends ListActivity {
 	private void SetupRecentStations() {
 		if (!isAuthenticatedUser)
 			return;
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
 		mMyRecentAdapter.resetList();
 		List<Station> stations = RecentStationsDao.getInstance().getRecentStations();
 		if (stations != null) {
 			for (Station station : stations) {
 				String name = station.getName();
 				String url = station.getUrl();
+				
+				if(url.startsWith("lastfm://playlist/") && settings.getBoolean("remove_playlists", false))
+					continue;
+				if(url.startsWith("lastfm://usertags/") && settings.getBoolean("remove_tags", false))
+					continue;
+				if(url.endsWith("/loved") && settings.getBoolean("remove_loved", false))
+					continue;
 				mMyRecentAdapter.putStation(name, url);
 			}
 		}
@@ -281,17 +293,19 @@ public class Profile_RadioTab extends ListActivity {
 	}
 
 	private void SetupMyStations() {
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+
 		Session session = LastFMApplication.getInstance().session;
 		mMyStationsAdapter = new LastFMStreamAdapter(this);
 		if (isAuthenticatedUser) {
 			mMyStationsAdapter.putStation(getString(R.string.profile_mylibrary), "lastfm://user/" + Uri.encode(mUsername) + "/personal");
-			if (session.getSubscriber().equals("1"))
+			if (!settings.getBoolean("remove_loved", false) && session.getSubscriber().equals("1"))
 				mMyStationsAdapter.putStation(getString(R.string.profile_myloved), "lastfm://user/" + Uri.encode(mUsername) + "/loved");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myrecs), "lastfm://user/" + Uri.encode(mUsername) + "/recommended");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myneighborhood), "lastfm://user/" + Uri.encode(mUsername) + "/neighbours");
 		} else {
 			mMyStationsAdapter.putStation(getString(R.string.profile_userlibrary, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/personal");
-			if (session.getSubscriber().equals("1"))
+			if (!settings.getBoolean("remove_loved", false) && session.getSubscriber().equals("1"))
 				mMyStationsAdapter.putStation(getString(R.string.profile_userloved, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/loved");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myrecs), "lastfm://user/" + Uri.encode(mUsername) + "/recommended");
 			mMyStationsAdapter.putStation(getString(R.string.profile_userneighborhood, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/neighbours");

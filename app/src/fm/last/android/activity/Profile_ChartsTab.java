@@ -30,6 +30,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -49,6 +50,7 @@ import android.widget.ViewFlipper;
 import android.widget.AdapterView.OnItemClickListener;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.activity.Event.EventActivityResult;
 import fm.last.android.adapter.ListAdapter;
@@ -129,31 +131,8 @@ public class Profile_ChartsTab extends ListActivity {
 
 		getListView().requestFocus();
 		
-		String[] mStrings;
+		RebuildChartsMenu();
 		
-		if(mUsername.equals(LastFMApplication.getInstance().session.getName()))
-			mStrings = new String[] { getString(R.string.profile_myrecs), getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
-				getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
-				getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
-																						// order
-																						// must
-																						// match
-																						// the
-																						// ProfileActions
-																						// enum
-		else
-			mStrings = new String[] { getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
-				getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
-				getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
-																						// order
-																						// must
-																						// match
-																						// the
-																						// ProfileActions
-																						// enum
-		mProfileAdapter = new ListAdapter(Profile_ChartsTab.this, mStrings);
-		getListView().setAdapter(mProfileAdapter);
-
 		// TODO should be functions and not member variables, caching is evil
 		mProfileLists[PROFILE_RECOMMENDED] = (ListView) findViewById(R.id.recommended_list_view);
 		mProfileLists[PROFILE_RECOMMENDED].setOnItemClickListener(mArtistListItemClickListener);
@@ -257,6 +236,59 @@ public class Profile_ChartsTab extends ListActivity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction("fm.last.android.ERROR");
+	}
+	
+	private void RebuildChartsMenu() {
+		String[] mStrings;
+		
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+
+		if(!settings.getBoolean("remove_tags", false)) {
+			if(mUsername.equals(LastFMApplication.getInstance().session.getName()))
+				mStrings = new String[] { getString(R.string.profile_myrecs), getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+					getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+					getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
+																							// order
+																							// must
+																							// match
+																							// the
+																							// ProfileActions
+																							// enum
+			else
+				mStrings = new String[] { getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+					getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+					getString(R.string.profile_friends), getString(R.string.profile_tags) }; // this
+																							// order
+																							// must
+																							// match
+																							// the
+																							// ProfileActions
+																							// enum
+		} else {
+			if(mUsername.equals(LastFMApplication.getInstance().session.getName()))
+				mStrings = new String[] { getString(R.string.profile_myrecs), getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+					getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+					getString(R.string.profile_friends) }; // this
+																							// order
+																							// must
+																							// match
+																							// the
+																							// ProfileActions
+																							// enum
+			else
+				mStrings = new String[] { getString(R.string.profile_topartists), getString(R.string.profile_topalbums),
+					getString(R.string.profile_toptracks), getString(R.string.profile_recentlyplayed),
+					getString(R.string.profile_friends) }; // this
+																							// order
+																							// must
+																							// match
+																							// the
+																							// ProfileActions
+																							// enum
+		}
+		
+		mProfileAdapter = new ListAdapter(Profile_ChartsTab.this, mStrings);
+		getListView().setAdapter(mProfileAdapter);
 	}
 	
 	private class LoadUserTask extends AsyncTask<Void, Void, Boolean> {
@@ -369,6 +401,14 @@ public class Profile_ChartsTab extends ListActivity {
 				for (ListView list : mProfileLists) {
 					if (list.getAdapter() != null && list.getAdapter().getClass().equals(ListAdapter.class))
 						((ListAdapter) list.getAdapter()).disableLoadBar();
+				}
+			} else if(action.equals(RadioPlayerService.STATION_CHANGED)) {
+				RebuildChartsMenu();
+				
+				if (!mViewHistory.isEmpty()) {
+					setPreviousAnimation();
+					mProfileAdapter.disableLoadBar();
+					mNestedViewFlipper.setDisplayedChild(mViewHistory.pop());
 				}
 			}
 		}
