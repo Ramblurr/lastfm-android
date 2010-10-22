@@ -8,4 +8,7 @@
 	<style name="playback_progress">
 		<item name="android:layout_width">230dip</item>
 	</style>
+	<style name="notice">
+		<item name="android:layout_width">500dip</item>
+	</style>
 </resources>

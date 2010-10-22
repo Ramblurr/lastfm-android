@@ -35,12 +35,37 @@
 				android:layout_below="@id/AdArea"
                	android:layout_height="212dip" android:layout_width="212dip" android:layout_margin="10dip"/>
            
+			<LinearLayout android:layout_width="fill_parent" android:visibility="gone"
+				android:layout_height="38dip"
+				android:background="@drawable/stripe" android:paddingTop="6dip" android:paddingBottom="2dip"
+				android:id="@+id/noticeContainer">
+
+			<TextView
+				android:id="@+id/notice"
+				style="@style/notice"
+				android:text="Changes are coming to Last.fm that affect this station.  Tap for more information."
+				android:ellipsize="marquee" android:marqueeRepeatLimit="-1"
+				android:textColor="#6b670e" android:textColorHighlight="#6b670e" android:textSize="8pt"
+				android:paddingRight="6dip"
+				android:layout_height="wrap_content"
+				android:singleLine="true"
+				/>
+
+			<ImageButton
+				android:id="@+id/dismiss"
+				android:src="@drawable/close" android:background="@null"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+
+			</LinearLayout>
+
                <ImageButton 
                    android:id="@+id/ontour" 
                    android:src="@drawable/on_tour" 
                    android:layout_height="wrap_content"
 			       android:layout_width="wrap_content"
-			       android:layout_below="@id/AdArea"
+			       android:layout_below="@id/noticeContainer"
 			       android:layout_alignParentRight="true"
 			       android:background="@null"
 					android:contentDescription="@string/action_ontour"
