@@ -42,7 +42,7 @@
 
 			<TextView
 				android:id="@+id/notice"
-				android:text="Changes are coming to Last.fm that affect this station.  Tap for more information."
+				android:text="This station will soon be discontinued due to changes coming to Last.fm radio. Tap here for more information."
 				android:ellipsize="marquee" android:marqueeRepeatLimit="-1"
 				android:textColor="#6b670e" android:textColorHighlight="#6b670e" android:textSize="8pt"
 				android:paddingRight="6dip"
