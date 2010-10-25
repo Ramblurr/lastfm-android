@@ -156,15 +156,6 @@ public class LastFMApplication extends Application {
 		mRequestedURL = url;
 		
 		if (session != null && session.getKey().length() > 0) {
-			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-			NetworkInfo ni = cm.getActiveNetworkInfo();
-			if(ni != null && (!ni.isAvailable() || !ni.isConnected())) {
-				presentError(mCtx, getString(R.string.ERROR_NONETWORK_TITLE), getString(R.string.ERROR_NONETWORK));
-				Intent i = new Intent("fm.last.android.ERROR");
-				sendBroadcast(i);
-				return;
-			}
-			
 			final Intent out = new Intent(this, RadioPlayerService.class);
 			out.setAction("fm.last.android.PLAY");
 			out.putExtra("station", url);
