@@ -150,7 +150,8 @@ public class Player extends Activity {
 						try {
 							String url = player.getStationUrl();
 							
-							if(url.startsWith("lastfm://playlist/") || url.startsWith("lastfm://usertags/") || url.endsWith("/loved")) {
+							if(url != null &&
+									(url.startsWith("lastfm://playlist/") || url.startsWith("lastfm://usertags/") || url.endsWith("/loved"))) {
 								findViewById(R.id.noticeContainer).setVisibility(View.VISIBLE);
 								TextView notice = (TextView) findViewById(R.id.notice);
 								notice.setSelected(true);
