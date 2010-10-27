@@ -21,12 +21,14 @@
 package fm.last.android.activity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -68,7 +70,16 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		mSearchButton.setOnClickListener(this);
 		
 		mVoiceButton = (ImageButton)findViewById(R.id.voice);
-		mVoiceButton.setOnClickListener(this);
+		// Check to see if a recognition activity is present
+		PackageManager pm = getPackageManager();
+		List activities = pm.queryIntentActivities(
+		  new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+		if (activities.size() != 0) {
+			mVoiceButton.setOnClickListener(this);
+		} else {
+			mVoiceButton.setVisibility(View.GONE);
+		}
+		
 		
 		mImageCache = new ImageCache();
 		
