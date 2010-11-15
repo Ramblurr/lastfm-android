@@ -20,8 +20,6 @@
  ***************************************************************************/
 package fm.last.android;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Locale;
 
 import android.app.AlertDialog;
@@ -35,8 +33,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -50,7 +46,6 @@ import fm.last.android.db.LastFmDbHelper;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
-import fm.last.api.AudioscrobblerService;
 import fm.last.api.Session;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
@@ -61,7 +56,6 @@ public class LastFMApplication extends Application {
 	public fm.last.android.player.IRadioPlayer player = null;
 	private Context mCtx;
 	public GoogleAnalyticsTracker tracker;
-	public AudioscrobblerService scrobbler;
 
 	private String mRequestedURL;
 	
@@ -103,20 +97,6 @@ public class LastFMApplication extends Application {
 		try {
 			version = getPackageManager().getPackageInfo("fm.last.android", 0).versionName;
 		} catch (NameNotFoundException e) {
-		}
-		scrobbler = AndroidLastFmServerFactory.getServer().createAudioscrobbler(session, version);
-		if(settings.getString("scrobbler_session", "").length() > 0) {
-			scrobbler.sessionId = settings.getString("scrobbler_session", "");
-			try {
-				scrobbler.npUrl = new URL(settings.getString("scrobbler_npurl", ""));
-			} catch (MalformedURLException e) {
-				scrobbler.npUrl = null;
-			}
-			try {
-				scrobbler.subsUrl = new URL(settings.getString("scrobbler_subsurl", ""));
-			} catch (MalformedURLException e) {
-				scrobbler.subsUrl = null;
-			}
 		}
 	}
 

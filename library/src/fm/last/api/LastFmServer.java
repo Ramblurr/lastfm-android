@@ -339,9 +339,6 @@ public interface LastFmServer {
 	 */
 	public Album getAlbumInfo(String artist, String album) throws IOException;
 
-	/** if this isn't self explanatory you fail */
-	public AudioscrobblerService createAudioscrobbler(Session session, String clientVersion);
-
 	public void loveTrack(String artist, String track, String sk) throws IOException;
 
 	public void banTrack(String artist, String track, String sk) throws IOException;
@@ -357,4 +354,8 @@ public interface LastFmServer {
 	public Station[] getUserRecentStations(String user, String sk) throws IOException;
 	
 	public Station searchForStation(String query) throws IOException;
+	
+	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String sk) throws IOException;
+	
+	public void updateNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException;
 }

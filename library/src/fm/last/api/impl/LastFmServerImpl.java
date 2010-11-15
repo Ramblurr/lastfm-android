@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import fm.last.api.Album;
 import fm.last.api.Artist;
-import fm.last.api.AudioscrobblerService;
 import fm.last.api.Event;
 import fm.last.api.Friends;
 import fm.last.api.LastFmServer;
@@ -534,10 +533,6 @@ final class LastFmServerImpl implements LastFmServer {
 		return AlbumFunctions.getAlbumInfo(baseUrl, params);
 	}
 
-	public AudioscrobblerService createAudioscrobbler(Session session, String clientVersion) {
-		return new AudioscrobblerService(session, api_key, shared_secret, clientVersion);
-	}
-
 	public void loveTrack(String artist, String track, String sk) throws IOException {
 		Map<String, String> params = createParams("track.love");
 		params.put("artist", artist);
@@ -555,6 +550,45 @@ final class LastFmServerImpl implements LastFmServer {
 		signParams(params);
 		TrackFunctions.banTrack(baseUrl, params);
 	}
+	
+	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String sk) throws IOException {
+		Map<String, String> params = createParams("track.scrobble");
+		params.put("artist", artist);
+		params.put("track", track);
+		if (album != null)
+			params.put("album", album);
+		params.put("timestamp", String.valueOf(timestamp));
+		if (duration > 0)
+			params.put("duration", String.valueOf(duration));
+		params.put("sk", sk);
+		signParams(params);
+		TrackFunctions.scrobbleTrack(baseUrl, params);
+	}
+	
+	public void updateNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException {
+		Map<String, String> params = createParams("track.updateNowPlaying");
+		params.put("artist", artist);
+		params.put("track", track);
+		if (album != null)
+			params.put("album", album);
+		if (duration > 0)
+			params.put("duration", String.valueOf(duration));
+		params.put("sk", sk);
+		signParams(params);
+		TrackFunctions.updateNowPlaying(baseUrl, params);
+	}
+	
+	/*track[i] (Required) : The track name.
+timestamp[i] (Required) : The time the track started playing, in UNIX timestamp format (integer number of seconds since 00:00:00, January 1st 1970 UTC). This must be in the UTC time zone.
+artist[i] (Required) : The artist name.
+album[i] (Optional) : The album name.
+albumArtist[i] (Optional) : The album artist - if this differs from the track artist.
+context[i] (Optional) : Sub-client version (not public, only enabled for certain API keys)
+streamId[i] (Optional) : The stream id for this track received from the radio.getPlaylist service.
+trackNumber[i] (Optional) : The track number of the track on the album.
+mbid[i] (Optional) : The MusicBrainz Track ID.
+duration[i] (Optional) : The length of the track in seconds.
+	 */
 
 	public void shareTrack(String artist, String track, String recipient, String sk) throws IOException {
 		Map<String, String> params = createParams("track.share");

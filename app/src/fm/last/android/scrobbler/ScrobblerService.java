@@ -39,7 +39,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -51,14 +50,13 @@ import android.provider.MediaStore;
 import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
-import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.db.ScrobblerQueueDao;
-import fm.last.api.AudioscrobblerService;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioTrack;
 import fm.last.api.Session;
+import fm.last.api.WSError;
 
 /**
  * A Last.fm scrobbler for Android
@@ -89,7 +87,6 @@ public class ScrobblerService extends Service {
 	private Session mSession;
 	public static final String LOVE = "fm.last.android.LOVE";
 	public static final String BAN = "fm.last.android.BAN";
-	AudioscrobblerService mScrobbler;
 	private Lock mScrobblerLock = new ReentrantLock();
 	SubmitTracksTask mSubmissionTask = null;
 	NowPlayingTask mNowPlayingTask = null;
@@ -104,6 +101,8 @@ public class ScrobblerService extends Service {
 	public static final String UNKNOWN = "fm.last.android.unknown";
 
 	private Logger logger;
+	
+	private String player = null;
 	
 	@Override
 	public void onCreate() {
@@ -123,9 +122,7 @@ public class ScrobblerService extends Service {
 
 		mSession = LastFMApplication.getInstance().session;
 
-		if (mSession != null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
-			mScrobbler = LastFMApplication.getInstance().scrobbler;
-		} else {
+		if (mSession == null || !PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble", true)) {
 			// User not authenticated, shutting down...
 			stopSelf();
 			return;
@@ -209,9 +206,6 @@ public class ScrobblerService extends Service {
 
 			scrobble_perc = (int)(track_duration * (scrobble_perc * 0.01));
 			boolean played = (playTime > scrobble_perc) || (playTime > 240);
-			if (!played && mCurrentTrack.rating.length() == 0 && mCurrentTrack.trackAuth.length() > 0) {
-				mCurrentTrack.rating = "S";
-			}
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
 				boolean queued = ScrobblerQueueDao.getInstance().addToQueue(mCurrentTrack);
@@ -232,10 +226,6 @@ public class ScrobblerService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		final Intent i = intent;
-		if (mScrobbler == null) {
-			stopIfReady();
-			return;
-		}
 
 		/*
 		 * The Android media player doesn't send a META_CHANGED notification for
@@ -406,9 +396,7 @@ public class ScrobblerService extends Service {
 
 			String title = intent.getStringExtra("track");
 			String artist = intent.getStringExtra("artist");
-			String player = intent.getStringExtra("player");
-			if(player != null)
-				mScrobbler.player = player;
+			player = intent.getStringExtra("player");
 
 			if (mCurrentTrack != null) {
 				int scrobble_perc = PreferenceManager.getDefaultSharedPreferences(this).getInt("scrobble_percentage", 50);
@@ -447,7 +435,7 @@ public class ScrobblerService extends Service {
 					boolean scrobbleWifiOnly = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_wifi_only", false);
 					if (cm.getBackgroundDataSetting() && (!scrobbleWifiOnly || (scrobbleWifiOnly && ni.getType() == ConnectivityManager.TYPE_WIFI) || auth != null && mNowPlayingTask == null)) {
 						mNowPlayingTask = new NowPlayingTask(mCurrentTrack.toRadioTrack());
-						mNowPlayingTask.execute(mScrobbler);
+						mNowPlayingTask.execute();
 					}
 				}
 			}
@@ -498,7 +486,7 @@ public class ScrobblerService extends Service {
 					int queueSize = ScrobblerQueueDao.getInstance().getQueueSize();
 					if (queueSize > 0 && mSubmissionTask == null) {
 						mSubmissionTask = new SubmitTracksTask();
-						mSubmissionTask.execute(mScrobbler);
+						mSubmissionTask.execute();
 					}
 				}
 			}
@@ -520,7 +508,7 @@ public class ScrobblerService extends Service {
 		return null;
 	}
 
-	private class NowPlayingTask extends AsyncTask<AudioscrobblerService, Void, Boolean> {
+	private class NowPlayingTask extends AsyncTask<Void, Void, Boolean> {
 		RadioTrack mTrack;
 
 		public NowPlayingTask(RadioTrack track) {
@@ -532,33 +520,23 @@ public class ScrobblerService extends Service {
 			/* If we have any scrobbles in the queue, try to send them now */
 			if (mSubmissionTask == null && ScrobblerQueueDao.getInstance().getQueueSize() > 0) {
 				mSubmissionTask = new SubmitTracksTask();
-				mSubmissionTask.execute(mScrobbler);
+				mSubmissionTask.execute();
 			}
 		}
 
 		@Override
-		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
+		public Boolean doInBackground(Void... params) {
 			boolean success = false;
+			LastFmServer server = AndroidLastFmServerFactory.getServer();
+
 			try {
 				mScrobblerLock.lock();
-				if(scrobbler[0].sessionId == null) {
-					scrobbler[0].handshake();
-					if(scrobbler[0].sessionId != null) {
-						SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
-						SharedPreferences.Editor editor = settings.edit();
-						editor.putString("scrobbler_session", scrobbler[0].sessionId);
-						editor.putString("scrobbler_npurl", scrobbler[0].npUrl.toString());
-						editor.putString("scrobbler_subsurl", scrobbler[0].subsUrl.toString());
-						editor.commit();
-					}
-				}
-				String result = scrobbler[0].nowPlaying(mTrack);
-				if(result.equals("BADSESSION")) {
-					scrobbler[0].sessionId = null;
-					doInBackground(scrobbler[0]);
-				}
+				server.updateNowPlaying(mTrack.getCreator(), mTrack.getTitle(), mTrack.getAlbum(), new Integer(mTrack.getDuration() / 1000), ScrobblerService.this.player, mSession.getKey());
 				success = true;
 			} catch (Exception e) {
+				e.printStackTrace();
+				success = false;
+			} catch (WSError e) {
 				e.printStackTrace();
 				success = false;
 			} finally {
@@ -576,10 +554,10 @@ public class ScrobblerService extends Service {
 		}
 	}
 
-	private class SubmitTracksTask extends AsyncTask<AudioscrobblerService, Void, Boolean> {
+	private class SubmitTracksTask extends AsyncTask<Void, Void, Boolean> {
 
 		@Override
-		public Boolean doInBackground(AudioscrobblerService... scrobbler) {
+		public Boolean doInBackground(Void... p) {
 			boolean success = false;
 			mScrobblerLock.lock();
 			logger.info("Going to submit " + ScrobblerQueueDao.getInstance().getQueueSize() + " tracks");
@@ -602,24 +580,16 @@ public class ScrobblerService extends Service {
 							}
 							server.banTrack(e.artist, e.title, mSession.getKey());
 						}
-						String result = scrobbler[0].submit(e.toRadioTrack(), e.startTime, e.rating);
-						if(result.equals("OK")) {
-							success = true;
-						} else if(result.equals("BADSESSION")) {
-							scrobbler[0].handshake();
-							if(scrobbler[0].sessionId != null) {
-								SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
-								SharedPreferences.Editor editor = settings.edit();
-								editor.putString("scrobbler_session", scrobbler[0].sessionId);
-								editor.putString("scrobbler_npurl", scrobbler[0].npUrl.toString());
-								editor.putString("scrobbler_subsurl", scrobbler[0].subsUrl.toString());
-								editor.commit();
-								continue; //try again with our new session key
-							}
-						}
+						server.scrobbleTrack(e.artist, e.title, e.album, e.startTime, (int)(e.duration / 1000), ScrobblerService.this.player, mSession.getKey());
+						success = true;
 					}
 				} 
 				catch (Exception ex) {
+					logger.severe("Unable to submit track: " + ex.toString());
+					ex.printStackTrace();
+					success = false;
+				}
+				catch (WSError ex) {
 					logger.severe("Unable to submit track: " + ex.toString());
 					ex.printStackTrace();
 					success = false;
