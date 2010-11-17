@@ -135,12 +135,10 @@ public class UrlUtil {
 		try {
 			int rc = conn.getResponseCode();
 			InputStream contentStream = null;
-			if (rc == 400)
-				contentStream = conn.getErrorStream();
-			else if (rc != 200) {
-				throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
-			} else
+			if (rc == 200)
 				contentStream = conn.getInputStream();
+			else
+				contentStream = conn.getErrorStream();
 			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
 			String response = toString(reader);
 			return response;

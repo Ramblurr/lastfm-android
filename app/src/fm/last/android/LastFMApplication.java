@@ -89,6 +89,7 @@ public class LastFMApplication extends Application {
 		String username = settings.getString("lastfm_user", "");
 		String session_key = settings.getString("lastfm_session_key", "");
 		String subscriber = settings.getString("lastfm_subscriber", "0");
+		
 		session = new Session(username, session_key, subscriber);
 		tracker = GoogleAnalyticsTracker.getInstance();
 		tracker.start(PrivateAPIKey.ANALYTICS_ID, this);
