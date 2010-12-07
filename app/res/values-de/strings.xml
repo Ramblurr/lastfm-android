@@ -104,9 +104,9 @@
 	<!-- Profile activity -->
     <string name="profile_label">Last.fm: Profil</string>
     <string name="profile_myradio">Radio</string>
-    <string name="profile_userradio">%ss Radio</string> 
+    <string name="profile_userradio">%1$ss Radio</string> 
     <string name="profile_myprofile">Profil</string>
-    <string name="profile_userprofile">%ss Profil</string>
+    <string name="profile_userprofile">%1$ss Profil</string>
     <string name="profile_tracksplayed">gespielte Titel</string>
     <string name="profile_newstation">Starte eine neue Station</string>   
     <string name="profile_mytags">Meine Tags</string>
@@ -117,11 +117,11 @@
     <string name="profile_mystations">Deine Stationen</string>
     <string name="profile_recentstations">Zuletzt gehörte Stationen</string>
     <string name="profile_commonartists">Gemeinsame Künstler</string>
-    <string name="profile_userneighborhood">%ss Nachbarn</string>
-    <string name="profile_userloved">%ss Lieblingslieder</string>
-    <string name="profile_userlibrary">%ss Musiksammlung</string>
-    <string name="profile_userstations">%ss Stationen</string>
-    <string name="profile_userplaylists">%ss Playlisten</string>
+    <string name="profile_userneighborhood">%1$ss Nachbarn</string>
+    <string name="profile_userloved">%1$ss Lieblingslieder</string>
+    <string name="profile_userlibrary">%1$ss Musiksammlung</string>
+    <string name="profile_userstations">%1$ss Stationen</string>
+    <string name="profile_userplaylists">%1$ss Playlisten</string>
     <string name="profile_myplaylists">Deine Playlisten</string>	
 	<string name="profile_topartists">Top-Künstler</string>
 	<string name="profile_notopartists">Keine Top-Künstler</string>
@@ -141,7 +141,7 @@
 	<string name="profile_tags">Tags</string>
 	<string name="profile_notags">Keine Tags</string>
 	<string name="profile_selectaction">Aktion wählen</string>
-	<string name="profile_userplays">%d gespielte Titel seit %2$te. %2$tb %2$tY</string>
+	<string name="profile_userplays">%1$d gespielte Titel seit %2$te. %2$tb %2$tY</string>
 	<string name="profile_loading">Lade Profil...</string>
 	<string name="profile_gender_male">männl.</string>
     <string name="profile_gender_female">weibl.</string>
@@ -174,10 +174,10 @@
     <string name="newstation_label">Last.fm: Starte eine neue Station</string>
     <string name="newstation_search">Suchen</string>
 	<string name="newstation_artist">Künstler</string>
-	<string name="newstation_artistsample">%s, %s und %s</string>
-	<string name="newstation_artistradio">%s-Radio</string>
+	<string name="newstation_artistsample">%1$s, %2$s und %3$s</string>
+	<string name="newstation_artistradio">%1$s-Radio</string>
 	<string name="newstation_tag">Tag</string>
-	<string name="newstation_tagradio">%s Tag-Radio</string>
+	<string name="newstation_tagradio">%1$s Tag-Radio</string>
 	<string name="newstation_user">Benutzer</string>
 	<string name="newstation_edithint_artist">z.B. Nirvana</string>
 	<string name="newstation_hint_artist">Gib einen Künstler an,\n um Musik zu hören.</string>
@@ -206,15 +206,15 @@
     <string name="playerservice_label">Last.fm Radio Player</string>
     <string name="playerservice_error_ticker_text">Beim Abspielen trat ein Fehler auf</string>
     <string name="playerservice_paused_ticker_text">Last.fm angehalten</string>
-    <string name="playerservice_paused_info">%s von \n %s</string>
+    <string name="playerservice_paused_info">%1$s von \n %2$s</string>
     <string name="playerservice_paused">Angehalten</string>
-    <string name="playerservice_streaming_ticker_text">Streame: %s von %s</string>
+    <string name="playerservice_streaming_ticker_text">Streame: %1$s von %2$s</string>
     <string name="playerservice_tuning">Station wird eingestellt</string>
-    <string name="playerservice_tuningwithstation">Stelle ein: %s</string>
+    <string name="playerservice_tuningwithstation">Stelle ein: %1$s</string>
     
     <!-- Scrobbler service -->
     <string name="scrobbler_label">Last.fm: Scrobbler</string>
-    <string name="scrobbler_ticker_text">Scrobble: %s von %s</string>
+    <string name="scrobbler_ticker_text">Scrobble: %1$s von %2$s</string>
     <string name="scrobbler_info_title">Scrobble gerade</string>
     <string name="scrobbler_trackloved">Der Titel wurde geliebt.</string>
     <string name="scrobbler_trackbanned">Der Titel wurde verbannt.</string>  
