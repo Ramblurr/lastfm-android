@@ -23,6 +23,7 @@ package fm.last.android.scrobbler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.FileHandler;
@@ -47,6 +48,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -233,7 +235,7 @@ public class ScrobblerService extends Service {
 		 * check to see whether the player is currently playing. We'll then send
 		 * our own META_CHANGED intent to the scrobbler.
 		 */
-		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
+		/*if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 				bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
@@ -269,7 +271,13 @@ public class ScrobblerService extends Service {
 				mCurrentTrack = null;
 				stopIfReady();
 			}
-		} else if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
+			Iterator<String> it = intent.getExtras().keySet().iterator();
+			String s = "";
+			while(it.hasNext()) {
+				s = it.next();
+				System.out.println("Key: " + s);
+			}
+		} else*/ if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
 				|| intent.getAction().equals("com.htc.music.metachanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -324,15 +332,20 @@ public class ScrobblerService extends Service {
 				}
 				handleIntent(i);
 			}
-		} else if(intent.getAction().equals("net.jjc1138.android.scrobbler.action.MUSIC_STATUS")) {
+		} else if(intent.getAction().equals("net.jjc1138.android.scrobbler.action.MUSIC_STATUS") || 
+				intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
+				|| intent.getAction().equals("com.android.music.queuechanged")) {
+			logger.info("Action: " + intent.getAction() + "\n");
 			boolean playing = intent.getBooleanExtra("playing", false);
 
 			if(!playing) {
 				i.setAction(PLAYBACK_FINISHED);
 			} else {
 				i.setAction(META_CHANGED);
-				int id = intent.getIntExtra("id", -1);
-
+				long id = intent.getIntExtra("id", -1);
+				if(id == -1)
+					id = intent.getLongExtra("id", -1);
+				
 				if(id != -1) {
 					final String[] columns = new String[] {
 						MediaStore.Audio.AudioColumns.ARTIST,
