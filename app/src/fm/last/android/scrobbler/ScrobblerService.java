@@ -229,55 +229,7 @@ public class ScrobblerService extends Service {
 	public void onStart(Intent intent, int startId) {
 		final Intent i = intent;
 
-		/*
-		 * The Android media player doesn't send a META_CHANGED notification for
-		 * the first track, so we'll have to catch PLAYBACK_STATE_CHANGED and
-		 * check to see whether the player is currently playing. We'll then send
-		 * our own META_CHANGED intent to the scrobbler.
-		 */
-		/*if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
-				|| intent.getAction().equals("com.android.music.queuechanged")) {
-			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
-				bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-
-						try {
-							if (s.isPlaying()) {
-								i.setAction(META_CHANGED);
-								i.putExtra("position", s.position());
-								i.putExtra("duration", s.duration());
-								handleIntent(i);
-							} else { // Media player was paused
-								mCurrentTrack = null;
-								NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-								nm.cancel(1338);
-								stopSelf();
-							}
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						unbindService(this);
-					}
-
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, 0);
-			} else {
-				// Clear the current track in case the user has disabled
-				// scrobbling of the media player
-				// during the middle of this track.
-				mCurrentTrack = null;
-				stopIfReady();
-			}
-			Iterator<String> it = intent.getExtras().keySet().iterator();
-			String s = "";
-			while(it.hasNext()) {
-				s = it.next();
-				System.out.println("Key: " + s);
-			}
-		} else*/ if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
+		if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
 				|| intent.getAction().equals("com.htc.music.metachanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
