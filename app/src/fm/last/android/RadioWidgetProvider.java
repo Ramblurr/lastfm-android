@@ -17,6 +17,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
@@ -68,21 +69,11 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 	}
 
 	public static boolean isAndroidMusicInstalled(Context ctx) {
+		if(Integer.decode(Build.VERSION.SDK) > 8)
+			return false;
 		try {
 			PackageManager pm = ctx.getPackageManager();
 			pm.getPackageInfo(getAndroidMusicPackageName(ctx), 0);
-			try {
-				LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(ctx), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						LastFMApplication.getInstance().unbindService(this);
-					}
-	
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, 0);
-			} catch (Exception e) {
-				return false;
-			}
 			return true;
 		} catch (Exception e) {
 		}

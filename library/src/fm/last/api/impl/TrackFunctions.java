@@ -29,6 +29,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import android.util.Log;
+
 import fm.last.api.Tag;
 import fm.last.api.Track;
 import fm.last.api.User;
@@ -303,6 +305,7 @@ public class TrackFunctions {
 		try {
 			responseXML = XMLUtil.stringToDocument(response);
 		} catch (SAXException e) {
+			Log.e("Last.fm", "Bad XML: " + response);
 			throw new IOException(e.getMessage());
 		}
 
@@ -323,6 +326,7 @@ public class TrackFunctions {
 		try {
 			responseXML = XMLUtil.stringToDocument(response);
 		} catch (SAXException e) {
+			Log.e("Last.fm", "Bad XML: " + response);
 			throw new IOException(e.getMessage());
 		}
 

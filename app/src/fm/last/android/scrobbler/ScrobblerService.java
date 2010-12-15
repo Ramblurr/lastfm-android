@@ -44,6 +44,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -229,7 +230,53 @@ public class ScrobblerService extends Service {
 	public void onStart(Intent intent, int startId) {
 		final Intent i = intent;
 
-		if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
+		/*
+		 * The Android media player doesn't send a META_CHANGED notification for
+		 * the first track, so we'll have to catch PLAYBACK_STATE_CHANGED and
+		 * check to see whether the player is currently playing. We'll then send
+		 * our own META_CHANGED intent to the scrobbler.
+		 */
+		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
+				|| intent.getAction().equals("com.android.music.queuechanged")) {
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+				if(Integer.decode(Build.VERSION.SDK) < 9) {
+					bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						public void onServiceConnected(ComponentName comp, IBinder binder) {
+							com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+	
+							try {
+								if (s.isPlaying()) {
+									i.setAction(META_CHANGED);
+									i.putExtra("position", s.position());
+									i.putExtra("duration", s.duration());
+									handleIntent(i);
+								} else { // Media player was paused
+									mCurrentTrack = null;
+									NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+									nm.cancel(1338);
+									stopSelf();
+								}
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							unbindService(this);
+						}
+	
+						public void onServiceDisconnected(ComponentName comp) {
+						}
+					}, 0);
+				} else {
+					intentFromMediaDB(i);
+				}
+			} else {
+				// Clear the current track in case the user has disabled
+				// scrobbling of the media player
+				// during the middle of this track.
+				mCurrentTrack = null;
+				stopIfReady();
+			}
+		} else if ((intent.getAction().equals("com.htc.music.playstatechanged") && intent.getIntExtra("id", -1) != -1)
 				|| intent.getAction().equals("com.htc.music.metachanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
 				bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -284,73 +331,77 @@ public class ScrobblerService extends Service {
 				}
 				handleIntent(i);
 			}
-		} else if(intent.getAction().equals("net.jjc1138.android.scrobbler.action.MUSIC_STATUS") || 
-				intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
-				|| intent.getAction().equals("com.android.music.queuechanged")) {
-			logger.info("Action: " + intent.getAction() + "\n");
-			boolean playing = intent.getBooleanExtra("playing", false);
-
-			if(!playing) {
-				i.setAction(PLAYBACK_FINISHED);
-			} else {
-				i.setAction(META_CHANGED);
-				long id = intent.getIntExtra("id", -1);
-				if(id == -1)
-					id = intent.getLongExtra("id", -1);
-				
-				if(id != -1) {
-					final String[] columns = new String[] {
-						MediaStore.Audio.AudioColumns.ARTIST,
-						MediaStore.Audio.AudioColumns.TITLE,
-						MediaStore.Audio.AudioColumns.DURATION,
-						MediaStore.Audio.AudioColumns.ALBUM,
-						MediaStore.Audio.AudioColumns.TRACK, };
-				
-					Cursor cur = getContentResolver().query(
-						ContentUris.withAppendedId(
-							MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-							id), columns, null, null, null);
-					
-					if (cur == null) {
-						logger.severe("could not open cursor to media in media store");
-						return;
-					}
-		
-		            try {
-						if (!cur.moveToFirst()) {
-						        logger.severe("no such media in media store");
-						        cur.close();
-						        return;
-						}
-						String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
-						i.putExtra("artist", artist);
-						
-						String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
-						i.putExtra("track", track);
-						
-						String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
-						i.putExtra("album", album);
-						
-						long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
-						if (duration != 0) {
-						    i.putExtra("duration", duration);
-						}
-		            } finally {
-		                    cur.close();
-		            }
-	            } else {
-					//convert the duration from int to long
-					long duration = intent.getIntExtra("secs", 0);
-					i.removeExtra("secs");
-					i.putExtra("duration", duration * 1000);
-				}
-			}
-			handleIntent(i);
+		} else if(intent.getAction().equals("net.jjc1138.android.scrobbler.action.MUSIC_STATUS")) {
+			intentFromMediaDB(intent);
 		} else { //
 			handleIntent(i);
 		}
 	}
 
+	public void intentFromMediaDB(Intent intent) {
+		final Intent i = intent;
+
+		boolean playing = intent.getBooleanExtra("playing", false);
+		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
+
+		if(!playing) {
+			i.setAction(PLAYBACK_FINISHED);
+		} else {
+			i.setAction(META_CHANGED);
+			long id = intent.getIntExtra("id", -1);
+			if(id == -1)
+				id = intent.getLongExtra("id", -1);
+			
+			if(id != -1) {
+				final String[] columns = new String[] {
+					MediaStore.Audio.AudioColumns.ARTIST,
+					MediaStore.Audio.AudioColumns.TITLE,
+					MediaStore.Audio.AudioColumns.DURATION,
+					MediaStore.Audio.AudioColumns.ALBUM,
+					MediaStore.Audio.AudioColumns.TRACK, };
+			
+				Cursor cur = getContentResolver().query(
+					ContentUris.withAppendedId(
+						MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+						id), columns, null, null, null);
+				
+				if (cur == null) {
+					logger.severe("could not open cursor to media in media store");
+					return;
+				}
+	
+	            try {
+					if (!cur.moveToFirst()) {
+					        logger.severe("no such media in media store");
+					        cur.close();
+					        return;
+					}
+					String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
+					i.putExtra("artist", artist);
+					
+					String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
+					i.putExtra("track", track);
+					
+					String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
+					i.putExtra("album", album);
+					
+					long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
+					if (duration != 0) {
+					    i.putExtra("duration", duration);
+					}
+	            } finally {
+	                    cur.close();
+	            }
+            } else {
+				//convert the duration from int to long
+				long duration = intent.getIntExtra("secs", 0);
+				i.removeExtra("secs");
+				i.putExtra("duration", duration * 1000);
+			}
+		}
+		handleIntent(i);
+	}
+	
 	public void handleIntent(Intent intent) {
 		if (intent.getAction().equals(META_CHANGED)) {
 			long startTime = System.currentTimeMillis() / 1000;
