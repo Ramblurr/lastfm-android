@@ -86,7 +86,6 @@
 	                    <TextView android:id="@+id/track_artist"
 	                        style="@style/playback_info"
 	                        android:layout_height="wrap_content"
-	                        android:layout_width="fill_parent"
 	                        android:layout_gravity="left"
 	                        android:textStyle="bold"
 	                        android:textSize="18sp"
@@ -105,8 +104,6 @@
 							android:textSize="18sp"
 							android:gravity="left"
 							android:singleLine="true"
-							android:layout_width="225dip"
-							android:ellipsize="marquee"
 							android:focusable="true"
 							android:text="Title"/>
 					</TableRow>

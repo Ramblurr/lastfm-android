@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<style name="playback_artwork">
-		<item name="android:layout_width">280dip</item>
-		<item name="android:layout_height">280dip</item>
+		<item name="android:layout_width">480dip</item>
+		<item name="android:layout_height">480dip</item>
 	</style>
 	<style name="LastFMButton">
 		<item name="android:background">@drawable/player_controls</item>
-		<item name="android:layout_width">170dip</item>
+		<item name="android:layout_width">260dip</item>
 		<item name="android:layout_height">76dip</item>
 	</style>
 	<style name="playback_progress">
-		<item name="android:layout_width">300dip</item>
-	</style>
-		<style name="notice">
-		<item name="android:layout_width">446dip</item>
+		<item name="android:layout_width">400dip</item>
 	</style>
 	<style name="playback_info">
 		<item name="android:textSize">12sp</item>
 		<item name="android:textColor">#fff</item>
 		<item name="android:textStyle">bold</item>
-		<item name="android:layout_width">300dip</item>
+		<item name="android:layout_width">440dip</item>
 		<item name="android:ellipsize">marquee</item>
 	</style>
 </resources>

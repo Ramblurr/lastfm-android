@@ -15,4 +15,11 @@
 		<style name="notice">
 		<item name="android:layout_width">446dip</item>
 	</style>
+	<style name="playback_info">
+		<item name="android:textSize">12sp</item>
+		<item name="android:textColor">#fff</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:layout_width">225dip</item>
+		<item name="android:ellipsize">marquee</item>
+	</style>
 </resources>
