@@ -16,7 +16,7 @@
 		<item name="android:textSize">8pt</item>
 	</style>
 	<style name="playback_info">
-		<item name="android:textSize">5pt</item>
+		<item name="android:textSize">12sp</item>
 		<item name="android:textColor">#fff</item>
 		<item name="android:textStyle">bold</item>
 	</style>
@@ -27,6 +27,11 @@
 	</style>
 	<style name="playback_progress">
 		<item name="android:layout_width">200dip</item>
+	</style>
+	<style name="playback_artwork">
+		<item name="android:layout_marginTop">10dip</item>
+		<item name="android:layout_width">300dip</item>
+		<item name="android:layout_height">300dip</item>
 	</style>
 	<style name="LastFMButton">
 		<item name="android:background">@drawable/player_controls</item>

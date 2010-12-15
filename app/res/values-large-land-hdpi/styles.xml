@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="playback_artwork">
+		<item name="android:layout_width">480dip</item>
+		<item name="android:layout_height">480dip</item>
+	</style>
+	<style name="LastFMButton">
+		<item name="android:background">@drawable/player_controls</item>
+		<item name="android:layout_width">260dip</item>
+		<item name="android:layout_height">76dip</item>
+	</style>
+	<style name="playback_progress">
+		<item name="android:layout_width">400dip</item>
+	</style>
+</resources>
