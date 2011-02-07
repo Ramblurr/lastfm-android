@@ -44,6 +44,17 @@ public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
 		String date = getText("date");
 		String link = getText("link");
 		String id = getText("id");
+		
+		boolean expired = false;
+		Integer playsLeft = 0;
+		
+		Node extensionNode = getChildNode("extension");
+		
+		if (extensionNode != null) {
+			expired = !XMLUtil.findNamedElementNode(extensionNode, "expired").getTextContent().contentEquals("0");
+			playsLeft = Integer.getInteger(XMLUtil.findNamedElementNode(extensionNode, "playsleft").getTextContent());
+		}
+		
 		boolean streamable = true;
 		if (getText("streamable") != null && getText("streamable").contentEquals("0"))
 			streamable = false;
@@ -57,6 +68,6 @@ public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
 				tracks[i++] = trackBuilder.build(trackNode);
 			}
 		}
-		return new RadioPlayList(title, creator, date, link, tracks, id, streamable);
+		return new RadioPlayList(title, creator, date, link, tracks, id, streamable, expired, playsLeft);
 	}
 }

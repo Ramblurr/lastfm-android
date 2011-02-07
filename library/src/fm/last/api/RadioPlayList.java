@@ -129,8 +129,10 @@ public class RadioPlayList implements Serializable {
 	private String id;
 	private boolean streamable;
 	private RadioTrack[] tracks;
+	private boolean expired;
+	private Integer playsLeft;
 
-	public RadioPlayList(String title, String creator, String date, String link, RadioTrack[] tracks, String id, boolean streamable) {
+	public RadioPlayList(String title, String creator, String date, String link, RadioTrack[] tracks, String id, boolean streamable, boolean expired, Integer playsLeft) {
 		this.title = title;
 		this.creator = creator;
 		this.date = date;
@@ -138,6 +140,8 @@ public class RadioPlayList implements Serializable {
 		this.tracks = tracks;
 		this.id = id;
 		this.streamable = streamable;
+		this.expired = expired;
+		this.playsLeft = playsLeft;
 	}
 
 	public String getTitle() {
@@ -166,5 +170,13 @@ public class RadioPlayList implements Serializable {
 
 	public boolean isStreamable() {
 		return streamable;
+	}
+	
+	public Integer playLeft() {
+		return playsLeft;
+	}
+	
+	public boolean expired() {
+		return expired;
 	}
 }
