@@ -34,6 +34,7 @@ import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
+import fm.last.api.SessionInfo;
 import fm.last.api.Station;
 import fm.last.api.Tag;
 import fm.last.api.Tasteometer;
@@ -170,6 +171,15 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("api_key", api_key);
 		signParams(params); // apparently unrequired
 		return AuthFunctions.getMobileSession(baseUrl, params);
+	}
+	
+	public SessionInfo getSessionInfo(String sk) throws IOException, WSError {
+		Map<String, String> params = createParams("auth.getSessionInfo");
+		if (sk != null) {
+			params.put("sk", sk);
+			signParams(params);
+		}
+		return AuthFunctions.getSessionInfo(baseUrl, params);
 	}
 
 	public Station tuneToStation(String station, String sk, String lang) throws IOException, WSError {

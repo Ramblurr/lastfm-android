@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import fm.last.api.Session;
+import fm.last.api.SessionInfo;
 import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 import fm.last.util.XMLUtil;
@@ -62,6 +63,32 @@ public class AuthFunctions {
 			Node sessionNode = XMLUtil.findNamedElementNode(lfmNode, "session");
 			SessionBuilder builder = new SessionBuilder();
 			return builder.build(sessionNode);
+		}
+	}
+	
+	public static SessionInfo getSessionInfo(String baseUrl, Map<String, String> params) throws IOException {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
+			Node userNode = XMLUtil.findNamedElementNode(lfmNode, "sessionInfo");
+			SessionInfoBuilder builder = new SessionInfoBuilder();
+			return builder.build(userNode);
 		}
 	}
 

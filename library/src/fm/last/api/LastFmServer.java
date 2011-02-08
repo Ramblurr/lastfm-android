@@ -73,6 +73,8 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public Session getMobileSession(String username, String authToken) throws IOException;
+	
+	public SessionInfo getSessionInfo(String sk) throws IOException, WSError;
 
 	public void signUp(String username, String password, String email) throws IOException;
 
