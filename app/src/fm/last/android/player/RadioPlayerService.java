@@ -731,6 +731,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);
 			}
 
+			SharedPreferences.Editor editor = getSharedPreferences(LastFm.PREFS, 0).edit();
+			editor.putInt("lastfm_playsleft", playlist.playLeft());
+			editor.commit();
+
 			RadioTrack[] tracks = playlist.getTracks();
 			logger.info("Got " + tracks.length + " track(s)");
 			for (int i = 0; i < tracks.length; i++) {
