@@ -24,9 +24,12 @@ import java.io.File;
 import java.util.List;
 
 import android.app.ActivityGroup;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -34,6 +37,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,16 +47,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.TabHost;
+import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.sync.AccountAuthenticatorService;
+import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.SessionInfo;
+import fm.last.api.WSError;
 
 public class Profile extends ActivityGroup {
+	public static final String PREFS = "SessionInfoPrefs";
 	private TabHost mTabHost;
 	private boolean mIsPlaying = false;
 	
@@ -186,6 +196,9 @@ public class Profile extends ActivityGroup {
 			Log.i("Last.fm", "Removing stale bug report archive");
 			f.delete();
 		}
+
+		mSessionInfoTask = new SessionInfoTask();
+		mSessionInfoTask.execute();
 	}
 
 	@Override
@@ -296,4 +309,81 @@ public class Profile extends ActivityGroup {
 		}
 		return false;
 	}
+	
+	/**
+	 * In a task because it can take a while, and Android has a tendency to
+	 * panic and show the force quit/wait dialog quickly. And this blocks.
+	 */
+	private class SessionInfoTask extends AsyncTask<String, Void, SessionInfo> {
+		Exception e;
+		WSError wse;
+
+		SessionInfoTask() {
+		}
+
+		@Override
+		public SessionInfo doInBackground(String... params) {
+
+			try {
+				return getSessionInfo();
+			} catch (WSError e) {
+				e.printStackTrace();
+				wse = e;
+			} catch (Exception e) {
+				e.printStackTrace();
+				this.e = e;
+			}
+
+			return null;
+		}
+
+		SessionInfo getSessionInfo() throws Exception, WSError {
+			LastFmServer server = AndroidLastFmServerFactory.getServer();
+			SessionInfo userSession = server.getSessionInfo(LastFMApplication.getInstance().session.getKey());
+			if (userSession == null)
+				throw (new WSError("auth.getSessionInfo", "auth failure", WSError.ERROR_AuthenticationFailed));
+			return userSession;
+		}
+
+		@Override
+		public void onPostExecute(SessionInfo userSession) {
+			mSessionInfoTask = null;
+
+			if (userSession != null) {
+				SharedPreferences.Editor editor = getSharedPreferences(PREFS, 0).edit();
+				editor.putBoolean("lastfm_radio", userSession.getRadio());
+				editor.putBoolean("lastfm_freetrial", userSession.getFreeTrial());
+				editor.putBoolean("lastfm_expired", userSession.getExpired());
+				editor.putInt("lastfm_playsleft", userSession.getPlaysLeft());
+				editor.putInt("lastfm_playselapsed", userSession.getPlaysElapsed());
+				editor.commit();
+			} else if (wse != null) {
+				//LastFMApplication.getInstance().presentError(context, wse);
+			} else if (e != null && e.getMessage() != null) {
+				AlertDialog.Builder d = new AlertDialog.Builder(Profile.this);
+				d.setIcon(android.R.drawable.ic_dialog_alert);
+				d.setNeutralButton(getString(R.string.common_ok), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+					}
+				});
+				if (e.getMessage().contains("code 403")) {
+					d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
+					d.setMessage(getResources().getString(R.string.ERROR_AUTH));
+					((EditText) findViewById(R.id.password)).setText("");
+					d.setNegativeButton(getString(R.string.main_forgotpassword), new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword"));
+							startActivity(myIntent);
+						}
+					});
+				} else {
+					d.setTitle(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE));
+					d.setMessage(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
+				}
+				d.show();
+			}
+		}
+	}
+
+	private SessionInfoTask mSessionInfoTask;
 }

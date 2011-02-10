@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 
 import fm.last.api.SessionInfo;
 import fm.last.xml.XMLBuilder;
+import fm.last.util.XMLUtil;
 
 /**
  * @author jennings Date: Oct 20, 2008
@@ -31,9 +32,19 @@ import fm.last.xml.XMLBuilder;
 public class SessionInfoBuilder extends XMLBuilder<SessionInfo> {
 
 	@Override
-	public SessionInfo build(Node sessionNode) {
-		node = sessionNode;
-		String radio = getText("radio");
-		return new SessionInfo(radio);
+	public SessionInfo build(Node applicationNode) {
+		node = applicationNode;
+		Node radioPermissionsNode = XMLUtil.findNamedElementNode(node, "radioPermission");
+		
+		Node userNode = XMLUtil.findNamedElementNode(radioPermissionsNode, "user");
+		boolean radio = !XMLUtil.getChildContents(userNode, "radio").contentEquals("0");
+		boolean freeTrial = !XMLUtil.getChildContents(userNode, "freetrial").contentEquals("0");
+		
+		Node trialNode = XMLUtil.findNamedElementNode(userNode, "trial");
+		boolean expired = !XMLUtil.getChildContents(trialNode, "expired").contentEquals("0");
+		Integer playsLeft = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playsleft"));
+		Integer playsElapsed  = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playselapsed"));
+		
+		return new SessionInfo(radio, freeTrial, expired, playsLeft, playsElapsed);
 	}
 }

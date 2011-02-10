@@ -32,18 +32,56 @@ import android.os.Parcelable;
  */
 public class SessionInfo implements Serializable, Parcelable {
 	private static final long serialVersionUID = -8500867686679447824L;
-	private String radio;
+	boolean radio;
+	boolean freeTrail;
+	boolean expired;
+	Integer playsLeft;
+	Integer playsElapsed;
 
-	public SessionInfo(String radio) {
+	public SessionInfo(boolean radio, boolean freeTrail, boolean expired, Integer playsLeft, Integer playsElapsed) {
 		this.radio = radio;
+		this.freeTrail = freeTrail;
+		this.expired = expired;
+		this.playsLeft = playsLeft;
+		this.playsElapsed = playsElapsed;
 	}
 
-	public String getRadio() {
+	public boolean getRadio() {
 		return radio;
+	}
+	
+	public boolean getFreeTrial() {
+		return freeTrail;
+	}
+	
+	public boolean getExpired() {
+		return expired;
+	}
+	
+	public Integer getPlaysLeft() {
+		return playsLeft;
+	}
+	
+	public void setPlaysLeft(Integer playsLeft) {
+		this.playsLeft = playsLeft;
+	}
+	
+	public Integer getPlaysElapsed() {
+		return playsElapsed;
+	}
+	
+	public void setPlaysElapsed(Integer playsElapsed) {
+		this.playsElapsed = playsElapsed;
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeString(radio);
+		boolean[] booleanArray = new boolean[3];
+		booleanArray[0] = radio;
+		booleanArray[0] = freeTrail;             
+		booleanArray[0] = expired;          
+		dest.writeBooleanArray(booleanArray);
+		dest.writeInt(playsLeft);
+		dest.writeInt(playsElapsed);
 	}
 
 	public static final Parcelable.Creator<SessionInfo> CREATOR = new Parcelable.Creator<SessionInfo>() {
@@ -57,7 +95,13 @@ public class SessionInfo implements Serializable, Parcelable {
 	};
 
 	private SessionInfo(Parcel in) {
-		radio = in.readString();
+		boolean[] booleanArray = new boolean[3];
+		in.readBooleanArray(booleanArray);
+		radio = booleanArray[0];
+		freeTrail = booleanArray[1];
+		expired = booleanArray[2];
+		playsLeft = in.readInt();
+		playsElapsed = in.readInt();
 	}
 
 	public int describeContents() {

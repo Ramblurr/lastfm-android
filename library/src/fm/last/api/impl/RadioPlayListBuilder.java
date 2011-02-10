@@ -52,7 +52,7 @@ public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
 		
 		if (extensionNode != null) {
 			expired = !XMLUtil.findNamedElementNode(extensionNode, "expired").getTextContent().contentEquals("0");
-			playsLeft = Integer.getInteger(XMLUtil.findNamedElementNode(extensionNode, "playsleft").getTextContent());
+			playsLeft = Integer.parseInt(XMLUtil.findNamedElementNode(extensionNode, "playsleft").getTextContent());
 		}
 		
 		boolean streamable = true;

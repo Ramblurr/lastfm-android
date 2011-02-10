@@ -86,7 +86,7 @@ public class AuthFunctions {
 			}
 			return null;
 		} else {
-			Node userNode = XMLUtil.findNamedElementNode(lfmNode, "sessionInfo");
+			Node userNode = XMLUtil.findNamedElementNode(lfmNode, "application");
 			SessionInfoBuilder builder = new SessionInfoBuilder();
 			return builder.build(userNode);
 		}
