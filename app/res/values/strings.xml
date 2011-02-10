@@ -274,7 +274,9 @@
 	<string name="ERROR_DEPRECATED_LOVED">Due to recent station changes, \'loved tracks\' radio is no longer available.\n\n(Don\'t worry, your list of loved tracks hasn\'t changed).</string>
 	<string name="ERROR_DEPRECATED_TAGS">Due to recent station changes, \'personal tag\' radio is no longer available.\n\n(Don\'t worry, your tags haven\'t changed).</string>
 	<string name="ERROR_DEPRECATED_PLAYLISTS">Due to recent station changes, playlists are no longer available.\n\n(Don\'t worry, the list of tracks in your playlists haven\'t changed).</string>
-	
+	<string name="ERROR_TRIAL_EXPIRED_TITLE">Your Free Trial Is Over</string>
+	<string name="ERROR_TRIAL_EXPIRED">Your free trial of Last.fm radio is over.  Subscribe now to get pesonalized radio on your device for just £3/€3/$3 per month.</string>
+
 	<!-- third party account access -->
 	<string name="account_access_title">Last.fm Account Access</string>
 	<string name="account_access_body">An application has requested access to your Last.fm profile.  Would you like to allow access?  Your password will not be shared.</string>

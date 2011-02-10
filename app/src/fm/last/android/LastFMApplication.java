@@ -33,6 +33,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -54,7 +55,7 @@ public class LastFMApplication extends Application {
 
 	public Session session;
 	public fm.last.android.player.IRadioPlayer player = null;
-	private Context mCtx;
+	public Context mCtx;
 	public GoogleAnalyticsTracker tracker;
 
 	private String mRequestedURL;
@@ -239,6 +240,28 @@ public class LastFMApplication extends Application {
 				case WSError.ERROR_RadioUnavailable:
 					description = R.string.ERROR_RADIO_UNAVAILABLE;
 					break;
+					
+				case WSError.ERROR_TrialExpired:
+					title = R.string.ERROR_TRIAL_EXPIRED_TITLE;
+					description = R.string.ERROR_TRIAL_EXPIRED;
+					AlertDialog.Builder d = new AlertDialog.Builder(ctx);
+					d.setTitle(getResources().getString(title));
+					d.setMessage(getResources().getString(description));
+					d.setIcon(android.R.drawable.ic_dialog_alert);
+					d.setPositiveButton("Subscribe", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							Intent i = new Intent(Intent.ACTION_VIEW);
+							i.setData(Uri.parse("http://www.last.fm/subscribe"));
+							i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(i);
+						}
+					});
+					d.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+						}
+					});
+					d.show();
+					return;
 					
 				case WSError.ERROR_Deprecated:
 					title = R.string.ERROR_DEPRECATED_TITLE;

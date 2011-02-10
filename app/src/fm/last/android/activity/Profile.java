@@ -108,7 +108,7 @@ public class Profile extends ActivityGroup {
 		Intent intent = getIntent();
 		if (intent.getData() != null) {
 			if(intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
-				LastFMApplication.getInstance().playRadioStation(this, intent.getData().toString(), true);
+				LastFMApplication.getInstance().playRadioStation(LastFMApplication.getInstance().mCtx, intent.getData().toString(), true);
 				finish();
 				return;
 			} else if(getIntent().getData().getScheme().equals("http")) {  //The search provider sent us an http:// URL, forward it to the metadata screen

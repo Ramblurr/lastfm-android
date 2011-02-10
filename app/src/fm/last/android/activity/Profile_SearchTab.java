@@ -138,6 +138,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		ListAdapter a = (ListAdapter)getListAdapter();
 		
 		if(a != null) {
+			LastFMApplication.getInstance().mCtx = this;
 			String URI = (String)a.getItem(position);
 			Intent i = new Intent(this, Profile.class);
 			i.setData(Uri.parse(URI));

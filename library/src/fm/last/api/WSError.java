@@ -42,6 +42,8 @@ public class WSError extends Error implements Parcelable {
 	public static final int ERROR_SubscribersOnly = 12;
 	public static final int ERROR_InvalidAPISignature = 13;
 
+	public static final int ERROR_TrialExpired = 18;
+
 	public static final int ERROR_NotEnoughContent = 20;
 	public static final int ERROR_NotEnoughMembers = 21;
 	public static final int ERROR_NotEnoughFans = 22;
