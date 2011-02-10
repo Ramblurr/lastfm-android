@@ -21,6 +21,7 @@
 package fm.last.api.impl;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -129,6 +130,14 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("track", track);
 		}
 		return TrackFunctions.searchForTrack(baseUrl, params);
+	}
+
+	public Serializable[] multiSearch(String query) throws IOException, WSError {
+		Map<String, String> params = createParams("search.multi");
+		if (query != null) {
+			params.put("term", query);
+		}
+		return SearchFunctions.multiSearch(baseUrl, params);
 	}
 
 	public Friends getFriends(String user, String recenttracks, String limit) throws IOException, WSError {

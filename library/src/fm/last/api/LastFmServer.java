@@ -21,6 +21,7 @@
 package fm.last.api;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 public interface LastFmServer {
 	/**
@@ -356,6 +357,8 @@ public interface LastFmServer {
 	public Station[] getUserRecentStations(String user, String sk) throws IOException;
 	
 	public Station searchForStation(String query) throws IOException;
+	
+	public Serializable[] multiSearch(String query) throws IOException;
 	
 	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String sk) throws IOException;
 	

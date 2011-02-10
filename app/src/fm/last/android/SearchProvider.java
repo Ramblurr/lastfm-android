@@ -11,7 +11,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.Serializable;
 
+import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.LastFmServer;
 import fm.last.api.Tag;
@@ -101,58 +103,52 @@ public class SearchProvider extends ContentProvider {
 	        long id = 0;
 
 	        try {
-		        Artist[] artists;
-		        artists = server.searchForArtist(processedQuery);
-	
-		        for (int i = 0; i < (artists.length < 10 ? artists.length : 10); i++) {
-		            cursor.addRow(new Object[] {
-		                    id++,                  // _id
-		                    artists[i].getName(),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-		                    Uri.parse("http://www.last.fm/music/"+artists[i].getName()),           // intent_data (included when clicking on item)
-		                    -1,
-		                    artists[i].getImages().length == 0 ? "" : artists[i].getImages()[0].getUrl()
-		            });
-				}
-	        } catch (WSError e) {
-	        }
-
-	        try {
-		        Track[] tracks;
-		        tracks = server.searchForTrack(processedQuery);
-	
-		        for (int i = 0; i < (tracks.length < 10 ? tracks.length : 10); i++) {
-		            cursor.addRow(new Object[] {
-		                    id++,                  // _id
-		                    tracks[i].getArtist().getName() + " - " + tracks[i].getName(),           // text1
-		                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-		                    Uri.parse("http://www.last.fm/music/"+Uri.encode(tracks[i].getArtist().getName())+"/_/"+tracks[i].getName()),           // intent_data (included when clicking on item)
-		                    -1,
-		                    tracks[i].getImages().length == 0 ? "" : tracks[i].getImages()[0].getUrl()
-		            });
-				}
-	        } catch (WSError e) {
-	        }
-
-	        try {
-		        Tag[] tags;
-				tags = server.searchForTag(processedQuery);
-	
-		        for (int i = 0; i < (tags.length < 10 ? tags.length : 10); i++) {
-					if (tags[i].getTagcount() > 100) {
+	        	Serializable[] results;
+	        	results = server.multiSearch(query);
+	        	
+		        for (int i = 0; i < results.length; i++) {
+		        	if(results[i].getClass().equals(Artist.class)) {
+		        		Artist artist = (Artist)results[i];
+		        		
 			            cursor.addRow(new Object[] {
 			                    id++,                  // _id
-			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tags[i].getName()),           // text1
+			                    artist.getName(),           // text1
+			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
+			                    Uri.parse("http://www.last.fm/music/"+artist.getName()),           // intent_data (included when clicking on item)
+			                    -1,
+			                    artist.getImages().length == 0 ? "" : artist.getImages()[0].getUrl()
+			            });
+		        	} else if(results[i].getClass().equals(Album.class)) {
+		        		Album album = (Album)results[i];
+		        		
+		        		//TODO: We need an album display
+		        	} else if(results[i].getClass().equals(Track.class)) {
+		        		Track track = (Track)results[i];
+
+		        		cursor.addRow(new Object[] {
+			                    id++,                  // _id
+			                    track.getArtist().getName() + " - " + track.getName(),           // text1
+			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
+			                    Uri.parse("http://www.last.fm/music/"+Uri.encode(track.getArtist().getName())+"/_/"+track.getName()),           // intent_data (included when clicking on item)
+			                    -1,
+			                    track.getImages().length == 0 ? "" : track.getImages()[0].getUrl()
+			            });
+		        	} else if(results[i].getClass().equals(Tag.class)) {
+		        		Tag tag = (Tag)results[i];
+
+			            cursor.addRow(new Object[] {
+			                    id++,                  // _id
+			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tag.getName()),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
-			                    Uri.parse("lastfm://globaltags/"+tags[i].getName()),           // intent_data (included when clicking on item)
+			                    Uri.parse("lastfm://globaltags/"+tag.getName()),           // intent_data (included when clicking on item)
 			                    R.drawable.radio_icon,
 			                    -1
 			            });
-					}
+		        	}
 				}
 	        } catch (WSError e) {
 	        }
-	        
+
 	        try {
 		        User u = server.getUserInfo(processedQuery, LastFMApplication.getInstance().session.getKey());
 		        if(u != null && u.getName().toLowerCase().equals(processedQuery)) {
