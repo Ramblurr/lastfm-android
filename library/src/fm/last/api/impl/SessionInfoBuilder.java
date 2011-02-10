@@ -33,6 +33,10 @@ public class SessionInfoBuilder extends XMLBuilder<SessionInfo> {
 
 	@Override
 	public SessionInfo build(Node applicationNode) {
+		boolean expired = false;
+		Integer playsLeft = 30;
+		Integer playsElapsed = 0;
+		
 		node = applicationNode;
 		Node radioPermissionsNode = XMLUtil.findNamedElementNode(node, "radioPermission");
 		
@@ -41,9 +45,11 @@ public class SessionInfoBuilder extends XMLBuilder<SessionInfo> {
 		boolean freeTrial = !XMLUtil.getChildContents(userNode, "freetrial").contentEquals("0");
 		
 		Node trialNode = XMLUtil.findNamedElementNode(userNode, "trial");
-		boolean expired = !XMLUtil.getChildContents(trialNode, "expired").contentEquals("0");
-		Integer playsLeft = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playsleft"));
-		Integer playsElapsed  = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playselapsed"));
+		if(trialNode != null) {
+			expired = !XMLUtil.getChildContents(trialNode, "expired").contentEquals("0");
+			playsLeft = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playsleft"));
+			playsElapsed  = Integer.parseInt(XMLUtil.getChildContents(trialNode, "playselapsed"));
+		}
 		
 		return new SessionInfo(radio, freeTrial, expired, playsLeft, playsElapsed);
 	}
