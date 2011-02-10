@@ -347,6 +347,11 @@ public class LastFMApplication extends Application {
 		editor.remove("lastfm_pass");
 		editor.remove("lastfm_session_key");
 		editor.remove("lastfm_subscriber");
+		editor.remove("lastfm_freetrial");
+		editor.remove("lastfm_radio");
+		editor.remove("lastfm_playselapsed");
+		editor.remove("lastfm_playsremaining");
+		editor.remove("lastfm_freetrialexpirationwarning");
 		editor.remove("scrobbler_session");
 		editor.remove("scrobbler_subsurl");
 		editor.remove("scrobbler_npurl");

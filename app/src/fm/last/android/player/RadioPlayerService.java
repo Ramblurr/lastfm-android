@@ -44,6 +44,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
 import android.media.AudioManager;
@@ -54,6 +55,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.DeadObjectException;
 import android.os.IBinder;
@@ -68,6 +70,7 @@ import android.util.Log;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFMMediaButtonHandler;
+import fm.last.android.LastFm;
 import fm.last.android.MusicFocusable;
 import fm.last.android.MusicPlayerFocusHelper;
 import fm.last.android.R;
@@ -97,6 +100,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private String currentStationURL = null;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
+	private boolean mUpdatedTrialCount;
 	public static final int STATE_STOPPED = 0;
 	public static final int STATE_TUNING = 1;
 	public static final int STATE_PREPARING = 2;
@@ -429,6 +433,17 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		public void onBufferingUpdate(MediaPlayer p, int percent) {
 			if (p == mp) {
 				bufferPercent = percent;
+				if(percent > 50 && !mUpdatedTrialCount && getSharedPreferences(LastFm.PREFS, 0).getBoolean("lastfm_freetrial", false)) {
+					int elapsed = getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playselapsed", 0);
+					int left = getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playsleft", 30);
+					elapsed++;
+					left--;
+					SharedPreferences.Editor editor = getSharedPreferences(LastFm.PREFS, 0).edit();
+					editor.putInt("lastfm_playselapsed", elapsed);
+					editor.putInt("lastfm_playsleft", left);
+					editor.commit();
+					mUpdatedTrialCount = true;
+				}
 			}
 		}
 	};
@@ -445,6 +460,19 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					mState = STATE_PLAYING;
 					mAutoSkipCount = 0;
 					logger.info("Ready to produce packets (Hi, Laurie!)");
+					mUpdatedTrialCount = false;
+					if( getSharedPreferences(LastFm.PREFS, 0).getBoolean("lastfm_freetrial", false) && getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playsleft", 30) <= 5 && !getSharedPreferences(LastFm.PREFS, 0).getBoolean("lastfm_freetrialexpirationwarning", false)) {
+						Notification notification = new Notification(R.drawable.as_statusbar, getString(R.string.playerservice_trial_almost_expired_title), System.currentTimeMillis());
+						Intent i = new Intent(Intent.ACTION_VIEW);
+						i.setData(Uri.parse("http://www.last.fm/subscribe"));
+						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						PendingIntent contentIntent = PendingIntent.getActivity(RadioPlayerService.this, 0, i, 0);
+						notification.setLatestEventInfo(RadioPlayerService.this, getString(R.string.playerservice_trial_almost_expired_title), getString(R.string.playerservice_trial_almost_expired, getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playsleft", 30)), contentIntent);
+						nm.notify(NOTIFY_ID+1, notification);
+						SharedPreferences.Editor editor = getSharedPreferences(LastFm.PREFS, 0).edit();
+						editor.putBoolean("lastfm_freetrialexpirationwarning", true);
+						editor.commit();
+					}
 				} else {
 					p.stop();
 				}

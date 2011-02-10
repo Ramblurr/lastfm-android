@@ -218,6 +218,8 @@
     <string name="playerservice_streaming_ticker_text">Streaming: %1$s by %2$s</string>
     <string name="playerservice_tuning">Tuning to station</string>
     <string name="playerservice_tuningwithstation">Tuning: %1$s</string>
+    <string name="playerservice_trial_almost_expired_title">Free Trial Almost Over</string>
+    <string name="playerservice_trial_almost_expired">You have just %1$d tracks left.</string>
 
     <!-- Scrobbler service -->
     <string name="scrobbler_label">Last.fm: Scrobbler</string>
