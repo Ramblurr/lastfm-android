@@ -62,7 +62,6 @@ import fm.last.api.SessionInfo;
 import fm.last.api.WSError;
 
 public class Profile extends ActivityGroup {
-	public static final String PREFS = "SessionInfoPrefs";
 	private TabHost mTabHost;
 	private boolean mIsPlaying = false;
 	
@@ -350,7 +349,7 @@ public class Profile extends ActivityGroup {
 			mSessionInfoTask = null;
 
 			if (userSession != null) {
-				SharedPreferences.Editor editor = getSharedPreferences(PREFS, 0).edit();
+				SharedPreferences.Editor editor = getSharedPreferences(LastFm.PREFS, 0).edit();
 				editor.putBoolean("lastfm_radio", userSession.getRadio());
 				editor.putBoolean("lastfm_freetrial", userSession.getFreeTrial());
 				editor.putBoolean("lastfm_expired", userSession.getExpired());

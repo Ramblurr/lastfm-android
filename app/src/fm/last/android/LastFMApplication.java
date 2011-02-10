@@ -89,7 +89,6 @@ public class LastFMApplication extends Application {
 		String username = settings.getString("lastfm_user", "");
 		String session_key = settings.getString("lastfm_session_key", "");
 		String subscriber = settings.getString("lastfm_subscriber", "0");
-		String radio = settings.getString("lastfm_radio", "0");
 		
 		session = new Session(username, session_key, subscriber);
 		tracker = GoogleAnalyticsTracker.getInstance();
@@ -137,7 +136,31 @@ public class LastFMApplication extends Application {
 		mCtx = ctx;
 		mRequestedURL = url;
 		
-		if (session != null && session.getKey().length() > 0) {
+		Log.i("Last.fm", "Free trial active: " + getSharedPreferences(LastFm.PREFS, 0).getBoolean("lastfm_freetrial", false));
+		Log.i("Last.fm", "Free trial plays elapsed: " + getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playselapsed", 0));
+		Log.i("Last.fm", "Free trial plays remaining: " + getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playsleft", 30));
+		
+		if (getSharedPreferences(LastFm.PREFS, 0).getBoolean("lastfm_freetrial", false) && getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playselapsed", 0) == 0) {
+			AlertDialog.Builder d = new AlertDialog.Builder(ctx);
+			d.setTitle("Start Free Trial");
+			d.setMessage("Radio is a subscriber only feature.  Try it now with a free " + getSharedPreferences(LastFm.PREFS, 0).getInt("lastfm_playsleft", 30) + " track trial.");
+			d.setIcon(android.R.drawable.ic_dialog_info);
+			d.setPositiveButton("Start Trial", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					SharedPreferences.Editor editor = getSharedPreferences(LastFm.PREFS, 0).edit();
+					editor.putInt("lastfm_playselapsed", 1);
+					editor.commit();
+					playRadioStation(mCtx, mRequestedURL, true);
+				}
+			});
+			d.setNegativeButton("Later", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int whichButton) {
+					//Clear the loading indicators
+					sendBroadcast(new Intent("fm.last.android.ERROR"));
+				}
+			});
+			d.show();
+		} else if (session != null && session.getKey().length() > 0) {
 			final Intent out = new Intent(this, RadioPlayerService.class);
 			out.setAction("fm.last.android.PLAY");
 			out.putExtra("station", url);
