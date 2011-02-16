@@ -174,4 +174,13 @@ public class Event implements Serializable {
 	public HashMap<String, String> getTicketUrls() {
 		return this.ticketUrls;
 	}
+
+	public String getURLforImageSize(String size) {
+		for (ImageUrl image : images) {
+			if (image.getSize().contentEquals(size)) {
+				return image.getUrl();
+			}
+		}
+		return null;
+	}
 }

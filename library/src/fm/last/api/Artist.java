@@ -104,4 +104,13 @@ public class Artist implements Serializable {
 	public String getUserPlaycount() {
 		return userplaycount;
 	}
+
+	public String getURLforImageSize(String size) {
+		for (ImageUrl image : images) {
+			if (image.getSize().contentEquals(size)) {
+				return image.getUrl();
+			}
+		}
+		return null;
+	}
 }

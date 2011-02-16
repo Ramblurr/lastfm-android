@@ -116,7 +116,7 @@ public class SearchProvider extends ContentProvider {
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
 			                    Uri.parse("http://www.last.fm/music/"+artist.getName()),           // intent_data (included when clicking on item)
 			                    -1,
-			                    artist.getImages().length == 0 ? "" : artist.getImages()[0].getUrl()
+			                    artist.getImages().length == 0 ? "" : artist.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Album.class)) {
 		        		Album album = (Album)results[i];
@@ -131,7 +131,7 @@ public class SearchProvider extends ContentProvider {
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
 			                    Uri.parse("http://www.last.fm/music/"+Uri.encode(track.getArtist().getName())+"/_/"+track.getName()),           // intent_data (included when clicking on item)
 			                    -1,
-			                    track.getImages().length == 0 ? "" : track.getImages()[0].getUrl()
+			                    track.getImages().length == 0 ? "" : track.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Tag.class)) {
 		        		Tag tag = (Tag)results[i];
@@ -158,7 +158,7 @@ public class SearchProvider extends ContentProvider {
 		                    LastFMApplication.getInstance().getString(R.string.action_viewprofile),     // text2
 		                    Uri.parse("http://www.last.fm/user/"+processedQuery),           // intent_data (included when clicking on item)
 		                    -1,
-		                    u.getImages().length == 0 ? "" : u.getImages()[0].getUrl()
+		                    u.getImages().length == 0 ? "" : u.getURLforImageSize("extralarge")
 		            });
 		        }
 	        } catch (WSError e) {

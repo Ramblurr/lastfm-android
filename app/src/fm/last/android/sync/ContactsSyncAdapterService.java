@@ -395,7 +395,7 @@ public class ContactsSyncAdapterService extends Service {
 				if (entry.photo_timestamp == null || System.currentTimeMillis() > (entry.photo_timestamp + 604800000L)) {
 					String url = null;
 					if(user.getImages().length > 0)
-						url = user.getImages()[0].getUrl();
+						url = user.getURLforImageSize("extralarge");
 					if(entry.photo_url != url)
 						updateContactPhoto(operationList, entry.raw_id, url);
 				}

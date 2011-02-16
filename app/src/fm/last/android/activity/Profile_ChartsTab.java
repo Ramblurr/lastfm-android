@@ -753,7 +753,7 @@ public class Profile_ChartsTab extends ListActivity {
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < ((toptracks.length < 10) ? toptracks.length : 10); i++) {
 					ListEntry entry = new ListEntry(toptracks[i], R.drawable.song_icon, toptracks[i].getName(), toptracks[i].getImages().length == 0 ? ""
-							: toptracks[i].getImages()[0].getUrl(), // some
+							: toptracks[i].getURLforImageSize("extralarge"), // some
 																	// tracks
 																	// don't
 																	// have
@@ -888,7 +888,7 @@ public class Profile_ChartsTab extends ListActivity {
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < friends.length; i++) {
 					ListEntry entry = new ListEntry(friends[i], R.drawable.profile_unknown, friends[i].getName(), friends[i].getImages().length == 0 ? ""
-							: friends[i].getImages()[0].getUrl()); // some
+							: friends[i].getURLforImageSize("extralarge")); // some
 																	// tracks
 																	// don't
 																	// have

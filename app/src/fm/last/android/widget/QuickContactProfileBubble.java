@@ -62,7 +62,7 @@ public class QuickContactProfileBubble extends ProfileBubble {
 		if(avatar != null) {
 			mBadge.setImageBitmap(avatar);
 		} else if(mUser.getImages().length > 0) {
-			new FetchArtTask(mUser.getImages()[0].getUrl()).execute((Void) null);
+			new FetchArtTask(mUser.getURLforImageSize("extralarge")).execute((Void) null);
 		}
 	}
 	
@@ -77,7 +77,7 @@ public class QuickContactProfileBubble extends ProfileBubble {
 		if (c.moveToNext()) {
 			setQuickContactId(c.getLong(0));
 		} else if(mUser.getImages().length > 0) {
-			new FetchArtTask(mUser.getImages()[0].getUrl()).execute((Void) null);
+			new FetchArtTask(mUser.getURLforImageSize("extralarge")).execute((Void) null);
 		}
 	}
 	

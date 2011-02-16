@@ -436,7 +436,7 @@ public class Metadata extends Activity {
 
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < ((similar.length < 10) ? similar.length : 10); i++) {
-					ListEntry entry = new ListEntry(similar[i], R.drawable.artist_icon, similar[i].getName(), similar[i].getImages()[0].getUrl());
+					ListEntry entry = new ListEntry(similar[i], R.drawable.artist_icon, similar[i].getName(), similar[i].getURLforImageSize("extralarge"));
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
@@ -490,7 +490,7 @@ public class Metadata extends Activity {
 					return null;
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < ((fans.length < 10) ? fans.length : 10); i++) {
-					ListEntry entry = new ListEntry(fans[i], R.drawable.profile_unknown, fans[i].getName(), fans[i].getImages()[0].getUrl(),
+					ListEntry entry = new ListEntry(fans[i], R.drawable.profile_unknown, fans[i].getName(), fans[i].getURLforImageSize("extralarge"),
 							R.drawable.list_icon_arrow);
 					iconifiedEntries.add(entry);
 				}

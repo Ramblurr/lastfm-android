@@ -89,6 +89,15 @@ public class User implements Serializable {
 		return subscriber;
 	}
 
+	public String getURLforImageSize(String size) {
+		for (ImageUrl image : images) {
+			if (image.getSize().contentEquals(size)) {
+				return image.getUrl();
+			}
+		}
+		return null;
+	}
+
 	private final String name;
 	private final String url;
 	private final ImageUrl[] images;

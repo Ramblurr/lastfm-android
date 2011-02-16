@@ -72,30 +72,20 @@ public class ImageDownloader {
 	 * 
 	 * @param url
 	 */
-	@SuppressWarnings("unchecked")
 	public void getImage(String url) {
 
 		UserTask<String, Integer, Object> userTask = new UserTask<String, Integer, Object>() {
+			URL imageUrl;
 
 			@Override
 			public void onPostExecute(Object result) {
-				if (mListener != null) {
-					mListener.asynOperationEnded();
+				if (mListener != null && imageUrl != null) {
+					mListener.imageDownloaded(imageUrl.toString());
 				}
 			}
 
 			@Override
 			public void onPreExecute() {
-				if (mListener != null) {
-					mListener.asynOperationStarted();
-				}
-			}
-
-			@Override
-			public void onProgressUpdate(Integer... values) {
-				if (mListener != null) {
-					mListener.imageDownloadProgress(values[0].intValue(), values[1].intValue());
-				}
 			}
 
 			@Override
@@ -108,7 +98,6 @@ public class ImageDownloader {
 				if (!mImageCache.containsKey(url)) {
 
 					InputStream stream = null;
-					URL imageUrl;
 
 					try {
 						imageUrl = new URL(url);

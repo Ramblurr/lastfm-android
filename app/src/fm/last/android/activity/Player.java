@@ -870,12 +870,7 @@ public class Player extends Activity {
 				if (!artistName.equals(RadioPlayerService.UNKNOWN) && albumName != null && albumName.length() > 0) {
 					album = mServer.getAlbumInfo(artistName, albumName);
 					if (album != null) {
-						for (ImageUrl image : album.getImages()) {
-							if (image.getSize().contentEquals("extralarge")) {
-								artUrl = image.getUrl();
-								break;
-							}
-						}
+						artUrl = album.getURLforImageSize("mega");
 					}
 				}
 				success = true;

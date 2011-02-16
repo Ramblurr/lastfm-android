@@ -236,7 +236,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		// }
 	}
 
-	public void imageDownloadProgress(int imageDownloaded, int imageCount) {
+	public void imageDownloaded(String url) {
 		this.notifyDataSetChanged();
 	}
 

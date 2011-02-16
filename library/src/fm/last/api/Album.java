@@ -62,4 +62,12 @@ public class Album implements Serializable {
 		return images;
 	}
 
+	public String getURLforImageSize(String size) {
+		for (ImageUrl image : images) {
+			if (image.getSize().contentEquals(size)) {
+				return image.getUrl();
+			}
+		}
+		return null;
+	}
 }
