@@ -207,23 +207,18 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 		mList = list;
 		if (list == null)
 			return;
-		ArrayList<String> urls = new ArrayList<String>();
 		Iterator<ListEntry> it = list.iterator();
 		while (it.hasNext()) {
 			ListEntry entry = it.next();
 			if (entry.url != null) {
-				urls.add(entry.url);
+				try {
+					if (mImageDownloader.getUserTask(entry.url) == null) {
+						mImageDownloader.getImage(entry.url);
+					}
+				} catch (java.util.concurrent.RejectedExecutionException e) {
+					e.printStackTrace();
+				}
 			}
-		}
-
-		// super.setSource(oldList);
-
-		try {
-			if (mImageDownloader.getUserTask() == null) {
-				mImageDownloader.getImages(urls);
-			}
-		} catch (java.util.concurrent.RejectedExecutionException e) {
-			e.printStackTrace();
 		}
 	}
 

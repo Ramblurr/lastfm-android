@@ -47,7 +47,7 @@ public class ImageDownloader {
 	/**
 	 * Handle to ongoing tasks
 	 */
-	private Hashtable<String, UserTask<ArrayList<String>, Integer, Object>> mTasks;
+	private Hashtable<String, UserTask<String, Integer, Object>> mTasks;
 
 	/**
 	 * Default constructor
@@ -60,7 +60,7 @@ public class ImageDownloader {
 		}
 		this.mImageCache = imageCache;
 
-		mTasks = new Hashtable<String, UserTask<ArrayList<String>, Integer, Object>>();
+		mTasks = new Hashtable<String, UserTask<String, Integer, Object>>();
 	}
 
 	public void setListener(ImageDownloaderListener l) {
@@ -68,26 +68,14 @@ public class ImageDownloader {
 	}
 
 	/**
-	 * Requests images download, for multiple running on one instance use
-	 * getImages(ArrayList&lt;String&gt; urls, String tag)
+	 * Requests image download
 	 * 
-	 * @param urls
-	 */
-	public void getImages(ArrayList<String> urls) {
-		getImages(urls, TASK_TAG_DEFAULT);
-	}
-
-	/**
-	 * Requests images download additionally tagging running task with a given
-	 * string vale
-	 * 
-	 * @param urls
-	 * @param tag
+	 * @param url
 	 */
 	@SuppressWarnings("unchecked")
-	public void getImages(ArrayList<String> urls, String tag) {
+	public void getImage(String url) {
 
-		UserTask<ArrayList<String>, Integer, Object> userTask = new UserTask<ArrayList<String>, Integer, Object>() {
+		UserTask<String, Integer, Object> userTask = new UserTask<String, Integer, Object>() {
 
 			@Override
 			public void onPostExecute(Object result) {
@@ -111,54 +99,48 @@ public class ImageDownloader {
 			}
 
 			@Override
-			public Object doInBackground(ArrayList<String>... params) {
-				ArrayList<String> urls = params[0];
+			public Object doInBackground(String... params) {
+				String url = params[0];
 
-				// loop through all images and download url and download them
-				for (int i = 0; i < urls.size(); i++) {
-					if (urls.get(i) == null || urls.get(i).trim().length() == 0)
-						continue;
-					// check if we have already downloaded an url
-					if (!mImageCache.containsKey(urls.get(i))) {
+				if (url == null || url.trim().length() == 0)
+					return null;
+				// check if we have already downloaded an url
+				if (!mImageCache.containsKey(url)) {
 
-						InputStream stream = null;
-						URL imageUrl;
+					InputStream stream = null;
+					URL imageUrl;
 
+					try {
+						imageUrl = new URL(url);
 						try {
-							imageUrl = new URL(urls.get(i));
+							stream = imageUrl.openStream();
+							final Bitmap bmp = BitmapFactory.decodeStream(stream);
 							try {
-								stream = imageUrl.openStream();
-								final Bitmap bmp = BitmapFactory.decodeStream(stream);
-								try {
-									mImageCache.put(urls.get(i), bmp);
-								} catch (NullPointerException e) {
-									Log.e(TAG, "Failed to cache " + urls.get(i));
+								mImageCache.put(url, bmp);
+							} catch (NullPointerException e) {
+								Log.e(TAG, "Failed to cache " + url);
+							}
+						} catch (IOException e) {
+							Log.w(TAG, "Couldn't load bitmap from url: " + url, e);
+						} finally {
+							try {
+								if (stream != null) {
+									stream.close();
 								}
 							} catch (IOException e) {
-								Log.w(TAG, "Couldn't load bitmap from url: " + urls.get(i), e);
-							} finally {
-								try {
-									if (stream != null) {
-										stream.close();
-									}
-								} catch (IOException e) {
-								}
 							}
-						} catch (MalformedURLException e) {
-							Log.w(TAG, "Wrong url: " + urls.get(i), e);
 						}
-					} // END: check if we have already downloaded an url
+					} catch (MalformedURLException e) {
+						Log.w(TAG, "Wrong url: " + url, e);
+					}
+				} // END: check if we have already downloaded an url
 
-					// passing already downloaded images and total count
-					publishProgress((i + 1), urls.size());
-
-				} // for loop end
 				return null;
 			}
 
 		};
-		mTasks.put(tag, userTask);
-		userTask.execute(urls);
+		mTasks.put(url, userTask);
+		userTask.execute(url);
 
 	}
 
@@ -168,7 +150,7 @@ public class ImageDownloader {
 	 * 
 	 * @return
 	 */
-	public final UserTask<ArrayList<String>, Integer, Object> getUserTask() {
+	public final UserTask<String, Integer, Object> getUserTask() {
 		if (mTasks.containsKey(TASK_TAG_DEFAULT)) {
 			return mTasks.get(TASK_TAG_DEFAULT);
 		}
@@ -182,7 +164,7 @@ public class ImageDownloader {
 	 * 
 	 * @return
 	 */
-	public final UserTask<ArrayList<String>, Integer, Object> getUserTask(String tag) {
+	public final UserTask<String, Integer, Object> getUserTask(String tag) {
 		if (mTasks.containsKey(tag)) {
 			return mTasks.get(tag);
 		}
