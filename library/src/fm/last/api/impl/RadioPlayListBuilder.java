@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.w3c.dom.Node;
 
+import android.util.Log;
+
 import fm.last.api.RadioPlayList;
 import fm.last.api.RadioTrack;
 import fm.last.util.XMLUtil;
@@ -51,8 +53,9 @@ public class RadioPlayListBuilder extends XMLBuilder<RadioPlayList> {
 		Node extensionNode = getChildNode("extension");
 		
 		if (extensionNode != null) {
-			expired = !XMLUtil.findNamedElementNode(extensionNode, "expired").getTextContent().contentEquals("0");
-			playsLeft = Integer.parseInt(XMLUtil.findNamedElementNode(extensionNode, "playsleft").getTextContent());
+			expired = !XMLUtil.findNamedElementNode(extensionNode, "expired").getFirstChild().getNodeValue().contentEquals("0");
+			playsLeft = Integer.parseInt(XMLUtil.findNamedElementNode(extensionNode, "playsleft").getFirstChild().getNodeValue());
+			Log.i("Last.fm", "Expired: " + expired + " playsLeft:" + playsLeft);
 		}
 		
 		boolean streamable = true;
