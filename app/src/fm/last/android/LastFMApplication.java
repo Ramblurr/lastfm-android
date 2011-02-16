@@ -238,6 +238,8 @@ public class LastFMApplication extends Application {
 					break;
 					
 				case WSError.ERROR_RadioUnavailable:
+				case WSError.ERROR_AuthenticationFailed:
+				case WSError.ERROR_GeoRestricted:
 					description = R.string.ERROR_RADIO_UNAVAILABLE;
 					break;
 					
