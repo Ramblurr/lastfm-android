@@ -138,12 +138,18 @@ public class LastFMStreamAdapter extends BaseAdapter {
 		TextView name = (TextView) row.findViewById(R.id.row_label);
 		name.setText(mItems.get(position).mLabel);
 
-		ViewSwitcher switcher = (ViewSwitcher) row.findViewById(R.id.row_view_switcher);
-		row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
+		if(mLoadingBar == position || mItems.get(position).icon() == R.drawable.now_playing) {
+			ViewSwitcher switcher = (ViewSwitcher) row.findViewById(R.id.row_view_switcher);
+			row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
+			switcher.setDisplayedChild(mLoadingBar == position ? 1 : 0);
+			((ImageView) row.findViewById(R.id.row_disclosure_icon)).setImageResource(mItems.get(position).icon());
+		} else {
+			row.findViewById(R.id.row_view_switcher).setVisibility(View.GONE);
+		}
 
-		((ImageView) row.findViewById(R.id.row_disclosure_icon)).setImageResource(mItems.get(position).icon());
-
-		switcher.setDisplayedChild(mLoadingBar == position ? 1 : 0);
+		row.findViewById(R.id.row_icon).setVisibility(View.VISIBLE);
+		((ImageView) row.findViewById(R.id.row_icon)).setScaleType(ImageView.ScaleType.CENTER);
+		((ImageView) row.findViewById(R.id.row_icon)).setImageResource(R.drawable.list_icon_station);
 
 		if (position == mItems.size() - 1) {
 			row.setBackgroundResource(R.drawable.list_entry_rounded_bottom);

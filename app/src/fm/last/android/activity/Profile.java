@@ -368,7 +368,8 @@ public class Profile extends ActivityGroup {
 				if (e.getMessage().contains("code 403")) {
 					d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
 					d.setMessage(getResources().getString(R.string.ERROR_AUTH));
-					((EditText) findViewById(R.id.password)).setText("");
+					if(findViewById(R.id.password) != null)
+						((EditText) findViewById(R.id.password)).setText("");
 					d.setNegativeButton(getString(R.string.main_forgotpassword), new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword"));
