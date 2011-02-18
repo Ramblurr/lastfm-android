@@ -10,7 +10,6 @@
 	<string name="action_nowplaying">Now Playing</string>
 	<string name="action_amazon">Buy on Amazon</string>
 	<string name="action_share">Share</string>
-	<string name="action_addplaylist">Add to Playlist</string>
 	<string name="action_tagtrack">Tag Track</string>
     <string name="action_similar">Listen to Similar Artists</string>
     <string name="action_addlibrary">Add to Library</string>
@@ -46,15 +45,6 @@
 	<string name="signup_username">Username</string>
 	<string name="signup_password">Password</string>
 	<string name="signup_email">Your email</string>
-
-	<!-- AddToPlaylist activity -->
-	<string name="addtoplaylist_label">Last.fm: Add To Playlist</string>
-	<string name="addtoplaylist_newplaylist">New Playlist</string>
-	<string name="addtoplaylist_createplaylist">Create</string>
-	<string name="addtoplaylist_creating">Creating playlist</string>
-	<string name="addtoplaylist_creating_error">An error occurred while creating the playlist. Please try again.</string>
-	<string name="addtoplaylist_adding_error">An error occured while adding track to playlist. Please try again.</string>
-	<string name="addtoplaylist_noplaylists">No Playlists</string>
 
 	<!-- Tag activity -->
 	<string name="tag_label">Last.fm: Tag</string>

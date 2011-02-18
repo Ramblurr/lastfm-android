@@ -249,12 +249,6 @@ public class Metadata extends Activity {
 			intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackName);
 			startActivity(intent);
 			break;
-		case R.id.playlist_menu_item:
-			intent = new Intent(this, AddToPlaylist.class);
-			intent.putExtra(Share.INTENT_EXTRA_ARTIST, mArtistName);
-			intent.putExtra(Share.INTENT_EXTRA_TRACK, mTrackName);
-			startActivity(intent);
-			break;
 		case R.id.tag_menu_item:
 			intent = new Intent(this, fm.last.android.activity.Tag.class);
 			intent.putExtra("lastfm.artist", mArtistName);

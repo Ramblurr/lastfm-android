@@ -61,7 +61,6 @@ public class Profile_RadioTab extends ListActivity {
 	private SeparatedListAdapter mMainAdapter;
 	private LastFMStreamAdapter mMyStationsAdapter;
 	private LastFMStreamAdapter mMyRecentAdapter;
-	private LastFMStreamAdapter mMyPlaylistsAdapter;
 	private User mUser;
 	private String mUsername; // store this separate so we have access to it
 								// before User obj is retrieved
@@ -83,7 +82,7 @@ public class Profile_RadioTab extends ListActivity {
 		
 		mMyRecentAdapter = new LastFMStreamAdapter(this);
 
-		new LoadAsyncTaskEx().execute((Void) null);
+		new LoadUserTask().execute((Void) null);
 		SetupMyStations();
 
 		mIntentFilter = new IntentFilter();
@@ -118,17 +117,11 @@ public class Profile_RadioTab extends ListActivity {
 		}
 	}
 
-	private class LoadAsyncTaskEx extends AsyncTaskEx<Void, Void, Boolean> {
+	private class LoadUserTask extends AsyncTaskEx<Void, Void, Boolean> {
 		Tasteometer tasteometer;
 
 		@Override
-		public void onPreExecute() {
-			mMyPlaylistsAdapter = null;
-		}
-
-		@Override
 		public Boolean doInBackground(Void... params) {
-			RadioPlayList[] playlists;
 			boolean success = false;
 			Session session = LastFMApplication.getInstance().session;
 			fetchRecentStations();
@@ -153,18 +146,9 @@ public class Profile_RadioTab extends ListActivity {
 			try {
 				if (mUsername == null) {
 					mUser = mServer.getUserInfo(null, session.getKey());
-					playlists = mServer.getUserPlaylists(session.getName());
 				} else {
 					mUser = mServer.getUserInfo(mUsername, null);
 					tasteometer = mServer.tasteometerCompare(mUsername, session.getName(), 8);
-					playlists = mServer.getUserPlaylists(mUsername);
-				}
-				if (playlists.length > 0) {
-					mMyPlaylistsAdapter = new LastFMStreamAdapter(Profile_RadioTab.this);
-					for (RadioPlayList playlist : playlists) {
-						if (playlist.isStreamable())
-							mMyPlaylistsAdapter.putStation(playlist.getTitle(), "lastfm://playlist/" + playlist.getId() + "/shuffle");
-					}
 				}
 				success = true;
 			} catch (Exception e) {
@@ -182,8 +166,6 @@ public class Profile_RadioTab extends ListActivity {
 				if (!isAuthenticatedUser && Profile_RadioTab.this.mUser != null) {
 					SetupCommonArtists(tasteometer);
 				}
-				if (session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
-					mMainAdapter.addSection(getString(R.string.profile_userplaylists, mUsername), mMyPlaylistsAdapter);
 				mMainAdapter.notifyDataSetChanged();
 			}
 		}
@@ -203,32 +185,21 @@ public class Profile_RadioTab extends ListActivity {
 	}
 
 	private void RebuildMainMenu() {
-		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
-
 		SetupMyStations();
 		
-		Session session = LastFMApplication.getInstance().session;
 		mMainAdapter = new SeparatedListAdapter(this);
 		if (isAuthenticatedUser) {
 			mMainAdapter.addSection(getString(R.string.profile_mystations), mMyStationsAdapter);
 			if (mMyRecentAdapter.getCount() > 0)
 				mMainAdapter.addSection(getString(R.string.profile_recentstations), mMyRecentAdapter);
-			if (!settings.getBoolean("remove_playlists", false) && session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-				mMainAdapter.addSection(getString(R.string.profile_myplaylists), mMyPlaylistsAdapter);
-			}
 		} else {
 			mMainAdapter.addSection(getString(R.string.profile_userstations, mUsername), mMyStationsAdapter);
 			mMainAdapter.addSection(getString(R.string.profile_commonartists), mMyRecentAdapter);
-			if (session.getSubscriber().equals("1") && mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0) {
-				mMainAdapter.addSection(getString(R.string.profile_userplaylists, mUsername), mMyPlaylistsAdapter);
-			}
 		}
 		if (mMyStationsAdapter != null && mMyStationsAdapter.getCount() > 0)
 			mMyStationsAdapter.updateNowPlaying();
 		if (mMyRecentAdapter != null && mMyRecentAdapter.getCount() > 0)
 			mMyRecentAdapter.updateNowPlaying();
-		if (mMyPlaylistsAdapter != null && mMyPlaylistsAdapter.getCount() > 0)
-			mMyPlaylistsAdapter.updateNowPlaying();
 		setListAdapter(mMainAdapter);
 		mMainAdapter.notifyDataSetChanged();
 	}

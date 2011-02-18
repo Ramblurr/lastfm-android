@@ -68,9 +68,6 @@ public class PopupActionActivity extends ListActivity {
 			entry = new ListEntry(R.drawable.tag_dark, R.drawable.tag_dark, getString(R.string.action_tagtrack));
 			iconifiedEntries.add(entry);
 	
-			entry = new ListEntry(R.drawable.playlist_dark, R.drawable.playlist_dark, getString(R.string.action_addplaylist));
-			iconifiedEntries.add(entry);
-			
 			if(!getIntent().getBooleanExtra("lastfm.nowplaying", false)) {
 				entry = new ListEntry(R.drawable.love, R.drawable.love, getString(R.string.action_love));
 				iconifiedEntries.add(entry);
@@ -150,12 +147,6 @@ public class PopupActionActivity extends ListActivity {
 			break;
 		case R.drawable.tag_dark:
 			intent = new Intent(this, Tag.class);
-			intent.putExtra("lastfm.artist", mArtistName);
-			intent.putExtra("lastfm.track", mTrackName);
-			startActivity(intent);
-			break;
-		case R.drawable.playlist_dark:
-			intent = new Intent(this, AddToPlaylist.class);
 			intent.putExtra("lastfm.artist", mArtistName);
 			intent.putExtra("lastfm.track", mTrackName);
 			startActivity(intent);

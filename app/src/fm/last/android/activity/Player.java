@@ -275,20 +275,6 @@ public class Player extends Activity {
 				e.printStackTrace();
 			}
 			break;
-		case R.id.playlist_menu_item:
-			try {
-				if (LastFMApplication.getInstance().player == null)
-					return false;
-				Intent intent = new Intent(c, AddToPlaylist.class);
-				intent.putExtra(Share.INTENT_EXTRA_ARTIST, LastFMApplication
-						.getInstance().player.getArtistName());
-				intent.putExtra(Share.INTENT_EXTRA_TRACK, LastFMApplication
-						.getInstance().player.getTrackName());
-				c.startActivity(intent);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			break;
 		case R.id.tag_menu_item:
 			fireTagActivity(c);
 			break;
