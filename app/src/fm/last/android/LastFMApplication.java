@@ -160,7 +160,13 @@ public class LastFMApplication extends Application {
 					sendBroadcast(new Intent("fm.last.android.ERROR"));
 				}
 			});
-			d.show();
+			try {
+				d.show();
+			} catch (Exception e) { //If the app isn't currently on-screen, bring it forward and try again
+				Intent intent = new Intent ( Intent.ACTION_VIEW, Uri.parse(mRequestedURL));
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity( intent );
+			}
 		} else if (session != null && session.getKey().length() > 0) {
 			final Intent out = new Intent(this, RadioPlayerService.class);
 			out.setAction("fm.last.android.PLAY");
