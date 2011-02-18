@@ -314,8 +314,6 @@ public class Profile extends ActivityGroup {
 	 * panic and show the force quit/wait dialog quickly. And this blocks.
 	 */
 	private class SessionInfoTask extends AsyncTaskEx<String, Void, SessionInfo> {
-		Exception e;
-		WSError wse;
 
 		SessionInfoTask() {
 		}
@@ -324,24 +322,15 @@ public class Profile extends ActivityGroup {
 		public SessionInfo doInBackground(String... params) {
 
 			try {
-				return getSessionInfo();
+				LastFmServer server = AndroidLastFmServerFactory.getServer();
+				SessionInfo userSession = server.getSessionInfo(LastFMApplication.getInstance().session.getKey());
+				return userSession;
 			} catch (WSError e) {
 				e.printStackTrace();
-				wse = e;
 			} catch (Exception e) {
 				e.printStackTrace();
-				this.e = e;
 			}
-
 			return null;
-		}
-
-		SessionInfo getSessionInfo() throws Exception, WSError {
-			LastFmServer server = AndroidLastFmServerFactory.getServer();
-			SessionInfo userSession = server.getSessionInfo(LastFMApplication.getInstance().session.getKey());
-			if (userSession == null)
-				throw (new WSError("auth.getSessionInfo", "auth failure", WSError.ERROR_AuthenticationFailed));
-			return userSession;
 		}
 
 		@Override
@@ -356,31 +345,6 @@ public class Profile extends ActivityGroup {
 				editor.putInt("lastfm_playsleft", userSession.getPlaysLeft());
 				editor.putInt("lastfm_playselapsed", userSession.getPlaysElapsed());
 				editor.commit();
-			} else if (wse != null) {
-				//LastFMApplication.getInstance().presentError(context, wse);
-			} else if (e != null && e.getMessage() != null) {
-				AlertDialog.Builder d = new AlertDialog.Builder(Profile.this);
-				d.setIcon(android.R.drawable.ic_dialog_alert);
-				d.setNeutralButton(getString(R.string.common_ok), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-					}
-				});
-				if (e.getMessage().contains("code 403")) {
-					d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
-					d.setMessage(getResources().getString(R.string.ERROR_AUTH));
-					if(findViewById(R.id.password) != null)
-						((EditText) findViewById(R.id.password)).setText("");
-					d.setNegativeButton(getString(R.string.main_forgotpassword), new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int whichButton) {
-							final Intent myIntent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse("http://www.last.fm/settings/lostpassword"));
-							startActivity(myIntent);
-						}
-					});
-				} else {
-					d.setTitle(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE_TITLE));
-					d.setMessage(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
-				}
-				d.show();
 			}
 		}
 	}
