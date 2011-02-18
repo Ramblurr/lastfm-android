@@ -54,7 +54,7 @@
 
 		<ImageButton android:id="@+id/menu" style="@+style/WidgetButton.Menu" android:contentDescription="@string/action_menu"
 			android:layout_width="69dip" android:layout_height="72dip" android:paddingBottom="16dip"
-			android:paddingLeft="4dip"/>
+			android:paddingLeft="8dip"/>
 		<ImageButton android:id="@+id/love" style="@+style/WidgetButton.Love" android:contentDescription="@string/action_love"
 			android:layout_width="61dip" android:layout_height="72dip" android:paddingBottom="16dip"/>
 		<ImageButton android:id="@+id/ban" style="@+style/WidgetButton.Ban" android:contentDescription="@string/action_ban"
