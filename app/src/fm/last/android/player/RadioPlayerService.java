@@ -1261,9 +1261,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if(mState == STATE_PAUSED) {
 			pause();
 		}
-
-		if(mp != null && mp.isPlaying())
-			mp.setVolume(1.0f, 1.0f);
+	
+		try {
+			if(mp != null && mp.isPlaying())
+				mp.setVolume(1.0f, 1.0f);
+		} catch (Exception e) { //Sometimes the MediaPlayer is in a state where isPlaying() or setVolume() will fail
+			e.printStackTrace();
+		}
 	}
 
 	public void focusLost(boolean isTransient, boolean canDuck) {
@@ -1271,7 +1275,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
             return;
 
         if (canDuck) {
-            mp.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+    		try {
+    			mp.setVolume(DUCK_VOLUME, DUCK_VOLUME);
+    		} catch (Exception e) { //Sometimes the MediaPlayer is in a state where setVolume() will fail
+    			e.printStackTrace();
+    		}
         } else if(isTransient) {
             pause();
         } else {
