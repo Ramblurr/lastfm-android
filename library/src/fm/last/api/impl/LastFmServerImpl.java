@@ -635,7 +635,7 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("playlistID", playlistId);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.shareTrack(baseUrl, params);
+		TrackFunctions.addTrackToPlaylist(baseUrl, params);
 	}
 
 	public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException {

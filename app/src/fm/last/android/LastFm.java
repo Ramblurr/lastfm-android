@@ -350,8 +350,13 @@ public class LastFm extends Activity {
 				d.show();
 			}
 
-			if(mDialog.isShowing())
-				mDialog.dismiss();
+			if(mDialog.isShowing()) {
+				try {
+					mDialog.dismiss();
+				} catch (Exception e) { //This occasionally fails
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
