@@ -212,7 +212,7 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 			ListEntry entry = it.next();
 			if (entry.url != null) {
 				try {
-					if (mImageDownloader.getUserTask(entry.url) == null) {
+					if (mImageDownloader.getAsyncTaskEx(entry.url) == null) {
 						mImageDownloader.getImage(entry.url);
 					}
 				} catch (java.util.concurrent.RejectedExecutionException e) {

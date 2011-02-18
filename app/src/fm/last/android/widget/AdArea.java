@@ -17,7 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.telephony.TelephonyManager;
 import android.util.AttributeSet;
 import android.view.View;
@@ -147,7 +147,7 @@ public class AdArea extends ImageButton {
 		_cachedWidth = getWidth();
 	}
 
-	private class FetchAdTask extends AsyncTask<Void, Void, Boolean> {
+	private class FetchAdTask extends AsyncTaskEx<Void, Void, Boolean> {
 		Bitmap mBitmap = null;
 
 		@Override
@@ -177,7 +177,7 @@ public class AdArea extends ImageButton {
 		}
 	}
 
-	private class AdsEnabledTask extends AsyncTask<Void, Void, Boolean> {
+	private class AdsEnabledTask extends AsyncTaskEx<Void, Void, Boolean> {
 		Context ctx = null;
 
 		AdsEnabledTask(Context context) {

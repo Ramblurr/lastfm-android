@@ -16,7 +16,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -691,7 +691,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		return new Formatter().format("%02d:%02d", secs / 60, secs % 60).toString();
 	}
 
-	private static class UpdateTask extends AsyncTask<Context, Void, Void> {
+	private static class UpdateTask extends AsyncTaskEx<Context, Void, Void> {
 		@Override
 		protected Void doInBackground(Context... params) {
 			updateAppWidget(params[0]);
@@ -700,7 +700,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		
 	}
 	
-	private static class UpdateFromAndroidPlayerTask extends AsyncTask<com.android.music.IMediaPlaybackService, Void, Boolean> {
+	private static class UpdateFromAndroidPlayerTask extends AsyncTaskEx<com.android.music.IMediaPlaybackService, Void, Boolean> {
 		Context ctx = null;
 		String trackName = "";
 		String artistName = "";
@@ -740,7 +740,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 	}
 
-	private static class UpdateFromRadioPlayerTask extends AsyncTask<IRadioPlayer, Void, Boolean> {
+	private static class UpdateFromRadioPlayerTask extends AsyncTaskEx<IRadioPlayer, Void, Boolean> {
 		Context ctx = null;
 		String trackName = "";
 		String artistName = "";
@@ -798,7 +798,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 	}
 
-	private static class UpdateFromHTCPlayerTask extends AsyncTask<com.htc.music.IMediaPlaybackService, Void, Boolean> {
+	private static class UpdateFromHTCPlayerTask extends AsyncTaskEx<com.htc.music.IMediaPlaybackService, Void, Boolean> {
 		Context ctx = null;
 		String trackName = "";
 		String artistName = "";

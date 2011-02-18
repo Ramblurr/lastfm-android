@@ -35,7 +35,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
@@ -83,7 +83,7 @@ public class Profile_RadioTab extends ListActivity {
 		
 		mMyRecentAdapter = new LastFMStreamAdapter(this);
 
-		new LoadUserTask().execute((Void) null);
+		new LoadAsyncTaskEx().execute((Void) null);
 		SetupMyStations();
 
 		mIntentFilter = new IntentFilter();
@@ -118,7 +118,7 @@ public class Profile_RadioTab extends ListActivity {
 		}
 	}
 
-	private class LoadUserTask extends AsyncTask<Void, Void, Boolean> {
+	private class LoadAsyncTaskEx extends AsyncTaskEx<Void, Void, Boolean> {
 		Tasteometer tasteometer;
 
 		@Override

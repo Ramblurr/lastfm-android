@@ -61,7 +61,7 @@ import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
@@ -296,7 +296,7 @@ public class Metadata extends Activity {
 		return mImageCache;
 	}
 
-	private class LoadBioTask extends UserTask<Void, Void, Boolean> {
+	private class LoadBioTask extends AsyncTaskEx<Void, Void, Boolean> {
 		@Override
 		public void onPreExecute() {
 			mWebView.loadData(getString(R.string.common_loading), "text/html", "utf-8");
@@ -418,7 +418,7 @@ public class Metadata extends Activity {
 		}
 	}
 
-	private class LoadSimilarTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadSimilarTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -469,7 +469,7 @@ public class Metadata extends Activity {
 		}
 	}
 
-	private class LoadListenersTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadListenersTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -522,7 +522,7 @@ public class Metadata extends Activity {
 		}
 	}
 
-	private class LoadTagsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadTagsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {
@@ -582,7 +582,7 @@ public class Metadata extends Activity {
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class LoadEventsTask extends UserTask<Void, Void, Boolean> {
+	private class LoadEventsTask extends AsyncTaskEx<Void, Void, Boolean> {
 
 		/**
 		 * New adapter representing events data

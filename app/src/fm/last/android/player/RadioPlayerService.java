@@ -79,7 +79,7 @@ import fm.last.android.activity.Player;
 import fm.last.android.activity.Profile;
 import fm.last.android.db.RecentStationsDao;
 import fm.last.android.scrobbler.ScrobblerService;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.RadioTrack;
@@ -891,7 +891,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 	}
 	
-	private class TuneRadioTask extends UserTask<Void, Void, Void> {
+	private class TuneRadioTask extends AsyncTaskEx<Void, Void, Void> {
 		String mStationURL = "";
 		Session mSession = null;
 		
@@ -927,7 +927,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 	}
 	
-	private class NextTrackTask extends UserTask<Void, Void, Boolean> {
+	private class NextTrackTask extends AsyncTaskEx<Void, Void, Boolean> {
 
 		@Override
 		public Boolean doInBackground(Void... input) {

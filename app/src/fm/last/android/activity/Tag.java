@@ -49,7 +49,7 @@ import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.adapter.TagListAdapter;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.android.widget.TagLayout;
 import fm.last.android.widget.TagLayoutListener;
 import fm.last.api.LastFmServer;
@@ -257,9 +257,9 @@ public class Tag extends Activity {
 			// serialised and unserialised - unserialisation happens here. But
 			// if we are still
 			// loading tags the above 4 members will be null, so we need to do a
-			// new usertask
+			// new AsyncTaskEx
 			// because otherwise we'll never get the tags, and we can't
-			// serialise the usertask
+			// serialise the AsyncTaskEx
 			try {
 				fillData();
 				return;
@@ -475,7 +475,7 @@ public class Tag extends Activity {
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class LoadTagTask extends UserTask<Object, Integer, Object> {
+	private class LoadTagTask extends AsyncTaskEx<Object, Integer, Object> {
 		ProgressDialog mLoadDialog;
 
 		@Override
@@ -515,7 +515,7 @@ public class Tag extends Activity {
 	 * 
 	 * @author Lukasz Wisniewski
 	 */
-	private class SaveTagTask extends UserTask<Object, Integer, Object> {
+	private class SaveTagTask extends AsyncTaskEx<Object, Integer, Object> {
 
 		@Override
 		public void onPreExecute() {

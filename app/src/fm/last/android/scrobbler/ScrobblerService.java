@@ -43,7 +43,7 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -524,7 +524,7 @@ public class ScrobblerService extends Service {
 		return null;
 	}
 
-	private class NowPlayingTask extends AsyncTask<Void, Void, Boolean> {
+	private class NowPlayingTask extends AsyncTaskEx<Void, Void, Boolean> {
 		RadioTrack mTrack;
 
 		public NowPlayingTask(RadioTrack track) {
@@ -570,7 +570,7 @@ public class ScrobblerService extends Service {
 		}
 	}
 
-	private class SubmitTracksTask extends AsyncTask<Void, Void, Boolean> {
+	private class SubmitTracksTask extends AsyncTaskEx<Void, Void, Boolean> {
 
 		@Override
 		public Boolean doInBackground(Void... p) {

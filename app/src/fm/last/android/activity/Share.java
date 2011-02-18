@@ -37,7 +37,7 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.utils.ImageCache;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
 import fm.last.api.User;
@@ -78,7 +78,7 @@ public class Share extends Activity {
 		return mImageCache;
 	}
 
-	private class ShareTrackTask extends UserTask<Void, Void, Boolean> {
+	private class ShareTrackTask extends AsyncTaskEx<Void, Void, Boolean> {
 		String mArtist;
 		String mTrack;
 		String mRecipient;
@@ -127,7 +127,7 @@ public class Share extends Activity {
 		}
 	}
 
-	private class LoadFriendsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadFriendsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 		@Override
 		public void onPreExecute() {
 			mFriendsList.setAdapter(new NotificationAdapter(Share.this, NotificationAdapter.LOAD_MODE, getString(R.string.common_loading)));

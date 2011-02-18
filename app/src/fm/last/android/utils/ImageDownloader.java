@@ -47,7 +47,7 @@ public class ImageDownloader {
 	/**
 	 * Handle to ongoing tasks
 	 */
-	private Hashtable<String, UserTask<String, Integer, Object>> mTasks;
+	private Hashtable<String, AsyncTaskEx<String, Integer, Object>> mTasks;
 
 	/**
 	 * Default constructor
@@ -60,7 +60,7 @@ public class ImageDownloader {
 		}
 		this.mImageCache = imageCache;
 
-		mTasks = new Hashtable<String, UserTask<String, Integer, Object>>();
+		mTasks = new Hashtable<String, AsyncTaskEx<String, Integer, Object>>();
 	}
 
 	public void setListener(ImageDownloaderListener l) {
@@ -74,7 +74,7 @@ public class ImageDownloader {
 	 */
 	public void getImage(String url) {
 
-		UserTask<String, Integer, Object> userTask = new UserTask<String, Integer, Object>() {
+		AsyncTaskEx<String, Integer, Object> AsyncTaskEx = new AsyncTaskEx<String, Integer, Object>() {
 			URL imageUrl;
 
 			@Override
@@ -128,18 +128,18 @@ public class ImageDownloader {
 			}
 
 		};
-		mTasks.put(url, userTask);
-		userTask.execute(url);
+		mTasks.put(url, AsyncTaskEx);
+		AsyncTaskEx.execute(url);
 
 	}
 
 	/**
-	 * Returns UserTask instance initialized with
+	 * Returns AsyncTaskEx instance initialized with
 	 * getImages(ArrayList&lt;String&gt; urls) request
 	 * 
 	 * @return
 	 */
-	public final UserTask<String, Integer, Object> getUserTask() {
+	public final AsyncTaskEx<String, Integer, Object> getAsyncTaskEx() {
 		if (mTasks.containsKey(TASK_TAG_DEFAULT)) {
 			return mTasks.get(TASK_TAG_DEFAULT);
 		}
@@ -148,12 +148,12 @@ public class ImageDownloader {
 	}
 
 	/**
-	 * Returns UserTask instance initialized with
+	 * Returns AsyncTaskEx instance initialized with
 	 * getImages(ArrayList&lt;String&gt; urls, String tag) request
 	 * 
 	 * @return
 	 */
-	public final UserTask<String, Integer, Object> getUserTask(String tag) {
+	public final AsyncTaskEx<String, Integer, Object> getAsyncTaskEx(String tag) {
 		if (mTasks.containsKey(tag)) {
 			return mTasks.get(tag);
 		}

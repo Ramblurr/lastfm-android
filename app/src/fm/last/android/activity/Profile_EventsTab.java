@@ -31,7 +31,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -239,7 +239,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 
 	};
 
-	private class LoadMyEventsTask extends AsyncTask<Void, Void, EventListAdapter> {
+	private class LoadMyEventsTask extends AsyncTaskEx<Void, Void, EventListAdapter> {
 
 		@Override
 		public EventListAdapter doInBackground(Void... params) {
@@ -278,7 +278,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		}
 	}
 	
-	private class LoadRecommendedEventsTask extends AsyncTask<Void, Void, EventListAdapter> {
+	private class LoadRecommendedEventsTask extends AsyncTaskEx<Void, Void, EventListAdapter> {
 
 		@Override
 		public EventListAdapter doInBackground(Void... params) {
@@ -317,7 +317,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		}
 	}
 	
-	private class LoadNearbyEventsTask extends AsyncTask<Void, Void, EventListAdapter> {
+	private class LoadNearbyEventsTask extends AsyncTaskEx<Void, Void, EventListAdapter> {
 
 		@Override
 		public EventListAdapter doInBackground(Void... params) {

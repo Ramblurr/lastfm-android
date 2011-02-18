@@ -34,7 +34,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -122,7 +122,7 @@ public class Profile_ChartsTab extends ListActivity {
 		mProfileBubble.setClickable(false);
 		getListView().addHeaderView(mProfileBubble, null, false);
 
-		new LoadUserTask().execute((Void)null);
+		new LoadAsyncTaskEx().execute((Void)null);
 
 		mViewHistory = new Stack<Integer>();
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
@@ -291,7 +291,7 @@ public class Profile_ChartsTab extends ListActivity {
 		getListView().setAdapter(mProfileAdapter);
 	}
 	
-	private class LoadUserTask extends AsyncTask<Void, Void, Boolean> {
+	private class LoadAsyncTaskEx extends AsyncTaskEx<Void, Void, Boolean> {
 		User mUser = null;
 		
 		@Override
@@ -595,7 +595,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	};
 
-	private class LoadRecommendedArtistsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadRecommendedArtistsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -644,7 +644,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadTopArtistsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadTopArtistsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -693,7 +693,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadTopAlbumsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadTopAlbumsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -742,7 +742,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadTopTracksTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadTopTracksTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -791,7 +791,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadRecentTracksTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadRecentTracksTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -835,7 +835,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadTagsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadTagsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
@@ -877,7 +877,7 @@ public class Profile_ChartsTab extends ListActivity {
 		}
 	}
 
-	private class LoadFriendsTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadFriendsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {

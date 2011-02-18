@@ -36,7 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -221,7 +221,7 @@ public class LastFm extends Activity {
 	 * In a task because it can take a while, and Android has a tendency to
 	 * panic and show the force quit/wait dialog quickly. And this blocks.
 	 */
-	private class LoginTask extends AsyncTask<String, Void, Session> {
+	private class LoginTask extends AsyncTaskEx<String, Void, Session> {
 		Context context;
 		ProgressDialog mDialog;
 
@@ -347,7 +347,7 @@ public class LastFm extends Activity {
 
 	private LoginTask mLoginTask;
 
-	private class CheckUpdatesTask extends AsyncTask<Void, Void, Boolean> {
+	private class CheckUpdatesTask extends AsyncTaskEx<Void, Void, Boolean> {
 		private String mUpdateURL = "";
 
 		@Override

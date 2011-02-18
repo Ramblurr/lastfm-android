@@ -36,7 +36,7 @@ import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -782,7 +782,7 @@ public class Player extends Activity {
 		return 500;
 	}
 
-	private class RefreshTask extends AsyncTask<Void, Void, Void> {
+	private class RefreshTask extends AsyncTaskEx<Void, Void, Void> {
 		@Override
 		protected Void doInBackground(Void... params) {
 			long next = refreshNow();
@@ -825,7 +825,7 @@ public class Player extends Activity {
 				.toString();
 	}
 
-	private class SearchStationTask extends AsyncTask<Void, Void, Station> {
+	private class SearchStationTask extends AsyncTaskEx<Void, Void, Station> {
 
 		@Override
 		protected Station doInBackground(Void... arg0) {
@@ -866,7 +866,7 @@ public class Player extends Activity {
 		}
 	}
 	
-	private class LoadAlbumArtTask extends AsyncTask<String, Void, Boolean> {
+	private class LoadAlbumArtTask extends AsyncTaskEx<String, Void, Boolean> {
 		String artUrl;
 
 		@Override
@@ -909,7 +909,7 @@ public class Player extends Activity {
 		}
 	}
 
-	private class LoadEventsTask extends AsyncTask<Void, Void, Boolean> {
+	private class LoadEventsTask extends AsyncTaskEx<Void, Void, Boolean> {
 		String mArtist = null;
 
 		@Override

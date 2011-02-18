@@ -31,7 +31,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
@@ -151,7 +151,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 	     return true;
 	 }
 	
-	private class SearchTask extends AsyncTask<Void, Void, ArrayList<ListEntry>> {
+	private class SearchTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 
 		@Override
 		public void onPreExecute() {

@@ -37,7 +37,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
-import android.os.AsyncTask;
+import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -313,7 +313,7 @@ public class Profile extends ActivityGroup {
 	 * In a task because it can take a while, and Android has a tendency to
 	 * panic and show the force quit/wait dialog quickly. And this blocks.
 	 */
-	private class SessionInfoTask extends AsyncTask<String, Void, SessionInfo> {
+	private class SessionInfoTask extends AsyncTaskEx<String, Void, SessionInfo> {
 		Exception e;
 		WSError wse;
 

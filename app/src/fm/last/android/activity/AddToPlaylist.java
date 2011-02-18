@@ -43,7 +43,7 @@ import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
 import fm.last.android.adapter.NotificationAdapter;
 import fm.last.android.utils.ImageCache;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
@@ -132,7 +132,7 @@ public class AddToPlaylist extends Activity {
 		return mImageCache;
 	}
 
-	private class AddToPlaylistTask extends UserTask<Void, Void, Boolean> {
+	private class AddToPlaylistTask extends AsyncTaskEx<Void, Void, Boolean> {
 		String mArtist;
 		String mTrack;
 		String mPlaylistId;
@@ -176,7 +176,7 @@ public class AddToPlaylist extends Activity {
 		}
 	}
 
-	private class LoadPlaylistsTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class LoadPlaylistsTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 		@Override
 		public void onPreExecute() {
 			mPlaylistsList.setAdapter(new NotificationAdapter(AddToPlaylist.this, NotificationAdapter.LOAD_MODE, getString(R.string.common_loading)));
@@ -216,7 +216,7 @@ public class AddToPlaylist extends Activity {
 		}
 	}
 
-	private class CreatePlaylistTask extends UserTask<Void, Void, ArrayList<ListEntry>> {
+	private class CreatePlaylistTask extends AsyncTaskEx<Void, Void, ArrayList<ListEntry>> {
 		private String mTitle;
 
 		public CreatePlaylistTask(String title) {

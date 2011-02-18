@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 import fm.last.android.R;
-import fm.last.android.utils.UserTask;
+import fm.last.android.utils.AsyncTaskEx;
 import fm.last.util.UrlUtil;
 
 /**
@@ -65,7 +65,7 @@ public class AlbumArt extends ImageView {
 		_fetchTask.execute((Void) null);
 	}
 
-	private class FetchArtTask extends UserTask<Void, Void, Boolean> {
+	private class FetchArtTask extends AsyncTaskEx<Void, Void, Boolean> {
 		Bitmap mBitmap = null;
 		String mURL = null;
 
