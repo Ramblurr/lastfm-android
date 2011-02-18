@@ -269,7 +269,10 @@ public class LastFMApplication extends Application {
 						public void onClick(DialogInterface dialog, int whichButton) {
 						}
 					});
-					d.show();
+					try {
+						d.show();
+					} catch (Exception e) {
+					}
 					return;
 					
 				case WSError.ERROR_Deprecated:
@@ -353,7 +356,7 @@ public class LastFMApplication extends Application {
 			intent.putExtra("ERROR_TITLE", title);
 			intent.putExtra("ERROR_DESCRIPTION", description);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			ctx.startActivity(intent);
+			startActivity(intent);
 		}
 	}
 	
