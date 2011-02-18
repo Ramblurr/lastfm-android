@@ -54,6 +54,7 @@ import fm.last.android.widget.TagLayout;
 import fm.last.android.widget.TagLayoutListener;
 import fm.last.api.LastFmServer;
 import fm.last.api.Session;
+import fm.last.api.WSError;
 
 /**
  * Activity for tagging albums, artists and songs
@@ -285,6 +286,8 @@ public class Tag extends Activity {
 				oldTags = mServer.getArtistTags(mArtist, mSession.getKey());
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (WSError e) {
 			e.printStackTrace();
 		}
 

@@ -203,6 +203,7 @@ public class LastFMApplication extends Application {
 		} else {
 			Intent i = new Intent(mCtx, LastFm.class);
 			i.putExtra("station", url);
+			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			mCtx.startActivity(i);
 		}
 	}
