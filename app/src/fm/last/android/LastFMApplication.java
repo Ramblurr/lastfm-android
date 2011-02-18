@@ -345,7 +345,15 @@ public class LastFMApplication extends Application {
 			public void onClick(DialogInterface dialog, int whichButton) {
 			}
 		});
-		d.show();
+		try {
+			d.show();
+		} catch (Exception e) {
+			Intent intent = new Intent(LastFMApplication.this, Player.class);
+			intent.putExtra("ERROR_TITLE", title);
+			intent.putExtra("ERROR_DESCRIPTION", description);
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			ctx.startActivity(intent);
+		}
 	}
 	
 	public void logout() {

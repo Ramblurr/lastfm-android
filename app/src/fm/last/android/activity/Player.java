@@ -25,11 +25,13 @@ import java.util.Formatter;
 import java.util.concurrent.RejectedExecutionException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
@@ -201,6 +203,17 @@ public class Player extends Activity {
 				tuning = true;
 			} else if(intent.getData() != null && intent.getData().getScheme() != null && intent.getData().getScheme().equals("lastfm")) {
 				LastFMApplication.getInstance().playRadioStation(Player.this, intent.getData().toString(), false);
+				tuning = true;
+			} else if(intent.getStringExtra("ERROR_TITLE") != null) {
+				AlertDialog.Builder d = new AlertDialog.Builder(this);
+				d.setTitle(intent.getStringExtra("ERROR_TITLE"));
+				d.setMessage(intent.getStringExtra("ERROR_DESCRIPTION"));
+				d.setIcon(android.R.drawable.ic_dialog_alert);
+				d.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+					}
+				});
+				d.show();
 				tuning = true;
 			}
 		}
