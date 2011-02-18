@@ -114,7 +114,7 @@ public class Metadata extends Activity {
 				List<String> segments = getIntent().getData().getPathSegments();
 				
 				mArtistName = Uri.decode(segments.get(1)).replace("+", " ");
-				if(segments.size() > 2)
+				if(segments.size() > 3)
 					mTrackName = Uri.decode(segments.get(3)).replace("+", " ");
 			}
 		} 
