@@ -224,6 +224,7 @@ public class LastFm extends Activity {
 	private class LoginTask extends AsyncTaskEx<String, Void, Session> {
 		Context context;
 		ProgressDialog mDialog;
+		SessionInfo userSession;
 
 		Exception e;
 		WSError wse;
@@ -262,6 +263,7 @@ public class LastFm extends Activity {
 			Session session = server.getMobileSession(user, authToken);
 			if (session == null)
 				throw (new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
+			userSession = server.getSessionInfo(session.getKey());
 			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				Parcelable authResponse = null;
 				if(getIntent() != null && getIntent().getExtras() != null)
@@ -284,6 +286,14 @@ public class LastFm extends Activity {
 				editor.putBoolean("remove_playlists", true);
 				editor.putBoolean("remove_tags", true);
 				editor.putBoolean("remove_loved", true);
+				
+				if(userSession != null) {
+					editor.putBoolean("lastfm_radio", userSession.getRadio());
+					editor.putBoolean("lastfm_freetrial", userSession.getFreeTrial());
+					editor.putBoolean("lastfm_expired", userSession.getExpired());
+					editor.putInt("lastfm_playsleft", userSession.getPlaysLeft());
+					editor.putInt("lastfm_playselapsed", userSession.getPlaysElapsed());
+				}
 				editor.commit();
 
 				LastFMApplication.getInstance().session = session;
