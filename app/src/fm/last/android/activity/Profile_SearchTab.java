@@ -188,6 +188,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 						entry = new ListEntry(value, R.drawable.profile_unknown, text1, imageURL, text2);
 					else
 						entry = new ListEntry(value, R.drawable.list_icon_station, text1, imageURL, text2);
+					entry.centerIcon = true;
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;

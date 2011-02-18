@@ -133,6 +133,9 @@ public class ListAdapter extends BaseAdapter implements Serializable, ImageDownl
 			holder = (ViewHolder) row.getTag();
 		}
 
+		if(mList.get(position).centerIcon)
+			holder.image.setScaleType(ImageView.ScaleType.CENTER);
+		
 		holder.label.setText(mList.get(position).text);
 		if (mList.get(position).text_second != null) {
 			holder.label_second.setText(mList.get(position).text_second);
