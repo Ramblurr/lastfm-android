@@ -40,7 +40,6 @@ public class SearchProvider extends ContentProvider {
             SearchManager.SUGGEST_COLUMN_TEXT_1,
             SearchManager.SUGGEST_COLUMN_TEXT_2,
             SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-            SearchManager.SUGGEST_COLUMN_ICON_2,
             "_imageURL"
             };
 
@@ -115,7 +114,6 @@ public class SearchProvider extends ContentProvider {
 			                    artist.getName(),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
 			                    Uri.parse("http://www.last.fm/music/"+artist.getName()),           // intent_data (included when clicking on item)
-			                    -1,
 			                    artist.getImages().length == 0 ? "" : artist.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Album.class)) {
@@ -130,7 +128,6 @@ public class SearchProvider extends ContentProvider {
 			                    track.getArtist().getName() + " - " + track.getName(),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
 			                    Uri.parse("http://www.last.fm/music/"+Uri.encode(track.getArtist().getName())+"/_/"+track.getName()),           // intent_data (included when clicking on item)
-			                    -1,
 			                    track.getImages().length == 0 ? "" : track.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Tag.class)) {
@@ -141,7 +138,6 @@ public class SearchProvider extends ContentProvider {
 			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tag.getName()),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
 			                    Uri.parse("lastfm://globaltags/"+tag.getName()),           // intent_data (included when clicking on item)
-			                    R.drawable.radio_icon,
 			                    -1
 			            });
 		        	}
@@ -157,7 +153,6 @@ public class SearchProvider extends ContentProvider {
 		                    processedQuery,           // text1
 		                    LastFMApplication.getInstance().getString(R.string.action_viewprofile),     // text2
 		                    Uri.parse("http://www.last.fm/user/"+processedQuery),           // intent_data (included when clicking on item)
-		                    -1,
 		                    u.getImages().length == 0 ? "" : u.getURLforImageSize("extralarge")
 		            });
 		        }

@@ -182,9 +182,12 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 					String text2 = managedCursor.getString(managedCursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_TEXT_2));
 					String value = managedCursor.getString(managedCursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_INTENT_DATA));
 					String imageURL = managedCursor.getString(managedCursor.getColumnIndexOrThrow("_imageURL"));
-					int disclosure = managedCursor.getInt(managedCursor.getColumnIndexOrThrow(SearchManager.SUGGEST_COLUMN_ICON_2));
 					
-					ListEntry entry = new ListEntry(value, R.drawable.profile_unknown, text1, imageURL, disclosure, text2);
+					ListEntry entry;
+					if(!imageURL.equals("-1"))
+						entry = new ListEntry(value, R.drawable.profile_unknown, text1, imageURL, text2);
+					else
+						entry = new ListEntry(value, R.drawable.list_icon_station, text1, imageURL, text2);
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
