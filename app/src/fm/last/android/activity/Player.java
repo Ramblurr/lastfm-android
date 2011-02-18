@@ -22,6 +22,7 @@ package fm.last.android.activity;
 
 import java.io.IOException;
 import java.util.Formatter;
+import java.util.concurrent.RejectedExecutionException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -373,9 +374,13 @@ public class Player extends Activity {
 		if (LastFMApplication.getInstance().player == null)
 			LastFMApplication.getInstance().bindPlayerService();
 		updateTrackInfo();
-		long next = refreshNow();
-		queueNextRefresh(next);
 
+		try {
+			new RefreshTask().execute((Void)null);
+		} catch (RejectedExecutionException e) {
+			queueNextRefresh(500);
+		}
+		
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/Player");
 		} catch (SQLiteException e) {
@@ -777,14 +782,27 @@ public class Player extends Activity {
 		return 500;
 	}
 
+	private class RefreshTask extends AsyncTask<Void, Void, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+			long next = refreshNow();
+			queueNextRefresh(next);
+			return null;
+		}
+		
+	}
+	
 	private final Handler mHandler = new Handler() {
 
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			case REFRESH:
-				long next = refreshNow();
-				queueNextRefresh(next);
+				try {
+					new RefreshTask().execute((Void)null);
+				} catch (RejectedExecutionException e) {
+					queueNextRefresh(500);
+				}
 				break;
 			default:
 				break;
