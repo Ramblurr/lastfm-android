@@ -133,15 +133,18 @@ public class UrlUtil {
 		conn.connect();
 		BufferedReader reader = null;
 		try {
-			int rc = conn.getResponseCode();
 			InputStream contentStream = null;
-			if (rc == 200)
-				contentStream = conn.getInputStream();
-			else
+			if (conn.getErrorStream() != null)
 				contentStream = conn.getErrorStream();
-			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
-			String response = toString(reader);
-			return response;
+			else
+				contentStream = conn.getInputStream();
+			if(contentStream != null) {
+				reader = new BufferedReader(new InputStreamReader(contentStream), 512);
+				String response = toString(reader);
+				return response;
+			} else {
+				return "";
+			}
 		} finally {
 			if (reader != null) {
 				reader.close();
