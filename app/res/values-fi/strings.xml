@@ -231,7 +231,6 @@
   <string name="ERROR_SIGNUP_TITLE">Ei voitu rekisteröidä</string>
   <string name="ERROR_AMAZON">Amazon MP3 -verkkokauppa ei ole tällä hetkellä käytettävissä tässä laitteessa.</string>
   <string name="ERROR_AMAZON_TITLE">Amazon ei ole käytettävissä</string>
-  <string name="ERROR_RADIO_UNAVAILABLE">Last.fm Radio ei ole saatavilla tällä alueella.</string>
   <string name="ERROR_VOICE_TITLE">Äänihaku ei ole käytettävissä</string>
   <string name="ERROR_VOICE">Google Äänihakua ei ole asennettu tähän laitteeseen.</string>
   <string name="ERROR_DEPRECATED_TITLE">Asema ole enää käytettävissä</string>
