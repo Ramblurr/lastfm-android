@@ -55,6 +55,7 @@ import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.Tasteometer;
 import fm.last.api.User;
+import fm.last.api.WSError;
 
 public class Profile_RadioTab extends ListActivity {
 
@@ -124,11 +125,11 @@ public class Profile_RadioTab extends ListActivity {
 		public Boolean doInBackground(Void... params) {
 			boolean success = false;
 			Session session = LastFMApplication.getInstance().session;
-			fetchRecentStations();
 
 			// Check our subscriber status
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			try {
+				fetchRecentStations();
 				User user = server.getUserInfo(null, session.getKey());
 				if (user != null) {
 					String subscriber = user.getSubscriber();
@@ -139,6 +140,9 @@ public class Profile_RadioTab extends ListActivity {
 					session = new Session(session.getName(), session.getKey(), subscriber);
 					LastFMApplication.getInstance().session = session;
 				}
+			} catch (WSError e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

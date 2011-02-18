@@ -18,6 +18,7 @@ import fm.last.api.LastFmServer;
 import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
+import fm.last.api.WSError;
 import fm.last.util.UrlUtil;
 
 import android.accounts.Account;
@@ -378,6 +379,10 @@ public class ContactsSyncAdapterService extends Service {
 					}
 				}
 			}
+		} catch (WSError e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

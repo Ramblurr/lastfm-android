@@ -67,6 +67,7 @@ import fm.last.api.Session;
 import fm.last.api.Tag;
 import fm.last.api.Track;
 import fm.last.api.User;
+import fm.last.api.WSError;
 
 public class Profile_ChartsTab extends ListActivity {
 	// Java doesn't let you treat enums as ints easily, so we have to have this
@@ -122,7 +123,7 @@ public class Profile_ChartsTab extends ListActivity {
 		mProfileBubble.setClickable(false);
 		getListView().addHeaderView(mProfileBubble, null, false);
 
-		new LoadAsyncTaskEx().execute((Void)null);
+		new LoadUserTask().execute((Void)null);
 
 		mViewHistory = new Stack<Integer>();
 		mNestedViewFlipper = (ViewFlipper) findViewById(R.id.NestedViewFlipper);
@@ -291,7 +292,7 @@ public class Profile_ChartsTab extends ListActivity {
 		getListView().setAdapter(mProfileAdapter);
 	}
 	
-	private class LoadAsyncTaskEx extends AsyncTaskEx<Void, Void, Boolean> {
+	private class LoadUserTask extends AsyncTaskEx<Void, Void, Boolean> {
 		User mUser = null;
 		
 		@Override
@@ -299,6 +300,8 @@ public class Profile_ChartsTab extends ListActivity {
 			LastFmServer server = AndroidLastFmServerFactory.getServer();
 			try {
 				mUser = server.getUserInfo(mUsername, null);
+			} catch (WSError e) {
+				return false;
 			} catch (Exception e) {
 				return false;
 			}
