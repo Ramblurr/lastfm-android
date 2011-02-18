@@ -680,12 +680,20 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			clearNotification();
 			nm.notify(NOTIFY_ID, notification);
 			notifyChange(PLAYBACK_STATE_CHANGED);
-			mp.pause();
-			mState = STATE_PAUSED;
+			try {
+				mp.pause();
+				mState = STATE_PAUSED;
+			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't pause
+				e.printStackTrace();
+			}
 		} else {
 			playingNotify();
-			mp.start();
-			mState = STATE_PLAYING;
+			try {
+				mp.start();
+				mState = STATE_PLAYING;
+			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
+				e.printStackTrace();
+			}
 		}
 	}
 
