@@ -451,15 +451,33 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					}, 0);
 				}
 			} else if (action.equals("fm.last.android.widget.UPDATE") || action.startsWith("com.")) {
-				updateAppWidget(context);
+				try {
+					new UpdateTask().execute(ctx);
+				} catch (RejectedExecutionException e) { //try again in 1 second
+					if (mAlarmIntent == null) {
+						intent = new Intent("fm.last.android.widget.UPDATE");
+						mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+						AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+						am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+					}
+				}
 			}
 		}
 		super.onReceive(context, intent);
 	}
 
 	@Override
-	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		updateAppWidget(context);
+	public void onUpdate(Context ctx, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+		try {
+			new UpdateTask().execute(ctx);
+		} catch (RejectedExecutionException e) { //try again in 1 second
+			if (mAlarmIntent == null) {
+				Intent intent = new Intent("fm.last.android.widget.UPDATE");
+				mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+				AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+				am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+			}
+		}
 	}
 
 	@Override
@@ -673,6 +691,15 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		return new Formatter().format("%02d:%02d", secs / 60, secs % 60).toString();
 	}
 
+	private static class UpdateTask extends AsyncTask<Context, Void, Void> {
+		@Override
+		protected Void doInBackground(Context... params) {
+			updateAppWidget(params[0]);
+			return null;
+		}
+		
+	}
+	
 	private static class UpdateFromAndroidPlayerTask extends AsyncTask<com.android.music.IMediaPlaybackService, Void, Boolean> {
 		Context ctx = null;
 		String trackName = "";
