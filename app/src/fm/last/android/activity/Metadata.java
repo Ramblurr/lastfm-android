@@ -536,7 +536,8 @@ public class Metadata extends Activity {
 					return null;
 				ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 				for (int i = 0; i < ((tags.length < 10) ? tags.length : 10); i++) {
-					ListEntry entry = new ListEntry(tags[i], -1, tags[i].getName(), R.drawable.list_icon_station);
+					ListEntry entry = new ListEntry(tags[i], R.drawable.list_icon_station, tags[i].getName());
+					entry.centerIcon = true;
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
