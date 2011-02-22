@@ -708,13 +708,15 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			String discovery = "0";
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
-			logger.info("Current network type: " + ni.getTypeName());
-			if (ni.getType() == ConnectivityManager.TYPE_MOBILE)
+			if(ni != null)
+				logger.info("Current network type: " + ni.getTypeName());
+			
+			if (ni != null && ni.getType() == ConnectivityManager.TYPE_MOBILE)
 				bitrate = "64";
 			else
 				bitrate = "128";
 
-			mDoHasWiFi = (ni.getType() == ConnectivityManager.TYPE_WIFI);
+			mDoHasWiFi = (ni == null || ni.getType() == ConnectivityManager.TYPE_WIFI);
 
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("highquality", false))
 				bitrate = "128";
@@ -921,6 +923,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				i.putExtra("error", (Parcelable) e);
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
+				e.printStackTrace();
 				clearNotification();
 				stopSelf();
 			} catch (Exception e) {
@@ -928,6 +931,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				Intent i = new Intent("fm.last.android.ERROR");
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
+				e.printStackTrace();
 				clearNotification();
 				stopSelf();
 			}
