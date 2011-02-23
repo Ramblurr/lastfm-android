@@ -74,9 +74,9 @@ public class QuickContactProfileBubble extends ProfileBubble {
 				ContactsContract.Data.DATA1 + "=?" + " AND " + ContactsContract.Data.MIMETYPE + "='vnd.android.cursor.item/vnd.fm.last.android.profile'",
 				new String[] { user.getName() }, null);
 
-		if (c.moveToNext()) {
+		if (c != null && c.moveToNext()) {
 			setQuickContactId(c.getLong(0));
-		} else if(mUser.getImages().length > 0) {
+		} else if(mUser != null && mUser.getImages().length > 0) {
 			new FetchArtTask(mUser.getURLforImageSize("extralarge")).execute((Void) null);
 		}
 	}
