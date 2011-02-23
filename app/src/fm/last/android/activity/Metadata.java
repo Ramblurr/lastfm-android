@@ -301,6 +301,9 @@ public class Metadata extends Activity {
 			Artist artist;
 			boolean success = false;
 
+			if(mArtistName == null || LastFMApplication.getInstance().session == null)
+				return false;
+			
 			try {
 				String lang = Locale.getDefault().getLanguage();
 				if (lang.equalsIgnoreCase("de")) {
