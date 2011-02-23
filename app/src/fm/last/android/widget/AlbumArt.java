@@ -3,6 +3,8 @@
  */
 package fm.last.android.widget;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.content.Context;
@@ -81,6 +83,15 @@ public class AlbumArt extends ImageView {
 			boolean success = false;
 			try {
 				mBitmap = UrlUtil.getImage(new URL(mURL));
+				success = true;
+			} catch (OutOfMemoryError e) {
+				mURL.replace("/_/", "/300x300/");
+				try {
+					mBitmap = UrlUtil.getImage(new URL(mURL));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				success = true;
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -46,6 +46,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -887,7 +888,18 @@ public class Player extends Activity {
 				if (!artistName.equals(RadioPlayerService.UNKNOWN) && albumName != null && albumName.length() > 0) {
 					album = mServer.getAlbumInfo(artistName, albumName);
 					if (album != null) {
-						artUrl = album.getURLforImageSize("mega");
+						DisplayMetrics metrics = new DisplayMetrics();
+						getWindowManager().getDefaultDisplay().getMetrics(metrics);
+						int width = metrics.widthPixels;
+						if(metrics.heightPixels < width)
+							width = metrics.heightPixels;
+						
+						Log.i("LastFm", "Current screen width: " + width);
+						
+						if(width > 320)
+							artUrl = album.getURLforImageSize("mega");
+						else
+							artUrl = album.getURLforImageSize("extralarge");
 					}
 				}
 				success = true;
