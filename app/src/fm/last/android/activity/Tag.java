@@ -349,6 +349,9 @@ public class Tag extends Activity {
 
 		// TODO maybe nicer diff algorithm here
 
+		if(mTrackOldTags == null || mTrackNewTags == null)
+			return;
+		
 		for (int i = 0; i < mTrackOldTags.size(); i++) {
 			String oldTag = mTrackOldTags.get(i);
 			boolean presentInNew = false;
