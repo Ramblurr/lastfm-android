@@ -268,7 +268,7 @@ public class Player extends Activity {
 						"player-buy", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			Amazon.searchForTrack(this, mArtistName.getText().toString(),
@@ -382,7 +382,7 @@ public class Player extends Activity {
 		
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/Player");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 
@@ -452,7 +452,7 @@ public class Player extends Activity {
 						"player-love", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 		}
@@ -468,7 +468,7 @@ public class Player extends Activity {
 						"player-ban", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			bindService(new Intent(Player.this,
@@ -502,7 +502,7 @@ public class Player extends Activity {
 						"player-skip", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			bindService(new Intent(Player.this,
@@ -555,7 +555,7 @@ public class Player extends Activity {
 						"on-tour-badge", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			showEventsMetadataIntent();
@@ -571,7 +571,7 @@ public class Player extends Activity {
 						"player-stop", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 

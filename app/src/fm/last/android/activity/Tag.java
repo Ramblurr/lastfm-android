@@ -224,7 +224,7 @@ public class Tag extends Activity {
 		super.onResume();
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/Tag");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 	}

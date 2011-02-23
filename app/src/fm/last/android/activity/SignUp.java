@@ -60,7 +60,7 @@ public class SignUp extends Activity {
 							"signup", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 
@@ -95,7 +95,7 @@ public class SignUp extends Activity {
 		super.onResume();
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/SignUp");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 	}

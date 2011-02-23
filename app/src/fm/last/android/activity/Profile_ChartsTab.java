@@ -454,7 +454,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_RECOMMENDED: // "Top Artists"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/RecommendedArtists");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadRecommendedArtistsTask().execute((Void) null);
@@ -462,7 +462,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_TOPARTISTS: // "Top Artists"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopArtists");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadTopArtistsTask().execute((Void) null);
@@ -470,7 +470,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_TOPALBUMS: // "Top Albums"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopAlbums");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadTopAlbumsTask().execute((Void) null);
@@ -478,7 +478,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_TOPTRACKS: // "Top Tracks"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/TopTracks");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadTopTracksTask().execute((Void) null);
@@ -486,7 +486,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_RECENTLYPLAYED: // "Recently Played"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Charts/Recent");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadRecentTracksTask().execute((Void) null);
@@ -494,7 +494,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_FRIENDS: // "Friends"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Friends");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadFriendsTask().execute((Void) null);
@@ -502,7 +502,7 @@ public class Profile_ChartsTab extends ListActivity {
 		case PROFILE_TAGS: // "Tags"
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Tags");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadTagsTask().execute((Void) null);

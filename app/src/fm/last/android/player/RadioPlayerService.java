@@ -360,7 +360,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						"Stream", // Action
 						currentStation.getType(), // Label
 						(int) ((System.currentTimeMillis() - mStationStartTime) / 1000)); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			mStationStartTime = 0;
@@ -482,7 +482,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						"Buffering", // Action
 						currentStation.getType(), // Label
 						(int) ((System.currentTimeMillis() - mTrackStartTime) / 1000)); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 		}
@@ -735,7 +735,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 							"Error", // Action
 							"NotEnoughContent", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 				throw new WSError("radio.getPlaylist", "insufficient content", WSError.ERROR_NotEnoughContent);

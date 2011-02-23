@@ -174,7 +174,7 @@ public class PopupActionActivity extends ListActivity {
 							"widget-buy", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 			} else {
@@ -183,7 +183,7 @@ public class PopupActionActivity extends ListActivity {
 							"charts-buy", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 			}

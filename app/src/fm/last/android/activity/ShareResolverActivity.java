@@ -96,7 +96,7 @@ public class ShareResolverActivity extends ListActivity {
 						"share", // Action
 						intent.getComponent().getPackageName(), // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 

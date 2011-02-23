@@ -241,7 +241,7 @@ public class Profile extends ActivityGroup {
 		}
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/Profile");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 		super.onResume();

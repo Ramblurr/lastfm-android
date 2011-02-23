@@ -179,7 +179,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							"widget-skip", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 
@@ -260,7 +260,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							"widget-stop", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 				
@@ -355,7 +355,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							"widget-love", // Action
 							"", // Label
 							0); // Value
-				} catch (SQLiteException e) {
+				} catch (Exception e) {
 					//Google Analytics doesn't appear to be thread safe
 				}
 				LastFMApplication.getInstance().bindService(new Intent(context, fm.last.android.player.RadioPlayerService.class), new ServiceConnection() {
@@ -381,7 +381,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								"widget-prev", // Action
 								"", // Label
 								0); // Value
-					} catch (SQLiteException e) {
+					} catch (Exception e) {
 						//Google Analytics doesn't appear to be thread safe
 					}
 
@@ -429,7 +429,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								"widget-ban", // Action
 								"", // Label
 								0); // Value
-					} catch (SQLiteException e) {
+					} catch (Exception e) {
 						//Google Analytics doesn't appear to be thread safe
 					}
 

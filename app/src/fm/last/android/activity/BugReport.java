@@ -35,7 +35,7 @@ public class BugReport extends DialogPreference {
 		mBug = (EditText) getDialog().findViewById(R.id.bug);
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/BugReport");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 	}

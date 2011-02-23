@@ -178,7 +178,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		case EVENTS_MYEVENTS:
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadMyEventsTask().execute((Void) null);
@@ -186,7 +186,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		case EVENTS_RECOMMENDED:
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Recommended");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			new LoadRecommendedEventsTask().execute((Void) null);
@@ -194,7 +194,7 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 		case EVENTS_NEARME:
 			try {
 				LastFMApplication.getInstance().tracker.trackPageView("/Profile/Events/Nearby");
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);

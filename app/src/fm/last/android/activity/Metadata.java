@@ -190,7 +190,7 @@ public class Metadata extends Activity {
 		super.onResume();
 		try {
 			LastFMApplication.getInstance().tracker.trackPageView("/Metadata");
-		} catch (SQLiteException e) {
+		} catch (Exception e) {
 			//Google Analytics doesn't appear to be thread safe
 		}
 	}
@@ -222,7 +222,7 @@ public class Metadata extends Activity {
 						"on-tour-badge", // Action
 						"", // Label
 						0); // Value
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				//Google Analytics doesn't appear to be thread safe
 			}
 			mTabHost.setCurrentTabByTag("events");		
