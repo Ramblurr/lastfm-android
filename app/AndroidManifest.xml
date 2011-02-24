@@ -24,7 +24,7 @@
 	<uses-sdk android:minSdkVersion="3"/>
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
-		android:name="LastFMApplication">
+		android:name="LastFMApplication" android:installLocation="internalOnly">
 		<activity android:name="LastFm" android:configChanges="keyboardHidden">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
