@@ -91,6 +91,9 @@ public class AlbumArt extends ImageView {
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+				} catch (Error e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 				success = true;
 			} catch (Exception e) {
