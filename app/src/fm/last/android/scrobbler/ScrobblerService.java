@@ -341,7 +341,11 @@ public class ScrobblerService extends Service {
 	public void intentFromMediaDB(Intent intent) {
 		final Intent i = intent;
 
-		boolean playing = intent.getBooleanExtra("playing", false);
+		boolean playing = false;
+		
+		if(intent.getBooleanExtra("playing", false) || intent.getBooleanExtra("playstate", false) || intent.getAction().endsWith("metachanged"))
+			playing = true;
+		
 		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
 
 		if(!playing) {
