@@ -43,7 +43,8 @@ public class RecentStationsDao extends AbstractDao<Station>
 			return instance;
 		} 
 		else {
-			return new RecentStationsDao();
+			instance = new RecentStationsDao();
+			return instance;
 		}
 	}
 
@@ -52,7 +53,7 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * @param url the station's Last.fm URL
 	 * @param name the station's display name
 	 */
-	public void appendRecentStation(String url, String name) 
+	public synchronized void appendRecentStation(String url, String name) 
 	{
 		save(Collections.singletonList(new Station(name, null, url, null)));
 	}
@@ -61,7 +62,7 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * Read the last added station.
 	 * @return the last station that has been added to the list.
 	 */
-	public Station getLastStation() 
+	public synchronized Station getLastStation() 
 	{
 		List<Station> stations = loadWithQualification("ORDER BY Timestamp DESC LIMIT 4");
 		if (stations!=null && stations.size()>0) {
@@ -74,7 +75,7 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * Get the list of recent stations.
 	 * @return all stations in the table.
 	 */
-	public List<Station> getRecentStations() 
+	public synchronized List<Station> getRecentStations() 
 	{
 		return loadWithQualification("ORDER BY Timestamp DESC LIMIT 10");
 	}
@@ -84,7 +85,7 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * @see fm.last.android.db.AbstractDao#buildObject(android.database.Cursor)
 	 */
 	@Override
-	protected Station buildObject(Cursor c) 
+	protected synchronized Station buildObject(Cursor c) 
 	{
 		String name = c.getString(c.getColumnIndex("Name"));
 		String url = c.getString(c.getColumnIndex("Url"));
@@ -96,7 +97,7 @@ public class RecentStationsDao extends AbstractDao<Station>
 	 * @see fm.last.android.db.AbstractDao#fillContent(android.content.ContentValues, java.lang.Object)
 	 */
 	@Override
-	protected void fillContent(ContentValues content, Station data) 
+	protected synchronized void fillContent(ContentValues content, Station data) 
 	{
 		content.put("Url", data.getUrl());
 		content.put("Name", data.getName());

@@ -39,7 +39,8 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 			return instance;
 		} 
 		else {
-			return new ScrobblerQueueDao();
+			instance = new ScrobblerQueueDao();
+			return instance;
 		}
 	}
 	
@@ -57,7 +58,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * @return 	<code>true</code> if the entry has been added
 	 * 			<code>false</code> if the queue is full.
 	 */
-	public boolean addToQueue(ScrobblerQueueEntry entry)
+	public synchronized boolean addToQueue(ScrobblerQueueEntry entry)
 	{
 		if (entry==null) return true;
 		int currentSize = getQueueSize();
@@ -73,7 +74,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * Remove an entry from the queue.
 	 * @param entry the {@link ScrobblerQueueEntry} to be removed.
 	 */
-	public void removeFromQueue(ScrobblerQueueEntry entry)
+	public synchronized void removeFromQueue(ScrobblerQueueEntry entry)
 	{
 		if (entry==null) return;
 		removeWithQualification("WHERE StartTime="+entry.startTime+" AND CurrentTrack=0");
@@ -83,7 +84,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * Get an entry from the queue.
 	 * @return a {@link ScrobblerQueueEntry} from the queue.
 	 */
-	public ScrobblerQueueEntry nextQueueEntry()
+	public synchronized ScrobblerQueueEntry nextQueueEntry()
 	{
 		List<ScrobblerQueueEntry> queue = loadWithQualification("WHERE CurrentTrack=0 LIMIT 1");
 		if (queue!=null && queue.size()>0) {
@@ -96,7 +97,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * Load the queued entries excluding the current track.
 	 * @return list of queue entries.
 	 */
-	public List<ScrobblerQueueEntry> loadQueue()
+	public synchronized List<ScrobblerQueueEntry> loadQueue()
 	{
 		return loadWithQualification("WHERE CurrentTrack=0");
 	}
@@ -105,7 +106,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * Load the current track entry from the table.
 	 * @return {@link ScrobblerQueueEntry} representing the current track.
 	 */
-	public ScrobblerQueueEntry loadCurrentTrack()
+	public synchronized ScrobblerQueueEntry loadCurrentTrack()
 	{
 		List<ScrobblerQueueEntry> entries = loadWithQualification("WHERE CurrentTrack=1");
 		if (entries!=null && entries.size()==1) {
@@ -118,7 +119,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * Set the current track entry in the table.
 	 * @param track the {@link ScrobblerQueueEntry} for the current track.
 	 */
-	public void saveCurrentTrack(ScrobblerQueueEntry track) 
+	public synchronized void saveCurrentTrack(ScrobblerQueueEntry track) 
 	{
 		removeWithQualification("WHERE CurrentTrack=1");
 		if (track!=null) {
@@ -132,7 +133,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * @see fm.last.android.db.AbstractDao#buildObject(android.database.Cursor)
 	 */
 	@Override
-	protected ScrobblerQueueEntry buildObject(Cursor c) 
+	protected synchronized ScrobblerQueueEntry buildObject(Cursor c) 
 	{		
 		ScrobblerQueueEntry entry = new ScrobblerQueueEntry();
 		
@@ -165,7 +166,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	 * @see fm.last.android.db.AbstractDao#fillContent(android.content.ContentValues, java.lang.Object)
 	 */
 	@Override
-	protected void fillContent(ContentValues content, ScrobblerQueueEntry data) 
+	protected synchronized void fillContent(ContentValues content, ScrobblerQueueEntry data) 
 	{
 		content.put("Album", data.album);
 		content.put("Artist", data.artist);
