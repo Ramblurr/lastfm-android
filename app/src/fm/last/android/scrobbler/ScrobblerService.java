@@ -385,6 +385,13 @@ public class ScrobblerService extends Service {
 	
 	            try {
 					if (!cur.moveToFirst()) {
+						//Search internal storage if external storage fails
+						cur = getContentResolver().query(
+								ContentUris.withAppendedId(
+									MediaStore.Audio.Media.INTERNAL_CONTENT_URI,
+									id), columns, null, null, null);
+					}
+					if (!cur.moveToFirst()) {
 					        logger.info("no such media in media store");
 					        cur.close();
 					        //This isn't fatal if the intent still contains the artist and track,
