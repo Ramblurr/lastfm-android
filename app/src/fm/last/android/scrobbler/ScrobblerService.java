@@ -343,19 +343,21 @@ public class ScrobblerService extends Service {
 
 		boolean playing = false;
 		
-		if(intent.getBooleanExtra("playing", true) || intent.getBooleanExtra("playstate", true) || intent.getAction().endsWith("metachanged"))
+		if(intent.getBooleanExtra("playing", false) || intent.getAction().endsWith("metachanged"))
+			playing = true;
+		else if(intent.getBooleanExtra("playstate", true) && !intent.getBooleanExtra("playstate", false) && intent.getBooleanExtra("playing", true))
 			playing = true;
 		
 		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
 		
-		/*logger.info("Dumping intent extras...");
+		logger.info("Dumping intent extras...");
 		
 		Iterator<String> it = i.getExtras().keySet().iterator();
 		while(it.hasNext()) {
 			String key = it.next();
 			
 			logger.info("Key: " + key + " Value: " + i.getExtras().getSerializable(key));
-		}*/
+		}
 
 		if(!playing) {
 			i.setAction(PLAYBACK_FINISHED);
@@ -404,13 +406,16 @@ public class ScrobblerService extends Service {
 					        	i.putExtra("duration", 0);
 					} else {
 						String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
-						i.putExtra("artist", artist);
+						if(i.getStringExtra("artist") == null)
+							i.putExtra("artist", artist);
 						
 						String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
-						i.putExtra("track", track);
+						if(i.getStringExtra("track") == null)
+							i.putExtra("track", track);
 						
 						String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
-						i.putExtra("album", album);
+						if(i.getStringExtra("album") == null)
+							i.putExtra("album", album);
 						
 						long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
 						if (duration != 0) {
