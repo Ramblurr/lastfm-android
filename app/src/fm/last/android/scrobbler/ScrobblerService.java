@@ -345,20 +345,11 @@ public class ScrobblerService extends Service {
 		
 		if(intent.getBooleanExtra("playing", false) || intent.getAction().endsWith("metachanged"))
 			playing = true;
-		else if(intent.getBooleanExtra("playstate", true) && !intent.getBooleanExtra("playstate", false) && intent.getBooleanExtra("playing", true))
+		else if(intent.getBooleanExtra("playstate", false) || (intent.getSerializableExtra("playstate") == null && intent.getBooleanExtra("playing", true)))
 			playing = true;
 		
 		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
 		
-		logger.info("Dumping intent extras...");
-		
-		Iterator<String> it = i.getExtras().keySet().iterator();
-		while(it.hasNext()) {
-			String key = it.next();
-			
-			logger.info("Key: " + key + " Value: " + i.getExtras().getSerializable(key));
-		}
-
 		if(!playing) {
 			i.setAction(PLAYBACK_FINISHED);
 		} else {
