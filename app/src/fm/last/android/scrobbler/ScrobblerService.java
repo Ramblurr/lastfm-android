@@ -343,10 +343,19 @@ public class ScrobblerService extends Service {
 
 		boolean playing = false;
 		
-		if(intent.getBooleanExtra("playing", false) || intent.getBooleanExtra("playstate", false) || intent.getAction().endsWith("metachanged"))
+		if(intent.getBooleanExtra("playing", true) || intent.getBooleanExtra("playstate", true) || intent.getAction().endsWith("metachanged"))
 			playing = true;
 		
 		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
+		
+		/*logger.info("Dumping intent extras...");
+		
+		Iterator<String> it = i.getExtras().keySet().iterator();
+		while(it.hasNext()) {
+			String key = it.next();
+			
+			logger.info("Key: " + key + " Value: " + i.getExtras().getSerializable(key));
+		}*/
 
 		if(!playing) {
 			i.setAction(PLAYBACK_FINISHED);
@@ -363,7 +372,7 @@ public class ScrobblerService extends Service {
 					MediaStore.Audio.AudioColumns.DURATION,
 					MediaStore.Audio.AudioColumns.ALBUM,
 					MediaStore.Audio.AudioColumns.TRACK, };
-			
+				
 				Cursor cur = getContentResolver().query(
 					ContentUris.withAppendedId(
 						MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -376,22 +385,30 @@ public class ScrobblerService extends Service {
 	
 	            try {
 					if (!cur.moveToFirst()) {
-					        logger.severe("no such media in media store");
+					        logger.info("no such media in media store");
 					        cur.close();
-					        return;
-					}
-					String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
-					i.putExtra("artist", artist);
-					
-					String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
-					i.putExtra("track", track);
-					
-					String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
-					i.putExtra("album", album);
-					
-					long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
-					if (duration != 0) {
-					    i.putExtra("duration", duration);
+					        //This isn't fatal if the intent still contains the artist and track,
+					        //however without the duration, the track will be scrobbled regardless of whether
+					        //it's passed the scrobble point or not.  Also, Now Playing requests require a
+					        //duration so they expire properly on the site, so they wont appear.
+					        if(i.getStringExtra("artist") == null || i.getStringExtra("track") == null)
+					        	return;
+					        else
+					        	i.putExtra("duration", 0);
+					} else {
+						String artist = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST));
+						i.putExtra("artist", artist);
+						
+						String track = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE));
+						i.putExtra("track", track);
+						
+						String album = cur.getString(cur.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM));
+						i.putExtra("album", album);
+						
+						long duration = cur.getLong(cur.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
+						if (duration != 0) {
+						    i.putExtra("duration", duration);
+						}
 					}
 	            } finally {
 	                    cur.close();
