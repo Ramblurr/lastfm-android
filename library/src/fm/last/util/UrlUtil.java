@@ -65,6 +65,7 @@ public class UrlUtil {
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setInstanceFollowRedirects(false);
+		conn.setRequestProperty("connection", "close");
 		int rc = conn.getResponseCode();
 		if (rc != REDIRECT_RESPONSE_CODE) {
 			throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
@@ -118,6 +119,7 @@ public class UrlUtil {
 		setUserAgent(conn);
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
+		conn.setRequestProperty("connection", "close");
 		if (contentType != null) {
 			conn.setRequestProperty("Content-Type", contentType);
 		}
@@ -166,6 +168,7 @@ public class UrlUtil {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
+		conn.setRequestProperty("connection", "close");
 		BufferedReader reader = null;
 		try {
 			InputStream contentStream = null;
@@ -198,6 +201,7 @@ public class UrlUtil {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
+		conn.setRequestProperty("connection", "close");
 		InputStream istr = null;
 		try {
 			int rc = conn.getResponseCode();
@@ -259,6 +263,7 @@ public class UrlUtil {
 	public static String getXML(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		setUserAgent(conn);
+		conn.setRequestProperty("connection", "close");
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
 		try {
@@ -274,6 +279,7 @@ public class UrlUtil {
 	public static Bitmap getImage(URL url) throws IOException {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		setUserAgent(conn);
+		conn.setRequestProperty("connection", "close");
 		conn.setRequestMethod("GET");
 		return BitmapFactory.decodeStream(conn.getInputStream());
 	}
