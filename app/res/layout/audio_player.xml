@@ -104,6 +104,14 @@
 						android:layout_gravity="center" android:gravity="center" android:maxWidth="300dip"/>
 				</TableRow>
 
+				<TableRow android:layout_height="wrap_content"
+					android:layout_width="fill_parent" android:gravity="center">
+
+					<TextView android:id="@+id/track_context" style="@style/playback_info"
+						android:layout_height="wrap_content" android:layout_width="fill_parent"
+						android:layout_gravity="center" android:gravity="center" android:maxWidth="300dip"/>
+				</TableRow>
+
 				<TableRow android:layout_width="fill_parent"
 					android:layout_height="wrap_content" android:gravity="center"
 					android:layout_marginTop="4dip">

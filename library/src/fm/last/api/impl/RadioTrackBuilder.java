@@ -22,6 +22,9 @@ package fm.last.api.impl;
 
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fm.last.api.RadioTrack;
 import fm.last.util.XMLUtil;
 import fm.last.xml.XMLBuilder;
@@ -46,12 +49,23 @@ public class RadioTrackBuilder extends XMLBuilder<RadioTrack> {
 		// probably don't need the IgnoreCase but just in case digits have case in the future...
 		Boolean loved = lovedStr.equalsIgnoreCase("1");
 		
+		String[] context = null;
 		String auth = "";
 		Node extensionNode = XMLUtil.findNamedElementNode(node, "extension");
 		if (extensionNode != null) {
 			Node authNode = XMLUtil.findNamedElementNode(extensionNode, "trackauth");
 			auth = authNode.getFirstChild().getNodeValue();
+			Node contextNode = XMLUtil.findNamedElementNode(extensionNode, "context");
+			if(contextNode != null) {
+				List<String> contextList = new ArrayList<String>();
+				for (Node node : XMLUtil.getChildNodes(contextNode, Node.ELEMENT_NODE)) {
+					if(!node.getNodeName().equals("user"))
+						contextList.add(node.getFirstChild().getNodeValue());
+				}
+				if(contextList.size() > 0)
+					context = contextList.toArray(new String[contextList.size()]);
+			}
 		}
-		return new RadioTrack(location, title, identifier, album, creator, duration, image, auth, loved);
+		return new RadioTrack(location, title, identifier, album, creator, duration, image, auth, loved, context);
 	}
 }

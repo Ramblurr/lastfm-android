@@ -26,7 +26,7 @@ import fm.last.api.LastFmServerFactory;
 public class AndroidLastFmServerFactory {
 	private static final String API_KEY = PrivateAPIKey.KEY;
 	private static final String API_SECRET = PrivateAPIKey.SECRET;
-	private static final String XMLRPC_ROOT_URL = "http://ws.audioscrobbler.com/2.0/";
+	private static final String XMLRPC_ROOT_URL = "http://dane.ws.prod-context.dev.audioscrobbler.com/2.0/";//"http://ws.audioscrobbler.com/2.0/";
 	private static LastFmServer server;
 
 	private AndroidLastFmServerFactory() {

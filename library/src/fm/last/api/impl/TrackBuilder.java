@@ -64,7 +64,7 @@ public class TrackBuilder extends XMLBuilder<Track> {
 		for (Node imageNode : imageNodes) {
 			images[i++] = imageBuilder.build(imageNode);
 		}
-
+		
 		if(getChildNode("date") != null)
 			node = getChildNode("date");
 		String date = getAttribute("uts");

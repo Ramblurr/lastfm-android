@@ -30,8 +30,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import android.util.Log;
-
 import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Tag;

@@ -42,6 +42,7 @@ interface IRadioPlayer {
 	void setLoved(boolean loved);
 	long   getPosition();
 	int	   getBufferPercent();
+	String[] getContext();
 	
 	boolean isPlaying();
 	int getState();

@@ -88,6 +88,7 @@ public class Player extends Activity {
 	private TextView mTotalTime;
 	private TextView mArtistName;
 	private TextView mTrackName;
+	private TextView mTrackContext;
 	private ProgressBar mProgress;
 	private long mDuration;
 	private boolean paused;
@@ -130,6 +131,8 @@ public class Player extends Activity {
 		mAlbum.setLayoutParams(params);
 		mArtistName = (TextView) findViewById(R.id.track_artist);
 		mTrackName = (TextView) findViewById(R.id.track_title);
+		mTrackContext = (TextView) findViewById(R.id.track_context);
+		mTrackContext.setVisibility(View.GONE);
 
 		mLoveButton = (ImageButton) findViewById(R.id.love);
 		mLoveButton.setOnClickListener(mLoveListener);
@@ -652,6 +655,8 @@ public class Player extends Activity {
 						try {
 							String artistName = player.getArtistName();
 							String trackName = player.getTrackName();
+							String[] trackContext = player.getContext();
+							String stationURL = player.getStationUrl();
 							loved = player.getLoved();
 							
 							
@@ -674,6 +679,41 @@ public class Player extends Activity {
 									mTrackName.setText("");
 								} else {
 									mTrackName.setText(trackName);
+								}
+								if (trackContext == null || trackContext.length == 0) {
+									mTrackContext.setVisibility(View.GONE);
+									mTrackContext.setText("");
+								} else {
+									Log.i("Last.fm", "Station URL: " + stationURL);
+									String context = "";
+									if(stationURL.endsWith("/friends") || stationURL.endsWith("/neighbours") || stationURL.contains("/friends/") || stationURL.contains("/neighbours/"))
+										context += "From ";
+									else
+										context += "Similar to ";
+									
+									context += trackContext[0];
+									if(stationURL.endsWith("/friends") || stationURL.endsWith("/neighbours") || stationURL.contains("/friends/") || stationURL.contains("/neighbours/"))
+										if(context.endsWith("s"))
+											context += "'";
+										else
+											context += "'s";
+
+									if(trackContext.length > 1) {
+										context += " and " + trackContext[1];
+										if(stationURL.endsWith("/friends") || stationURL.endsWith("/neighbours") || stationURL.contains("/friends/") || stationURL.contains("/neighbours/"))
+											if(context.endsWith("s"))
+												context += "'";
+											else
+												context += "'s";
+									}
+									if(stationURL.endsWith("/friends") || stationURL.endsWith("/neighbours") || stationURL.contains("/friends/") || stationURL.contains("/neighbours/"))
+										if(trackContext.length > 1)
+											context += " libraries";
+										else
+											context += " library";
+									
+									mTrackContext.setVisibility(View.VISIBLE);
+									mTrackContext.setText(context);
 								}
 
 								if (mTuningDialog != null

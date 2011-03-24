@@ -1035,6 +1035,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				return UNKNOWN;
 		}
 
+		public String[] getContext() throws RemoteException {
+
+			if (currentTrack != null)
+				return currentTrack.getContext();
+			else
+				return null;
+		}
+
 		public boolean getLoved() throws RemoteException {
 			return currentTrack != null ? currentTrack.getLoved() : false;
 		}

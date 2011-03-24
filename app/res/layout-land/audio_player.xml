@@ -107,6 +107,22 @@
 							android:focusable="true"
 							android:text="Title"/>
 					</TableRow>
+					
+					<TableRow
+						android:layout_height="wrap_content"
+						android:layout_width="fill_parent"
+						android:layout_marginBottom="10dip">
+						
+						<TextView android:id="@+id/track_context"
+							style="@style/playback_info"
+							android:layout_height="wrap_content"
+							android:textStyle="bold" 
+							android:textSize="18sp"
+							android:gravity="left"
+							android:singleLine="true"
+							android:focusable="true"
+							android:text="Title"/>
+					</TableRow>
 				</TableLayout>
             
                 <LinearLayout

@@ -202,6 +202,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (lang != null) {
 			params.put("lang", lang);
 		}
+		params.put("additional_info", "1");
 		signParams(params);
 		return RadioFunctions.tuneToStation(baseUrl, params);
 	}
@@ -217,6 +218,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("speed_multiplier", "2");
 		params.put("rtp", rtp);
 		params.put("discovery", discovery);
+		params.put("additional_info", "1");
 		signParams(params);
 		return RadioFunctions.getRadioPlaylist(baseUrl, params);
 	}
