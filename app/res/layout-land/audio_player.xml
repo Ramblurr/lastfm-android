@@ -119,7 +119,7 @@
 							android:textStyle="bold" 
 							android:textSize="18sp"
 							android:gravity="left"
-							android:singleLine="true"
+							android:singleLine="false"
 							android:focusable="true"
 							android:text="Title"/>
 					</TableRow>

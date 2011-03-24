@@ -122,6 +122,7 @@
     <string name="profile_mylibrary">Your Library</string>
     <string name="profile_mymix">Your Mix Radio</string>
     <string name="profile_mystations">Your Stations</string>
+    <string name="profile_myfriends">Your Friends</string>
     <string name="profile_recentstations">Recent Stations</string>
     <string name="profile_commonartists">Common Artists</string>
     <string name="profile_userneighborhood">%1$s\'s Neighborhood</string>
@@ -130,6 +131,7 @@
     <string name="profile_userstations">%1$s\'s Stations</string>
     <string name="profile_userplaylists">%1$s\'s Playlists</string>
     <string name="profile_usermix">%1$s\'s Mix Radio</string>
+    <string name="profile_userfriends">%1$s\'s Friends</string>
     <string name="profile_myplaylists">Your Playlists</string>
 	<string name="profile_topartists">Top Artists</string>
 	<string name="profile_notopartists">No Top Artists</string>

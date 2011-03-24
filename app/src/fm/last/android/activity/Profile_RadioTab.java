@@ -279,6 +279,7 @@ public class Profile_RadioTab extends ListActivity {
 			mMyStationsAdapter.putStation(getString(R.string.profile_myrecs), "lastfm://user/" + Uri.encode(mUsername) + "/recommended");
 			mMyStationsAdapter.putStation(getString(R.string.profile_mymix), "lastfm://user/" + Uri.encode(mUsername) + "/mix");
 			mMyStationsAdapter.putStation(getString(R.string.profile_myneighborhood), "lastfm://user/" + Uri.encode(mUsername) + "/neighbours");
+			mMyStationsAdapter.putStation(getString(R.string.profile_myfriends), "lastfm://user/" + Uri.encode(mUsername) + "/friends");
 		} else {
 			mMyStationsAdapter.putStation(getString(R.string.profile_userlibrary, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/personal");
 			if (!settings.getBoolean("remove_loved", false) && session.getSubscriber().equals("1"))
@@ -286,6 +287,7 @@ public class Profile_RadioTab extends ListActivity {
 			mMyStationsAdapter.putStation(getString(R.string.profile_myrecs), "lastfm://user/" + Uri.encode(mUsername) + "/recommended");
 			mMyStationsAdapter.putStation(getString(R.string.profile_usermix, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/mix");
 			mMyStationsAdapter.putStation(getString(R.string.profile_userneighborhood, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/neighbours");
+			mMyStationsAdapter.putStation(getString(R.string.profile_userfriends, mUsername), "lastfm://user/" + Uri.encode(mUsername) + "/friends");
 		}
 
 		mMyStationsAdapter.updateModel();

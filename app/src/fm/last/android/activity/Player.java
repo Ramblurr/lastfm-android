@@ -684,7 +684,6 @@ public class Player extends Activity {
 									mTrackContext.setVisibility(View.GONE);
 									mTrackContext.setText("");
 								} else {
-									Log.i("Last.fm", "Station URL: " + stationURL);
 									String context = "";
 									if(stationURL.endsWith("/friends") || stationURL.endsWith("/neighbours") || stationURL.contains("/friends/") || stationURL.contains("/neighbours/"))
 										context += "From ";
