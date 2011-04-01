@@ -33,7 +33,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	/** 
 	 * @return the {@link ScrobblerQueueDao} singleton.
 	 */
-	public static ScrobblerQueueDao getInstance() 
+	public synchronized static ScrobblerQueueDao getInstance() 
 	{
 		if(instance != null) {
 			return instance;
@@ -47,7 +47,7 @@ public class ScrobblerQueueDao extends AbstractDao<ScrobblerQueueEntry>
 	/**
 	 * @return the current number of queue entries.
 	 */
-	public int getQueueSize()
+	public synchronized int getQueueSize()
 	{
 		return countWithQualification("WHERE CurrentTrack=0");
 	}
