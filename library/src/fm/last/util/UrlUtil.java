@@ -37,6 +37,7 @@ import java.util.Map;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
@@ -120,6 +121,7 @@ public class UrlUtil {
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		conn.setRequestProperty("connection", "close");
+		conn.setRequestProperty ("Authorization", "Basic dGVzdGVyOmZ1dHVyZW9mbXVzaWM=");
 		if (contentType != null) {
 			conn.setRequestProperty("Content-Type", contentType);
 		}
@@ -169,6 +171,7 @@ public class UrlUtil {
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("connection", "close");
+		conn.setRequestProperty ("Authorization", "Basic dGVzdGVyOmZ1dHVyZW9mbXVzaWM=");
 		BufferedReader reader = null;
 		try {
 			InputStream contentStream = null;

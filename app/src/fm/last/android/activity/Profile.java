@@ -223,7 +223,7 @@ public class Profile extends ActivityGroup {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
 						try {
-							mIsPlaying = player.isPlaying();
+							mIsPlaying = player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED;
 						} catch (RemoteException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

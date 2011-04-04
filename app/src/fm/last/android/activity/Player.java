@@ -399,7 +399,7 @@ public class Player extends Activity {
 							IRadioPlayer player = IRadioPlayer.Stub
 									.asInterface(binder);
 							try {
-								if (!player.isPlaying()) {
+								if (player.getState() == RadioPlayerService.STATE_STOPPED) {
 									Intent i = new Intent(Player.this, Profile.class);
 									startActivity(i);
 									finish();
@@ -587,8 +587,8 @@ public class Player extends Activity {
 							IRadioPlayer player = IRadioPlayer.Stub
 									.asInterface(binder);
 							try {
-								if (player.isPlaying())
-									player.stop();
+								if (player.getState() != RadioPlayerService.STATE_STOPPED)
+									player.pause();
 							} catch (RemoteException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -599,8 +599,6 @@ public class Player extends Activity {
 						public void onServiceDisconnected(ComponentName comp) {
 						}
 					}, 0);
-			LastFMApplication.getInstance().unbindPlayerService();
-			finish();
 		}
 	};
 
@@ -779,6 +777,11 @@ public class Player extends Activity {
 						IRadioPlayer player = IRadioPlayer.Stub
 								.asInterface(binder);
 						try {
+							if(player.getState() == RadioPlayerService.STATE_PAUSED) {
+								mStopButton.setImageResource(R.drawable.play);
+							} else {
+								mStopButton.setImageResource(R.drawable.pause);
+							}
 							mDuration = player.getDuration();
 							long pos = player.getPosition();
 							if ((pos >= 0) && (mDuration > 0)

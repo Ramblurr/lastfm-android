@@ -72,6 +72,10 @@ public class RadioTrack implements Serializable {
 	public String getLocationUrl() {
 		return locationUrl;
 	}
+	
+	public void setLocationUrl(String url) {
+		locationUrl = url;
+	}
 
 	public String getTitle() {
 		return title;

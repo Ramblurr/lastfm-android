@@ -20,10 +20,15 @@
  ***************************************************************************/
 package fm.last.android.player;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Timer;
@@ -86,6 +91,7 @@ import fm.last.api.RadioTrack;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.WSError;
+import fm.last.util.UrlUtil;
 
 public class RadioPlayerService extends Service implements MusicFocusable {
 
@@ -115,6 +121,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private boolean mDoHasWiFi = false;
 	private long mStationStartTime = 0;
 	private long mTrackStartTime = 0;
+	private int mTrackPosition = 0;
 	private boolean pauseButtonPressed = false;
 	private static final int NOTIFY_ID = 1337;
 
@@ -245,6 +252,38 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityListener, intentFilter);
+		try {
+			if (getFileStreamPath("player.dat").exists()) {
+				FileInputStream fileStream = openFileInput("player.dat");
+				ObjectInputStream objectStream = new ObjectInputStream(fileStream);
+				Object obj = objectStream.readObject();
+				currentSession = (Session)obj;
+				obj = objectStream.readObject();
+				currentStation = (Station)obj;
+				currentStationURL = currentStation.getUrl();
+				obj = objectStream.readObject();
+				currentTrack = (RadioTrack)obj;
+				obj = objectStream.readObject();
+				mStationStartTime = (Long)obj;
+				obj = objectStream.readObject();
+				mTrackStartTime = (Long)obj;
+				obj = objectStream.readObject();
+				mTrackPosition = (Integer)obj;
+				objectStream.close();
+				fileStream.close();
+				logger.info("Loaded serialized state");
+				mState = STATE_PAUSED;
+			}
+		} catch (Exception e) {
+			logger.warning("Unable to load serialized state");
+			currentStation = null;
+			currentStationURL = null;
+			currentTrack = null;
+			mStationStartTime = 0;
+			mTrackStartTime = 0;
+			mTrackPosition = 0;
+			e.printStackTrace();
+		}
 	}
 
 	BroadcastReceiver connectivityListener = new BroadcastReceiver() {
@@ -328,16 +367,47 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 		clearNotification();
 		unregisterReceiver(connectivityListener);
+		releaseLocks();
+		
+		if(mState == STATE_PAUSED) {
+			serializeCurrentStation();
+		}
+	}
+
+	private void releaseLocks() {
 		if(wakeLock != null && wakeLock.isHeld())
 			wakeLock.release();
 		
 		if(wifiLock != null && wifiLock.isHeld())
 			wifiLock.release();
-		
-        unregisterMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
-        		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 	}
+	
+	private void serializeCurrentStation() {
+		try {
+			if (getFileStreamPath("player.dat").exists())
+				deleteFile("player.dat");
+			if (mState == STATE_PAUSED && currentTrack != null) {
+				logger.info("Serializing station info");
+				FileOutputStream filestream = openFileOutput("player.dat", 0);
+				ObjectOutputStream objectstream = new ObjectOutputStream(filestream);
 
+				objectstream.writeObject(currentSession);
+				objectstream.writeObject(currentStation);
+				objectstream.writeObject(currentTrack);
+				objectstream.writeObject(new Long(mStationStartTime));
+				objectstream.writeObject(new Long(mTrackStartTime));
+				objectstream.writeObject(new Integer(mTrackPosition));
+				objectstream.close();
+				filestream.close();
+			}
+		} catch (Exception e) {
+			if (getFileStreamPath("player.dat").exists())
+				deleteFile("player.dat");
+			logger.severe("Unable to save queue state");
+			e.printStackTrace();
+		}
+	}
+	
 	public IBinder getBinder() {
 
 		return mBinder;
@@ -450,8 +520,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private OnPreparedListener mOnPreparedListener = new OnPreparedListener() {
 		public void onPrepared(MediaPlayer p) {
+			logger.info("Prepared");
 			if (p == mp) {
+				logger.info("main player");
 				if (mState == STATE_PREPARING) {
+					logger.info("preparing state");
+					if(mTrackPosition > 0)
+						p.seekTo(mTrackPosition);
+					mTrackPosition = 0;
 					p.start();
 					try {
 						playingNotify();
@@ -544,6 +620,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				currentTrack = track;
 				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true, track.getLoved());
 			}
+			if(track.getLocationUrl().contains("play.last.fm")) {
+				URL newURL = UrlUtil.getRedirectedUrl(new URL(track.getLocationUrl()));
+				track.setLocationUrl(newURL.toString());
+			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
 			p.setWakeMode(this, PowerManager.PARTIAL_WAKE_LOCK);
@@ -587,11 +667,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 		clearNotification();
 		notifyChange(PLAYBACK_FINISHED);
-		if (wakeLock.isHeld())
-			wakeLock.release();
-
-		if (wifiLock.isHeld())
-			wifiLock.release();
+		releaseLocks();
 		
 		currentQueue.clear();
 		if(currentStation != null)
@@ -618,6 +694,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			}
 		}
 
+		mTrackPosition = 0;
 		mState = STATE_SKIPPING;
 		// Check if we're running low on tracks
 		if (currentQueue.size() < 1) {
@@ -660,37 +737,32 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (mState == STATE_STOPPED || mState == STATE_NODATA || mState == STATE_ERROR || currentStation == null)
 			return;
 
-		// TODO: This should not be exposed in the UI, only used to pause
-		// during a phone call or similar interruption
-
 		if (mState != STATE_PAUSED) {
-			Notification notification = new Notification(R.drawable.stop, getString(R.string.playerservice_paused_ticker_text), System.currentTimeMillis());
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, Player.class), 0);
-			String info;
-			String name;
-			if (currentTrack != null) {
-				info = getString(R.string.playerservice_paused_info, currentTrack.getTitle(), currentTrack.getCreator());
-				name = currentStation.getName();
-			} else {
-				info = getString(R.string.playerservice_paused);
-				name = currentStation.getName();
-			}
-			notification.setLatestEventInfo(this, name, info, contentIntent);
-			// notification.flags |= Notification.FLAG_ONGOING_EVENT;
 			clearNotification();
-			nm.notify(NOTIFY_ID, notification);
 			notifyChange(PLAYBACK_STATE_CHANGED);
 			try {
+				mTrackPosition = mp.getCurrentPosition();
 				mp.pause();
 				mState = STATE_PAUSED;
+				releaseLocks();
+				serializeCurrentStation();
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't pause
 				e.printStackTrace();
 			}
 		} else {
 			playingNotify();
 			try {
-				mp.start();
-				mState = STATE_PLAYING;
+				if(currentTrack != null && mTrackPosition > 0) {
+					if(mp == null) {
+						mp = new MediaPlayer();
+						playTrack(currentTrack, mp);
+					} else {
+						mp.start();
+						mState = STATE_PLAYING;
+					}
+				}
+				if (getFileStreamPath("player.dat").exists())
+					deleteFile("player.dat");
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
 				e.printStackTrace();
 			}
@@ -1062,6 +1134,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 		public long getDuration() throws RemoteException {
 			try {
+				if (mState == STATE_PAUSED && currentTrack != null)
+					return currentTrack.getDuration();
 				if (mp != null && mp.isPlaying())
 					return mp.getDuration();
 			} catch (Exception e) {
@@ -1078,12 +1152,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 
 		public boolean isPlaying() throws RemoteException {
-
-			return mState != STATE_STOPPED && mState != STATE_ERROR;
+			return mState != STATE_STOPPED && mState != STATE_ERROR && mState != STATE_PAUSED;
 		}
 
 		public long getPosition() throws RemoteException {
 			try {
+				if (mState == STATE_PAUSED && mTrackPosition > 0)
+					return mTrackPosition;
 				if (mp != null && mp.isPlaying())
 					return mp.getCurrentPosition();
 			} catch (Exception e) {
