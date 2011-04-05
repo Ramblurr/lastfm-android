@@ -261,7 +261,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				currentSession = (Session)obj;
 				obj = objectStream.readObject();
 				currentStation = (Station)obj;
-				currentStationURL = currentStation.getUrl();
+				obj = objectStream.readObject();
+				currentStationURL = (String)obj;
 				obj = objectStream.readObject();
 				currentTrack = (RadioTrack)obj;
 				obj = objectStream.readObject();
@@ -398,6 +399,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 				objectstream.writeObject(currentSession);
 				objectstream.writeObject(currentStation);
+				objectstream.writeObject(currentStationURL);
 				objectstream.writeObject(currentTrack);
 				objectstream.writeObject(new Long(mStationStartTime));
 				objectstream.writeObject(new Long(mTrackStartTime));
@@ -871,7 +873,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			i.putExtra("trackAuth", currentTrack.getTrackAuth());
 			i.putExtra("loved", currentTrack.getLoved());
 			if(mTrackPosition > 0)
-				i.putExtra("position",mTrackPosition);
+				i.putExtra("position",(long) mTrackPosition);
 		}
 		if (what.equals(PLAYBACK_ERROR) && mError != null) {
 			i.putExtra("error", (Parcelable) mError);
