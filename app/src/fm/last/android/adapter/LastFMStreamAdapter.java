@@ -39,6 +39,7 @@ import android.widget.ViewSwitcher;
 import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.player.IRadioPlayer;
+import fm.last.android.player.RadioPlayerService;
 
 /** The adapter for radio streams, uses non-full-width list entry graphics */
 public class LastFMStreamAdapter extends BaseAdapter {
@@ -50,7 +51,7 @@ public class LastFMStreamAdapter extends BaseAdapter {
 
 		public int icon() {
 			try {
-				if (player != null && player.isPlaying()) {
+				if (player != null && (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)) {
 					String current = player.getStationUrl();
 					if (current != null && mStationUrl.compareTo(current) == 0) {
 						// now playing is always the same (focus or not)

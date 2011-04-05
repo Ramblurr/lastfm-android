@@ -50,7 +50,6 @@ import fm.last.android.db.RecentStationsDao;
 import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.api.LastFmServer;
-import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
 import fm.last.api.Station;
 import fm.last.api.Tasteometer;
@@ -307,7 +306,9 @@ public class Profile_RadioTab extends ListActivity {
 						try {
 							String adapter_station = mMainAdapter.getStation(position);
 							String current_station = player.getStationUrl();
-							if (player.isPlaying() && adapter_station.equals(current_station)) {
+							if ((player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED) && adapter_station.equals(current_station)) {
+								if(player.getState() == RadioPlayerService.STATE_PAUSED)
+									player.pause();
 								Intent intent = new Intent(Profile_RadioTab.this, Player.class);
 								startActivity(intent);
 							} else {
