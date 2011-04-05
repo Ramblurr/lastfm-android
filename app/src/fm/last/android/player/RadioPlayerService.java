@@ -1381,11 +1381,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     		} catch (Exception e) { //Sometimes the MediaPlayer is in a state where setVolume() will fail
     			e.printStackTrace();
     		}
-        } else if(isTransient) {
-            pause();
-            focusLost = true;
         } else {
-        	stop();
+            pause();
+            focusLost = isTransient;
         }
 	}
 }
