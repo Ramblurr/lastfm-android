@@ -123,6 +123,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private long mTrackStartTime = 0;
 	private int mTrackPosition = 0;
 	private boolean pauseButtonPressed = false;
+	private boolean focusLost = false;
 	private static final int NOTIFY_ID = 1337;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -1353,8 +1354,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     }
 
 	public void focusGained() {
-		if(mState == STATE_PAUSED) {
+		if(mState == STATE_PAUSED && focusLost) {
 			pause();
+			focusLost = false;
 		}
 	
 		try {
@@ -1366,7 +1368,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	public void focusLost(boolean isTransient, boolean canDuck) {
-        if (mp == null)
+        if (mp == null || mState == STATE_PAUSED)
             return;
 
         if (canDuck) {
@@ -1377,6 +1379,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     		}
         } else if(isTransient) {
             pause();
+            focusLost = true;
         } else {
         	stop();
         }
