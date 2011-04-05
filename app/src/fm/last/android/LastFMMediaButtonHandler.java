@@ -73,7 +73,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 								intent = new Intent("fm.last.android.widget.STOP");
 								PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 								AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-								am.set(AlarmManager.RTC, System.currentTimeMillis() + 2000, alarmIntent);
+								am.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, alarmIntent);
 							}
 							abortBroadcast();
 							return;

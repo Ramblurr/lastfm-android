@@ -323,7 +323,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// startRadio instead
 										// of stop
 										if (player.isPlaying())
-											player.stop();
+											player.pause();
 										else {
 											Station lastStation = RecentStationsDao.getInstance().getLastStation();
 											if (lastStation == null) {
@@ -572,7 +572,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
-	public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering, boolean loved) {
+	public static void updateAppWidget_playing(Context context, String title, String artist, long pos, long duration, boolean buffering, boolean loved, boolean paused) {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 		bindButtonIntents(context, views);
@@ -589,7 +589,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		}
 
 		views.setTextViewText(R.id.widgettext, artist + " - " + title);
-		views.setImageViewResource(R.id.stop, R.drawable.stop);
+		if(paused)
+			views.setImageViewResource(R.id.stop, R.drawable.play);
+		else
+			views.setImageViewResource(R.id.stop, R.drawable.pause);
 		if(loved)
 			views.setImageViewResource(R.id.love, R.drawable.loved);
 		else
@@ -601,7 +604,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			views.setImageViewResource(R.id.ban, R.drawable.ban);
 		}
 		
-		if (mAlarmIntent == null) {
+		if (mAlarmIntent == null && !paused) {
 			Intent intent = new Intent("fm.last.android.widget.UPDATE");
 			mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 			AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -731,7 +734,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		@Override
 		public void onPostExecute(Boolean result) {
 			if(result) {
-				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false);
+				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false, false);
 			} else if(trackName != null && !RadioPlayerService.radioAvailable(ctx)) {
 				updateAppWidget_idle(ctx, artistName + " - " + trackName, false);
 			} else if(!RadioPlayerService.radioAvailable(ctx)) {
@@ -760,7 +763,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		public Boolean doInBackground(IRadioPlayer... s) {
 			boolean playing = false;
 			try {
-				if (s[0].isPlaying()) {
+				if (s[0].isPlaying() || s[0].getState() == RadioPlayerService.STATE_PAUSED) {
 					trackName = s[0].getTrackName();
 					artistName = s[0].getArtistName();
 					position = s[0].getPosition();
@@ -786,7 +789,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				if (trackName.equals(RadioPlayerService.UNKNOWN))
 					updateAppWidget_idle(ctx, stationName, true);
 				else
-					updateAppWidget_playing(ctx, trackName, artistName, position, duration, buffering, loved);
+					updateAppWidget_playing(ctx, trackName, artistName, position, duration, buffering, loved, state == RadioPlayerService.STATE_PAUSED);
 			} else if (!mediaPlayerPlaying) {
 				if (stationName == null || stationName.length() < 1) {
 					Station station = RecentStationsDao.getInstance().getLastStation();
@@ -832,7 +835,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		@Override
 		public void onPostExecute(Boolean result) {
 			if(result) {
-				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false);
+				updateAppWidget_playing(ctx, trackName, artistName, position, duration, false, false, false);
 			}
 		}
 	}

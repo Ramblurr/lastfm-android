@@ -346,8 +346,12 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (intent != null && intent.getAction() != null && intent.getAction().equals("fm.last.android.PLAY")) {
 			String stationURL = intent.getStringExtra("station");
 			Session session = intent.getParcelableExtra("session");
-			if(mState != STATE_STOPPED && currentStationURL != null && currentStationURL.equals(stationURL))
-				return;
+			if(currentStationURL != null && currentStationURL.equals(stationURL)) {
+				if(mState == STATE_PAUSED)
+					pause();
+				if(mState != STATE_STOPPED)
+					return;
+			}
 			if (stationURL != null && stationURL.length() > 0 && session != null) {
 				new TuneRadioTask(stationURL, session).execute();
 			}
@@ -619,7 +623,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 			if (p == mp) {
 				currentTrack = track;
-				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true, track.getLoved());
+				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true, track.getLoved(), false);
 			}
 			if(track.getLocationUrl().contains("play.last.fm")) {
 				URL newURL = UrlUtil.getRedirectedUrl(new URL(track.getLocationUrl()));
