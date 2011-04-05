@@ -614,6 +614,14 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
 		}
 
+		if(paused) {
+			Intent intent = new Intent("fm.last.android.widget.UPDATE");
+			mAlarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+			AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			am.cancel(mAlarmIntent);
+			mAlarmIntent = null;
+		}
+		
 		appWidgetManager.updateAppWidget(THIS_APPWIDGET, views);
 	}
 
