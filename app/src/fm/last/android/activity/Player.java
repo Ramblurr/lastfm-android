@@ -587,7 +587,9 @@ public class Player extends Activity {
 							IRadioPlayer player = IRadioPlayer.Stub
 									.asInterface(binder);
 							try {
-								if (player.getState() != RadioPlayerService.STATE_STOPPED)
+								if (player.getState() == RadioPlayerService.STATE_PAUSED)
+									LastFMApplication.getInstance().playRadioStation(Player.this, player.getStationUrl(), false);
+								else if (player.getState() != RadioPlayerService.STATE_STOPPED)
 									player.pause();
 							} catch (RemoteException e) {
 								// TODO Auto-generated catch block

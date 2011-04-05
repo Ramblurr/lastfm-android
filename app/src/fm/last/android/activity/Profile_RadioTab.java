@@ -307,8 +307,8 @@ public class Profile_RadioTab extends ListActivity {
 							String adapter_station = mMainAdapter.getStation(position);
 							String current_station = player.getStationUrl();
 							if ((player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED) && adapter_station.equals(current_station)) {
-								if(player.getState() == RadioPlayerService.STATE_PAUSED)
-									player.pause();
+								if (player.getState() == RadioPlayerService.STATE_PAUSED)
+									LastFMApplication.getInstance().playRadioStation(Profile_RadioTab.this, player.getStationUrl(), false);
 								Intent intent = new Intent(Profile_RadioTab.this, Player.class);
 								startActivity(intent);
 							} else {
