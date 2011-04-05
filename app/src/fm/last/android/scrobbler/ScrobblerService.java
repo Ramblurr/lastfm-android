@@ -93,6 +93,7 @@ public class ScrobblerService extends Service {
 	private Lock mScrobblerLock = new ReentrantLock();
 	SubmitTracksTask mSubmissionTask = null;
 	NowPlayingTask mNowPlayingTask = null;
+	ClearNowPlayingTask mClearNowPlayingTask = null;
 	ScrobblerQueueEntry mCurrentTrack = null;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -504,6 +505,8 @@ public class ScrobblerService extends Service {
 		}
 		if (intent.getAction().equals(PLAYBACK_PAUSED) && mCurrentTrack != null) {
 			if(intent.getLongExtra("position", 0) > 0 || !intent.hasExtra("position")) { //Work-around for buggy DoubleTwist player
+				mClearNowPlayingTask = new ClearNowPlayingTask(mCurrentTrack.toRadioTrack());
+				mClearNowPlayingTask.execute();
 				mCurrentTrack = null;
 				NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 				nm.cancel(1338);
@@ -535,7 +538,7 @@ public class ScrobblerService extends Service {
 	}
 
 	public void stopIfReady() {
-		if (mSubmissionTask == null && mNowPlayingTask == null)
+		if (mSubmissionTask == null && mNowPlayingTask == null && mClearNowPlayingTask == null)
 			stopSelf();
 	}
 
@@ -546,6 +549,41 @@ public class ScrobblerService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
+	}
+
+	private class ClearNowPlayingTask extends AsyncTaskEx<Void, Void, Boolean> {
+		RadioTrack mTrack;
+
+		public ClearNowPlayingTask(RadioTrack track) {
+			mTrack = track;
+		}
+
+		@Override
+		public Boolean doInBackground(Void... params) {
+			boolean success = false;
+			LastFmServer server = AndroidLastFmServerFactory.getServer();
+
+			try {
+				mScrobblerLock.lock();
+				server.removeNowPlaying(mTrack.getCreator(), mTrack.getTitle(), mTrack.getAlbum(), new Integer(mTrack.getDuration() / 1000), ScrobblerService.this.player, mSession.getKey());
+				success = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				success = false;
+			} catch (WSError e) {
+				e.printStackTrace();
+				success = false;
+			} finally {
+				mScrobblerLock.unlock();
+			}
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			mClearNowPlayingTask = null;
+			stopIfReady();
+		}
 	}
 
 	private class NowPlayingTask extends AsyncTaskEx<Void, Void, Boolean> {

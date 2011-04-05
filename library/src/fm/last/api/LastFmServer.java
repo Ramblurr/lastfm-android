@@ -363,4 +363,5 @@ public interface LastFmServer {
 	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String sk) throws IOException;
 	
 	public void updateNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException;
+	public void removeNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException;
 }

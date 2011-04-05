@@ -599,6 +599,19 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.updateNowPlaying(baseUrl, params);
 	}
 	
+	public void removeNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException {
+		Map<String, String> params = createParams("track.removeNowPlaying");
+		params.put("artist", artist);
+		params.put("track", track);
+		if (album != null)
+			params.put("album", album);
+		if (duration > 0)
+			params.put("duration", String.valueOf(duration));
+		params.put("sk", sk);
+		signParams(params);
+		TrackFunctions.updateNowPlaying(baseUrl, params);
+	}
+	
 	/*track[i] (Required) : The track name.
 timestamp[i] (Required) : The time the track started playing, in UNIX timestamp format (integer number of seconds since 00:00:00, January 1st 1970 UTC). This must be in the UTC time zone.
 artist[i] (Required) : The artist name.

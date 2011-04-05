@@ -745,6 +745,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		if (mState != STATE_PAUSED) {
 			clearNotification();
 			notifyChange(PLAYBACK_STATE_CHANGED);
+			notifyChange(ScrobblerService.PLAYBACK_PAUSED);
 			try {
 				mTrackPosition = mp.getCurrentPosition();
 				mp.pause();
@@ -756,6 +757,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			}
 		} else {
 			playingNotify();
+			notifyChange(ScrobblerService.META_CHANGED);
 			try {
 				if(currentTrack != null && mTrackPosition > 0) {
 					if(mp == null) {
@@ -868,6 +870,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			i.putExtra("duration", (long) currentTrack.getDuration());
 			i.putExtra("trackAuth", currentTrack.getTrackAuth());
 			i.putExtra("loved", currentTrack.getLoved());
+			if(mTrackPosition > 0)
+				i.putExtra("position",mTrackPosition);
 		}
 		if (what.equals(PLAYBACK_ERROR) && mError != null) {
 			i.putExtra("error", (Parcelable) mError);
