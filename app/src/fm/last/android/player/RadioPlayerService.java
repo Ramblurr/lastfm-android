@@ -113,7 +113,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	public static final int STATE_PLAYING = 3;
 	public static final int STATE_SKIPPING = 4;
 	public static final int STATE_PAUSED = 5;
-	public static final int STATE_NODATA = 6;
 	public static final int STATE_ERROR = -1;
 	private int mState = STATE_STOPPED;
 	private int mPlaylistRetryCount = 0;
@@ -124,6 +123,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private int mTrackPosition = 0;
 	private boolean pauseButtonPressed = false;
 	private boolean focusLost = false;
+	private boolean lostDataConnection = false;
 	private static final int NOTIFY_ID = 1337;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
@@ -295,7 +295,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			NetworkInfo ni = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
 			if (ni.getState() == NetworkInfo.State.DISCONNECTED || ni.getState() == NetworkInfo.State.SUSPENDED) {
-				if (mState != STATE_STOPPED && mState != STATE_ERROR) {
+				if (mState != STATE_STOPPED && mState != STATE_ERROR && mState != STATE_PAUSED) {
+					ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+					NetworkInfo activeni = cm.getActiveNetworkInfo();
+					if(activeni != null && activeni.isConnected()) {
+						logger.info("A network other than the active network has disconnected, ignoring");
+						return;
+					}
 					// Ignore disconnections that don't change our WiFi / cell
 					// state
 					if ((ni.getType() == ConnectivityManager.TYPE_WIFI) != mDoHasWiFi) {
@@ -308,19 +314,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 					logger.info("Data connection lost! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: " + ni.getExtraInfo()
 							+ " Reason: " + ni.getReason());
-					if (mp != null && bufferPercent < 99) {
-						try {
-							mp.stop();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-						clearNotification();
-						mState = STATE_NODATA;
-						currentQueue.clear();
-					}
+					lostDataConnection = true;
 				}
-			} else if (ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_PAUSED && mState != STATE_ERROR) {
-				if (mState == STATE_NODATA || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
+			} else if (ni.getState() == NetworkInfo.State.CONNECTED && mState != STATE_STOPPED && mState != STATE_ERROR) {
+				if (lostDataConnection || ni.isFailover() || ni.getType() == ConnectivityManager.TYPE_WIFI) {
 					if (ni.getType() == ConnectivityManager.TYPE_WIFI) {
 						if (!mDoHasWiFi)
 							mDoHasWiFi = true;
@@ -329,8 +326,12 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					}
 					logger.info("New data connection attached! Type: " + ni.getTypeName() + " Subtype: " + ni.getSubtypeName() + "Extra Info: "
 							+ ni.getExtraInfo() + " Reason: " + ni.getReason());
-					mState = STATE_TUNING;
-					new NextTrackTask().execute();
+					if(lostDataConnection) {
+						if(mState == STATE_PAUSED) {
+							pause();
+							lostDataConnection = false;
+						}
+					}
 				}
 			}
 		}
@@ -499,9 +500,23 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private OnCompletionListener mOnCompletionListener = new OnCompletionListener() {
 
-		public void onCompletion(MediaPlayer mp) {
-			logger.info("Track completed normally (bye, laurie!)");
-			new NextTrackTask().execute((Void) null);
+		public void onCompletion(MediaPlayer p) {
+			if(lostDataConnection && bufferPercent < 99) {
+				logger.info("Track ran out of data, pausing");
+				pause();
+				mp.release();
+				mp = null;
+				ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+				NetworkInfo activeni = cm.getActiveNetworkInfo();
+				if(activeni != null && activeni.isConnected()) {
+					logger.info("Another data connection is available, attempting to resume");
+					pause();
+					lostDataConnection = false;
+				}
+			} else {
+				logger.info("Track completed normally (bye, laurie!)");
+				new NextTrackTask().execute((Void) null);
+			}
 		}
 	};
 
@@ -608,7 +623,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					}
 					if (mState == STATE_PAUSED) {
 						logger.severe("Playback error while paused, data connection probably timed out.");
-						mState = STATE_NODATA;
 					}
 				}
 			}
@@ -618,7 +632,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private void playTrack(RadioTrack track, MediaPlayer p) {
 		try {
-			if (mState == STATE_STOPPED || mState == STATE_PREPARING || mState == STATE_NODATA) {
+			if (mState == STATE_STOPPED || mState == STATE_PREPARING) {
 				logger.severe("playTrack() called from wrong state!");
 				return;
 			}
@@ -689,7 +703,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private void nextSong() {
 		pauseButtonPressed = false;
 		
-		if (mState == STATE_SKIPPING || mState == STATE_STOPPED || mState == STATE_NODATA) {
+		if (mState == STATE_SKIPPING || mState == STATE_STOPPED) {
 			logger.severe("nextSong() called in wrong state: " + mState);
 			return;
 		}
@@ -702,6 +716,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 
 		mTrackPosition = 0;
+		lostDataConnection = false;
 		mState = STATE_SKIPPING;
 		// Check if we're running low on tracks
 		if (currentQueue.size() < 1) {
@@ -741,7 +756,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	private void pause() {
-		if (mState == STATE_STOPPED || mState == STATE_NODATA || mState == STATE_ERROR || currentStation == null)
+		if (mState == STATE_STOPPED || mState == STATE_ERROR || currentStation == null)
 			return;
 
 		if (mState != STATE_PAUSED) {
@@ -758,6 +773,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				e.printStackTrace();
 			}
 		} else {
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			mDoHasWiFi = (ni == null || ni.getType() == ConnectivityManager.TYPE_WIFI);
 			playingNotify();
 			notifyChange(ScrobblerService.META_CHANGED);
 			try {
