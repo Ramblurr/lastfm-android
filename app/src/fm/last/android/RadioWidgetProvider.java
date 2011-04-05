@@ -592,7 +592,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		if(paused)
 			views.setImageViewResource(R.id.stop, R.drawable.play);
 		else
-			views.setImageViewResource(R.id.stop, R.drawable.pause);
+			if(mediaPlayerPlaying)
+				views.setImageViewResource(R.id.stop, R.drawable.stop);
+			else
+				views.setImageViewResource(R.id.stop, R.drawable.pause);
 		if(loved)
 			views.setImageViewResource(R.id.love, R.drawable.loved);
 		else
