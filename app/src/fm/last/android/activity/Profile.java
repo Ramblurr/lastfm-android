@@ -233,7 +233,7 @@ public class Profile extends ActivityGroup {
 
 					public void onServiceDisconnected(ComponentName comp) {
 					}
-				}, 0);
+				}, Context.BIND_AUTO_CREATE);
 
 		if (LastFMApplication.getInstance().session == null) {
 			finish(); // We shouldn't really get here, but sometimes the window
