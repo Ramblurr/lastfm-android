@@ -28,13 +28,17 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 			IRadioPlayer player = fm.last.android.player.IRadioPlayer.Stub.asInterface(service);
 
 			if (player != null && (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)) {
+				if ((intent.getAction().equals("android.media.AUDIO_BECOMING_NOISY") && PreferenceManager.getDefaultSharedPreferences(
+								LastFMApplication.getInstance()).getBoolean("handle_noisy", true))) {
+					if(player.getState() != RadioPlayerService.STATE_PAUSED)
+						player.pause();
+				}
 				if (intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_FF")) {
 					player.skip();
 				}
-				if (intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_PLAYPAUSE")
-						|| (intent.getAction().equals("android.media.AUDIO_BECOMING_NOISY") && PreferenceManager.getDefaultSharedPreferences(
-								LastFMApplication.getInstance()).getBoolean("handle_noisy", true))) {
-					player.pause();
+				if (intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_PLAYPAUSE")) {
+					intent = new Intent("fm.last.android.widget.STOP");
+					context.sendBroadcast(intent);
 				}
 
 				if (intent.getAction().equals("android.intent.action.MEDIA_BUTTON")) {
