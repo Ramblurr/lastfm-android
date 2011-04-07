@@ -796,6 +796,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
 		@Override
 		public void onPostExecute(Boolean result) {
+			if(mediaPlayerPlaying)
+				return;
 			if(result) {
 				if (trackName.equals(RadioPlayerService.UNKNOWN))
 					updateAppWidget_idle(ctx, stationName, true);
