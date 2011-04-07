@@ -54,7 +54,7 @@ public class PopupActionActivity extends ListActivity {
 		ArrayList<ListEntry> iconifiedEntries = new ArrayList<ListEntry>();
 
 		if(!RadioPlayerService.radioAvailable(this) || getIntent().getBooleanExtra("lastfm.nowplaying", false)) {
-			entry = new ListEntry(R.drawable.list_radio_icon_rest, R.drawable.list_radio_icon_rest, getResources().getString(R.string.action_viewinfo));
+			entry = new ListEntry(R.drawable.info_dark, R.drawable.info_dark, getResources().getString(R.string.action_viewinfo));
 			entry.centerIcon = true;
 			iconifiedEntries.add(entry);
 		} else {
