@@ -38,7 +38,6 @@ import android.net.Uri;
 import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import fm.last.android.AndroidLastFmServerFactory;

@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,16 +53,21 @@ public class LastFMStreamAdapter extends BaseAdapter {
 			try {
 				if (player != null && (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)) {
 					String current = player.getStationUrl();
+					playing = false;
+					paused = false;
 					if (current != null && mStationUrl.compareTo(current) == 0) {
-						playing = true;
-					} else {
-						playing = false;
+						if(player.isPlaying())
+							playing = true;
+						else
+							paused = true;
 					}
 				}
 			} catch (RemoteException e) {
 			}
 			if(playing)
 				return R.drawable.now_playing;
+			else if(paused)
+				return R.drawable.now_paused;
 			else
 				return R.drawable.list_icon_station;
 		}
@@ -71,6 +75,7 @@ public class LastFMStreamAdapter extends BaseAdapter {
 		public String mLabel;
 		public String mStationUrl;
 		public boolean playing = false;
+		public boolean paused = false;
 	};
 
 	ArrayList<Stream> mItems;
@@ -149,7 +154,7 @@ public class LastFMStreamAdapter extends BaseAdapter {
 		TextView name = (TextView) row.findViewById(R.id.row_label);
 		name.setText(mItems.get(position).mLabel);
 
-		if(mLoadingBar == position || mItems.get(position).icon() == R.drawable.now_playing) {
+		if(mLoadingBar == position || mItems.get(position).icon() == R.drawable.now_playing || mItems.get(position).icon() == R.drawable.now_paused) {
 			ViewSwitcher switcher = (ViewSwitcher) row.findViewById(R.id.row_view_switcher);
 			row.findViewById(R.id.row_view_switcher).setVisibility(View.VISIBLE);
 			switcher.setDisplayedChild(mLoadingBar == position ? 1 : 0);

@@ -24,18 +24,14 @@ import java.io.File;
 import java.util.List;
 
 import android.app.ActivityGroup;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
@@ -47,7 +43,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
-import android.widget.EditText;
 import android.widget.TabHost;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
@@ -64,6 +59,7 @@ import fm.last.api.WSError;
 public class Profile extends ActivityGroup {
 	private TabHost mTabHost;
 	private boolean mIsPlaying = false;
+	private boolean mIsPaused = false;
 	
 	public static boolean isHTCContactsInstalled(Context ctx) {
 		try {
@@ -223,7 +219,8 @@ public class Profile extends ActivityGroup {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						IRadioPlayer player = IRadioPlayer.Stub.asInterface(binder);
 						try {
-							mIsPlaying = player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED;
+							mIsPlaying = player.isPlaying();
+							mIsPaused = (player.getState() == RadioPlayerService.STATE_PAUSED);
 						} catch (RemoteException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -278,7 +275,11 @@ public class Profile extends ActivityGroup {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(3).setEnabled(mIsPlaying);
+		if(mIsPaused)
+			menu.findItem(3).setTitle(getString(R.string.action_nowpaused));
+		else
+			menu.findItem(3).setTitle(getString(R.string.action_nowplaying));
+		menu.findItem(3).setEnabled(mIsPlaying || mIsPaused);
 
 		return super.onPrepareOptionsMenu(menu);
 	}

@@ -8,6 +8,7 @@
 	<string name="action_logout">Logout</string>
 	<string name="action_settings">Settings</string>
 	<string name="action_nowplaying">Now Playing</string>
+	<string name="action_nowpaused">Now Paused</string>
 	<string name="action_amazon">Buy on Amazon</string>
 	<string name="action_share">Share</string>
 	<string name="action_tagtrack">Tag Track</string>
