@@ -222,7 +222,7 @@ public class LastFMApplication extends Application {
 		int description = 0;
 
 		if(error != null) {
-			System.out.printf("Received a webservice error during method: %s: %s\n", error.getMethod(), error.getMessage());
+			Log.e("Last.fm", "Received a webservice error during method: " + error.getMethod() + ", message: " + error.getMessage());
 	
 			if (error.getMethod().startsWith("radio.")) {
 				title = R.string.ERROR_STATION_TITLE;
@@ -329,8 +329,8 @@ public class LastFMApplication extends Application {
 					description = R.string.ERROR_SUBSCRIPTION;
 					break;
 				default:
-					description = R.string.ERROR_SERVER_UNAVAILABLE;
-					break;
+					presentError(ctx, getResources().getString(title), getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE) + "\n\n" + error.getMethod() + ": " + error.getMessage());
+					return;
 				}
 			} else {
 				description = R.string.ERROR_SERVER_UNAVAILABLE;

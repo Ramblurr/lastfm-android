@@ -1030,6 +1030,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			} catch (Exception e) {
 				currentStationURL = null;
 				Intent i = new Intent("fm.last.android.ERROR");
+				i.putExtra("error", (Parcelable) new WSError(e.getClass().getSimpleName(), e.getMessage(), -1));
 				sendBroadcast(i);
 				logger.severe("Tuning error: " + e.getMessage());
 				e.printStackTrace();

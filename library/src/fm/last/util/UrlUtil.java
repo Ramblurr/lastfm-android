@@ -37,7 +37,6 @@ import java.util.Map;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.util.Log;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
@@ -121,7 +120,6 @@ public class UrlUtil {
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		conn.setRequestProperty("connection", "close");
-		conn.setRequestProperty ("Authorization", "Basic dGVzdGVyOmZ1dHVyZW9mbXVzaWM=");
 		if (contentType != null) {
 			conn.setRequestProperty("Content-Type", contentType);
 		}
@@ -134,36 +132,30 @@ public class UrlUtil {
 				ostr.close();
 		}
 
-		conn.connect();
 		BufferedReader reader = null;
+		String response = "";
+		conn.connect();
 		try {
-			InputStream contentStream = null;
-			if (conn.getErrorStream() != null)
-				contentStream = conn.getErrorStream();
-			else
-				contentStream = conn.getInputStream();
-			if(contentStream != null) {
-				reader = new BufferedReader(new InputStreamReader(contentStream), 512);
-				String response = toString(reader);
-				return response;
-			} else {
-				return "";
-			}
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-
-			// Dispatch any queued Analytics data while we've got the network
-			// open
-			try {
-				GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
-				if(tracker != null)
-					tracker.dispatch();
-			} catch (Exception e1) {
-				//ignore any exceptions thrown by analytics
-			}
+			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+		} catch (IOException e) {
+			reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
 		}
+
+		if(reader != null) {
+			response = toString(reader);
+			reader.close();
+		}
+
+		// Dispatch any queued Analytics data while we've got the network
+		// open
+		try {
+			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+			if(tracker != null)
+				tracker.dispatch();
+		} catch (Exception e1) {
+			//ignore any exceptions thrown by analytics
+		}
+		return response;
 	}
 
 	public static String doGet(URL url) throws IOException {
@@ -171,25 +163,20 @@ public class UrlUtil {
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("connection", "close");
-		conn.setRequestProperty ("Authorization", "Basic dGVzdGVyOmZ1dHVyZW9mbXVzaWM=");
 		BufferedReader reader = null;
+		String response = "";
+		conn.connect();
 		try {
-			InputStream contentStream = null;
-			int rc = conn.getResponseCode();
-			if (rc == 400)
-				contentStream = conn.getErrorStream();
-			else if (rc != 200) {
-				throw new IOException("code " + rc + " '" + conn.getResponseMessage() + "'");
-			} else {
-				contentStream = conn.getInputStream();
-			}
-			reader = new BufferedReader(new InputStreamReader(contentStream), 512);
-			return toString(reader);
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
+			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+		} catch (IOException e) {
+			reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
 		}
+
+		if(reader != null) {
+			response = toString(reader);
+			reader.close();
+		}
+		return response;
 	}
 
 	/**
