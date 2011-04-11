@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,23 +55,29 @@ public class LastFMStreamAdapter extends BaseAdapter {
 				if (player != null && (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)) {
 					String current = player.getStationUrl();
 					if (current != null && mStationUrl.compareTo(current) == 0) {
-						// now playing is always the same (focus or not)
-						return R.drawable.now_playing;
+						playing = true;
+					} else {
+						playing = false;
 					}
 				}
 			} catch (RemoteException e) {
 			}
-			return R.drawable.list_icon_station;
+			if(playing)
+				return R.drawable.now_playing;
+			else
+				return R.drawable.list_icon_station;
 		}
 
 		public String mLabel;
 		public String mStationUrl;
+		public boolean playing = false;
 	};
 
 	ArrayList<Stream> mItems;
 	Activity context;
 	private int mLoadingBar = -1;
 	IRadioPlayer player = null;
+	public SeparatedListAdapter container = null;
 
 	/**
 	 * Enables load bar at given position, at the same time only one can be
@@ -88,7 +95,7 @@ public class LastFMStreamAdapter extends BaseAdapter {
 	 */
 	public void disableLoadBar() {
 		this.mLoadingBar = -1;
-		notifyDataSetChanged();
+		updateNowPlaying();
 	}
 
 	/**
@@ -101,6 +108,9 @@ public class LastFMStreamAdapter extends BaseAdapter {
 					public void onServiceConnected(ComponentName comp, IBinder binder) {
 						player = IRadioPlayer.Stub.asInterface(binder);
 						notifyDataSetChanged();
+						if(container != null) {
+							container.notifyDataSetChanged();
+						}
 						LastFMApplication.getInstance().unbindService(this);
 					}
 
@@ -174,7 +184,7 @@ public class LastFMStreamAdapter extends BaseAdapter {
 	}
 
 	public void updateModel() {
-		notifyDataSetChanged();
+		updateNowPlaying();
 	}
 
 	public String getLabel(int position) {

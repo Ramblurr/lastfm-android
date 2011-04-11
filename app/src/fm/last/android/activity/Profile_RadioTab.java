@@ -38,6 +38,7 @@ import android.net.Uri;
 import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import fm.last.android.AndroidLastFmServerFactory;
@@ -191,10 +192,13 @@ public class Profile_RadioTab extends ListActivity {
 		SetupMyStations();
 		
 		mMainAdapter = new SeparatedListAdapter(this);
+		mMyStationsAdapter.container = mMainAdapter;
+		mMyRecentAdapter.container = mMainAdapter;
 		if (isAuthenticatedUser) {
 			mMainAdapter.addSection(getString(R.string.profile_mystations), mMyStationsAdapter);
-			if (mMyRecentAdapter.getCount() > 0)
+			if (mMyRecentAdapter.getCount() > 0) {
 				mMainAdapter.addSection(getString(R.string.profile_recentstations), mMyRecentAdapter);
+			}
 		} else {
 			mMainAdapter.addSection(getString(R.string.profile_userstations, mUsername), mMyStationsAdapter);
 			mMainAdapter.addSection(getString(R.string.profile_commonartists), mMyRecentAdapter);
@@ -215,6 +219,7 @@ public class Profile_RadioTab extends ListActivity {
 		RebuildMainMenu();
 		mMainAdapter.disableLoadBar();
 		getListView().setEnabled(true);
+		mMainAdapter.notifyDataSetChanged();
 
 		super.onResume();
 	}
