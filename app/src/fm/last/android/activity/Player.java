@@ -517,7 +517,7 @@ public class Player extends Activity {
 							IRadioPlayer player = IRadioPlayer.Stub
 									.asInterface(binder);
 							try {
-								if (player.isPlaying())
+								if (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)
 									player.skip();
 							} catch (RemoteException e) {
 								// TODO Auto-generated catch block

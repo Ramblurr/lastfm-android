@@ -235,7 +235,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// If the player is in a stopped state, call
 										// startRadio instead
 										// of skip
-										if (player.isPlaying())
+										if (player.isPlaying() || player.getState() == RadioPlayerService.STATE_PAUSED)
 											player.skip();
 										else {
 											Station lastStation = RecentStationsDao.getInstance().getLastStation();
