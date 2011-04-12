@@ -89,31 +89,34 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			if (action.equals("fm.last.android.widget.ACTION")) {
 				if(mediaPlayerPlaying) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-							public void onServiceConnected(ComponentName comp, IBinder binder) {
-								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-								try {
-									if (s.isPlaying()) {
-										String track = s.getTrackName();
-										String artist = s.getArtistName();
-										Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
-										i.putExtra("lastfm.artist", artist);
-										i.putExtra("lastfm.track", track);
-										i.putExtra("lastfm.nowplaying", true);
-										i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-										LastFMApplication.getInstance().startActivity(i);
+						try {
+							LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+								public void onServiceConnected(ComponentName comp, IBinder binder) {
+									com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+			
+									try {
+										if (s.isPlaying()) {
+											String track = s.getTrackName();
+											String artist = s.getArtistName();
+											Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
+											i.putExtra("lastfm.artist", artist);
+											i.putExtra("lastfm.track", track);
+											i.putExtra("lastfm.nowplaying", true);
+											i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+											LastFMApplication.getInstance().startActivity(i);
+										}
+									} catch (RemoteException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
 									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									LastFMApplication.getInstance().unbindService(this);
 								}
-								LastFMApplication.getInstance().unbindService(this);
-							}
-		
-							public void onServiceDisconnected(ComponentName comp) {
-							}
-						}, 0);
+			
+								public void onServiceDisconnected(ComponentName comp) {
+								}
+							}, 0);
+						} catch (Exception e) {
+						}
 					}
 					if(isHTCMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -185,22 +188,25 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 
 				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-							public void onServiceConnected(ComponentName comp, IBinder binder) {
-								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-								try {
-									s.next();
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+						try {
+							LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+								public void onServiceConnected(ComponentName comp, IBinder binder) {
+									com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+			
+									try {
+										s.next();
+									} catch (RemoteException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									LastFMApplication.getInstance().unbindService(this);
 								}
-								LastFMApplication.getInstance().unbindService(this);
-							}
-		
-							public void onServiceDisconnected(ComponentName comp) {
-							}
-						}, 0);
+			
+								public void onServiceDisconnected(ComponentName comp) {
+								}
+							}, 0);
+						} catch (Exception e) {
+						}
 					}
 					if(isHTCMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -266,28 +272,31 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				
 				if(mediaPlayerPlaying || !RadioPlayerService.radioAvailable(context)) {
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-							public void onServiceConnected(ComponentName comp, IBinder binder) {
-								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-								try {
-									if (s.isPlaying()) {
-										s.pause();
-										mediaPlayerPlaying = false;
-									} else {
-										s.play();
-										mediaPlayerPlaying = true;
+						try {
+							LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+								public void onServiceConnected(ComponentName comp, IBinder binder) {
+									com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+			
+									try {
+										if (s.isPlaying()) {
+											s.pause();
+											mediaPlayerPlaying = false;
+										} else {
+											s.play();
+											mediaPlayerPlaying = true;
+										}
+									} catch (RemoteException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
 									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									LastFMApplication.getInstance().unbindService(this);
 								}
-								LastFMApplication.getInstance().unbindService(this);
-							}
-		
-							public void onServiceDisconnected(ComponentName comp) {
-							}
-						}, 0);
+			
+								public void onServiceDisconnected(ComponentName comp) {
+								}
+							}, 0);
+						} catch (Exception e) {
+						}
 					}
 					if(isHTCMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -386,22 +395,25 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 					}
 
 					if(isAndroidMusicInstalled(context)) {
-						LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-							public void onServiceConnected(ComponentName comp, IBinder binder) {
-								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-								try {
-									s.prev();
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+						try {
+							LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+								public void onServiceConnected(ComponentName comp, IBinder binder) {
+									com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+			
+									try {
+										s.prev();
+									} catch (RemoteException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+									LastFMApplication.getInstance().unbindService(this);
 								}
-								LastFMApplication.getInstance().unbindService(this);
-							}
-		
-							public void onServiceDisconnected(ComponentName comp) {
-							}
-						}, 0);
+			
+								public void onServiceDisconnected(ComponentName comp) {
+								}
+							}, 0);
+						} catch (Exception e) {
+						}
 					}
 					if(isHTCMusicInstalled(context)) {
 						LastFMApplication.getInstance().bindService(new Intent().setClassName("com.htc.music", "com.htc.music.MediaPlaybackService"), new ServiceConnection() {
@@ -630,26 +642,29 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 		bindButtonIntents(context, null);
 
 		if(isAndroidMusicInstalled(context)) {
-			LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-				public void onServiceConnected(ComponentName comp, IBinder binder) {
-					com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-					try {
-						new UpdateFromAndroidPlayerTask(ctx).execute(s);
-					} catch (RejectedExecutionException e) { //try again in 1 second
-						if (mAlarmIntent == null) {
-							Intent intent = new Intent("fm.last.android.widget.UPDATE");
-							mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
-							AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
-							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+			try {
+				LastFMApplication.getInstance().bindService(new Intent().setClassName(getAndroidMusicPackageName(context), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+					public void onServiceConnected(ComponentName comp, IBinder binder) {
+						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+		
+						try {
+							new UpdateFromAndroidPlayerTask(ctx).execute(s);
+						} catch (RejectedExecutionException e) { //try again in 1 second
+							if (mAlarmIntent == null) {
+								Intent intent = new Intent("fm.last.android.widget.UPDATE");
+								mAlarmIntent = PendingIntent.getBroadcast(ctx, 0, intent, 0);
+								AlarmManager am = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
+								am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
+							}
 						}
+						LastFMApplication.getInstance().unbindService(this);
 					}
-					LastFMApplication.getInstance().unbindService(this);
-				}
-	
-				public void onServiceDisconnected(ComponentName comp) {
-				}
-			}, 0);
+		
+					public void onServiceDisconnected(ComponentName comp) {
+					}
+				}, 0);
+			} catch (Exception e) {
+			}
 		}
 		
 		if(isHTCMusicInstalled(context)) {

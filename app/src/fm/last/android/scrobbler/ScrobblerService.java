@@ -240,33 +240,37 @@ public class ScrobblerService extends Service {
 		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
-				if(Integer.decode(Build.VERSION.SDK) < 9) {
-					bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-						public void onServiceConnected(ComponentName comp, IBinder binder) {
-							com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-	
-							try {
-								if (s.isPlaying()) {
-									i.setAction(META_CHANGED);
-									i.putExtra("position", s.position());
-									i.putExtra("duration", s.duration());
-									handleIntent(i);
-								} else { // Media player was paused
-									mCurrentTrack = null;
-									NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-									nm.cancel(1338);
-									stopSelf();
+				if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
+					try {
+						bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+							public void onServiceConnected(ComponentName comp, IBinder binder) {
+								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+		
+								try {
+									if (s.isPlaying()) {
+										i.setAction(META_CHANGED);
+										i.putExtra("position", s.position());
+										i.putExtra("duration", s.duration());
+										handleIntent(i);
+									} else { // Media player was paused
+										mCurrentTrack = null;
+										NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+										nm.cancel(1338);
+										stopSelf();
+									}
+								} catch (RemoteException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
-							} catch (RemoteException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								unbindService(this);
 							}
-							unbindService(this);
-						}
-	
-						public void onServiceDisconnected(ComponentName comp) {
-						}
-					}, 0);
+		
+							public void onServiceDisconnected(ComponentName comp) {
+							}
+						}, 0);
+					} catch (Exception e) {
+						intentFromMediaDB(i);
+					}
 				} else {
 					intentFromMediaDB(i);
 				}

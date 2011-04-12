@@ -930,28 +930,31 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			
 			//Stop the standard media player
 			if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
-				bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-					public void onServiceConnected(ComponentName comp, IBinder binder) {
-						com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-						try {
-							if (s.isPlaying()) {
-								s.pause();
-								sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+				try {
+					bindService(new Intent().setClassName("com.android.music", "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+						public void onServiceConnected(ComponentName comp, IBinder binder) {
+							com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+			
+							try {
+								if (s.isPlaying()) {
+									s.pause();
+									sendBroadcast(new Intent(ScrobblerService.PLAYBACK_PAUSED));
+								}
+							} catch (RemoteException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
-						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							try {
+								unbindService(this);
+							} catch (Exception e) {
+							}
 						}
-						try {
-							unbindService(this);
-						} catch (Exception e) {
+			
+						public void onServiceDisconnected(ComponentName comp) {
 						}
-					}
-		
-					public void onServiceDisconnected(ComponentName comp) {
-					}
-				}, 0);
+					}, 0);
+				} catch (Exception e) {
+				}
 			}
 			
 			//Stop the HTC media player
