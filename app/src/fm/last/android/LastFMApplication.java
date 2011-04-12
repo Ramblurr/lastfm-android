@@ -223,7 +223,15 @@ public class LastFMApplication extends Application {
 
 		if(error != null) {
 			Log.e("Last.fm", "Received a webservice error during method: " + error.getMethod() + ", message: " + error.getMessage());
-	
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Errors", // Category
+						error.getMethod(), // Action
+						error.getMessage(), // Label
+						0); // Value
+			} catch (Exception e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
+
 			if (error.getMethod().startsWith("radio.")) {
 				title = R.string.ERROR_STATION_TITLE;
 				switch (error.getCode()) {

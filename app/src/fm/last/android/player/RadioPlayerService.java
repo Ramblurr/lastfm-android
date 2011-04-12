@@ -772,6 +772,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't pause
 				e.printStackTrace();
 			}
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+						"Pause", // Action
+						"", // Label
+						0); // Value
+			} catch (Exception e) {
+				//Google Analytics doesn't appear to be thread safe
+			}
 		} else {
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
@@ -792,6 +800,14 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					deleteFile("player.dat");
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
 				e.printStackTrace();
+			}
+			try {
+				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
+						"Resume", // Action
+						"", // Label
+						0); // Value
+			} catch (Exception e) {
+				//Google Analytics doesn't appear to be thread safe
 			}
 		}
 	}
