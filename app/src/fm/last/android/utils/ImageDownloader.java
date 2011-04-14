@@ -109,7 +109,9 @@ public class ImageDownloader {
 							} catch (NullPointerException e) {
 								Log.e(TAG, "Failed to cache " + url);
 							}
-						} catch (IOException e) {
+						} catch (OutOfMemoryError e) {
+							Log.w(TAG, "Couldn't load bitmap from url: " + url, e);
+						} catch (Exception e) {
 							Log.w(TAG, "Couldn't load bitmap from url: " + url, e);
 						} finally {
 							try {
