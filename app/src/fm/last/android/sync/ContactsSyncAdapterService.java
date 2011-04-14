@@ -338,7 +338,7 @@ public class ContactsSyncAdapterService extends Service {
 		Uri rawContactUri = RawContacts.CONTENT_URI.buildUpon().appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name).appendQueryParameter(
 				RawContacts.ACCOUNT_TYPE, account.type).build();
 		Cursor c1 = mContentResolver.query(rawContactUri, new String[] { BaseColumns._ID, UsernameColumn, PhotoUrlColumn, PhotoTimestampColumn, TasteTimestampColumn }, null, null, null);
-		while (c1.moveToNext()) {
+		while (c1 != null && c1.moveToNext()) {
 			if(is_full_sync) {
 				deleteContact(context, c1.getLong(0));
 			} else {
