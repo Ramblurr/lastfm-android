@@ -125,6 +125,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private boolean focusLost = false;
 	private boolean lostDataConnection = false;
 	private static final int NOTIFY_ID = 1337;
+	private FadeVolumeTask mFadeVolumeTask = null;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
 	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
@@ -191,58 +192,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
 			mTelephonyManager.listen(new PhoneStateListener() {
-				private FadeVolumeTask mFadeVolumeTask = null;
-	
 				@Override
 				public void onCallStateChanged(int state, String incomingNumber) {
 					if (mState != STATE_STOPPED) {
-						if (mFadeVolumeTask != null)
-							mFadeVolumeTask.cancel();
-	
-						if (state == TelephonyManager.CALL_STATE_IDLE) // fade music
-																		// in to
-																		// 100%
-						{
-							logger.info("Call ended, fading music back in");
-							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
-								@Override
-								public void onPreExecute() {
-									if (mState == STATE_PAUSED)
-										RadioPlayerService.this.pause();
-								}
-	
-								@Override
-								public void onPostExecute() {
-									mFadeVolumeTask = null;
-								}
-							};
+						if (state == TelephonyManager.CALL_STATE_IDLE) {
+							focusGained();
 						} else { // fade music out to silence
-							logger.info("Incoming call, fading music out");
-							if (mState == STATE_PAUSED) {
-								// this particular state of affairs should be
-								// impossible, seeing as we are the only
-								// component that dares the pause the radio. But we
-								// cater to it just in case
-								if(mp != null && mp.isPlaying())
-									mp.setVolume(0.0f, 0.0f);
-								return;
-							}
-	
-							// fade out faster if making a call, this feels more
-							// natural
-							int duration = state == TelephonyManager.CALL_STATE_RINGING ? 3000 : 1500;
-	
-							mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, duration) {
-								@Override
-								public void onPreExecute() {
-								}
-	
-								@Override
-								public void onPostExecute() {
-									RadioPlayerService.this.pause();
-									mFadeVolumeTask = null;
-								}
-							};
+							focusLost(true, false);
 						}
 					}
 					super.onCallStateChanged(state, incomingNumber);
@@ -1402,21 +1358,39 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     }
 
 	public void focusGained() {
+		if (mFadeVolumeTask != null)
+			mFadeVolumeTask.cancel();
+
 		if(mState == STATE_PAUSED && focusLost) {
-			pause();
+			logger.info("fading music back in");
+			mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_IN, 5000) {
+				@Override
+				public void onPreExecute() {
+					if (mState == STATE_PAUSED)
+						RadioPlayerService.this.pause();
+				}
+
+				@Override
+				public void onPostExecute() {
+					mFadeVolumeTask = null;
+				}
+			};
 			focusLost = false;
-		}
-	
-		try {
-			if(mp != null && mp.isPlaying())
-				mp.setVolume(1.0f, 1.0f);
-		} catch (Exception e) { //Sometimes the MediaPlayer is in a state where isPlaying() or setVolume() will fail
-			e.printStackTrace();
+		} else {
+			try {
+				if(mp != null && mp.isPlaying())
+					mp.setVolume(1.0f, 1.0f);
+			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where isPlaying() or setVolume() will fail
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public void focusLost(boolean isTransient, boolean canDuck) {
-        if (mp == null || mState == STATE_PAUSED)
+		if (mFadeVolumeTask != null)
+			mFadeVolumeTask.cancel();
+
+		if (mp == null || mState == STATE_PAUSED)
             return;
 
         if (canDuck) {
@@ -1426,7 +1400,19 @@ public class RadioPlayerService extends Service implements MusicFocusable {
     			e.printStackTrace();
     		}
         } else {
-            pause();
+			logger.info("fading music out");
+
+			mFadeVolumeTask = new FadeVolumeTask(FadeVolumeTask.FADE_OUT, 1500) {
+				@Override
+				public void onPreExecute() {
+				}
+
+				@Override
+				public void onPostExecute() {
+					RadioPlayerService.this.pause();
+					mFadeVolumeTask = null;
+				}
+			};
             focusLost = isTransient;
         }
 	}
