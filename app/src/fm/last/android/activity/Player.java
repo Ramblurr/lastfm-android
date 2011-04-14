@@ -358,7 +358,7 @@ public class Player extends Activity {
 		mHandler.removeMessages(REFRESH);
 		if (LastFMApplication.getInstance().player != null)
 			LastFMApplication.getInstance().unbindPlayerService();
-		if(wakelock != null)
+		if(wakelock != null && wakelock.isHeld())
 			wakelock.release();
 		super.onPause();
 	}
