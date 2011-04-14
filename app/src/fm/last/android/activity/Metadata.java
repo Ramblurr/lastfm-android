@@ -375,6 +375,8 @@ public class Metadata extends Activity {
 				mBio += "</div><br style='clear:both;'/>" + formatBio(artist.getBio().getContent()) + "</div></body></html>";
 
 				success = true;
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (WSError e) {
