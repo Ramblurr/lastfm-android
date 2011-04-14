@@ -49,9 +49,9 @@ public class ArtistBuilder extends XMLBuilder<Artist> {
 		String userplaycount = "0";
 		Node statsNode = getChildNode("stats");
 		if (statsNode != null) {
-			playcount = XMLUtil.findNamedElementNode(statsNode, "playcount").getFirstChild().getNodeValue();
-			listeners = XMLUtil.findNamedElementNode(statsNode, "listeners").getFirstChild().getNodeValue();
 			try {
+				playcount = XMLUtil.findNamedElementNode(statsNode, "playcount").getFirstChild().getNodeValue();
+				listeners = XMLUtil.findNamedElementNode(statsNode, "listeners").getFirstChild().getNodeValue();
 				userplaycount = XMLUtil.findNamedElementNode(statsNode, "userplaycount").getFirstChild().getNodeValue();
 			} catch (Exception e) {
 				//This node isn't always present
