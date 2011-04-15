@@ -410,7 +410,9 @@ public class ContactsSyncAdapterService extends Service {
 					if (tracks.length > 0) {
 						updateContactStatus(operationList, entry.raw_id, tracks[0]);
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
+				} catch (WSError e) {
 					e.printStackTrace();
 				}
 				try {
@@ -419,7 +421,9 @@ public class ContactsSyncAdapterService extends Service {
 						taste = server.tasteometerCompare(account.name, username, 3);
 						updateTasteometer(operationList, entry.raw_id, username, taste);
 					}
-				} catch (IOException e) {
+				} catch (Exception e) {
+					e.printStackTrace();
+				} catch (WSError e) {
 					e.printStackTrace();
 				}
 				updateContactName(operationList, entry.raw_id, user.getRealName(), username);
