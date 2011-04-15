@@ -20,7 +20,7 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		IBinder service = peekService(context, new Intent(context, RadioPlayerService.class));
 		
-		if (service == null || !PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("headset_controls", true)) {
+		if (service == null) {
 			Log.i(TAG, "LastFM-Player not active, don't handling media keys.");
 			return;
 		}
@@ -33,6 +33,9 @@ public class LastFMMediaButtonHandler extends BroadcastReceiver {
 					if(player.getState() != RadioPlayerService.STATE_PAUSED)
 						player.pause();
 				}
+				if(!PreferenceManager.getDefaultSharedPreferences(LastFMApplication.getInstance()).getBoolean("headset_controls", true))
+					return;
+				
 				if (intent.getAction().equals("com.smartmadsoft.openwatch.command.BUTTON_FF")) {
 					player.skip();
 				}
