@@ -136,9 +136,11 @@ public class UrlUtil {
 		String response = "";
 		conn.connect();
 		try {
-			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+			if(conn.getInputStream() != null)
+				reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
 		} catch (IOException e) {
-			reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
+			if(conn.getErrorStream() != null)
+				reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
 		}
 
 		if(reader != null) {
@@ -167,9 +169,11 @@ public class UrlUtil {
 		String response = "";
 		conn.connect();
 		try {
-			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
+			if(conn.getInputStream() != null)
+				reader = new BufferedReader(new InputStreamReader(conn.getInputStream()), 512);
 		} catch (IOException e) {
-			reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
+			if(conn.getErrorStream() != null)
+				reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()), 512);
 		}
 
 		if(reader != null) {
