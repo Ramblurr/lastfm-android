@@ -675,7 +675,7 @@ public class ScrobblerService extends Service {
 				catch (WSError ex) {
 					logger.severe("Unable to submit track: " + ex.toString());
 					ex.printStackTrace();
-					success = false;
+					success = true; //Remove the track from the queue
 				}
 				if(success) {
 					ScrobblerQueueDao.getInstance().removeFromQueue(e);
