@@ -20,11 +20,8 @@
  ***************************************************************************/
 package fm.last.android.activity;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -66,9 +63,11 @@ public class SignUp extends Activity {
 
 				setResult(RESULT_OK, new Intent().putExtra("username", username).putExtra("password", password));
 				finish();
-			} catch (IOException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				LastFMApplication app = (LastFMApplication) getApplication();
+				app.presentError(SignUp.this, new WSError(e.getClass().getSimpleName(), e.getMessage(), -1));
 			} catch (WSError e) {
 				LastFMApplication app = (LastFMApplication) getApplication();
 				app.presentError(SignUp.this, e);
