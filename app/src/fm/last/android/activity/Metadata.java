@@ -439,6 +439,8 @@ public class Metadata extends Activity {
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (WSError e) {
@@ -494,6 +496,8 @@ public class Metadata extends Activity {
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} catch (WSError e) {
@@ -546,6 +550,8 @@ public class Metadata extends Activity {
 					iconifiedEntries.add(entry);
 				}
 				return iconifiedEntries;
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
 			} catch (WSError e) {
@@ -608,6 +614,8 @@ public class Metadata extends Activity {
 				((EventListAdapter) mNewEventAdapter).setEventsSource(events);
 				if (events.length > 0)
 					result = true;
+			} catch (OutOfMemoryError e) {
+				e.printStackTrace();
 
 			} catch (IOException e) {
 				e.printStackTrace();

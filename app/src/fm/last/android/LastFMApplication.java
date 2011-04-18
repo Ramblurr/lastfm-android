@@ -182,8 +182,12 @@ public class LastFMApplication extends Application {
 
 					@Override
 					public void onReceive(Context context, Intent intent) {
-						unregisterReceiver(this);
-
+						try {
+							unregisterReceiver(this);
+						} catch (Exception e) {
+							e.printStackTrace(); //Sometimes this can throw an IllegalArgumentException
+						}
+							
 						String action = intent.getAction();
 						if (action.equals(RadioPlayerService.STATION_CHANGED)) {
 							Intent i = new Intent(LastFMApplication.this, Player.class);
