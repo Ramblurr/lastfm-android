@@ -1268,7 +1268,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				volumeValue *= (float) (mCurrentStep) / (float) mSteps;
 			}
 
-			mp.setVolume(volumeValue, volumeValue);
+			try {
+				mp.setVolume(volumeValue, volumeValue);
+			} catch (Exception e) {
+				return;
+			}
 
 			if (mCurrentStep >= mSteps) {
 				this.onPostExecute();
