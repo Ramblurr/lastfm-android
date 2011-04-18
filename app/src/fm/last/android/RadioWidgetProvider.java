@@ -153,7 +153,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									try {
 										String track = player.getTrackName();
 										String artist = player.getArtistName();
-										if (!track.equals(RadioPlayerService.UNKNOWN)) {
+										if (!track.equals(RadioPlayerService.UNKNOWN) && player.getState() != RadioPlayerService.STATE_PAUSED) {
 											Intent i = new Intent(LastFMApplication.getInstance(), PopupActionActivity.class);
 											i.putExtra("lastfm.artist", artist);
 											i.putExtra("lastfm.track", track);
