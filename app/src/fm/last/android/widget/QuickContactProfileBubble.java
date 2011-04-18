@@ -70,10 +70,16 @@ public class QuickContactProfileBubble extends ProfileBubble {
 	public void setUser(User user) {
 		super.setUser(user);
 
-		Cursor c = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.Data.CONTACT_ID },
+		Cursor c = null;
+		
+		try {
+			c = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.Data.CONTACT_ID },
 				ContactsContract.Data.DATA1 + "=?" + " AND " + ContactsContract.Data.MIMETYPE + "='vnd.android.cursor.item/vnd.fm.last.android.profile'",
 				new String[] { user.getName() }, null);
-
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		if (c != null && c.moveToNext()) {
 			setQuickContactId(c.getLong(0));
 		} else if(mUser != null && mUser.getImages().length > 0) {
