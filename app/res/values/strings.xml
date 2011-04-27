@@ -77,6 +77,8 @@
 	<string name="prefs_cat_player_title">Player</string>
 	<string name="prefs_highquality_title">High Quality Audio</string>
 	<string name="prefs_highquality_summary">Use high quality audio over cellular networks</string>
+	<string name="prefs_faststreaming_title">Fast Streaming</string>
+	<string name="prefs_faststreaming_summary">Transfer songs quickly</string>
 	<string name="prefs_cat_about_title">About Last.fm for Android</string>
 	<string name="prefs_bugreport_title">Report a bug</string>
 	<string name="prefs_bugreport_summary">Email a bug report to Last.fm</string>

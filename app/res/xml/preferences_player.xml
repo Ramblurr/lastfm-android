@@ -8,6 +8,10 @@
 			android:defaultValue="false"
 			android:summary="@string/prefs_highquality_summary" android:title="@string/prefs_highquality_title"/>
 		<CheckBoxPreference
+			android:key="faststreaming"
+			android:defaultValue="true"
+			android:summary="@string/prefs_faststreaming_summary" android:title="@string/prefs_faststreaming_title"/>
+		<CheckBoxPreference
 			android:key="handle_noisy"
 			android:defaultValue="true"
 			android:summary="@string/prefs_noisy_summary" android:title="@string/prefs_noisy_title"/>

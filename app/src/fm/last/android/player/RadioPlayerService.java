@@ -772,6 +772,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			String bitrate;
 			String rtp = "1";
 			String discovery = "0";
+			String multiplier = "2";
 			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 			NetworkInfo ni = cm.getActiveNetworkInfo();
 			if(ni != null)
@@ -793,8 +794,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("discovery", false))
 				discovery = "1";
 
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("faststreaming", true))
+				multiplier = "8";
+
 			logger.info("Requesting bitrate: " + bitrate);
-			playlist = server.getRadioPlayList(bitrate, rtp, discovery, currentSession.getKey());
+			playlist = server.getRadioPlayList(bitrate, rtp, discovery, multiplier, currentSession.getKey());
 			if (playlist == null || playlist.getTracks().length == 0) {
 				try {
 					LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
