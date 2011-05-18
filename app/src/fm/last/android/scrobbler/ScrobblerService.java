@@ -663,7 +663,7 @@ public class ScrobblerService extends Service {
 							server.banTrack(e.artist, e.title, mSession.getKey());
 						}
 						if(!e.rating.equals("B") && !e.rating.equals("S"))
-							server.scrobbleTrack(e.artist, e.title, e.album, e.startTime, (int)(e.duration / 1000), ScrobblerService.this.player, mSession.getKey());
+							server.scrobbleTrack(e.artist, e.title, e.album, e.startTime, (int)(e.duration / 1000), ScrobblerService.this.player, e.trackAuth, mSession.getKey());
 						success = true;
 					}
 				} 

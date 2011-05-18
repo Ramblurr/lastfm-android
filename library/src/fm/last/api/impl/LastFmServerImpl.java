@@ -572,12 +572,14 @@ final class LastFmServerImpl implements LastFmServer {
 		TrackFunctions.banTrack(baseUrl, params);
 	}
 	
-	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String sk) throws IOException {
+	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String streamid, String sk) throws IOException {
 		Map<String, String> params = createParams("track.scrobble");
 		params.put("artist", artist);
 		params.put("track", track);
 		if (album != null)
 			params.put("album", album);
+		if (streamid != null && streamid.length() > 0)
+			params.put("streamId", streamid);
 		params.put("timestamp", String.valueOf(timestamp));
 		if (duration > 0)
 			params.put("duration", String.valueOf(duration));
