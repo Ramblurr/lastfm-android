@@ -164,7 +164,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				handler.setFormatter(new SimpleFormatter());
 				logger.addHandler(handler);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
