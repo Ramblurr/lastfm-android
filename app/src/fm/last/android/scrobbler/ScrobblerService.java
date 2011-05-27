@@ -40,6 +40,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -53,6 +54,7 @@ import android.util.Log;
 import android.widget.Toast;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
+import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.db.ScrobblerQueueDao;
@@ -209,7 +211,8 @@ public class ScrobblerService extends Service {
 			int track_duration = (int) (mCurrentTrack.duration / 1000);
 
 			scrobble_perc = (int)(track_duration * (scrobble_perc * 0.01));
-			boolean played = (playTime > scrobble_perc) || (playTime > 240);
+			boolean played = (playTime > 30 && playTime > scrobble_perc) || (playTime > 240);
+			
 			if (played || mCurrentTrack.rating.length() > 0) {
 				logger.info("Enqueuing track (Rating:" + mCurrentTrack.rating + ")");
 				boolean queued = ScrobblerQueueDao.getInstance().addToQueue(mCurrentTrack);
@@ -230,7 +233,7 @@ public class ScrobblerService extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		final Intent i = intent;
-
+		
 		/*
 		 * The Android media player doesn't send a META_CHANGED notification for
 		 * the first track, so we'll have to catch PLAYBACK_STATE_CHANGED and
@@ -239,35 +242,43 @@ public class ScrobblerService extends Service {
 		 */
 		if (intent.getAction().equals("com.android.music.playstatechanged") || intent.getAction().equals("com.android.music.metachanged")
 				|| intent.getAction().equals("com.android.music.queuechanged")) {
-			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true)) {
+			long id = -1;
+			try {
+				id = intent.getLongExtra("id", -1);
+			} catch (Exception e) {
+				//ignore this
+			}
+			if(id == -1)
+				id = intent.getIntExtra("id", -1);
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("scrobble_music_player", true) && id != -1) {
 				if(RadioWidgetProvider.isAndroidMusicInstalled(this)) {
 					try {
-						bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
-							public void onServiceConnected(ComponentName comp, IBinder binder) {
-								com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
-		
-								try {
-									if (s.isPlaying()) {
-										i.setAction(META_CHANGED);
-										i.putExtra("position", s.position());
-										i.putExtra("duration", s.duration());
-										handleIntent(i);
-									} else { // Media player was paused
-										mCurrentTrack = null;
-										NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-										nm.cancel(1338);
-										stopSelf();
-									}
-								} catch (RemoteException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								unbindService(this);
-							}
-		
-							public void onServiceDisconnected(ComponentName comp) {
-							}
-						}, 0);
+				       bindService(new Intent().setClassName(RadioWidgetProvider.getAndroidMusicPackageName(this), "com.android.music.MediaPlaybackService"), new ServiceConnection() {
+				    	   public void onServiceConnected(ComponentName comp, IBinder binder) {
+				    		   com.android.music.IMediaPlaybackService s = com.android.music.IMediaPlaybackService.Stub.asInterface(binder);
+				
+				    		   try {
+				    			   if (s.isPlaying()) {
+				    				   i.setAction(META_CHANGED);
+				    				   i.putExtra("position", s.position());
+				    				   i.putExtra("duration", s.duration());
+				    				   handleIntent(i);
+				    			   } else { // Media player was paused
+				    				   mCurrentTrack = null;
+				    				   NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+				    				   nm.cancel(1338);
+				    				   stopSelf();
+				    			   }
+				    		   } catch (RemoteException e) {
+				    			   // TODO Auto-generated catch block
+				    			   e.printStackTrace();
+				    		   }
+				    		   unbindService(this);
+				    	   }
+				
+				    	   public void onServiceDisconnected(ComponentName comp) {
+				    	   }
+				       }, 0);
 					} catch (Exception e) {
 						intentFromMediaDB(i);
 					}
@@ -348,18 +359,30 @@ public class ScrobblerService extends Service {
 
 		boolean playing = false;
 		
-		if(intent.getBooleanExtra("playing", false) || intent.getAction().endsWith("metachanged"))
+		SharedPreferences settings = getSharedPreferences(LastFm.PREFS, 0);
+		boolean mediaPlayerIsPlaying = settings.getBoolean("mediaPlayerIsPlaying", false);
+		
+		if(intent.getAction().endsWith("metachanged"))
+			playing = mediaPlayerIsPlaying;
+		else if(intent.getBooleanExtra("playing", false))
 			playing = true;
 		else if(intent.getBooleanExtra("playstate", false) || (intent.getSerializableExtra("playstate") == null && intent.getBooleanExtra("playing", true)))
 			playing = true;
 		
-		logger.info("Action: " + intent.getAction() + " Playing: " + playing + "\n");
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putBoolean("mediaPlayerIsPlaying", playing);
+		editor.commit();
 		
 		if(!playing) {
 			i.setAction(PLAYBACK_FINISHED);
 		} else {
 			i.setAction(META_CHANGED);
-			long id = intent.getIntExtra("id", -1);
+			long id = -1;
+			try {
+				id = intent.getIntExtra("id", -1);
+			} catch (Exception e) {
+				//ignore this
+			}
 			if(id == -1)
 				id = intent.getLongExtra("id", -1);
 			
@@ -390,7 +413,7 @@ public class ScrobblerService extends Service {
 									id), columns, null, null, null);
 					}
 					if (!cur.moveToFirst()) {
-					        logger.info("no such media in media store");
+					        logger.info("no such media in media store: " + id);
 					        cur.close();
 					        //This isn't fatal if the intent still contains the artist and track,
 					        //however without the duration, the track will be scrobbled regardless of whether
@@ -463,6 +486,9 @@ public class ScrobblerService extends Service {
 			mCurrentTrack.artist = artist;
 			mCurrentTrack.album = intent.getStringExtra("album");
 			mCurrentTrack.duration = intent.getLongExtra("duration", 0);
+			if(mCurrentTrack.duration == 0)
+				mCurrentTrack.duration = (long)intent.getIntExtra("duration", 0);
+
 			if (mCurrentTrack.title == null || mCurrentTrack.artist == null) {
 				mCurrentTrack = null;
 				stopIfReady();

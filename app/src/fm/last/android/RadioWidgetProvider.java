@@ -14,8 +14,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteException;
 import fm.last.android.utils.AsyncTaskEx;
 import android.os.Build;
 import android.os.IBinder;
@@ -73,8 +73,8 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 			return false;
 		try {
 			PackageManager pm = ctx.getPackageManager();
-			pm.getPackageInfo(getAndroidMusicPackageName(ctx), 0);
-			return true;
+			PackageInfo pi = pm.getPackageInfo(getAndroidMusicPackageName(ctx), 0);
+			return pi.versionCode < 300;
 		} catch (Exception e) {
 		}
 		return false;
