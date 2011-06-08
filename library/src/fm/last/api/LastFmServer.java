@@ -262,6 +262,7 @@ public interface LastFmServer {
 	 * @throws IOException
 	 */
 	public Event[] getUserEvents(String user) throws IOException;
+	public Event[] getUserFriendsEvents(String user) throws IOException;
 
 	public Event[] getUserRecommendedEvents(String user, String sk) throws IOException;
 	public Event[] getNearbyEvents(String latitude, String longitude) throws IOException;
