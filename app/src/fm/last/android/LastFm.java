@@ -324,16 +324,15 @@ public class LastFm extends Activity {
 					startActivity(intent);
 				}
 				finish();
-			} else if (wse != null) {
-				LastFMApplication.getInstance().presentError(context, wse);
-			} else if (e != null && e.getMessage() != null) {
+			} else if (wse != null || (e != null && e.getMessage() != null)) {
 				AlertDialog.Builder d = new AlertDialog.Builder(LastFm.this);
 				d.setIcon(android.R.drawable.ic_dialog_alert);
 				d.setNeutralButton(getString(R.string.common_ok), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 					}
 				});
-				if (e.getMessage().contains("code 403")) {
+				if ((wse != null && wse.getCode() == WSError.ERROR_AuthenticationFailed) ||
+						(e != null && e.getMessage().contains("code 403"))) {
 					d.setTitle(getResources().getString(R.string.ERROR_AUTH_TITLE));
 					d.setMessage(getResources().getString(R.string.ERROR_AUTH));
 					((EditText) findViewById(R.id.password)).setText("");
@@ -348,6 +347,8 @@ public class LastFm extends Activity {
 					d.setMessage(getResources().getString(R.string.ERROR_SERVER_UNAVAILABLE));
 				}
 				d.show();
+			} else if (wse != null) {
+				LastFMApplication.getInstance().presentError(context, wse);
 			}
 
 			if(mDialog.isShowing()) {
