@@ -50,6 +50,7 @@ import fm.last.android.adapter.EventListAdapter;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.api.Event;
 import fm.last.api.LastFmServer;
+import fm.last.api.WSError;
 
 public class Profile_EventsTab extends ListActivity implements LocationListener {
 	// Java doesn't let you treat enums as ints easily, so we have to have this
@@ -336,6 +337,8 @@ public class Profile_EventsTab extends ListActivity implements LocationListener 
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e) {
+				e.printStackTrace();
+			} catch (WSError e) {
 				e.printStackTrace();
 			}
 			return null;
