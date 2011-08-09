@@ -134,7 +134,7 @@ public class PopupActionActivity extends ListActivity {
 			intent.putExtra("track", mTrackName);
 			startActivity(intent);
 			break;
-		case R.drawable.radio_dark:
+		case R.drawable.list_radio_icon_rest:
 			((ListAdapter)getListAdapter()).enableLoadBar(position);
 			LastFMApplication.getInstance().playRadioStation(this, "lastfm://artist/" + Uri.encode(mArtistName) + "/similarartists", true);
 			return;
