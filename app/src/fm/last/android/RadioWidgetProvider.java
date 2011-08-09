@@ -749,8 +749,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				artistName = s[0].getArtistName();
 				position = s[0].position();
 				duration = s[0].duration();
-			} catch (NullPointerException e) {
-			} catch (RemoteException e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
