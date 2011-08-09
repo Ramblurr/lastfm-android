@@ -225,7 +225,10 @@ public class Profile extends ActivityGroup {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						LastFMApplication.getInstance().unbindService(this);
+						try {
+							LastFMApplication.getInstance().unbindService(this);
+						} catch (IllegalArgumentException e) {
+						}
 					}
 
 					public void onServiceDisconnected(ComponentName comp) {

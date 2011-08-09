@@ -273,7 +273,10 @@ public class ScrobblerService extends Service {
 				    			   // TODO Auto-generated catch block
 				    			   e.printStackTrace();
 				    		   }
-				    		   unbindService(this);
+								try {
+									LastFMApplication.getInstance().unbindService(this);
+								} catch (IllegalArgumentException e) {
+								}
 				    	   }
 				
 				    	   public void onServiceDisconnected(ComponentName comp) {
@@ -318,7 +321,10 @@ public class ScrobblerService extends Service {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						unbindService(this);
+						try {
+							LastFMApplication.getInstance().unbindService(this);
+						} catch (IllegalArgumentException e) {
+						}
 					}
 
 					public void onServiceDisconnected(ComponentName comp) {

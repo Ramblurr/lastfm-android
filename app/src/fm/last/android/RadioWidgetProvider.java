@@ -109,7 +109,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 			
 								public void onServiceDisconnected(ComponentName comp) {
@@ -138,7 +141,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								LastFMApplication.getInstance().unbindService(this);
+								try {
+									LastFMApplication.getInstance().unbindService(this);
+								} catch (IllegalArgumentException e) {
+								}
 							}
 				
 							public void onServiceDisconnected(ComponentName comp) {
@@ -169,7 +175,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 	
 								public void onServiceDisconnected(ComponentName comp) {
@@ -199,7 +208,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 			
 								public void onServiceDisconnected(ComponentName comp) {
@@ -219,7 +231,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								LastFMApplication.getInstance().unbindService(this);
+								try {
+									LastFMApplication.getInstance().unbindService(this);
+								} catch (IllegalArgumentException e) {
+								}
 							}
 				
 							public void onServiceDisconnected(ComponentName comp) {
@@ -253,7 +268,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 	
 								public void onServiceDisconnected(ComponentName comp) {
@@ -289,7 +307,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 			
 								public void onServiceDisconnected(ComponentName comp) {
@@ -315,7 +336,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								LastFMApplication.getInstance().unbindService(this);
+								try {
+									LastFMApplication.getInstance().unbindService(this);
+								} catch (IllegalArgumentException e) {
+								}
 							}
 				
 							public void onServiceDisconnected(ComponentName comp) {
@@ -349,7 +373,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 	
 								public void onServiceDisconnected(ComponentName comp) {
@@ -377,7 +404,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						LastFMApplication.getInstance().unbindService(this);
+						try {
+							LastFMApplication.getInstance().unbindService(this);
+						} catch (IllegalArgumentException e) {
+						}
 					}
 
 					public void onServiceDisconnected(ComponentName arg0) {
@@ -406,7 +436,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
 									}
-									LastFMApplication.getInstance().unbindService(this);
+									try {
+										LastFMApplication.getInstance().unbindService(this);
+									} catch (IllegalArgumentException e) {
+									}
 								}
 			
 								public void onServiceDisconnected(ComponentName comp) {
@@ -426,7 +459,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
-								LastFMApplication.getInstance().unbindService(this);
+								try {
+									LastFMApplication.getInstance().unbindService(this);
+								} catch (IllegalArgumentException e) {
+								}
 							}
 				
 							public void onServiceDisconnected(ComponentName comp) {
@@ -455,7 +491,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-							LastFMApplication.getInstance().unbindService(this);
+							try {
+								LastFMApplication.getInstance().unbindService(this);
+							} catch (IllegalArgumentException e) {
+							}
 						}
 	
 						public void onServiceDisconnected(ComponentName comp) {
@@ -657,7 +696,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 								am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
 							}
 						}
-						LastFMApplication.getInstance().unbindService(this);
+						try {
+							LastFMApplication.getInstance().unbindService(this);
+						} catch (IllegalArgumentException e) {
+						}
 					}
 		
 					public void onServiceDisconnected(ComponentName comp) {
@@ -682,8 +724,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
 						}
 					}
-
-					LastFMApplication.getInstance().unbindService(this);
+					try {
+						LastFMApplication.getInstance().unbindService(this);
+					} catch (IllegalArgumentException e) {
+					}
 				}
 	
 				public void onServiceDisconnected(ComponentName comp) {
@@ -706,8 +750,10 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 							am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000, 1000, mAlarmIntent);
 						}
 					}
-
-					LastFMApplication.getInstance().unbindService(this);
+					try {
+						LastFMApplication.getInstance().unbindService(this);
+					} catch (IllegalArgumentException e) {
+					}
 				}
 	
 				public void onServiceDisconnected(ComponentName comp) {

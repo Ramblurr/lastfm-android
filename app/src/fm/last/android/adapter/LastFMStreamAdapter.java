@@ -116,7 +116,10 @@ public class LastFMStreamAdapter extends BaseAdapter {
 						if(container != null) {
 							container.notifyDataSetChanged();
 						}
-						LastFMApplication.getInstance().unbindService(this);
+						try {
+							LastFMApplication.getInstance().unbindService(this);
+						} catch (IllegalArgumentException e) {
+						}
 					}
 
 					public void onServiceDisconnected(ComponentName comp) {
