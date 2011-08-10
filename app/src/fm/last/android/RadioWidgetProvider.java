@@ -860,7 +860,7 @@ public class RadioWidgetProvider extends AppWidgetProvider {
 				return;
 			if(result) {
 				if (trackName.equals(RadioPlayerService.UNKNOWN))
-					updateAppWidget_idle(ctx, stationName, true);
+					updateAppWidget_idle(ctx, stationName, state != RadioPlayerService.STATE_PAUSED);
 				else
 					updateAppWidget_playing(ctx, trackName, artistName, position, duration, buffering, loved, state == RadioPlayerService.STATE_PAUSED);
 			} else if (!mediaPlayerPlaying) {

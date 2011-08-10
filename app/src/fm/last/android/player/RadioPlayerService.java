@@ -665,7 +665,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 		if (mState == STATE_PLAYING || mState == STATE_PREPARING) {
 			currentTrack = null;
-			if (mp.isPlaying()) {
+			if (mp != null && mp.isPlaying()) {
 				mp.stop();
 			}
 		}
@@ -768,11 +768,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						mState = STATE_PLAYING;
 					}
 				} else {
-					mState = STATE_SKIPPING;
+					mState = STATE_PREPARING;
 					nextSong();
 				}
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
-				mState = STATE_SKIPPING;
+				mState = STATE_PREPARING;
 				nextSong();
 				e.printStackTrace();
 			}
