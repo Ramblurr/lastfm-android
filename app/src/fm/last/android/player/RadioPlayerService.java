@@ -625,6 +625,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			logger.severe(e.toString());
 		} catch (IOException e) {
 			logger.severe(e.getMessage());
+			mState = STATE_PREPARING;
 			mOnErrorListener.onError(p, 0, 0);
 		}
 	}
@@ -732,10 +733,11 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 					mp = null;
 					mTrackPosition = 0;
 				}
-				mState = STATE_PAUSED;
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't pause
 				e.printStackTrace();
 			}
+			mState = STATE_PAUSED;
+			RadioWidgetProvider.updateAppWidget_playing(this, currentTrack.getTitle(), currentTrack.getCreator(), 0, 0, false, false, true);
 			serializeCurrentStation();
 			releaseLocks();
 			try {
@@ -762,6 +764,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						mp.start();
 						mState = STATE_PLAYING;
 					}
+				} else {
+					mState = STATE_SKIPPING;
+					nextSong();
 				}
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
 				mState = STATE_SKIPPING;
