@@ -20,21 +20,6 @@
  ***************************************************************************/
 package fm.last.api.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import fm.last.api.Artist;
-import fm.last.api.Tag;
-import fm.last.api.WSError;
-import fm.last.util.UrlUtil;
-import fm.last.util.XMLUtil;
-
 /**
  * @author Casey Link
  */
@@ -42,108 +27,6 @@ public class TagFunctions {
 	private static int TAGS_PER_POST = 10;
 
 	private TagFunctions() {
-	}
-
-	public static Tag[] searchForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
-		String response = UrlUtil.doGet(baseUrl, params);
-
-		Document responseXML = null;
-		try {
-			responseXML = XMLUtil.stringToDocument(response);
-		} catch (SAXException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-		if (!status.contains("ok")) {
-			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-			if (errorNode != null) {
-				WSErrorBuilder eb = new WSErrorBuilder();
-				throw eb.build(params.get("method"), errorNode);
-			}
-			return null;
-		} else {
-			Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
-			Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "tagmatches");
-
-			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
-			TagBuilder tagBuilder = new TagBuilder();
-			List<Tag> tags = new ArrayList<Tag>();
-			for (Node node : elnodes) {
-				Tag artistObject = tagBuilder.build(node);
-				tags.add(artistObject);
-			}
-			return tags.toArray(new Tag[tags.size()]);
-		}
-	}
-
-	private static Tag[] getChildTags(String baseUrl, Map<String, String> params, String child) throws IOException, WSError {
-		String response = UrlUtil.doGet(baseUrl, params);
-
-		Document responseXML = null;
-		try {
-			responseXML = XMLUtil.stringToDocument(response);
-		} catch (SAXException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-		if (!status.contains("ok")) {
-			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-			if (errorNode != null) {
-				WSErrorBuilder eb = new WSErrorBuilder();
-				throw eb.build(params.get("method"), errorNode);
-			}
-			return null;
-		} else {
-			Node childNode = XMLUtil.findNamedElementNode(lfmNode, child);
-
-			Node[] elnodes = XMLUtil.getChildNodes(childNode, Node.ELEMENT_NODE);
-			TagBuilder tagBuilder = new TagBuilder();
-			List<Tag> tags = new ArrayList<Tag>();
-			for (Node node : elnodes) {
-				Tag artistObject = tagBuilder.build(node);
-				tags.add(artistObject);
-			}
-			return tags.toArray(new Tag[tags.size()]);
-		}
-	}
-
-	public static Tag[] getTopTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
-		return getChildTags(baseUrl, params, "toptags");
-	}
-
-	public static Tag[] getTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
-		return getChildTags(baseUrl, params, "tags");
-	}
-
-	public static void addTags(String baseUrl, Map<String, String> params) throws IOException, WSError {
-		String response = UrlUtil.doPost(baseUrl, params);
-		// int n = (tag.length-1) / TAGS_PER_POST;
-		// int i = 0;
-		// do{
-		// params.put("tags", buildTags(tag, i*TAGS_PER_POST));
-		//			
-		// }while (i++ < n);
-
-		Document responseXML = null;
-		try {
-			responseXML = XMLUtil.stringToDocument(response);
-		} catch (SAXException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-		if (!status.contains("ok")) {
-			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-			if (errorNode != null) {
-				WSErrorBuilder eb = new WSErrorBuilder();
-				throw eb.build(params.get("method"), errorNode);
-			}
-		}
 	}
 
 	public static String buildTags(String[] tag) {
@@ -155,60 +38,5 @@ public class TagFunctions {
 			}
 		}
 		return tags;
-	}
-
-	public static void removeTag(String baseUrl, Map<String, String> params) throws IOException {
-		String response = UrlUtil.doPost(baseUrl, params);
-		Document responseXML = null;
-		try {
-			responseXML = XMLUtil.stringToDocument(response);
-		} catch (SAXException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-		if (!status.contains("ok")) {
-			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-			if (errorNode != null) {
-				WSErrorBuilder eb = new WSErrorBuilder();
-				throw eb.build(params.get("method"), errorNode);
-			}
-		}
-	}
-
-	public static Artist[] topArtistsForTag(String baseUrl, Map<String, String> params) throws IOException, WSError {
-		String response = UrlUtil.doGet(baseUrl, params);
-
-		Document responseXML = null;
-		try {
-			responseXML = XMLUtil.stringToDocument(response);
-		} catch (SAXException e) {
-			throw new IOException(e.getMessage());
-		}
-
-		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
-		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
-		if (!status.contains("ok")) {
-			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
-			if (errorNode != null) {
-				WSErrorBuilder eb = new WSErrorBuilder();
-				throw eb.build(params.get("method"), errorNode);
-			}
-			return null;
-		} else {
-			Node artistMatches = XMLUtil.findNamedElementNode(lfmNode, "topartists");
-
-			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
-			ArtistBuilder artistBuilder = new ArtistBuilder();
-			List<Artist> artists = new ArrayList<Artist>();
-			for (Node node : elnodes) {
-				Artist artistObject = artistBuilder.build(node);
-				artists.add(artistObject);
-				if (artists.size() > 3)
-					break;
-			}
-			return artists.toArray(new Artist[artists.size()]);
-		}
 	}
 }

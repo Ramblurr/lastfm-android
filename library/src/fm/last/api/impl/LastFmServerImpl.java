@@ -22,10 +22,18 @@ package fm.last.api.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import android.util.Log;
 
 import fm.last.api.Album;
 import fm.last.api.Artist;
@@ -42,6 +50,9 @@ import fm.last.api.Tasteometer;
 import fm.last.api.Track;
 import fm.last.api.User;
 import fm.last.api.WSError;
+import fm.last.util.UrlUtil;
+import fm.last.util.XMLUtil;
+import fm.last.xml.XMLBuilder;
 
 /**
  * An implementation of LastFmServer
@@ -53,6 +64,90 @@ final class LastFmServerImpl implements LastFmServer {
 	private String api_key;
 	private String shared_secret;
 	private String baseUrl;
+
+	private class Parser<T> {
+		@SuppressWarnings("unchecked")
+		public T getItem(String baseUrl, Map<String, String> params, String nodeName, XMLBuilder<?> builder) throws IOException, WSError {
+			String response = UrlUtil.doGet(baseUrl, params);
+
+			Document responseXML = null;
+			try {
+				responseXML = XMLUtil.stringToDocument(response);
+			} catch (SAXException e) {
+				throw new IOException(e.getMessage());
+			}
+
+			Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+			String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+			if (!status.contains("ok")) {
+				Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+				if (errorNode != null) {
+					WSErrorBuilder eb = new WSErrorBuilder();
+					throw eb.build(params.get("method"), errorNode);
+				}
+				return null;
+			} else {
+				Node itemNode = XMLUtil.findNamedElementNode(lfmNode, nodeName);
+
+				return (T)builder.build(itemNode);
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		public List<T> getList(String baseUrl, Map<String, String> params, String nodeName, String elementName, XMLBuilder<?> builder) throws IOException, WSError {
+			String response = UrlUtil.doGet(baseUrl, params);
+
+			Document responseXML = null;
+			try {
+				responseXML = XMLUtil.stringToDocument(response);
+			} catch (SAXException e) {
+				throw new IOException(e.getMessage());
+			}
+
+			Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+			String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+			if (!status.contains("ok")) {
+				Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+				if (errorNode != null) {
+					WSErrorBuilder eb = new WSErrorBuilder();
+					throw eb.build(params.get("method"), errorNode);
+				}
+				return null;
+			} else {
+				Node baseNode = XMLUtil.findNamedElementNode(lfmNode, nodeName);
+
+				List<Node> elementNodes = XMLUtil.findNamedElementNodes(baseNode, elementName);
+				ArrayList<T> items = new ArrayList<T>();
+				for (Node itemNode : elementNodes) {
+					items.add((T)builder.build(itemNode));
+				}
+
+				return items;
+			}
+		}
+	}
+
+	public void post(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			Log.e("Last.fm", "Bad XML: " + response);
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+		}
+	}
 
 	LastFmServerImpl(String baseUrl, String api_key, String shared_secret) {
 		this.baseUrl = baseUrl;
@@ -105,7 +200,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (limit != null) {
 			params.put("limit", limit);
 		}
-		return ArtistFunctions.getSimilarArtists(baseUrl, params);
+		List<Artist> artists = new Parser<Artist>().getList(baseUrl, params, "similarartists", "artist", new ArtistBuilder());
+		return artists.toArray(new Artist[artists.size()]);
 	}
 
 	public Artist[] searchForArtist(String artist) throws IOException, WSError {
@@ -113,7 +209,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (artist != null) {
 			params.put("artist", artist);
 		}
-		return ArtistFunctions.searchForArtist(baseUrl, params);
+		return SearchFunctions.searchForArtist(baseUrl, params);
 	}
 
 	public Tag[] searchForTag(String tag) throws IOException, WSError {
@@ -121,7 +217,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (tag != null) {
 			params.put("tag", tag);
 		}
-		return TagFunctions.searchForTag(baseUrl, params);
+		return SearchFunctions.searchForTag(baseUrl, params);
 	}
 
 	public Track[] searchForTrack(String track) throws IOException, WSError {
@@ -129,7 +225,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (track != null) {
 			params.put("track", track);
 		}
-		return TrackFunctions.searchForTrack(baseUrl, params);
+		return SearchFunctions.searchForTrack(baseUrl, params);
 	}
 
 	public Serializable[] multiSearch(String query) throws IOException, WSError {
@@ -165,7 +261,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		return TrackFunctions.getTrackInfo(baseUrl, params);
+		return new Parser<Track>().getItem(baseUrl, params, "track", new TrackBuilder());
 	}
 
 	public Session getMobileSession(String username, String authToken) throws IOException, WSError {
@@ -178,8 +274,8 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		params.put("method", "auth.getMobileSession");
 		params.put("api_key", api_key);
-		signParams(params); // apparently unrequired
-		return AuthFunctions.getMobileSession(baseUrl, params);
+		signParams(params);
+		return new Parser<Session>().getItem(baseUrl, params, "session", new SessionBuilder());
 	}
 	
 	public SessionInfo getSessionInfo(String sk) throws IOException, WSError {
@@ -188,7 +284,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 			signParams(params);
 		}
-		return AuthFunctions.getSessionInfo(baseUrl, params);
+		return new Parser<SessionInfo>().getItem(baseUrl, params, "application", new SessionInfoBuilder());
 	}
 
 	public Station tuneToStation(String station, String sk, String lang) throws IOException, WSError {
@@ -232,7 +328,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 			signParams(params);
 		}
-		return UserFunctions.getUserInfo(baseUrl, params);
+		return new Parser<User>().getItem(baseUrl, params, "user", new UserBuilder());
 	}
 
 	public Tag[] getTrackTopTags(String artist, String track, String mbid) throws IOException, WSError {
@@ -246,7 +342,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		return TrackFunctions.getTrackTopTags(baseUrl, params);
+		List<Tag> tags = new Parser<Tag>().getList(baseUrl, params, "toptags", "tag", new TagBuilder());
+		return tags.toArray(new Tag[tags.size()]);
 	}
 
 	public Tag[] getArtistTopTags(String artist, String mbid) throws IOException, WSError {
@@ -257,7 +354,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		return TrackFunctions.getTrackTopTags(baseUrl, params);
+		List<Tag> tags = new Parser<Tag>().getList(baseUrl, params, "toptags", "tag", new TagBuilder());
+		return tags.toArray(new Tag[tags.size()]);
 	}
 
 	public Tag[] getUserTopTags(String user, Integer limit) throws IOException, WSError {
@@ -268,7 +366,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (limit != null) {
 			params.put("limit", limit.toString());
 		}
-		return UserFunctions.getUserTopTags(baseUrl, params);
+		List<Tag> tags = new Parser<Tag>().getList(baseUrl, params, "toptags", "tag", new TagBuilder());
+		return tags.toArray(new Tag[tags.size()]);
 	}
 
 	public Tag[] getTrackTags(String artist, String track, String sk) throws IOException, WSError {
@@ -283,7 +382,8 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		return TrackFunctions.getTrackTags(baseUrl, params);
+		List<Tag> tags = new Parser<Tag>().getList(baseUrl, params, "tags", "tag", new TagBuilder());
+		return tags.toArray(new Tag[tags.size()]);
 	}
 
 	public Tag[] getArtistTags(String artist, String sk) throws IOException, WSError {
@@ -295,7 +395,8 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		return TrackFunctions.getTrackTags(baseUrl, params);
+		List<Tag> tags = new Parser<Tag>().getList(baseUrl, params, "tags", "tag", new TagBuilder());
+		return tags.toArray(new Tag[tags.size()]);
 	}
 
 	public void addTrackTags(String artist, String track, String[] tag, String sk) throws IOException, WSError {
@@ -313,7 +414,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		TrackFunctions.addTrackTags(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void removeTrackTag(String artist, String track, String tag, String sk) throws IOException, WSError {
@@ -331,7 +432,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		TrackFunctions.removeTrackTag(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void addArtistTags(String artist, String[] tag, String sk) throws IOException, WSError {
@@ -346,7 +447,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		TrackFunctions.addTrackTags(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void removeArtistTag(String artist, String tag, String sk) throws IOException, WSError {
@@ -361,7 +462,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("sk", sk);
 		}
 		signParams(params);
-		TrackFunctions.removeTrackTag(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public Artist getArtistInfo(String artist, String mbid, String lang, String username) throws IOException, WSError {
@@ -378,7 +479,7 @@ final class LastFmServerImpl implements LastFmServer {
 		if (username != null) {
 			params.put("username", username);
 		}
-		return ArtistFunctions.getArtistInfo(baseUrl, params);
+		return new Parser<Artist>().getItem(baseUrl, params, "artist", new ArtistBuilder());
 	}
 
 	public User[] getTrackTopFans(String track, String artist, String mbid) throws IOException, WSError {
@@ -392,7 +493,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		return TrackFunctions.getTrackTopFans(baseUrl, params);
+		List<User> users = new Parser<User>().getList(baseUrl, params, "topfans", "user", new UserBuilder());
+		return users.toArray(new User[users.size()]);
 	}
 
 	public User[] getArtistTopFans(String artist, String mbid) throws IOException, WSError {
@@ -403,7 +505,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (mbid != null) {
 			params.put("mbid", mbid);
 		}
-		return TrackFunctions.getTrackTopFans(baseUrl, params);
+		List<User> users = new Parser<User>().getList(baseUrl, params, "topfans", "user", new UserBuilder());
+		return users.toArray(new User[users.size()]);
 	}
 
 	public Event[] getArtistEvents(String artist) throws IOException, WSError {
@@ -411,7 +514,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (artist != null) {
 			params.put("artist", artist);
 		}
-		return ArtistFunctions.getArtistEvents(baseUrl, params);
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
 	}
 
 	public Event[] getUserEvents(String user) throws IOException, WSError {
@@ -419,7 +523,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (user != null) {
 			params.put("user", user);
 		}
-		return UserFunctions.getUserEvents(baseUrl, params);
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
 	}
 
 	public Event[] getUserFriendsEvents(String user) throws IOException, WSError {
@@ -427,7 +532,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (user != null) {
 			params.put("user", user);
 		}
-		return UserFunctions.getUserEvents(baseUrl, params);
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
 	}
 
 	public Event[] getUserRecommendedEvents(String user, String sk) throws IOException, WSError {
@@ -435,7 +541,8 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("user", user);
 		params.put("sk", sk);
 		signParams(params);
-		return UserFunctions.getUserEvents(baseUrl, params);
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
 	}
 
 	public Event[] getNearbyEvents(String latitude, String longitude) throws IOException, WSError {
@@ -443,7 +550,8 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("lat", latitude);
 		params.put("long", longitude);
 		params.put("distance", "50");
-		return UserFunctions.getUserEvents(baseUrl, params);
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
 	}
 
 	public void attendEvent(String event, String status, String sk) throws IOException, WSError {
@@ -452,7 +560,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("status", status);
 		params.put("sk", sk);
 		signParams(params);
-		UserFunctions.attendEvent(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public Artist[] getUserTopArtists(String user, String period) throws IOException {
@@ -463,7 +571,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (period != null) {
 			params.put("period", period);
 		}
-		return UserFunctions.getUserTopArtists(baseUrl, params);
+		List<Artist> artists = new Parser<Artist>().getList(baseUrl, params, "topartists", "artist", new ArtistBuilder());
+		return artists.toArray(new Artist[artists.size()]);
 	}
 
 	public Artist[] getUserRecommendedArtists(String user, String sk) throws IOException {
@@ -473,7 +582,8 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		params.put("sk", sk);
 		signParams(params);
-		return UserFunctions.getUserRecommendedArtists(baseUrl, params);
+		List<Artist> artists = new Parser<Artist>().getList(baseUrl, params, "recommendations", "artist", new ArtistBuilder());
+		return artists.toArray(new Artist[artists.size()]);
 	}
 
 	public Album[] getUserTopAlbums(String user, String period) throws IOException {
@@ -484,7 +594,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (period != null) {
 			params.put("period", period);
 		}
-		return UserFunctions.getUserTopAlbums(baseUrl, params);
+		List<Album> albums = new Parser<Album>().getList(baseUrl, params, "topalbums", "album", new AlbumBuilder());
+		return albums.toArray(new Album[albums.size()]);
 	}
 
 	public Track[] getUserTopTracks(String user, String period) throws IOException {
@@ -495,7 +606,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (period != null) {
 			params.put("period", period);
 		}
-		return UserFunctions.getUserTopTracks(baseUrl, params);
+		List<Track> tracks = new Parser<Track>().getList(baseUrl, params, "toptracks", "track", new TrackBuilder());
+		return tracks.toArray(new Track[tracks.size()]);
 	}
 
 	public Track[] getUserRecentTracks(String user, String nowPlaying, int limit) throws IOException {
@@ -508,7 +620,8 @@ final class LastFmServerImpl implements LastFmServer {
 		if (limit > 0) {
 			params.put("limit", String.valueOf(limit));
 		}
-		return UserFunctions.getUserRecentTracks(baseUrl, params);
+		List<Track> tracks = new Parser<Track>().getList(baseUrl, params, "recenttracks", "track", new TrackBuilder());
+		return tracks.toArray(new Track[tracks.size()]);
 	}
 
 	public void libraryAddAlbum(String album, String sk) throws IOException {
@@ -516,7 +629,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("album", album);
 		params.put("sk", sk);
 		signParams(params);
-		LibraryFunctions.addAlbum(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void libraryAddArtist(String artist, String sk) throws IOException {
@@ -524,8 +637,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("artist", artist);
 		params.put("sk", sk);
 		signParams(params);
-		LibraryFunctions.addArtist(baseUrl, params);
-
+		post(baseUrl, params);
 	}
 
 	public void libraryAddTrack(String track, String sk) throws IOException {
@@ -533,7 +645,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("track", track);
 		params.put("sk", sk);
 		signParams(params);
-		LibraryFunctions.addTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public Tasteometer tasteometerCompare(String user1, String user2, int limit) throws IOException {
@@ -550,7 +662,8 @@ final class LastFmServerImpl implements LastFmServer {
 	public RadioPlayList[] getUserPlaylists(String username) throws IOException {
 		Map<String, String> params = createParams("user.getPlaylists");
 		params.put("user", username);
-		return UserFunctions.getUserPlaylists(baseUrl, params);
+		List<RadioPlayList> playlists = new Parser<RadioPlayList>().getList(baseUrl, params, "playlists", "playlist", new RadioPlayListBuilder());
+		return playlists.toArray(new RadioPlayList[playlists.size()]);
 	}
 
 	public Album getAlbumInfo(String artist, String album) throws IOException {
@@ -559,7 +672,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("artist", artist);
 		if (album != null)
 			params.put("album", album);
-		return AlbumFunctions.getAlbumInfo(baseUrl, params);
+		return new Parser<Album>().getItem(baseUrl, params, "album", new AlbumBuilder());
 	}
 
 	public void loveTrack(String artist, String track, String sk) throws IOException {
@@ -568,7 +681,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("track", track);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.loveTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void banTrack(String artist, String track, String sk) throws IOException {
@@ -577,7 +690,7 @@ final class LastFmServerImpl implements LastFmServer {
 		params.put("track", track);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.banTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 	
 	public void scrobbleTrack(String artist, String track, String album, long timestamp, int duration, String context, String streamid, String sk) throws IOException {
@@ -593,7 +706,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("duration", String.valueOf(duration));
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.scrobbleTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 	
 	public void updateNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException {
@@ -606,7 +719,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("duration", String.valueOf(duration));
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.updateNowPlaying(baseUrl, params);
+		post(baseUrl, params);
 	}
 	
 	public void removeNowPlaying(String artist, String track, String album, int duration, String context, String sk) throws IOException {
@@ -619,7 +732,7 @@ final class LastFmServerImpl implements LastFmServer {
 			params.put("duration", String.valueOf(duration));
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.updateNowPlaying(baseUrl, params);
+		post(baseUrl, params);
 	}
 	
 	/*track[i] (Required) : The track name.
@@ -641,7 +754,7 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("recipient", recipient);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.shareTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void shareArtist(String artist, String recipient, String sk) throws IOException {
@@ -650,7 +763,7 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("recipient", recipient);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.shareTrack(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException {
@@ -660,7 +773,7 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("playlistID", playlistId);
 		params.put("sk", sk);
 		signParams(params);
-		TrackFunctions.addTrackToPlaylist(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 	public RadioPlayList[] createPlaylist(String title, String description, String sk) throws IOException {
@@ -669,8 +782,8 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("description", description);
 		params.put("sk", sk);
 		signParams(params);
-		// This returns the same XML response as user.getPlaylists
-		return UserFunctions.getUserPlaylists(baseUrl, params);
+		List<RadioPlayList> playlists = new Parser<RadioPlayList>().getList(baseUrl, params, "playlists", "playlist", new RadioPlayListBuilder());
+		return playlists.toArray(new RadioPlayList[playlists.size()]);
 	}
 
 	public Station[] getUserRecentStations(String user, String sk) throws IOException {
@@ -678,8 +791,8 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("user", user);
 		params.put("sk", sk);
 		signParams(params);
-		// This returns the same XML response as user.getPlaylists
-		return UserFunctions.getUserRecentStations(baseUrl, params);
+		List<Station> stations = new Parser<Station>().getList(baseUrl, params, "recentstations", "station", new StationBuilder());
+		return stations.toArray(new Station[stations.size()]);
 	}
 
 	public Station searchForStation(String station) throws IOException {
@@ -691,8 +804,8 @@ duration[i] (Optional) : The length of the track in seconds.
 	public Artist[] topArtistsForTag(String tag) throws IOException {
 		Map<String, String> params = createParams("tag.getTopArtists");
 		params.put("tag", tag);
-
-		return TagFunctions.topArtistsForTag(baseUrl, params);
+		List<Artist> artists = new Parser<Artist>().getList(baseUrl, params, "topartists", "artist", new ArtistBuilder());
+		return artists.toArray(new Artist[artists.size()]);
 	}
 
 	public void signUp(String username, String password, String email) throws IOException {
@@ -701,7 +814,7 @@ duration[i] (Optional) : The length of the track in seconds.
 		params.put("password", password);
 		params.put("email", email);
 		signParams(params);
-		UserFunctions.signUp(baseUrl, params);
+		post(baseUrl, params);
 	}
 
 }
