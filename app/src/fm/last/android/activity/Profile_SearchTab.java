@@ -29,12 +29,12 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import fm.last.android.utils.AsyncTaskEx;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -72,7 +72,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		mVoiceButton = (ImageButton)findViewById(R.id.voice);
 		// Check to see if a recognition activity is present
 		PackageManager pm = getPackageManager();
-		List activities = pm.queryIntentActivities(
+		List<ResolveInfo> activities = pm.queryIntentActivities(
 		  new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
 		if (activities.size() != 0) {
 			mVoiceButton.setOnClickListener(this);

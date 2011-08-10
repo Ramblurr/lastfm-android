@@ -372,6 +372,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		return mBinder;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void clearNotification() {
 		try {
 			Class types[] = { boolean.class };
@@ -396,6 +397,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void playingNotify() {
 
 		if (currentTrack == null || currentTrack.getTitle() == null || currentTrack.getCreator() == null)
@@ -426,6 +428,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void tuningNotify() {
 		String info = getString(R.string.playerservice_tuning);
 		if (currentStation != null) {

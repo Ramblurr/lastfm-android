@@ -27,11 +27,8 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
@@ -127,7 +124,9 @@ public class Event extends Activity {
 			}
 		});
 
-		if(((HashMap<String,String>)(getIntent().getSerializableExtra("lastfm.event.ticketurls"))).size() > 0) {
+		@SuppressWarnings("unchecked")
+		HashMap<String, String> ticketMap = (HashMap<String,String>)(getIntent().getSerializableExtra("lastfm.event.ticketurls"));
+		if(ticketMap.size() > 0) {
 			findViewById(R.id.buytickets).setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					final Intent myIntent = new Intent(Event.this, TicketProviderPopup.class);
@@ -220,8 +219,6 @@ public class Event extends Activity {
 		intent.putExtra("lastfm.event.day", new SimpleDateFormat("d").format(event.getStartDate()));
 		intent.putExtra("lastfm.event.status", event.getStatus());
 		intent.putExtra("lastfm.event.ticketurls", (Serializable)event.getTicketUrls());
-		Log.i("LastFm", "ticket URL count: " + event.getTicketUrls().size());
-		Log.i("LastFm", "ticket URL count from intent: " + ((HashMap<String,String>)(intent.getSerializableExtra("lastfm.event.ticketurls"))).size());
 		return intent;
 	}
 }

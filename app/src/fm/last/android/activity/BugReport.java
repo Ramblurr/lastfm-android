@@ -10,7 +10,6 @@ import java.util.zip.ZipOutputStream;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;

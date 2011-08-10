@@ -22,7 +22,6 @@ package fm.last.api;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.List;
 
 public interface LastFmServer {
 	/**

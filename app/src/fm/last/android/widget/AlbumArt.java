@@ -3,8 +3,6 @@
  */
 package fm.last.android.widget;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.content.Context;

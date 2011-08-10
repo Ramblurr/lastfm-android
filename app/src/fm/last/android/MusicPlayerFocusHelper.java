@@ -95,7 +95,7 @@ public class MusicPlayerFocusHelper {
         initializeStaticCompat();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes" )
     static Class sClassOnAudioFocusChangeListener;
     static Method sMethodRequestAudioFocus;
     static Method sMethodAbandonAudioFocus;

@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
  * @author sam
  * 
  */
+@SuppressWarnings("unused")
 public class Amazon {
 	private static final String ACTION_EXTERNAL_EVENT = "com.amazon.mp3.action.EXTERNAL_EVENT";
 	private static final String TYPE_TOP_MUSIC_BROWSE = "com.amazon.mp3.type.TOP_MUSIC_BROWSE";

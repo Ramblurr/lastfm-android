@@ -9,27 +9,17 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import android.app.ListActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
-import android.widget.Toast;
-import fm.last.android.Amazon;
-import fm.last.android.AndroidLastFmServerFactory;
-import fm.last.android.LastFMApplication;
 import fm.last.android.R;
 import fm.last.android.adapter.ListAdapter;
 import fm.last.android.adapter.ListEntry;
-import fm.last.android.player.RadioPlayerService;
 import fm.last.android.utils.ImageCache;
-import fm.last.api.LastFmServer;
 
 /**
  * @author sam
@@ -38,6 +28,7 @@ import fm.last.api.LastFmServer;
 public class TicketProviderPopup extends ListActivity {
 	private HashMap<String, String> mTicketUrls;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onCreate(Bundle icicle) {
 		ListEntry entry;
@@ -55,7 +46,7 @@ public class TicketProviderPopup extends ListActivity {
 			Iterator<Entry<String, String>> itr = mTicketUrls.entrySet().iterator();
 			
 			while(itr.hasNext()) {
-				HashMap.Entry pairs = (HashMap.Entry)itr.next();
+				HashMap.Entry<String, String> pairs = (HashMap.Entry<String, String>)itr.next();
 				
 				entry = new ListEntry(R.drawable.shopping_cart_dark, R.drawable.shopping_cart_dark, (String)pairs.getKey());
 				iconifiedEntries.add(entry);

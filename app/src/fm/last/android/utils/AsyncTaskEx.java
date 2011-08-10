@@ -20,7 +20,6 @@ import android.os.Message;
 import android.os.Process;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.Callable;
@@ -193,7 +192,8 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
         };
 
         mFuture = new FutureTask<Result>(mWorker) {
-            @Override
+            @SuppressWarnings("unchecked")
+			@Override
             protected void done() {
                 Message message;
                 Result result = null;
@@ -268,7 +268,6 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
      * @see #onPreExecute
      * @see #doInBackground
      */
-    @SuppressWarnings({"UnusedDeclaration"})
     protected void onPostExecute(Result result) {
     }
 
@@ -281,7 +280,6 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
      * @see #publishProgress
      * @see #doInBackground
      */
-    @SuppressWarnings({"UnusedDeclaration"})
     protected void onProgressUpdate(Progress... values) {
     }
 
@@ -424,8 +422,8 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
     }
 
     private static class InternalHandler extends Handler {
-        @SuppressWarnings({"unchecked", "RawUseOfParameterizedType"})
-        @Override
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+		@Override
         public void handleMessage(Message msg) {
             AsyncTaskExResult result = (AsyncTaskExResult) msg.obj;
             switch (msg.what) {
@@ -447,12 +445,13 @@ public abstract class AsyncTaskEx<Params, Progress, Result> {
         Params[] mParams;
     }
 
-    @SuppressWarnings({"RawUseOfParameterizedType"})
     private static class AsyncTaskExResult<Data> {
-        final AsyncTaskEx mTask;
+        @SuppressWarnings("rawtypes")
+		final AsyncTaskEx mTask;
         final Data[] mData;
 
-        AsyncTaskExResult(AsyncTaskEx task, Data... data) {
+        @SuppressWarnings("rawtypes")
+		AsyncTaskExResult(AsyncTaskEx task, Data... data) {
             mTask = task;
             mData = data;
         }

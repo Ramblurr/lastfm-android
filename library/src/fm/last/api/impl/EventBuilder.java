@@ -30,8 +30,6 @@ import java.util.Locale;
 
 import org.w3c.dom.Node;
 
-import android.util.Log;
-
 import fm.last.api.Event;
 import fm.last.api.ImageUrl;
 import fm.last.api.Venue;

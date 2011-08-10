@@ -8,7 +8,6 @@ import fm.last.android.LastFm;
 import fm.last.android.R;
 import fm.last.android.activity.AccountAccessPrompt;
 import fm.last.android.activity.AccountFailActivity;
-import fm.last.android.activity.SyncPrompt;
 import fm.last.api.MD5;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

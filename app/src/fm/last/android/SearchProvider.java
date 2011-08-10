@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -117,7 +116,7 @@ public class SearchProvider extends ContentProvider {
 			                    artist.getImages().length == 0 ? "" : artist.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Album.class)) {
-		        		Album album = (Album)results[i];
+		        		//Album album = (Album)results[i];
 		        		
 		        		//TODO: We need an album display
 		        	} else if(results[i].getClass().equals(Track.class)) {
