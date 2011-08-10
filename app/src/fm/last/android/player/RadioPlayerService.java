@@ -737,7 +737,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				e.printStackTrace();
 			}
 			mState = STATE_PAUSED;
-			RadioWidgetProvider.updateAppWidget_playing(this, currentTrack.getTitle(), currentTrack.getCreator(), 0, 0, false, false, true);
+			if(currentTrack != null)
+				RadioWidgetProvider.updateAppWidget_playing(this, currentTrack.getTitle(), currentTrack.getCreator(), 0, 0, false, false, true);
+			else
+				RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
 			serializeCurrentStation();
 			releaseLocks();
 			try {
