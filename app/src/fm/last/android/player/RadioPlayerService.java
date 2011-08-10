@@ -625,6 +625,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			logger.severe(e.toString());
 		} catch (IOException e) {
 			logger.severe(e.getMessage());
+			mOnErrorListener.onError(p, 0, 0);
 		}
 	}
 
@@ -767,6 +768,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				nextSong();
 				e.printStackTrace();
 			}
+			mp.setOnCompletionListener(mOnCompletionListener);
+			mp.setOnErrorListener(mOnErrorListener);
 			if (getFileStreamPath("player.dat").exists())
 				deleteFile("player.dat");
 			try {
