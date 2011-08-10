@@ -586,11 +586,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 
 	private void playTrack(RadioTrack track, MediaPlayer p) {
 		try {
-			if (mState == STATE_STOPPED || mState == STATE_PREPARING) {
-				logger.severe("playTrack() called from wrong state!");
-				return;
-			}
-
 			if (p == mp) {
 				currentTrack = track;
 				RadioWidgetProvider.updateAppWidget_playing(this, track.getTitle(), track.getCreator(), 0, 0, true, track.getLoved(), false);
@@ -598,6 +593,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			if(track.getLocationUrl().contains("play.last.fm")) {
 				URL newURL = UrlUtil.getRedirectedUrl(new URL(track.getLocationUrl()));
 				track.setLocationUrl(newURL.toString());
+			}
+			if (mState == STATE_STOPPED || mState == STATE_PAUSED || mState == STATE_PREPARING) {
+				logger.severe("playTrack() called from wrong state!");
+				return;
 			}
 			logger.info("Streaming: " + track.getLocationUrl());
 			p.reset();
@@ -692,8 +691,10 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			if(mp == null) {
 				mp = new MediaPlayer();
 			}
-			playTrack(currentQueue.poll(), mp);
-			notifyChange(META_CHANGED);
+			if(mState == STATE_SKIPPING)
+				playTrack(currentQueue.poll(), mp);
+			if(mState == STATE_PREPARING)
+				notifyChange(META_CHANGED);
 		} else {
 			// we ran out of tracks, display a NEC error and stop
 			clearNotification();
@@ -710,6 +711,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	}
 
 	private void pause() {
+		logger.info("Pause()" + mState);
 		if (mState == STATE_STOPPED || mState == STATE_ERROR || currentStation == null)
 			return;
 
@@ -717,15 +719,24 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			clearNotification();
 			notifyChange(PLAYBACK_STATE_CHANGED);
 			notifyChange(ScrobblerService.PLAYBACK_PAUSED);
+			mp.setOnErrorListener(null);
+			mp.setOnCompletionListener(null);
 			try {
 				mTrackPosition = mp.getCurrentPosition();
-				mp.pause();
+				if(mp.isPlaying()) {
+					mp.pause();
+				} else {
+					mp.reset();
+					mp.release();
+					mp = null;
+					mTrackPosition = 0;
+				}
 				mState = STATE_PAUSED;
-				releaseLocks();
-				serializeCurrentStation();
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't pause
 				e.printStackTrace();
 			}
+			serializeCurrentStation();
+			releaseLocks();
 			try {
 				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
 						"Pause", // Action
@@ -741,8 +752,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			playingNotify();
 			notifyChange(ScrobblerService.META_CHANGED);
 			try {
-				if(currentTrack != null && mTrackPosition > 0) {
+				if(currentTrack != null) {
 					if(mp == null) {
+						mState = STATE_SKIPPING;
 						mp = new MediaPlayer();
 						playTrack(currentTrack, mp);
 					} else {
@@ -750,11 +762,13 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 						mState = STATE_PLAYING;
 					}
 				}
-				if (getFileStreamPath("player.dat").exists())
-					deleteFile("player.dat");
 			} catch (Exception e) { //Sometimes the MediaPlayer is in a state where it can't resume
+				mState = STATE_SKIPPING;
+				nextSong();
 				e.printStackTrace();
 			}
+			if (getFileStreamPath("player.dat").exists())
+				deleteFile("player.dat");
 			try {
 				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
 						"Resume", // Action
