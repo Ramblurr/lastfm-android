@@ -112,7 +112,7 @@ public class SearchProvider extends ContentProvider {
 			                    id++,                  // _id
 			                    artist.getName(),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-			                    Uri.parse("http://www.last.fm/music/"+artist.getName()),           // intent_data (included when clicking on item)
+			                    Uri.parse("http://www.last.fm/music/"+artist.getName().replace("/", "%2f")),           // intent_data (included when clicking on item)
 			                    artist.getImages().length == 0 ? "" : artist.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Album.class)) {
@@ -126,7 +126,7 @@ public class SearchProvider extends ContentProvider {
 			                    id++,                  // _id
 			                    track.getArtist().getName() + " - " + track.getName(),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_viewinfo),     // text2
-			                    Uri.parse("http://www.last.fm/music/"+Uri.encode(track.getArtist().getName())+"/_/"+track.getName()),           // intent_data (included when clicking on item)
+			                    Uri.parse("http://www.last.fm/music/"+Uri.encode(track.getArtist().getName().replace("/", "%2f"))+"/_/"+track.getName().replace("/", "%2f")),           // intent_data (included when clicking on item)
 			                    track.getImages().length == 0 ? "" : track.getURLforImageSize("extralarge")
 			            });
 		        	} else if(results[i].getClass().equals(Tag.class)) {
@@ -134,7 +134,7 @@ public class SearchProvider extends ContentProvider {
 
 			            cursor.addRow(new Object[] {
 			                    id++,                  // _id
-			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tag.getName()),           // text1
+			                    LastFMApplication.getInstance().getString(R.string.newstation_tagradio,tag.getName().replace("/", "%2f")),           // text1
 			                    LastFMApplication.getInstance().getString(R.string.action_tagradio),     // text2
 			                    Uri.parse("lastfm://globaltags/"+tag.getName()),           // intent_data (included when clicking on item)
 			                    -1

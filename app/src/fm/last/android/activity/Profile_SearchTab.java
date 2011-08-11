@@ -172,7 +172,7 @@ public class Profile_SearchTab extends ListActivity implements OnClickListener, 
 		@Override
 		public ArrayList<ListEntry> doInBackground(Void... params) {
 			try {
-				Cursor managedCursor = managedQuery(Uri.withAppendedPath(SearchProvider.SUGGESTIONS_URI,mSearchText.getText().toString()),null,null,null,null);
+				Cursor managedCursor = managedQuery(Uri.withAppendedPath(SearchProvider.SUGGESTIONS_URI,Uri.encode(mSearchText.getText().toString()).replace("/", "%2f")),null,null,null,null);
 				if (managedCursor.getCount() == 0)
 					return null;
 				
