@@ -1,3 +1,4 @@
+package fm.last.android;
 /***************************************************************************
  *   Copyright 2005-2009 Last.fm Ltd.                                      *
  *   Portions contributed by Casey Link, Lukasz Wisniewski,                *
@@ -18,7 +19,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.         *
  ***************************************************************************/
-package fm.last.android;
+
 
 import fm.last.api.LastFmServer;
 import fm.last.api.LastFmServerFactory;
@@ -26,8 +27,10 @@ import fm.last.api.LastFmServerFactory;
 public class AndroidLastFmServerFactory {
 	private static final String API_KEY = PrivateAPIKey.KEY;
 	private static final String API_SECRET = PrivateAPIKey.SECRET;
-	private static final String XMLRPC_ROOT_URL = "https://ws.audioscrobbler.com/2.0/";
+	private static final String XMLRPC_ROOT_URL = "http://ws.audioscrobbler.com/2.0/";
+	private static final String XMLRPC_ROOT_URL_SECURE = "https://ws.audioscrobbler.com/2.0/";
 	private static LastFmServer server;
+	private static LastFmServer secureServer;
 
 	private AndroidLastFmServerFactory() {
 	}
@@ -37,6 +40,13 @@ public class AndroidLastFmServerFactory {
 			server = LastFmServerFactory.getServer(XMLRPC_ROOT_URL, API_KEY, API_SECRET);
 		}
 		return server;
+	}
+
+	public static LastFmServer getSecureServer() {
+		if (secureServer == null) {
+			secureServer = LastFmServerFactory.getServer(XMLRPC_ROOT_URL_SECURE, API_KEY, API_SECRET);
+		}
+		return secureServer;
 	}
 
 }

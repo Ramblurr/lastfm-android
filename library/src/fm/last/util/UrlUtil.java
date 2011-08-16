@@ -32,8 +32,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -54,6 +63,43 @@ public class UrlUtil {
 
 	public static String useragent;
 
+	// always verify the host - dont check for certificate
+	final static HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+	        public boolean verify(String hostname, SSLSession session) {
+	                return true;
+	        }
+	};
+
+	/**
+	 * Trust every server - dont check for any certificate
+	 */
+	private static void trustAllHosts() {
+	        // Create a trust manager that does not validate certificate chains
+	        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+	                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+	                        return new java.security.cert.X509Certificate[] {};
+	                }
+
+	                public void checkClientTrusted(X509Certificate[] chain,
+	                                String authType) throws CertificateException {
+	                }
+
+	                public void checkServerTrusted(X509Certificate[] chain,
+	                                String authType) throws CertificateException {
+	                }
+	        } };
+
+	        // Install the all-trusting trust manager
+	        try {
+	                SSLContext sc = SSLContext.getInstance("TLS");
+	                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+	                HttpsURLConnection
+	                                .setDefaultSSLSocketFactory(sc.getSocketFactory());
+	        } catch (Exception e) {
+	                e.printStackTrace();
+	        }
+	}
+	
 	/** mainly sets the User-Agent we need */
 	private static void setUserAgent(HttpURLConnection conn) {
 		if (useragent != null)
@@ -61,7 +107,16 @@ public class UrlUtil {
 	}
 
 	public static URL getRedirectedUrl(URL url) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setInstanceFollowRedirects(false);
@@ -115,7 +170,16 @@ public class UrlUtil {
 	}
 
 	public static String doPost(URL url, InputStream stuffToPost, String contentType) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
@@ -161,7 +225,16 @@ public class UrlUtil {
 	}
 
 	public static String doGet(URL url) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("connection", "close");
@@ -192,7 +265,16 @@ public class UrlUtil {
 	 * @throws IOException
 	 */
 	public static byte[] doGetAndReturnBytes(URL url, int maxBytes) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("connection", "close");
@@ -246,7 +328,7 @@ public class UrlUtil {
 
 	private static String escape(String s) {
 		try {
-			return URLEncoder.encode(s, "UTF-8").replace("/", "%2f");
+			return URLEncoder.encode(s, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.e("UrlUtil", "Cannot find UTF-8 encoding - this is not very likely!");
 			return s;
@@ -255,23 +337,52 @@ public class UrlUtil {
 	}
 
 	public static String getXML(URL url) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestProperty("connection", "close");
 		conn.setRequestMethod("GET");
 		BufferedReader reader = null;
+		String output = null;
 		try {
 			reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-			return toString(reader);
+			output = toString(reader);
 		} finally {
 			if (reader != null) {
 				reader.close();
 			}
 		}
+		// Dispatch any queued Analytics data while we've got the network
+		// open
+		try {
+			GoogleAnalyticsTracker tracker = GoogleAnalyticsTracker.getInstance();
+			if(tracker != null)
+				tracker.dispatch();
+		} catch (Exception e1) {
+			//ignore any exceptions thrown by analytics
+		}
+		return output;
 	}
 
 	public static Bitmap getImage(URL url) throws IOException {
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+
+        if (url.getProtocol().toLowerCase().equals("https")) {
+            trustAllHosts();
+            HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
+            https.setHostnameVerifier(DO_NOT_VERIFY);
+            conn = https;
+        } else {
+        	conn = (HttpURLConnection) url.openConnection();
+        }
 		setUserAgent(conn);
 		conn.setRequestProperty("connection", "close");
 		conn.setRequestMethod("GET");

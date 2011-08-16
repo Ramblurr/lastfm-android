@@ -257,12 +257,13 @@ public class LastFm extends Activity {
 
 		Session login(String user, String pass) throws Exception, WSError {
 			user = user.toLowerCase().trim();
-			LastFmServer server = AndroidLastFmServerFactory.getServer();
+			LastFmServer server = AndroidLastFmServerFactory.getSecureServer();
 			String md5Password = MD5.getInstance().hash(pass);
 			String authToken = MD5.getInstance().hash(user + md5Password);
 			Session session = server.getMobileSession(user, authToken);
 			if (session == null)
 				throw (new WSError("auth.getMobileSession", "auth failure", WSError.ERROR_AuthenticationFailed));
+			server = AndroidLastFmServerFactory.getServer();
 			userSession = server.getSessionInfo(session.getKey());
 			if(Integer.decode(Build.VERSION.SDK) >= 6) {
 				Parcelable authResponse = null;

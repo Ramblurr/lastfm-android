@@ -68,8 +68,9 @@ final class LastFmServerImpl implements LastFmServer {
 	private class Parser<T> {
 		@SuppressWarnings("unchecked")
 		public T getItem(String baseUrl, Map<String, String> params, String nodeName, XMLBuilder<?> builder) throws IOException, WSError {
+			Log.i("Last.fm", "BaseURL: " + baseUrl);
 			String response = UrlUtil.doGet(baseUrl, params);
-
+			Log.i("Last.fm", "Response: " + response);
 			Document responseXML = null;
 			try {
 				responseXML = XMLUtil.stringToDocument(response);

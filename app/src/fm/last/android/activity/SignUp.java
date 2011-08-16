@@ -44,7 +44,7 @@ public class SignUp extends Activity {
 
 	protected OnClickListener mOnSignUpClickListener = new OnClickListener() {
 		public void onClick(View v) {
-			LastFmServer server = AndroidLastFmServerFactory.getServer();
+			LastFmServer server = AndroidLastFmServerFactory.getSecureServer();
 			try {
 				String username = mUsername.getText().toString();
 				String password = mPassword.getText().toString();
