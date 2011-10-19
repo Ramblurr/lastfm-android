@@ -36,7 +36,7 @@ interface IRadioPlayer {
 	String getArtistName();
 	String getAlbumName();
 	String getTrackName();
-	String getArtUrl();
+	Bitmap getArtwork();
 	long   getDuration();
 	boolean getLoved();
 	void setLoved(boolean loved);

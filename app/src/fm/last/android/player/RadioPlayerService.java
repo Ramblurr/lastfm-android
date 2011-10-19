@@ -48,8 +48,12 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
@@ -67,12 +71,11 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import fm.last.android.AndroidLastFmServerFactory;
 import fm.last.android.LastFMApplication;
 import fm.last.android.LastFMMediaButtonHandler;
 import fm.last.android.LastFm;
-import fm.last.android.MusicFocusable;
-import fm.last.android.MusicPlayerFocusHelper;
 import fm.last.android.R;
 import fm.last.android.RadioWidgetProvider;
 import fm.last.android.activity.Player;
@@ -80,6 +83,7 @@ import fm.last.android.activity.Profile;
 import fm.last.android.db.RecentStationsDao;
 import fm.last.android.scrobbler.ScrobblerService;
 import fm.last.android.utils.AsyncTaskEx;
+import fm.last.api.Album;
 import fm.last.api.LastFmServer;
 import fm.last.api.RadioPlayList;
 import fm.last.api.RadioTrack;
@@ -101,6 +105,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private String currentStationURL = null;
 	private PowerManager.WakeLock wakeLock;
 	private WifiManager.WifiLock wifiLock;
+	private AudioManager mAudioManager;
 	private boolean mUpdatedTrialCount;
 	public static final int STATE_STOPPED = 0;
 	public static final int STATE_TUNING = 1;
@@ -121,12 +126,15 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 	private boolean lostDataConnection = false;
 	private static final int NOTIFY_ID = 1337;
 	private FadeVolumeTask mFadeVolumeTask = null;
+    RemoteControlClientCompat mRemoteControlClientCompat;
+    private Bitmap mArtwork;
 
 	public static final String META_CHANGED = "fm.last.android.metachanged";
 	public static final String PLAYBACK_FINISHED = "fm.last.android.playbackcomplete";
 	public static final String PLAYBACK_STATE_CHANGED = "fm.last.android.playstatechanged";
 	public static final String STATION_CHANGED = "fm.last.android.stationchanged";
 	public static final String PLAYBACK_ERROR = "fm.last.android.playbackerror";
+	public static final String ARTWORK_AVAILABLE = "fm.last.android.artworkavailable";
 	public static final String UNKNOWN = "fm.last.android.unknown";
 
 	/**
@@ -183,6 +191,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wm.createWifiLock("Last.fm Player");
 
+		mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+		
 		if(!mFocusHelper.isSupported()) {
 
 			mTelephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
@@ -381,7 +391,16 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			method.invoke(this, args);
 		} catch (NoSuchMethodException e) {
 			nm.cancel(NOTIFY_ID);
-			setForeground(false);
+			Class types[] = { boolean.class };
+			Object args[] = { false };
+			Method method;
+			try {
+				method = Service.class.getMethod("setForeground", types);
+				method.invoke(this, args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} catch (Exception e) {
 		}
 		if (currentStation != null && mStationStartTime > 0) {
@@ -416,7 +435,16 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			method.invoke(this, args);
 		} catch (NoSuchMethodException e) {
 			nm.notify(NOTIFY_ID, notification);
-			setForeground(true);
+			Class types[] = { boolean.class };
+			Object args[] = { true };
+			Method method;
+			try {
+				method = Service.class.getMethod("setForeground", types);
+				method.invoke(this, args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} catch (Exception e) {
 		}
 
@@ -446,7 +474,16 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			method.invoke(this, args);
 		} catch (NoSuchMethodException e) {
 			nm.notify(NOTIFY_ID, notification);
-			setForeground(true);
+			Class types[] = { boolean.class };
+			Object args[] = { true };
+			Method method;
+			try {
+				method = Service.class.getMethod("setForeground", types);
+				method.invoke(this, args);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		} catch (Exception e) {
 		}
 		mStationStartTime = System.currentTimeMillis();
@@ -608,9 +645,44 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			p.setAudioStreamType(AudioManager.STREAM_MUSIC);
 			p.setDataSource(track.getLocationUrl());
 			
+			new LoadAlbumArtTask().execute((Void)null);
+			
 	        if (mFocusHelper.isSupported())
 	            mFocusHelper.requestMusicFocus();
-	        
+
+            // Use the remote control APIs (if available) to set the playback state
+
+            if (mRemoteControlClientCompat == null) {
+                Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                intent.setComponent(new ComponentName(this, LastFMMediaButtonHandler.class));
+                mRemoteControlClientCompat = new RemoteControlClientCompat(
+                        PendingIntent.getBroadcast(this /*context*/,
+                                0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/));
+                RemoteControlHelper.registerRemoteControlClient(mAudioManager,
+                        mRemoteControlClientCompat);
+            }
+
+            mRemoteControlClientCompat.setPlaybackState(
+                    RemoteControlClient.PLAYSTATE_PLAYING);
+
+            mRemoteControlClientCompat.setTransportControlFlags(
+                    RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+                    RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
+                    RemoteControlClient.FLAG_KEY_MEDIA_NEXT |
+                    RemoteControlClient.FLAG_KEY_MEDIA_STOP);
+
+            // Update the remote controls
+            mRemoteControlClientCompat.editMetadata(true)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, track.getCreator())
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, track.getAlbum())
+                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, track.getTitle())
+                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
+                            track.getDuration())
+                    .putBitmap(
+                            RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
+                            mArtwork)
+                    .apply();
+            
 			// We do this because there has been bugs in our phonecall fade code
 			// that resulted in the music never becoming audible again after a
 			// call.
@@ -651,6 +723,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 		
         if (mFocusHelper.isSupported())
             mFocusHelper.abandonMusicFocus();
+        if (mRemoteControlClientCompat != null)
+            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
         
 		stopSelf();
 	}
@@ -743,6 +817,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 				RadioWidgetProvider.updateAppWidget_idle(this, currentStation.getName(), false);
 			serializeCurrentStation();
 			releaseLocks();
+	        if (mRemoteControlClientCompat != null)
+	            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
 			try {
 				LastFMApplication.getInstance().tracker.trackEvent("Radio", // Category
 						"Pause", // Action
@@ -778,6 +854,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			}
 			mp.setOnCompletionListener(mOnCompletionListener);
 			mp.setOnErrorListener(mOnErrorListener);
+	        if (mRemoteControlClientCompat != null)
+	            mRemoteControlClientCompat.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
 			if (getFileStreamPath("player.dat").exists())
 				deleteFile("player.dat");
 			try {
@@ -993,7 +1071,7 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			currentStationURL = url;
 			notifyChange(STATION_CHANGED);
 			RecentStationsDao.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
-            registerMediaButtonEventReceiverCompat((AudioManager) getSystemService(Context.AUDIO_SERVICE), 
+            registerMediaButtonEventReceiverCompat(mAudioManager, 
             		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 		} else {
 			clearNotification();
@@ -1003,6 +1081,89 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			stopSelf();
 		}
 	}
+	
+	private class LoadAlbumArtTask extends AsyncTaskEx<Void, Void, Boolean> {
+		String artistName;
+		String albumName;
+		Bitmap art;
+		
+		@Override
+		public void onPreExecute() {
+			mArtwork = BitmapFactory.decodeResource(getResources(), R.drawable.no_artwork);
+			artistName = currentTrack.getCreator();
+			albumName = currentTrack.getAlbum();
+			logger.info("Fetching artwork");
+		}
+
+		@Override
+		public Boolean doInBackground(Void... params) {
+			String artUrl = "";
+			Album album = null;
+			boolean success = false;
+
+			artUrl = currentTrack.getImageUrl();
+
+			try {
+				LastFmServer server = AndroidLastFmServerFactory.getServer();
+				if (!artistName.equals(RadioPlayerService.UNKNOWN) && albumName != null && albumName.length() > 0) {
+					album = server.getAlbumInfo(artistName, albumName);
+					if (album != null) {
+						DisplayMetrics metrics = new DisplayMetrics();
+
+						android.view.WindowManager wm = (android.view.WindowManager)getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+						wm.getDefaultDisplay().getMetrics(metrics);
+						int width = metrics.widthPixels;
+						if(metrics.heightPixels < width)
+							width = metrics.heightPixels;
+						
+						if(width > 320)
+							artUrl = album.getURLforImageSize("mega");
+						else
+							artUrl = album.getURLforImageSize("extralarge");
+					}
+				}
+				art = UrlUtil.getImage(new URL(artUrl));
+				success = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			} catch (WSError e) {
+			} catch (OutOfMemoryError e) {
+				artUrl = album.getURLforImageSize("extralarge");
+				try {
+					art = UrlUtil.getImage(new URL(artUrl));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (Error e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				success = true;
+			}
+			return success;
+		}
+
+		@Override
+		public void onPostExecute(Boolean result) {
+			if(result && currentTrack != null && currentTrack.getAlbum().equals(albumName) && currentTrack.getCreator().equals(artistName)) {
+				mArtwork = art;
+	            // Update the remote controls
+	            mRemoteControlClientCompat.editMetadata(true)
+	                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, currentTrack.getCreator())
+	                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, currentTrack.getAlbum())
+	                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, currentTrack.getTitle())
+	                    .putLong(MediaMetadataRetriever.METADATA_KEY_DURATION,
+	                    		currentTrack.getDuration())
+	                    .putBitmap(
+	                            RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
+	                            mArtwork)
+	                    .apply();
+	            logger.info("Album art updated");
+				notifyChange(ARTWORK_AVAILABLE);
+			}
+		}
+	}
+
 	
 	private class TuneRadioTask extends AsyncTaskEx<Void, Void, Void> {
 		String mStationURL = "";
@@ -1198,11 +1359,8 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			return 0;
 		}
 
-		public String getArtUrl() throws RemoteException {
-			if (currentTrack != null) {
-				return currentTrack.getImageUrl();
-			} else
-				return UNKNOWN;
+		public Bitmap getArtwork() throws RemoteException {
+			return mArtwork;
 		}
 
 		public String getStationName() throws RemoteException {

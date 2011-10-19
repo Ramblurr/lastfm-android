@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="/LastFmAPI/libs/libGoogleAnalytics.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/LastFmAPI"/>
-	<classpathentry kind="src" path="LastFmAPI_src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

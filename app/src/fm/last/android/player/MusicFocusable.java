@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fm.last.android;
+package fm.last.android.player;
 
 public interface MusicFocusable {
     public void focusGained();

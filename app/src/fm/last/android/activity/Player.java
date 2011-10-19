@@ -45,8 +45,6 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -67,7 +65,6 @@ import fm.last.android.player.IRadioPlayer;
 import fm.last.android.player.RadioPlayerService;
 import fm.last.android.widget.AdArea;
 import fm.last.android.widget.AlbumArt;
-import fm.last.api.Album;
 import fm.last.api.Event;
 import fm.last.api.LastFmServer;
 import fm.last.api.Station;
@@ -95,7 +92,6 @@ public class Player extends Activity {
 
 	private String mCachedArtist = null;
 	private String mCachedTrack = null;
-	private Bitmap mCachedBitmap = null;
 
 	private static final int REFRESH = 1;
 
@@ -198,6 +194,7 @@ public class Player extends Activity {
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_STATE_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.STATION_CHANGED);
 		mIntentFilter.addAction(RadioPlayerService.PLAYBACK_ERROR);
+		mIntentFilter.addAction(RadioPlayerService.ARTWORK_AVAILABLE);
 		mIntentFilter.addAction("fm.last.android.ERROR");
 
 		Intent intent = getIntent();
@@ -224,7 +221,6 @@ public class Player extends Activity {
 		if (icicle != null) {
 			mCachedArtist = icicle.getString("artist");
 			mCachedTrack = icicle.getString("track");
-			mCachedBitmap = icicle.getParcelable("artwork");
 			if (icicle.getBoolean("isOnTour", false))
 				mOntourButton.setVisibility(View.VISIBLE);
 			loved = icicle.getBoolean("loved", false);
@@ -340,7 +336,6 @@ public class Player extends Activity {
 		outState.putBoolean("configchange", getChangingConfigurations() != 0);
 		outState.putString("artist", mArtistName.getText().toString());
 		outState.putString("track", mTrackName.getText().toString());
-		outState.putParcelable("artwork", mAlbum.getBitmap());
 		outState.putBoolean("isOnTour",
 				mOntourButton.getVisibility() == View.VISIBLE);
 		outState.putBoolean("loved",
@@ -625,7 +620,7 @@ public class Player extends Activity {
 		public void onReceive(Context context, Intent intent) {
 
 			String action = intent.getAction();
-			if (action.equals(RadioPlayerService.META_CHANGED)) {
+			if (action.equals(RadioPlayerService.META_CHANGED) || action.equals(RadioPlayerService.ARTWORK_AVAILABLE)) {
 				// redraw the artist/title info and
 				// set new max for progress bar
 				updateTrackInfo();
@@ -673,7 +668,7 @@ public class Player extends Activity {
 							String[] trackContext = player.getContext();
 							String stationURL = player.getStationUrl();
 							loved = player.getLoved();
-							
+							mAlbum.setImageBitmap(player.getArtwork());
 							
 							if (loved) {
 								mLoveButton.setImageResource(R.drawable.loved);
@@ -741,25 +736,11 @@ public class Player extends Activity {
 									mTuningDialog.setCancelable(true);
 								}
 
-								if (mCachedArtist != null
+								if (!(mCachedArtist != null
 										&& mCachedArtist.equals(artistName)
 										&& mCachedTrack != null
-										&& mCachedTrack.equals(trackName)) {
-									if (mCachedBitmap != null) {
-										mAlbum.setImageBitmap(mCachedBitmap);
-										mCachedBitmap = null;
-									} else {
-										new LoadAlbumArtTask().execute(player
-												.getArtUrl(), player
-												.getArtistName(), player
-												.getAlbumName());
-									}
-								} else {
+										&& mCachedTrack.equals(trackName))) {
 									new LoadEventsTask().execute((Void) null);
-									new LoadAlbumArtTask().execute(player
-											.getArtUrl(), player
-											.getArtistName(), player
-											.getAlbumName());
 								}
 							}
 						} catch (java.util.concurrent.RejectedExecutionException e) {
@@ -933,60 +914,6 @@ public class Player extends Activity {
 		}
 	}
 	
-	private class LoadAlbumArtTask extends AsyncTaskEx<String, Void, Boolean> {
-		String artUrl;
-
-		@Override
-		public void onPreExecute() {
-			mAlbum.clear();
-		}
-
-		@Override
-		public Boolean doInBackground(String... params) {
-			Album album;
-			boolean success = false;
-
-			artUrl = params[0];
-			Log.i("LastFm", "Art URL from playlist: " + artUrl);
-
-			try {
-				String artistName = params[1];
-				String albumName = params[2];
-				if (!artistName.equals(RadioPlayerService.UNKNOWN) && albumName != null && albumName.length() > 0) {
-					album = mServer.getAlbumInfo(artistName, albumName);
-					if (album != null) {
-						DisplayMetrics metrics = new DisplayMetrics();
-						getWindowManager().getDefaultDisplay().getMetrics(metrics);
-						int width = metrics.widthPixels;
-						if(metrics.heightPixels < width)
-							width = metrics.heightPixels;
-						
-						Log.i("LastFm", "Current screen width: " + width);
-						
-						if(width > 320)
-							artUrl = album.getURLforImageSize("mega");
-						else
-							artUrl = album.getURLforImageSize("extralarge");
-					}
-				}
-				success = true;
-			} catch (Exception e) {
-				e.printStackTrace();
-			} catch (WSError e) {
-			}
-			return success;
-		}
-
-		@Override
-		public void onPostExecute(Boolean result) {
-			if (artUrl != RadioPlayerService.UNKNOWN) {
-				mAlbum.fetch(artUrl);
-			} else {
-				mAlbum.setDefaultImageResource(R.drawable.no_artwork);
-			}
-		}
-	}
-
 	private class LoadEventsTask extends AsyncTaskEx<Void, Void, Boolean> {
 		String mArtist = null;
 
