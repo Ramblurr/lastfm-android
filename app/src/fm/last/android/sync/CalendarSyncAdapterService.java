@@ -102,8 +102,9 @@ public class CalendarSyncAdapterService extends Service {
 			builder.withValue(Calendars.NAME, "Last.fm Events");
 			builder.withValue(Calendars.CALENDAR_DISPLAY_NAME, "Last.fm Events");
 			builder.withValue(Calendars.CALENDAR_COLOR, 0xD51007);
-			builder.withValue(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_READ);
+			builder.withValue(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_RESPOND);
 			builder.withValue(Calendars.OWNER_ACCOUNT, account.name);
+			builder.withValue(Calendars.SYNC_EVENTS, 1);
 			operationList.add(builder.build());
 			try {
 				mContentResolver.applyBatch(CalendarContract.AUTHORITY, operationList);
@@ -159,6 +160,10 @@ public class CalendarSyncAdapterService extends Service {
 		builder.withValue(Events.DTEND, dtend);
 		builder.withValue(Events.TITLE, event.getTitle());
 		builder.withValue(Events.EVENT_LOCATION, event.getVenue().getName() + "\n" + event.getVenue().getLocation().getCity() + "\n" + event.getVenue().getLocation().getCountry());
+		if(Integer.valueOf(event.getStatus()) == 1)
+			builder.withValue(Events.STATUS, Events.STATUS_TENTATIVE);
+		else
+			builder.withValue(Events.STATUS, Events.STATUS_CONFIRMED);
 		builder.withValue(Events._SYNC_ID, Long.valueOf(event.getId()));
 		return builder.build();
 	}
