@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import fm.last.api.Album;
 import fm.last.api.Artist;
+import fm.last.api.Event;
 import fm.last.api.Tag;
 import fm.last.api.Track;
 import fm.last.api.WSError;
@@ -193,6 +194,40 @@ public class SearchFunctions {
 				tags.add(artistObject);
 			}
 			return tags.toArray(new Tag[tags.size()]);
+		}
+	}
+	
+	public static Event[] searchForEvent(String baseUrl, Map<String, String> params) throws IOException, WSError {
+		String response = UrlUtil.doGet(baseUrl, params);
+
+		Document responseXML = null;
+		try {
+			responseXML = XMLUtil.stringToDocument(response);
+		} catch (SAXException e) {
+			throw new IOException(e.getMessage());
+		}
+
+		Node lfmNode = XMLUtil.findNamedElementNode(responseXML, "lfm");
+		String status = lfmNode.getAttributes().getNamedItem("status").getNodeValue();
+		if (!status.contains("ok")) {
+			Node errorNode = XMLUtil.findNamedElementNode(lfmNode, "error");
+			if (errorNode != null) {
+				WSErrorBuilder eb = new WSErrorBuilder();
+				throw eb.build(params.get("method"), errorNode);
+			}
+			return null;
+		} else {
+			Node resultsNode = XMLUtil.findNamedElementNode(lfmNode, "results");
+			Node artistMatches = XMLUtil.findNamedElementNode(resultsNode, "eventmatches");
+
+			Node[] elnodes = XMLUtil.getChildNodes(artistMatches, Node.ELEMENT_NODE);
+			EventBuilder eventBuilder = new EventBuilder();
+			List<Event> events = new ArrayList<Event>();
+			for (Node node : elnodes) {
+				Event eventObject = eventBuilder.build(node);
+				events.add(eventObject);
+			}
+			return events.toArray(new Event[events.size()]);
 		}
 	}
 }

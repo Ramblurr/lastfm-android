@@ -22,6 +22,7 @@ package fm.last.api;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 public interface LastFmServer {
 	/**
@@ -41,6 +42,10 @@ public interface LastFmServer {
 	public Tag[] searchForTag(String Tag) throws IOException;
 
 	public Track[] searchForTrack(String track) throws IOException;
+
+	public Event[] searchForEvent(String event) throws IOException;
+
+	public Event[] searchForFestival(String event) throws IOException;
 
 	/**
 	 * See http://www.last.fm/api/show?service=263
@@ -85,6 +90,9 @@ public interface LastFmServer {
 
 	public User getUserInfo(String user, String sk) throws IOException;
 
+	public Geo getGeo() throws IOException;
+	public List<Metro> getMetros() throws IOException;
+	
 	/**
 	 * See http://www.lastfm.pl/api/show?service=289
 	 * 
@@ -263,9 +271,13 @@ public interface LastFmServer {
 	 */
 	public Event[] getUserEvents(String user) throws IOException;
 	public Event[] getUserFriendsEvents(String user) throws IOException;
-
+	public Event getEventInfo(String event, String sk) throws IOException;
 	public Event[] getUserRecommendedEvents(String user, String sk) throws IOException;
 	public Event[] getNearbyEvents(String latitude, String longitude) throws IOException;
+	public Event[] getFestivalsForMetro(String metro, int page, String sk) throws IOException;
+	public Event[] getUserFestivals(String user) throws IOException;
+	public Event[] getUserFriendsFestivals(String user) throws IOException;
+	public Artist[] getRecommendedLineupForEvent(String event, String sk) throws IOException;
 
 	
 	/**
@@ -350,6 +362,8 @@ public interface LastFmServer {
 	public void shareTrack(String artist, String track, String recipient, String sk) throws IOException;
 
 	public void shareArtist(String artist, String recipient, String sk) throws IOException;
+
+	public void shareEvent(String event, String recipient, String sk) throws IOException;
 
 	public void addTrackToPlaylist(String artist, String track, String playlistId, String sk) throws IOException;
 

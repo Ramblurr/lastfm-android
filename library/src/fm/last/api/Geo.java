@@ -22,51 +22,22 @@ package fm.last.api;
 
 import java.io.Serializable;
 
-/**
- * Represents a venue
- * 
- * @author Lukasz Wisniewski
- */
-public class Venue implements Serializable {
-	private static final long serialVersionUID = -9136513976031500466L;
-	private String name;
-	private String url;
-	private String phonenumber;
-	private Location location;
+public class Geo implements Serializable {
+	private static final long serialVersionUID = 4241815999032525503L;
+	private String countrycode;
+	private String countryname;
 
-	public Venue(String name, String url, Location location, String phonenumber) {
+	public Geo(String countrycode, String countryname) {
 		super();
-		this.name = name;
-		this.url = url;
-		this.location = location;
-		this.phonenumber = phonenumber;
+		this.countrycode = countrycode;
+		this.countryname = countryname;
 	}
 
-	public String getName() {
-		return name;
+	public String getCountryCode() {
+		return countrycode;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public Location getLocation() {
-		return location;
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
-	public String getPhoneNumber() {
-		return phonenumber;
+	public String getCountryName() {
+		return countryname;
 	}
 }

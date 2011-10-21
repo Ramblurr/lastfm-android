@@ -38,8 +38,9 @@ public class VenueBuilder extends XMLBuilder<Venue> {
 		LocationBuilder locationBuilder = new LocationBuilder();
 		Node locationNode = getChildNode("location");
 		Location location = locationBuilder.build(locationNode);
-		String url = getText("url");
-		return new Venue(name, url, location);
+		String url = getText("website");
+		String phonenumber = getText("phonenumber");
+		return new Venue(name, url, location, phonenumber);
 	}
 
 }

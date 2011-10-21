@@ -59,6 +59,18 @@ public class EventBuilder extends XMLBuilder<Event> {
 			artists[i++] = artist.getFirstChild().getNodeValue();
 		}
 
+		// friends
+		String[] friends = null;
+		Node friendsNode = getChildNode("friendsattending");
+		if(friendsNode != null) {
+			List<Node> friendNodes = XMLUtil.findNamedElementNodes(friendsNode, "attendee");
+			friends = new String[friendNodes.size()];
+			i = 0;
+			for (Node friend : friendNodes) {
+				friends[i++] = friend.getFirstChild().getNodeValue();
+			}
+		}
+		
 		// headliner
 		String headliner = null;
 		headliner = XMLUtil.findNamedElementNode(artistsNode, "headliner").getFirstChild().getNodeValue();
@@ -120,6 +132,9 @@ public class EventBuilder extends XMLBuilder<Event> {
 		// status
 		String status = this.getAttribute("status");
 
+		// score
+		String score = getText("score");
+		
 		// ticket providers
 		Node ticketsNode = getChildNode("tickets");
 		List<Node> ticketNodes = XMLUtil.findNamedElementNodes(ticketsNode, "ticket");
@@ -128,7 +143,7 @@ public class EventBuilder extends XMLBuilder<Event> {
 			ticketUrls.put(ticket.getAttributes().getNamedItem("supplier").getNodeValue(),ticket.getFirstChild().getNodeValue());
 		}
 
-		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status, ticketUrls);
+		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status, ticketUrls, score, friends);
 	}
 
 }

@@ -39,8 +39,10 @@ import fm.last.api.Album;
 import fm.last.api.Artist;
 import fm.last.api.Event;
 import fm.last.api.Friends;
+import fm.last.api.Geo;
 import fm.last.api.LastFmServer;
 import fm.last.api.MD5;
+import fm.last.api.Metro;
 import fm.last.api.RadioPlayList;
 import fm.last.api.Session;
 import fm.last.api.SessionInfo;
@@ -226,6 +228,23 @@ final class LastFmServerImpl implements LastFmServer {
 		}
 		return SearchFunctions.searchForTrack(baseUrl, params);
 	}
+	
+	public Event[] searchForEvent(String event) throws IOException {
+		Map<String, String> params = createParams("event.search");
+		if (event != null) {
+			params.put("event", event);
+		}
+		return SearchFunctions.searchForEvent(baseUrl, params);
+	}
+
+	public Event[] searchForFestival(String event) throws IOException {
+		Map<String, String> params = createParams("event.search");
+		if (event != null) {
+			params.put("event", event);
+		}
+		params.put("festivalsonly", "1");
+		return SearchFunctions.searchForEvent(baseUrl, params);
+	}
 
 	public Serializable[] multiSearch(String query) throws IOException, WSError {
 		Map<String, String> params = createParams("search.multi");
@@ -330,6 +349,18 @@ final class LastFmServerImpl implements LastFmServer {
 		return new Parser<User>().getItem(baseUrl, params, "user", new UserBuilder());
 	}
 
+	public Event getEventInfo(String event, String sk) throws IOException {
+		Map<String, String> params = createParams("event.getInfo");
+		if (event != null) {
+			params.put("event", event);
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+			signParams(params);
+		}
+		return new Parser<Event>().getItem(baseUrl, params, "event", new EventBuilder());
+	}
+	
 	public Tag[] getTrackTopTags(String artist, String track, String mbid) throws IOException, WSError {
 		Map<String, String> params = createParams("track.getTopTags");
 		if (artist != null) {
@@ -552,7 +583,54 @@ final class LastFmServerImpl implements LastFmServer {
 		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
 		return events.toArray(new Event[events.size()]);
 	}
+	
+	public Event[] getFestivalsForMetro(String metro, int page, String sk) throws IOException {
+		Map<String, String> params = createParams("geo.getEvents");
+		params.put("location", metro);
+		params.put("limit", "50");
+		params.put("festivalsonly", "1");
+		params.put("page", String.valueOf(page));
+		if(sk != null) {
+			params.put("sk", sk);
+			signParams(params);
+		}
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
+	}
 
+	public Event[] getUserFestivals(String user) throws IOException {
+		Map<String, String> params = createParams("user.getEvents");
+		if (user != null) {
+			params.put("user", user);
+		}
+		params.put("festivalsonly", "1");
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
+	}
+	
+	public Event[] getUserFriendsFestivals(String user) throws IOException {
+		Map<String, String> params = createParams("user.getFriendsEvents");
+		if (user != null) {
+			params.put("user", user);
+		}
+		params.put("festivalsonly", "1");
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
+	}
+
+	public Artist[] getRecommendedLineupForEvent(String event, String sk) throws IOException {
+		Map<String, String> params = createParams("event.getRecommendedLineup");
+		if (event != null) {
+			params.put("event", event);
+		}
+		if (sk != null) {
+			params.put("sk", sk);
+			signParams(params);
+		}
+		List<Artist> artists = new Parser<Artist>().getList(baseUrl, params, "artists", "artist", new ArtistBuilder());
+		return artists.toArray(new Artist[artists.size()]);
+	}
+	
 	public void attendEvent(String event, String status, String sk) throws IOException, WSError {
 		Map<String, String> params = createParams("event.attend");
 		params.put("event", event);
@@ -734,18 +812,6 @@ final class LastFmServerImpl implements LastFmServer {
 		post(baseUrl, params);
 	}
 	
-	/*track[i] (Required) : The track name.
-timestamp[i] (Required) : The time the track started playing, in UNIX timestamp format (integer number of seconds since 00:00:00, January 1st 1970 UTC). This must be in the UTC time zone.
-artist[i] (Required) : The artist name.
-album[i] (Optional) : The album name.
-albumArtist[i] (Optional) : The album artist - if this differs from the track artist.
-context[i] (Optional) : Sub-client version (not public, only enabled for certain API keys)
-streamId[i] (Optional) : The stream id for this track received from the radio.getPlaylist service.
-trackNumber[i] (Optional) : The track number of the track on the album.
-mbid[i] (Optional) : The MusicBrainz Track ID.
-duration[i] (Optional) : The length of the track in seconds.
-	 */
-
 	public void shareTrack(String artist, String track, String recipient, String sk) throws IOException {
 		Map<String, String> params = createParams("track.share");
 		params.put("artist", artist);
@@ -759,6 +825,15 @@ duration[i] (Optional) : The length of the track in seconds.
 	public void shareArtist(String artist, String recipient, String sk) throws IOException {
 		Map<String, String> params = createParams("artist.share");
 		params.put("artist", artist);
+		params.put("recipient", recipient);
+		params.put("sk", sk);
+		signParams(params);
+		post(baseUrl, params);
+	}
+	
+	public void shareEvent(String event, String recipient, String sk) throws IOException {
+		Map<String, String> params = createParams("event.share");
+		params.put("event", event);
 		params.put("recipient", recipient);
 		params.put("sk", sk);
 		signParams(params);
@@ -816,4 +891,13 @@ duration[i] (Optional) : The length of the track in seconds.
 		post(baseUrl, params);
 	}
 
+	public Geo getGeo() throws IOException {
+		Map<String, String> params = createParams("bespoke.getGeo");
+		return new Parser<Geo>().getItem(baseUrl, params, "geo", new GeoBuilder());
+	}
+
+	public List<Metro> getMetros() throws IOException {
+		Map<String, String> params = createParams("geo.getMetros");
+		return new Parser<Metro>().getList(baseUrl, params, "metros", "metro", new MetroBuilder());
+	}
 }

@@ -34,6 +34,7 @@ public class Event implements Serializable {
 	private int id;
 	private String title;
 	private String[] artists;
+	private String[] friends;
 	private String headliner;
 
 	private Venue venue;
@@ -47,9 +48,10 @@ public class Event implements Serializable {
 	private String url;
 	private String status;
 	private HashMap<String, String> ticketUrls;
+	private float score;
 
 	public Event(int id, String title, String[] artists, String headliner, Venue venue, Date startDate, String description, ImageUrl[] images, int attendance,
-			int reviews, String tag, String url, String status, HashMap<String, String>ticketUrls) {
+			int reviews, String tag, String url, String status, HashMap<String, String>ticketUrls, String score, String[] friends) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -65,6 +67,11 @@ public class Event implements Serializable {
 		this.url = url;
 		this.status = status;
 		this.ticketUrls = ticketUrls;
+		if(score != null)
+			this.score = Float.parseFloat(score);
+		else
+			this.score = 0.0f;
+		this.friends = friends;
 	}
 
 	public int getId() {
@@ -182,5 +189,13 @@ public class Event implements Serializable {
 			}
 		}
 		return null;
+	}
+	
+	public float getScore() {
+		return score;
+	}
+	
+	public String[] getFriends() {
+		return friends;
 	}
 }
