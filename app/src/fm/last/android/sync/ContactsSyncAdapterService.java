@@ -34,6 +34,7 @@ import android.content.SyncResult;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -185,10 +186,12 @@ public class ContactsSyncAdapterService extends Service {
 					}
 					operationList.add(builder.build());
 
-					builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
-					builder.withSelection(BaseColumns._ID + " = '" + c.getLong(0) + "'", null);
-					builder.withValue(ContactsContract.Data.DATA3, status);
-					operationList.add(builder.build());
+					if(Integer.decode(Build.VERSION.SDK) <= 10) {
+						builder = ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI);
+						builder.withSelection(BaseColumns._ID + " = '" + c.getLong(0) + "'", null);
+						builder.withValue(ContactsContract.Data.DATA3, status);
+						operationList.add(builder.build());
+					}
 				}
 			}
 		} finally {
@@ -418,7 +421,8 @@ public class ContactsSyncAdapterService extends Service {
 					if (!account.name.equals(username) && (entry.taste_timestamp == null || System.currentTimeMillis() > (entry.taste_timestamp + 2628000000L))) {
 						Tasteometer taste;
 						taste = server.tasteometerCompare(account.name, username, 3);
-						updateTasteometer(operationList, entry.raw_id, username, taste);
+						if(Integer.decode(Build.VERSION.SDK) <= 10)
+							updateTasteometer(operationList, entry.raw_id, username, taste);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

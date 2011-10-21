@@ -91,6 +91,17 @@ public class EventBuilder extends XMLBuilder<Event> {
 			e.printStackTrace();
 		}
 
+		// endDate
+		Date endDate = null;
+		try {
+			String text = getText("endDate");
+			if (text != null) {
+				endDate = dateFormat.parse(text);
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
 		// description
 		// FIXME String description = getText("description");
 		String description = null;
@@ -137,13 +148,15 @@ public class EventBuilder extends XMLBuilder<Event> {
 		
 		// ticket providers
 		Node ticketsNode = getChildNode("tickets");
-		List<Node> ticketNodes = XMLUtil.findNamedElementNodes(ticketsNode, "ticket");
 		HashMap<String, String> ticketUrls = new HashMap<String, String>();
-		for (Node ticket : ticketNodes) {
-			ticketUrls.put(ticket.getAttributes().getNamedItem("supplier").getNodeValue(),ticket.getFirstChild().getNodeValue());
+		if(ticketsNode != null) {
+			List<Node> ticketNodes = XMLUtil.findNamedElementNodes(ticketsNode, "ticket");
+			for (Node ticket : ticketNodes) {
+				ticketUrls.put(ticket.getAttributes().getNamedItem("supplier").getNodeValue(),ticket.getFirstChild().getNodeValue());
+			}
 		}
-
-		return new Event(id, title, artists, headliner, venue, startDate, description, images, attendance, reviews, tag, url, status, ticketUrls, score, friends);
+		
+		return new Event(id, title, artists, headliner, venue, startDate, endDate, description, images, attendance, reviews, tag, url, status, ticketUrls, score, friends);
 	}
 
 }

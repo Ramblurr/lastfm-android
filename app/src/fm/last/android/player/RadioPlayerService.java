@@ -647,6 +647,9 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			
 			new LoadAlbumArtTask().execute((Void)null);
 			
+            registerMediaButtonEventReceiverCompat(mAudioManager, 
+            		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
+
 	        if (mFocusHelper.isSupported())
 	            mFocusHelper.requestMusicFocus();
 
@@ -1071,8 +1074,6 @@ public class RadioPlayerService extends Service implements MusicFocusable {
 			currentStationURL = url;
 			notifyChange(STATION_CHANGED);
 			RecentStationsDao.getInstance().appendRecentStation(currentStationURL, currentStation.getName());
-            registerMediaButtonEventReceiverCompat(mAudioManager, 
-            		new ComponentName(getApplicationContext(), LastFMMediaButtonHandler.class));
 		} else {
 			clearNotification();
 			currentStationURL = null;

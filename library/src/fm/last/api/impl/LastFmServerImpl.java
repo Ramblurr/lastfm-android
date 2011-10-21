@@ -557,6 +557,15 @@ final class LastFmServerImpl implements LastFmServer {
 		return events.toArray(new Event[events.size()]);
 	}
 
+	public Event[] getPastUserEvents(String user) throws IOException, WSError {
+		Map<String, String> params = createParams("user.getPastEvents");
+		if (user != null) {
+			params.put("user", user);
+		}
+		List<Event> events = new Parser<Event>().getList(baseUrl, params, "events", "event", new EventBuilder());
+		return events.toArray(new Event[events.size()]);
+	}
+
 	public Event[] getUserFriendsEvents(String user) throws IOException, WSError {
 		Map<String, String> params = createParams("user.getFriendsEvents");
 		if (user != null) {

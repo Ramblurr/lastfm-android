@@ -40,6 +40,7 @@ public class Event implements Serializable {
 	private Venue venue;
 
 	private Date startDate;
+	private Date endDate;
 	private String description;
 	private ImageUrl[] images;
 	private int attendance;
@@ -50,7 +51,7 @@ public class Event implements Serializable {
 	private HashMap<String, String> ticketUrls;
 	private float score;
 
-	public Event(int id, String title, String[] artists, String headliner, Venue venue, Date startDate, String description, ImageUrl[] images, int attendance,
+	public Event(int id, String title, String[] artists, String headliner, Venue venue, Date startDate, Date endDate, String description, ImageUrl[] images, int attendance,
 			int reviews, String tag, String url, String status, HashMap<String, String>ticketUrls, String score, String[] friends) {
 		super();
 		this.id = id;
@@ -59,6 +60,7 @@ public class Event implements Serializable {
 		this.headliner = headliner;
 		this.venue = venue;
 		this.startDate = startDate;
+		this.endDate = endDate;
 		this.description = description;
 		this.images = images;
 		this.attendance = attendance;
@@ -116,6 +118,10 @@ public class Event implements Serializable {
 
 	public Date getStartDate() {
 		return startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
 	}
 
 	public void setStartDate(Date startDate) {
